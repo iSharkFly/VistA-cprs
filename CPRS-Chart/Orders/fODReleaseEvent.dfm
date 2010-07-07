@@ -1,22 +1,17 @@
-object frmOrdersReleaseEvent: TfrmOrdersReleaseEvent
+inherited frmOrdersReleaseEvent: TfrmOrdersReleaseEvent
   Left = 410
   Top = 145
-  Width = 494
-  Height = 488
   Caption = 'Release to Service'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
+  ClientHeight = 461
+  ClientWidth = 486
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  ExplicitWidth = 494
+  ExplicitHeight = 488
   PixelsPerInch = 96
   TextHeight = 13
-  object lblRelease: TLabel
+  object lblRelease: TLabel [0]
     Left = 0
     Top = 0
     Width = 486
@@ -24,8 +19,9 @@ object frmOrdersReleaseEvent: TfrmOrdersReleaseEvent
     Align = alTop
     Layout = tlCenter
     WordWrap = True
+    ExplicitWidth = 3
   end
-  object pnlMiddle: TPanel
+  object pnlMiddle: TPanel [1]
     Left = 0
     Top = 13
     Width = 486
@@ -48,7 +44,7 @@ object frmOrdersReleaseEvent: TfrmOrdersReleaseEvent
       OnMouseMove = cklstOrdersMouseMove
     end
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [2]
     Left = 0
     Top = 426
     Width = 486
@@ -79,5 +75,26 @@ object frmOrdersReleaseEvent: TfrmOrdersReleaseEvent
       TabOrder = 1
       OnClick = btnCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlMiddle'
+        'Status = stsDefault')
+      (
+        'Component = cklstOrders'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmOrdersReleaseEvent'
+        'Status = stsDefault'))
   end
 end

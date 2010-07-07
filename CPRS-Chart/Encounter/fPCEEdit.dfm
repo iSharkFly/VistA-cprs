@@ -1,17 +1,10 @@
-object frmPCEEdit: TfrmPCEEdit
+inherited frmPCEEdit: TfrmPCEEdit
   Left = 214
   Top = 107
   BorderStyle = bsDialog
   Caption = 'Edit Encounter'
   ClientHeight = 128
   ClientWidth = 543
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   DesignSize = (
@@ -19,7 +12,7 @@ object frmPCEEdit: TfrmPCEEdit
     128)
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TStaticText
+  object Label1: TStaticText [0]
     Left = 0
     Top = 0
     Width = 543
@@ -34,8 +27,9 @@ object frmPCEEdit: TfrmPCEEdit
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 5
+    ExplicitWidth = 201
   end
-  object lblNew: TMemo
+  object lblNew: TMemo [1]
     Left = 136
     Top = 32
     Width = 401
@@ -47,7 +41,7 @@ object frmPCEEdit: TfrmPCEEdit
       'New')
     TabOrder = 3
   end
-  object lblNote: TMemo
+  object lblNote: TMemo [2]
     Left = 136
     Top = 73
     Width = 401
@@ -59,7 +53,7 @@ object frmPCEEdit: TfrmPCEEdit
       'Note')
     TabOrder = 4
   end
-  object btnNew: TButton
+  object btnNew: TButton [3]
     Left = 8
     Top = 28
     Width = 121
@@ -68,7 +62,7 @@ object frmPCEEdit: TfrmPCEEdit
     ModalResult = 6
     TabOrder = 0
   end
-  object btnNote: TButton
+  object btnNote: TButton [4]
     Left = 8
     Top = 69
     Width = 121
@@ -77,7 +71,7 @@ object frmPCEEdit: TfrmPCEEdit
     ModalResult = 7
     TabOrder = 1
   end
-  object btnCancel: TButton
+  object btnCancel: TButton [5]
     Left = 465
     Top = 104
     Width = 75
@@ -87,5 +81,29 @@ object frmPCEEdit: TfrmPCEEdit
     Caption = '&Cancel'
     ModalResult = 2
     TabOrder = 2
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Label1'
+        'Status = stsDefault')
+      (
+        'Component = lblNew'
+        'Status = stsDefault')
+      (
+        'Component = lblNote'
+        'Status = stsDefault')
+      (
+        'Component = btnNew'
+        'Status = stsDefault')
+      (
+        'Component = btnNote'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmPCEEdit'
+        'Status = stsDefault'))
   end
 end

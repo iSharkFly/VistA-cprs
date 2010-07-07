@@ -1,21 +1,15 @@
-object frmConsultsByStatus: TfrmConsultsByStatus
+inherited frmConsultsByStatus: TfrmConsultsByStatus
   Left = 286
   Top = 202
-  Width = 316
-  Height = 232
   BorderIcons = []
   Caption = 'List Consults by Status'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 205
+  ClientWidth = 308
   OldCreateOrder = True
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 308
@@ -76,5 +70,26 @@ object frmConsultsByStatus: TfrmConsultsByStatus
       TabOrder = 3
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = radSort'
+        'Status = stsDefault')
+      (
+        'Component = lstStatus'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmConsultsByStatus'
+        'Status = stsDefault'))
   end
 end

@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls;
+  StdCtrls, ExtCtrls, uDlgComponents, VA508AccessibilityManager;
 
 type
-  TfraTemplateFieldButton = class(TFrame)
+  TfraTemplateFieldButton = class(TFrame, ICPRSDialogComponent)
     pnlBtn: TPanel;
     lblText: TLabel;
     pbFocus: TPaintBox;
@@ -15,10 +15,11 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure pnlBtnMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure pnlBtnEnter(Sender: TObject);
-    procedure pnlBtnExit(Sender: TObject);
+    procedure FrameEnter(Sender: TObject);
+    procedure FrameExit(Sender: TObject);
     procedure pbFocusPaint(Sender: TObject);
   private
+    FCPRSDialogData: ICPRSDialogComponent;
     FBtnDown: boolean;
     FItems: TStringList;
     FOnChange: TNotifyEvent;
@@ -32,6 +33,7 @@ type
     property ButtonText: string read GetButtonText write SetButtonText;
     property Items: TStringList read FItems;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    property CPRSDialogData: ICPRSDialogComponent read FCPRSDialogData implements ICPRSDialogComponent;
   end;
 
 implementation
@@ -39,8 +41,8 @@ implementation
 {$R *.DFM}
 
 uses
-  ORFn;
-  
+  ORFn, VA508AccessibilityRouter;
+
 procedure TfraTemplateFieldButton.pnlBtnMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
@@ -68,6 +70,13 @@ begin
       if(idx >= FItems.Count) then
         idx := 0;
       ButtonText := FItems[idx];
+      if ScreenReaderSystemActive then
+      begin
+        txt := FItems[idx];
+        if Trim(txt) = '' then
+          txt := 'blank';
+        GetScreenReader.Speak(txt);
+      end;
       if assigned(FOnChange) then
         FOnChange(Self);
     end;
@@ -85,23 +94,28 @@ begin
   end;
 end;
 
-procedure TfraTemplateFieldButton.pnlBtnEnter(Sender: TObject);
+type
+  TWinControlFriend = class(TWinControl);
+  
+procedure TfraTemplateFieldButton.FrameEnter(Sender: TObject);
 begin
   pbFocus.Invalidate;
 end;
 
-procedure TfraTemplateFieldButton.pnlBtnExit(Sender: TObject);
+procedure TfraTemplateFieldButton.FrameExit(Sender: TObject);
 begin
   pbFocus.Invalidate;
 end;
 
 constructor TfraTemplateFieldButton.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
+  TabStop := TRUE;
   FItems := TStringList.Create;
   OnKeyDown := ButtonKeyDown;
   OnKeyUp := ButtonKeyUp;
   Font.Size := MainFontSize;
+  FCPRSDialogData := TCPRSDialogComponent.Create(Self, 'multi value button');
 end;
 
 procedure TfraTemplateFieldButton.ButtonKeyDown(Sender: TObject; var Key: Word;
@@ -141,7 +155,11 @@ end;
 destructor TfraTemplateFieldButton.Destroy;
 begin
   FItems.Free;
+  FCPRSDialogData := nil;
   inherited;
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfraTemplateFieldButton);
 
 end.

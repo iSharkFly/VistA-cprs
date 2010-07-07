@@ -252,6 +252,11 @@ procedure ExpandEmbeddedFields(flds: TStringList);
 function MakeXMLParamTIU(ANoteID: string; ANoteRec: TEditNoteRec): string;  overload;
 function MakeXMLParamTIU(ADCSummID: string; ADCSummRec: TEditDCSummRec): string;  overload;
 function GetXMLParamReturnValueTIU(DocInfo, ParamTag: string): string;
+procedure UpdatePersonalObjects;
+procedure SetTemplateDialogCanceled(value: Boolean);
+function WasTemplateDialogCanceled: Boolean;
+procedure SetTemplateBPHasObjects(value: Boolean);
+function TemplateBPHasObjects: Boolean;
 
 const
   EmptyNodeText = '<^Empty Node^>';
@@ -277,13 +282,19 @@ var
   TitlesTemplate: TTemplate = nil;
   ConsultsTemplate: TTemplate = nil;
   ProceduresTemplate: TTemplate = nil;
+  uPersonalObjects: TStringList = nil;   // -------- CQ #8665 - RV ------------
 
 implementation
 
 uses
   Windows, rTemplates, uCore, dShared, fTemplateDialog, ActiveX, ComObj, uTemplateFields,
-  XMLUtils, fTemplateImport, Word97, uSpell, rCore, uConst, ORCtrls, uEventHooks,
-  fReminderDialog, rODBase;
+  XMLUtils, fTemplateImport, uSpell, rCore, uConst, ORCtrls, uEventHooks,
+  fReminderDialog, rODBase
+  {$IFDEF VER140}
+  , Word97;
+  {$ELSE}
+  , WordXP, VAUtils;
+  {$ENDIF}
 
 const
   MaxSeq = 999999;
@@ -310,6 +321,8 @@ var
   uTemplateDataLoaded: boolean = FALSE;
   uDGroupConsults: integer = 0;
   uDGroupProcedures: integer = 0;
+  uTemplateDialogCanceled: Boolean = FALSE;
+  uTemplateBPHasObjects: Boolean = FALSE;
 
 type
   TTemplateExportField = (efName, efBlankLines, efType, efStatus, efExclude, efDialog,
@@ -530,7 +543,7 @@ begin
       TmpSL := TStringList.Create;
       try
         GetTemplateRoots;
-        TmpSL.Assign(RPCBrokerV.Results);
+        FastAssign(RPCBrokerV.Results, TmpSL);
         for i := 0 to TmpSL.Count-1 do
           AddTemplate(TmpSL[i]);
         uTemplateDataLoaded := TRUE;
@@ -558,7 +571,7 @@ begin
         TmpSL := TStringList.Create;
         try
           GetTemplateChildren(tmpl.FID);
-          TmpSL.Assign(RPCBrokerV.Results);
+          FastAssign(RPCBrokerV.Results, TmpSL);
           for i := 0 to TmpSL.Count-1 do
             AddTemplate(TmpSL[i], tmpl);
         finally
@@ -596,6 +609,14 @@ begin
     TempSL.Free;
     TempSL := nil;
   end;
+  // -------- CQ #8665 - RV ------------
+  if (assigned(uPersonalObjects)) then
+  begin
+    KillObj(@uPersonalObjects);
+    uPersonalObjects.Free;
+    uPersonalObjects := nil;
+  end;
+  // ------end CQ #8665 ------------
   if(assigned(Deleted)) then
   begin
     Deleted.Clear;
@@ -720,9 +741,9 @@ end;
 procedure DisplayErrors(Errors: TStringList; SingleError: string = '');
 begin
   if(assigned(Errors)) then
-    ShowMessage(Errors.text)
+    ShowMsg(Errors.text)
   else
-    ShowMessage(SingleError);
+    ShowMsg(SingleError);
 end;
 
 
@@ -864,7 +885,7 @@ begin
         end
         else
           DescSL.Add('5,1=@');
-        TempSL.AddStrings(DescSL)
+        FastAddStrings(DescSL, TempSL)
       finally
         DescSL.Free;
       end;
@@ -1172,7 +1193,11 @@ begin
             try
               WApp.Connect;
               TmpVar := AFileName;
+              {$IFDEF VER140}
               WDoc.ConnectTo(WApp.Documents.Add(TmpVar, EmptyParam));
+              {$ELSE}
+              WDoc.ConnectTo(WApp.Documents.Add(TmpVar, EmptyParam, EmptyParam, EmptyParam));
+              {$ENDIF}
               ffTotal := WDoc.FormFields.Count;
 
               if ffTotal > 3 then
@@ -1306,7 +1331,7 @@ begin
                               AddField(tfDateType, TemplateFieldDateCodes[tmpDate], TRUE);
                             if tmp <> '' then
                               AddField(tfDefault, tmp);
-                            Fields.AddStrings(PendingAdd);
+                            FastAddStrings(PendingAdd, Fields);
                             PendingAdd.Clear;
                             AddFieldHeader(tmpType, FALSE);
                           end;
@@ -1395,7 +1420,7 @@ begin
                           if Fields.Count > 0 then
                           begin
                             Fields[0] := Fields[0] + IntToStr(Integer(FldCache.Objects[i])) + '">';
-                            Data.AddStrings(Fields);
+                            FastAddStrings(Fields, Data);
                           end;
                         end;
                         Data.Add('</' + XMLTemplateFieldsTag + '>');
@@ -1485,6 +1510,8 @@ var
   txt: string;
 
 begin
+  SetTemplateDialogCanceled(FALSE);
+  SetTemplateBPHasObjects(FALSE);
   Template := GetLinkedTemplate(IntToStr(IEN), LType);
   if assigned(Template) then
   begin
@@ -1877,6 +1904,7 @@ begin
       end;
       try
         TmpSL.Text := FullBoilerPlate;
+        if Pos('|', TmpSL.Text) > 0 then SetTemplateBPHasObjects(TRUE);
       finally
         if(IsDialog) then
           GettingDialogText := OldGettingDialogText;
@@ -2549,7 +2577,7 @@ begin
       if(assigned(dmodShared.OnTemplateLock)) then
         dmodShared.OnTemplateLock(Self)
       else
-        ShowMessage(Format(TemplateLockedText, [FPrintName]));
+        ShowMsg(Format(TemplateLockedText, [FPrintName]));
     end;
   end
   else
@@ -2874,9 +2902,46 @@ begin
    Result := Piece(FReminderDialog,U,3);
 end;
 
+// -------- CQ #8665 - RV ------------
+procedure UpdatePersonalObjects;
+var
+  i: integer;
+begin
+  if not assigned(uPersonalObjects) then
+  begin
+    uPersonalObjects := TStringList.Create;
+    GetAllowedPersonalObjects;
+    for i := 0 to RPCBrokerV.Results.Count-1 do
+      uPersonalObjects.Add(Piece(RPCBrokerV.Results[i],U,1));
+    uPersonalObjects.Sorted := TRUE;
+  end;
+end;
+// -----end CQ #8665 ------------
+
+
+procedure SetTemplateDialogCanceled(value: Boolean);
+begin
+  uTemplateDialogCanceled := value;
+end;  
+
+function WasTemplateDialogCanceled: Boolean;
+begin
+  Result := uTemplateDialogCanceled;
+end;
+
+procedure SetTemplateBPHasObjects(value: Boolean);
+begin
+  uTemplateBPHasObjects := value;
+end;  
+
+function TemplateBPHasObjects: Boolean;
+begin
+  Result := uTemplateBPHasObjects;
+end;
+
 initialization
 
 finalization
   ReleaseTemplates;
-
 end.
+

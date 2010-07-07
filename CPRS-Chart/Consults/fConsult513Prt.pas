@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, ORCtrls, StdCtrls, Mask, ORNet, ORFn, ComCtrls;
+  fAutoSz, ORCtrls, StdCtrls, Mask, ORNet, ORFn, ComCtrls,
+  VA508AccessibilityManager, uReports;
 
 type
   Tfrm513Print = class(TfrmAutoSz)
@@ -25,13 +26,12 @@ type
     chkDefault: TCheckBox;
     procedure cboDeviceNeedData(Sender: TObject; const StartFrom: String;
       Direction, InsertAt: Integer);
-    procedure FormCreate(Sender: TObject);
     procedure cboDeviceChange(Sender: TObject);
     procedure radChartCopyClick(Sender: TObject);
     procedure radWorkCopyClick(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdCancelClick(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
+
   private
     { Private declarations }
     FConsult: Integer;
@@ -97,18 +97,6 @@ begin
   end;
 end;
 
-procedure Tfrm513Print.FormCreate(Sender: TObject);
-begin
-  inherited;
-  FReportText := TRichEdit.Create(Self);
-  with FReportText do
-    begin
-      Parent := Self;
-      Visible := False;
-      Width := 600;
-    end;
-end;
-
 procedure Tfrm513Print.DisplaySelectDevice;
 begin
   with cboDevice, lblPrintTo do
@@ -156,6 +144,7 @@ var
   RemoteQuery: string;    //for Remote site printing
 begin
   inherited;
+  FReportText := CreateReportTextComponent(Self);
   RemoteSiteID := '';
   RemoteQuery := '';
   if cboDevice.ItemID = '' then
@@ -168,7 +157,7 @@ begin
     begin
       if dlgWinPrinter.Execute then with FReportText do
         begin
-          FReportText.Lines.Assign(GetFormattedSF513(FConsult, ChartCopy));
+          QuickCopy(GetFormattedSF513(FConsult, ChartCopy), FReportText);
           PrintWindowsReport(FReportText, PAGE_BREAK, Self.Caption, ErrMsg);
           if Length(ErrMsg) > 0 then InfoBox(ErrMsg, TX_ERR_CAP, MB_OK);
         end;
@@ -182,6 +171,7 @@ begin
     end;
   if chkDefault.Checked then SaveDefaultPrinter(Piece(cboDevice.ItemID, ';', 1));
   User.CurrentPrinter := cboDevice.ItemID;
+  FReportText.Free;
   Close;
 end;
 
@@ -189,12 +179,6 @@ procedure Tfrm513Print.cmdCancelClick(Sender: TObject);
 begin
   inherited;
   Close;
-end;
-
-procedure Tfrm513Print.FormDestroy(Sender: TObject);
-begin
-  FReportText.Free;
-  inherited;
 end;
 
 end.

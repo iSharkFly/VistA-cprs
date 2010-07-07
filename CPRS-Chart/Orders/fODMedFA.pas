@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORCtrls, ORFn;
+  fAutoSz, StdCtrls, ORCtrls, ORFn, VA508AccessibilityManager;
 
 type
   TfrmODMedFA = class(TfrmAutoSz)
@@ -59,7 +59,7 @@ begin
         ResizeFormToFont(TForm(frmODMedFA));
         with frmODMedFA do
         begin
-          lstFormAlt.Items.Assign(FormAltList);
+          FastAssign(FormAltList, lstFormAlt.Items);
           ShowModal;
           if Length(FSelected) > 0 then
           begin

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fODBase, StdCtrls, ORCtrls, ExtCtrls, ComCtrls, ORfn, uConst, Buttons,
-  Menus;
+  Menus, VA508AccessibilityManager;
 
 type
   TfrmODProc = class(TfrmODBase)
@@ -58,7 +58,6 @@ type
     procedure popReasonReformatClick(Sender: TObject);
     procedure memReasonKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure FormDestroy(Sender: TObject);
     procedure memReasonKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure memReasonKeyPress(Sender: TObject; var Key: Char);
@@ -89,7 +88,8 @@ implementation
 
 uses
     rODBase, rConsults, uCore, uConsults, rCore, fConsults, fPCELex, rPCE, ORClasses,
-    clipbrd, fPreReq, uTemplates, uAccessibleRichEdit, fFrame, uODBase;
+    clipbrd, fPreReq, uTemplates, fFrame, uODBase,
+  uVA508CPRSCompatibility;
 
 var
   ProvDx:  TProvisionalDiagnosis;
@@ -114,7 +114,6 @@ begin
   AutoSizeDisabled := True;
   inherited;
   DoSetFontSize(MainFontSize);
-  TAccessibleRichEdit.WrapControl(memReason);
   AllowQuickOrder := True;
   FillChar(ProvDx, SizeOf(ProvDx), 0);
   FillerID := 'GMRC';                     // does 'on Display' order check **KCM**
@@ -187,7 +186,7 @@ begin
   begin
     SetControl(cboProc,       'ORDERABLE', 1);
     if cboProc.ItemIndex < 0 then exit;
-    cboService.Items.Assign(GetProcedureServices(cboProc.ItemIEN));
+    FastAssign(GetProcedureServices(cboProc.ItemIEN), cboService.Items);
     Changing := True;
     tmpResp := TResponse(FindResponseByName('CLASS',1));
     cboCategory.SelectByID(tmpResp.IValue);
@@ -225,8 +224,22 @@ begin
       end;
     SetProvDiagPromptingMode;
     GetProvDxandValidateCode(Responses);
+    SetTemplateDialogCanceled(FALSE);
     SetControl(memReason,     'COMMENT',   1);
+    if WasTemplateDialogCanceled then
+    begin
+      AbortOrder := True;
+      Close;
+      Exit;
+    end;
+    SetTemplateDialogCanceled(FALSE);
     SetupReasonForRequest(OrderAction);
+    if WasTemplateDialogCanceled then
+    begin
+      AbortOrder := True;
+      Close;
+      Exit;
+    end;
     Changing := False;
     OrderMessage(ConsultMessage(cboProc.ItemIEN));
     ControlChange(Self);
@@ -359,7 +372,7 @@ begin
     with cboService do
       begin
         Clear;
-        Items.Assign(GetProcedureServices(cboProc.ItemIEN));
+        FastAssign(GetProcedureServices(cboProc.ItemIEN), cboService.Items);
         if Items.Count > 1 then
           ItemIndex := -1
         else if Items.Count = 1 then
@@ -384,7 +397,7 @@ begin
       Changing := True;
       with cboService do
         begin
-          Items.Assign(GetProcedureServices(cboProc.ItemIEN));
+          FastAssign(GetProcedureServices(cboProc.ItemIEN), cboService.Items);
           if Items.Count > 1 then
             ItemIndex := -1
           else if Items.Count = 1 then
@@ -401,9 +414,14 @@ begin
       SetControl(cboUrgency,    'URGENCY',     1);
       SetControl(cboPlace,      'PLACE',     1);
       SetControl(txtAttn,       'PROVIDER',  1);
+      SetTemplateDialogCanceled(FALSE);
       SetControl(memReason,     'COMMENT',   1);
-//      if ((cboProc.ItemIEN > 0) and (Length(memReason.Text) = 0)) then
-//        memReason.Lines.Assign(DefaultReasonForRequest(Piece(cboProc.Items[cboProc.ItemIndex], U, 4), True));
+      if WasTemplateDialogCanceled and OrderContainsObjects then
+      begin
+        AbortOrder := TRUE;
+        Close;
+        Exit;
+      end;
       SetupReasonForRequest(ORDER_QUICK);
       GetProvDxandValidateCode(Responses);
       SetControl(cboService,    'SERVICE',   1);
@@ -440,7 +458,7 @@ begin
               Close;
               Exit;
             end;
-          memReason.Lines.Assign(DefaultReasonForRequest(Piece(cboProc.Items[cboProc.ItemIndex], U, 4), True));
+          FastAssign(DefaultReasonForRequest(Piece(cboProc.Items[cboProc.ItemIndex], U, 4), True), memReason.Lines);
           SetupReasonForRequest(ORDER_NEW);
         end;
     end;
@@ -456,9 +474,9 @@ begin
   inherited;
   AStringList := TStringList.Create;
   try
-    AStringList.Assign(memReason.Lines);
+    AStringList.Text := memReason.Text;
     LimitStringLength(AStringList, 74);
-    memReason.Lines.Assign(AstringList);
+    memReason.Text := AStringList.Text;
     ControlChange(Self);
   finally
     AStringList.Free;
@@ -661,7 +679,7 @@ var
 
 begin
   if ((OrderAction = ORDER_QUICK) and (cboProc.ItemID <> '') and (Length(memReason.Text) = 0)) then
-    memReason.Lines.Assign(DefaultReasonForRequest(Piece(cboProc.Items[cboProc.ItemIndex], U, 4), True));
+    FastAssign(DefaultReasonForRequest(Piece(cboProc.Items[cboProc.ItemIndex], U, 4), True), memReason.Lines);
   EditReason := GMRCREAF;
   if EditReason = '' then EditReason := ReasonForRequestEditable(Piece(cboProc.Items[cboProc.ItemIndex], U, 4));
   case EditReason[1] of
@@ -689,7 +707,7 @@ begin
     with cboProc do
       if ItemIEN > 0 then
         begin
-          Alist.Assign(GetServicePrerequisites(Piece(Items[ItemIndex], U, 4)));
+          FastAssign(GetServicePrerequisites(Piece(Items[ItemIndex], U, 4)), Alist);
           if AList.Count > 0 then
             begin
               if not DisplayPrerequisites(AList, TC_PREREQUISITES + DisplayText[ItemIndex]) then
@@ -707,7 +725,8 @@ begin
   end;
 end;
 
-function TfrmODProc.DefaultReasonForRequest(Service: string; Resolve: Boolean): TStrings;
+function TfrmODProc.DefaultReasonForRequest(Service: string;
+  Resolve: Boolean): TStrings;
 var
   TmpSL: TStringList;
   DocInfo: string;
@@ -719,15 +738,23 @@ begin
   TmpSL := TStringList.Create;
   try
     Result := GetDefaultReasonForRequest(Piece(cboProc.Items[cboProc.ItemIndex], U, 4), Resolve);
-    TmpSL.Assign(Result);
+    FastAssign(Result, TmpSL);
     x := TmpSL.Text;
     ExpandOrderObjects(x, HasObjects);
     TmpSL.Text := x;
     Responses.OrderContainsObjects := HasObjects;
-    ExecuteTemplateOrBoilerPlate(TmpSL, StrToIntDef(piece(piece(cboProc.Items[cboProc.ItemIndex],U,4),';',1),0),
+    ExecuteTemplateOrBoilerPlate(TmpSL, StrToIntDef(Piece(Piece(cboProc.Items[cboProc.ItemIndex], U, 4), ';', 1), 0),
                    ltProcedure, nil, 'Reason for Request: ' + cboProc.DisplayText[cboProc.ItemIndex], DocInfo);
-    if TmpSL.Text <> x then Responses.OrderContainsObjects := False;
-    Result.Assign(TmpSL);
+    AbortOrder := WasTemplateDialogCanceled;
+    Responses.OrderContainsObjects := HasObjects or TemplateBPHasObjects;
+    if AbortOrder then
+    begin
+      Result.Text := '';
+      Close;
+      Exit;
+    end
+    else
+      FastAssignWith508Msg(TmpSL, Result);
   finally
     TmpSL.Free;
   end;
@@ -777,12 +804,6 @@ begin
       txtProvDiag.Text := ProvDx.Text;
       if ProvDx.Code <> '' then txtProvDiag.Text :=  txtProvDiag.Text + ' (' + ProvDx.Code + ')';
     end;
-end;
-
-procedure TfrmODProc.FormDestroy(Sender: TObject);
-begin
-  inherited;
-  TAccessibleRichEdit.UnwrapControl(memReason);
 end;
 
 procedure TfrmODProc.SetFontSize(FontSize: integer);

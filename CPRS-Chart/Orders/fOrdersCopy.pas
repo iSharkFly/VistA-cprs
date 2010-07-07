@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ExtCtrls, mEvntDelay, uCore, fODBase, UConst, fAutoSz;
+  StdCtrls, ORCtrls, ExtCtrls, mEvntDelay, uCore, fODBase, UConst, fAutoSz, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmCopyOrders = class(TForm)
+  TfrmCopyOrders = class(TfrmBase508Form)
     pnlInfo: TPanel;
     fraEvntDelayList: TfraEvntDelayList;
     pnlRadio: TPanel;
@@ -15,14 +16,13 @@ type
     radRelease: TRadioButton;
     radEvtDelay: TRadioButton;
     Image1: TImage;
-    Label2: TStaticText;
-    Label1: TStaticText;
+    lblInstruction2: TVA508StaticText;
+    lblInstruction: TVA508StaticText;
     pnlTop: TPanel;
-    lblPtInfo: TStaticText;
-    pnlBtns: TPanel;
-    gbBtns: TGroupBox;
+    lblPtInfo: TVA508StaticText;
     cmdOK: TButton;
     cmdCancel: TButton;
+    pnlBottom: TPanel;
     procedure cmdOKClick(Sender: TObject);
     procedure cmdCancelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -36,6 +36,7 @@ type
       Shift: TShiftState);
   private
     OKPressed: Boolean;
+    procedure AdjustFormSize;
   public
   end;
   
@@ -115,7 +116,8 @@ begin
 
   frmCopyOrders := TfrmCopyOrders.Create(Application);
   try
-    ResizeFormToFont(TForm(frmCopyOrders));
+    ResizeAnchoredFormToFont(TForm(frmCopyOrders));
+    frmCopyOrders.AdjustFormSize;
     CurrTS := Piece(GetCurrentSpec(Patient.DFN),'^',1);
     if Length(CurrTS)>0 then
       SpeCap := #13 + 'The current treating specialty is ' + CurrTS
@@ -131,6 +133,7 @@ begin
       else
         frmCopyOrders.lblPtInfo.Caption := Patient.Name + ' currently is an outpatient.'  + SpeCap;
     end;
+    frmCopyOrders.AdjustFormSize;
     frmCopyOrders.ShowModal;
     if (frmCopyOrders.OKPressed) and (frmCopyOrders.radRelease.Checked) then
     begin
@@ -233,15 +236,8 @@ begin
   if not Patient.Inpatient then
   begin
     pnlInfo.Visible := False;
-    pnlBtns.Top := pnlRadio.Top;
   end;
-  if not radEvtDelay.Checked then
-  begin
-    if not pnlInfo.Visible then
-      Height := Height - fraEvntDelayList.Height - pnlInfo.Height
-    else
-	  Height := Height - fraEvntDelayList.Height;	
-  end;
+  AdjustFormSize;
 end;
 
 procedure TfrmCopyOrders.cmdOKClick(Sender: TObject);
@@ -262,6 +258,27 @@ begin
   Close;
 end;
 
+procedure TfrmCopyOrders.AdjustFormSize;
+var
+  y: integer;
+begin
+  y := lblPtInfo.Height + 8; // allow for font changes
+  if pnlInfo.Visible then
+  begin
+    lblInstruction2.top := lblInstruction.Height; // allow for font change
+    pnlInfo.Height := lblInstruction2.top + lblInstruction2.Height;
+    inc(y,pnlInfo.Height);
+  end;
+  pnlTop.Height := y;
+  inc(y, pnlRadio.Height);
+  if fraEvntDelayList.Visible then
+  begin
+    inc(y, fraEvntDelayList.Height);
+  end;
+  VertScrollBar.Range := y;
+  ClientHeight := y;
+end;
+
 procedure TfrmCopyOrders.cmdCancelClick(Sender: TObject);
 begin
   inherited;
@@ -274,10 +291,10 @@ begin
   if radRelease.Checked then
     radRelease.Checked  := False;
   radEvtDelay.Checked := True;
-  Height := Height + fraEvntDelayList.Height;
   fraEvntDelayList.Visible := True;
   frmCopyOrders.fraEvntDelayList.UserDefaultEvent := StrToIntDef(GetDefaultEvt(IntToStr(User.DUZ)),0);
   fraEvntDelayList.DisplayEvntDelayList;
+  AdjustFormSize;
 end;
 
 procedure TfrmCopyOrders.radReleaseClick(Sender: TObject);
@@ -287,7 +304,7 @@ begin
     radEvtDelay.Checked := False;
   radRelease.Checked  := True;
   fraEvntDelayList.Visible := False;
-  Height := Height - fraEvntDelayList.Height;
+  AdjustFormSize;
 end;
 
 procedure TfrmCopyOrders.fraEvntDelayListcboEvntListChange(
@@ -326,6 +343,7 @@ end;
 procedure TfrmCopyOrders.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  inherited;
   if Key = VK_RETURN then
     cmdOKClick(Self);
 end;

@@ -1,4 +1,4 @@
-object frmOptionsReportsDefault: TfrmOptionsReportsDefault
+inherited frmOptionsReportsDefault: TfrmOptionsReportsDefault
   Left = 773
   Top = 334
   BorderIcons = [biSystemMenu, biHelp]
@@ -6,51 +6,44 @@ object frmOptionsReportsDefault: TfrmOptionsReportsDefault
   Caption = 'Default Settings For Available CPRS Reports'
   ClientHeight = 205
   ClientWidth = 384
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object Label2: TLabel
+  object Label2: TLabel [0]
     Left = 8
     Top = 118
     Width = 23
     Height = 13
     Caption = 'Max:'
   end
-  object Label3: TLabel
+  object Label3: TLabel [1]
     Left = 8
     Top = 48
     Width = 51
     Height = 13
     Caption = 'Start Date:'
   end
-  object Label4: TLabel
+  object Label4: TLabel [2]
     Left = 8
     Top = 81
     Width = 51
     Height = 13
     Caption = 'Stop Date:'
   end
-  object Bevel1: TBevel
+  object Bevel1: TBevel [3]
     Left = 8
     Top = 8
     Width = 337
     Height = 2
   end
-  object Bevel2: TBevel
+  object Bevel2: TBevel [4]
     Left = 0
     Top = 173
     Width = 384
     Height = 2
     Align = alBottom
   end
-  object lblDefaultText: TMemo
+  object lblDefaultText: TMemo [5]
     Left = 232
     Top = 40
     Width = 137
@@ -65,7 +58,7 @@ object frmOptionsReportsDefault: TfrmOptionsReportsDefault
     ReadOnly = True
     TabOrder = 4
   end
-  object edtDefaultMax: TCaptionEdit
+  object edtDefaultMax: TCaptionEdit [6]
     Left = 96
     Top = 112
     Width = 121
@@ -76,7 +69,7 @@ object frmOptionsReportsDefault: TfrmOptionsReportsDefault
     OnKeyPress = edtDefaultMaxKeyPress
     Caption = 'Max'
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [7]
     Left = 0
     Top = 175
     Width = 384
@@ -118,7 +111,7 @@ object frmOptionsReportsDefault: TfrmOptionsReportsDefault
       OnClick = btnCancelClick
     end
   end
-  object odcDfStart: TORDateBox
+  object odcDfStart: TORDateBox [8]
     Left = 96
     Top = 48
     Width = 121
@@ -130,7 +123,7 @@ object frmOptionsReportsDefault: TfrmOptionsReportsDefault
     DateOnly = True
     RequireTime = False
   end
-  object odcDfStop: TORDateBox
+  object odcDfStop: TORDateBox [9]
     Left = 96
     Top = 80
     Width = 121
@@ -141,5 +134,35 @@ object frmOptionsReportsDefault: TfrmOptionsReportsDefault
     OnKeyPress = odcDfStopKeyPress
     DateOnly = True
     RequireTime = False
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblDefaultText'
+        'Status = stsDefault')
+      (
+        'Component = edtDefaultMax'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnReset'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = odcDfStart'
+        'Status = stsDefault')
+      (
+        'Component = odcDfStop'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsReportsDefault'
+        'Status = stsDefault'))
   end
 end

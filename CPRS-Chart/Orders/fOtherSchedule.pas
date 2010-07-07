@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ComCtrls, StdCtrls, ExtCtrls, Buttons, fAutoSz, rMisc;
+  Dialogs, ComCtrls, StdCtrls, ExtCtrls, Buttons, fAutoSz, rMisc, ORCtrls, rODMeds,
+  VA508AccessibilityManager, VAUtils;
 
 const
   NSS_TXT = 'This order will not become active until a valid schedule is used.';
@@ -28,7 +29,6 @@ type
     Panel4: TPanel;
     btn0k1: TButton;
     btnCancel: TButton;
-    txtSchedule: TEdit;
     Label1: TLabel;
     btnReset: TButton;
     btnRemove: TButton;
@@ -36,6 +36,11 @@ type
     Splitter1: TSplitter;
     btnAdd: TButton;
     Button1: TButton;
+    GroupBox3: TGroupBox;
+    NSScboSchedule: TORComboBox;
+    btnSchAdd: TButton;
+    btnSchRemove: TButton;
+    txtSchedule: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure btnCancelClick(Sender: TObject);
     procedure btn0k1Click(Sender: TObject);
@@ -57,16 +62,23 @@ type
     procedure lstMinuteKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure Button1Click(Sender: TObject);
+    procedure btnSchAddClick(Sender: TObject);
+    procedure btnSchRemoveClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     FDaySchedule: array [1..7] of string;
     FTimeSchedule: TStringList;
+    FSchedule: String;
     FOtherSchedule: String;
     FFromCheckBox: boolean;
     FFromEditBox: boolean;
     function GetSiteMessage: string;
     procedure SetDaySchedule(Sender: TObject);
     procedure SetTimeSchedule;
+    procedure SetScheduleSelection;
     procedure UpdateOnFreeTextInput;
+    procedure EnabledTime(TF: boolean);
+    procedure EnabledSch(TF: boolean);
     function CheckDay(ADayStr: string): string;
     
   public
@@ -74,27 +86,47 @@ type
 
 function ShowOtherSchedule(var ASchedule: string): boolean;
 
+var
+   frmOtherSchedule: TfrmOtherSchedule;
+
 implementation
 
 uses ORFn, ORNet, rOrders;
 {$R *.dfm}
 
-function ShowOtherSchedule(var ASchedule: string): boolean;
+function ShowOtherSchedule(var ASchedule: string):
+
+boolean;
 var
-  frmOtherSchedule: TfrmOtherSchedule;
+
+  AdminTime, SchType: string;
 begin
   Result := False;
   try
+   ASchedule := '';
    frmOtherSchedule := TfrmOtherSchedule.Create(Application);
    ResizeFormToFont(TForm(frmOtherSchedule));
    SetFormPosition(frmOtherSchedule);
    if frmOtherSchedule.ShowModal = mrOK then
    begin
      ASchedule := UpperCase(frmOtherSchedule.FOtherSchedule);
+     if frmOtherSchedule.GroupBox3.Enabled = True then
+       begin
+         AdminTime := Piece(frmOtherSchedule.NSScboSchedule.Items.Strings[frmOtherSchedule.NSScboSchedule.itemindex],U,4);
+         schType := Piece(frmOtherSchedule.NSScboSchedule.Items.Strings[frmOtherSchedule.NSScboSchedule.itemindex],U,3);
+         ASchedule := ASchedule + U + AdminTime + U + schType;
+         //if (schType = 'P') or (schType = 'OC') then ASchedule := ASchedule + U + '1'
+         //else ASchedule := ASchedule + U + '0';
+       end
+     else if frmOtherSchedule.GroupBox2.Enabled = true then
+       begin
+         AdminTime := Piece(ASchedule,'@',2);
+         ASchedule := ASchedule + U + AdminTime + U + 'C';
+       end;
      Result := True;
    end;
   except
-   ShowMessage('Error happen when building other schedule');
+   ShowMsg('Error happen when building other schedule');
   end;
 end;
 
@@ -104,22 +136,37 @@ var
   i: integer;
   nssMsg: string;
 begin
+  frmOtherSchedule := nil;
   FFromCheckBox := False;
   FFromEditBox := False;
   image1.Picture.Icon.Handle := LoadIcon(0, IDI_WARNING);
   for i := 1 to 7 do
    FDaySchedule[i] := '';
   FTimeSchedule := TStringlist.Create;
+  FSchedule := '';
   FOtherSchedule := '';
   nssMsg := GetSiteMessage;
   if Length(nssMsg)< 1 then
     nssMsg := NSS_TXT;
   memMessage.Lines.Add(nssMsg);
+  LoadDOWSchedules(NSScboSchedule.Items);
+  if ScreenReaderActive = false then txtSchedule.TabStop := false;
+
+end;
+
+procedure TfrmOtherSchedule.FormDestroy(Sender: TObject);
+begin
+  inherited;
+    //FDaySchedule
+    FTimeSchedule.Free;
+    frmOtherSchedule := nil;
+    //FSchedule: String;
+    //FOtherSchedule: String;
 end;
 
 procedure TfrmOtherSchedule.btnCancelClick(Sender: TObject);
 begin
-  modalResult := mrCancel;
+  frmOtherSchedule.Release;
 end;
 
 procedure TfrmOtherSchedule.btn0k1Click(Sender: TObject);
@@ -127,21 +174,26 @@ begin
   if (cbo1.Checked = false) and (cbo2.Checked = false) and (cbo3.Checked = false) and (cbo4.Checked = false) and (cbo5.Checked = false) and
     (cbo6.Checked = false) and (cbo7.Checked = false) then
     begin
-      ShowMessage('A day of week must be selected!');
+      ShowMsg('A day of week must be selected!');
       Exit;
     end;
-  if not IsValidSchStr(FOtherSchedule) then
+  if Pos('@', self.txtSchedule.Text) = 0 then
+    begin
+      ShowMsg('An Administation Time or a schedule needs to be selected');
+      exit;
+    end;
+(*  if not IsValidSchStr(FOtherSchedule) then
   begin
-    ShowMessage('The schedule you entered is invalid!');
+    Show508Message('The schedule you entered is invalid!');
     Exit;
-  end;
+  end;  *)
   modalResult := mrOK;
 end;
 
 procedure TfrmOtherSchedule.SetDaySchedule(Sender: TObject);
 var
   i : integer;
-  TimePart, DayPart: string;
+  TimePart, DayPart, Schedule: string;
 begin
   with (Sender as TCheckBox) do
   begin
@@ -151,18 +203,23 @@ begin
       else
         FDaySchedule[TCheckBox(Sender).Tag] := '';
     except
-      ShowMessage('Error happened when building day schedule.');
+      ShowMsg('Error happened when building day schedule.');
       Exit;
     end;
   end;
 
   TimePart := '';
   DayPart := '';
-  for i := 0 to FTimeSchedule.Count - 1 do
-  begin
-    if i = 0 then TimePart := TimePart + FTimeSchedule[i]
-    else TimePart := TimePart + '-' + FTimeSchedule[i];
-  end;
+  schedule := '';
+  if Self.GroupBox2.Enabled = True then
+    begin
+        for i := 0 to FTimeSchedule.Count - 1 do
+          begin
+            if i = 0 then TimePart := TimePart + FTimeSchedule[i]
+            else TimePart := TimePart + '-' + FTimeSchedule[i];
+          end;
+    end;
+  if (self.GroupBox3.Enabled = True) and (FSchedule <> '') then schedule := FSchedule;
   for i := Low(FDaySchedule) to High(FDaySchedule) do
   begin
     if Length(FDaySchedule[i])>0 then
@@ -178,7 +235,41 @@ begin
     else if Length(DayPart) = 0 then
       FOtherSchedule := TimePart;
   end
+  else if Length(schedule) > 0 then
+    begin
+      if length(DayPart) > 0 then
+      FOtherSchedule := DayPart + '@' + Schedule
+    else if Length(DayPart) = 0 then
+      FOtherSchedule := Schedule;
+    end
   else FOtherSchedule := DayPart;
+  txtSchedule.Text := FOtherSchedule;
+end;
+
+
+procedure TfrmOtherSchedule.SetScheduleSelection;
+var
+  i: integer;
+  DayPart: string;
+begin
+  DayPart := '';
+  for i := Low(FDaySchedule) to High(FDaySchedule) do
+  begin
+    if Length(FDaySchedule[i])>0 then
+    begin
+      if DayPart = '' then DayPart := FDaySchedule[i]
+      else DayPart := DayPart + '-' + FDaySchedule[i];
+    end;
+  end;
+  if Length(DayPart) > 0 then
+  begin
+    if FSchedule <> '' then
+      FOtherSchedule := DayPart + '@' + FSchedule
+    else
+      FOtherSchedule := DayPart;
+  end
+  else FOtherSchedule := FSchedule;
+  //if Length(APRN) > 0 then FOtherSchedule := FOtherSchedule;
   txtSchedule.Text := FOtherSchedule;
 end;
 
@@ -277,6 +368,7 @@ procedure TfrmOtherSchedule.btnAddClick(Sender: TObject);
 var
   hour, min: string;
 begin
+  if FSchedule <> '' then Exit;
   if lstHour.ItemIndex < 0 then exit;
   hour := lstHour.Items[lstHour.ItemIndex];
   hour := Trim(Copy(hour,1,3));
@@ -297,6 +389,7 @@ begin
     FTimeSchedule.Add(hour+min);
   FTimeSchedule.Sort;
   SetTimeSchedule;
+  if FTimeSchedule.Count > 0 then EnabledSch(False);
 end;
 
 procedure TfrmOtherSchedule.btnResetClick(Sender: TObject);
@@ -312,11 +405,41 @@ begin
   cbo7.Checked := false;
   lstHour.ItemIndex := -1;
   lstMinute.ItemIndex := -1;
+  NSScboSchedule.ItemIndex := -1;
   for i := low(FDaySchedule) to high(FDaySchedule) do
     FDaySchedule[i] := '';
   FTimeSchedule.Clear;
   FOtherSchedule := '';
   txtSchedule.Text := '';
+  FSchedule := '';
+  EnabledTime(True);
+  EnabledSch(True);
+end;
+
+procedure TfrmOtherSchedule.btnSchAddClick(Sender: TObject);
+begin
+  inherited;
+  if self.NSScboSchedule.ItemIndex < 0 then Exit;
+  if FSchedule <> '' then
+    begin
+      infoBox('A Day-of-week schedule can only contain one schedule','Warning',MB_OK);
+      Exit;
+    end;
+  FSchedule := self.NSScboSchedule.Text;
+  SetScheduleSelection;
+  Self.NSScboSchedule.Enabled := False;
+  EnabledTime(False);
+end;
+
+procedure TfrmOtherSchedule.btnSchRemoveClick(Sender: TObject);
+begin
+  inherited;
+  if (FSchedule = '') or (self.NSScboSchedule.ItemIndex < 0) then exit;
+  if self.NSScboSchedule.Text <> FSchedule then exit;
+  Fschedule := '';
+  SetScheduleSelection;
+  self.NSScboSchedule.Enabled := True;
+  EnabledTime(True);
 end;
 
 procedure TfrmOtherSchedule.btnRemoveClick(Sender: TObject);
@@ -345,6 +468,7 @@ begin
   FTimeSchedule.Sort;
   SetTimeSchedule;
   FFromCheckBox := False;
+  if FTimeSchedule.Count = 0 then EnabledSch(True);
 end;
 
 function TfrmOtherSchedule.GetSiteMessage: string;
@@ -369,6 +493,7 @@ begin
   except
     Action := caFree;
   end;
+  //frmOtherSchedule := nil;
 end;
 
 procedure TfrmOtherSchedule.UpdateOnFreeTextInput;
@@ -520,6 +645,31 @@ begin
     result := 'SA'
   else
     result := '';
+end;
+
+procedure TfrmOtherSchedule.EnabledSch(TF: boolean);
+begin
+   self.GroupBox3.Enabled := TF;
+   self.NSScboSchedule.Enabled := TF;
+   self.btnSchAdd.Enabled := TF;
+   self.btnSchRemove.Enabled := TF;
+//   if TF = False then self.NSScboSchedule.Color := cl3DLight
+//   else self.NSScboSchedule.Color := clWindow;
+   if TF = False then self.NSScboSchedule.ItemIndex := -1;
+end;
+
+procedure TfrmOtherSchedule.EnabledTime(TF: boolean);
+begin
+  self.GroupBox2.Enabled := TF;
+  self.lstHour.Enabled := TF;
+  self.lstMinute.Enabled := TF;
+  self.btnAdd.Enabled := TF;
+  self.btnRemove.Enabled := TF;
+  if TF = False then
+    begin
+      self.lstHour.ItemIndex := -1;
+      self.lstMinute.ItemIndex := -1;
+    end;
 end;
 
 procedure TfrmOtherSchedule.lstMinuteMouseUp(Sender: TObject;

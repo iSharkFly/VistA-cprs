@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fPCEBase, ORCtrls, StdCtrls, ComCtrls, CheckLst, ExtCtrls, Buttons, uPCE, rPCE, ORFn,
-  fPCELex, fPCEOther, rCore, fPCEBaseMain;
+  fPCELex, fPCEOther, rCore, fPCEBaseMain, VA508AccessibilityManager;
 
 type
   TfrmSkinTests = class(TfrmPCEBaseMain)
@@ -40,7 +40,7 @@ implementation
 {$R *.DFM}
 
 uses
-  fEncounterFrame;
+  fEncounterFrame, VA508AccessibilityRouter;
 
 procedure TfrmSkinTests.cboSkinResultsChange(Sender: TObject);
 var
@@ -136,7 +136,7 @@ begin
       end
       else
       begin
-        Showmessage('If the reading is over 9, the results are required to be positive.');
+        Show508Message('If the reading is over 9, the results are required to be positive.');
         cboSkinResults.SelectById('P');
        end;
     end;
@@ -243,6 +243,9 @@ begin
   if(UpDnReading.Position = 0) then
     EdtReadingChange(Sender);
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmSkinTests);
 
 end.
   

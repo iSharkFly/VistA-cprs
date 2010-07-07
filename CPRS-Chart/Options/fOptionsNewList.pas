@@ -3,19 +3,23 @@ unit fOptionsNewList;
 interface
 
 uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, Dialogs,
-  Buttons, ComCtrls, ExtCtrls, OrFn, ORCtrls;
+  Buttons, ComCtrls, ExtCtrls, OrFn, ORCtrls, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOptionsNewList = class(TForm)
+  TfrmOptionsNewList = class(TfrmBase508Form)
     pnlBottom: TPanel;
     btnOK: TButton;
     btnCancel: TButton;
     txtNewList: TCaptionEdit;
     lblEnter: TLabel;
     lblNew: TLabel;
+    Label1: TLabel;
+    grpVisibility: TRadioGroup;
     procedure btnOKClick(Sender: TObject);
     procedure txtNewListKeyPress(Sender: TObject; var Key: Char);
     procedure txtNewListChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     FNewList: string;
@@ -30,7 +34,7 @@ var
 
 implementation
 
-uses rOptions;
+uses rOptions, VAUtils;
 
 {$R *.DFM}
 
@@ -62,14 +66,14 @@ begin
   with txtNewList do
   begin
     if (length(Text) < 3) or (length(Text) > 30) then
-      showmessage('Enter a valid name.')
+      ShowMsg('Enter a valid name.')
     else if not ContainsAlpha(txtNewList.Text[1]) then
-      showmessage('Enter a valid name.')
+      ShowMsg('Enter a valid name.')
     else
     begin
-      FNewList := rpcNewList(Text);
+      FNewList := rpcNewList(Text, grpVisibility.ItemIndex);
       if Piece(FNewList, '^', 1) = '' then
-        showmessage('Enter a valid name. ' + Piece(FNewList, '^', 2))
+        ShowMsg('Enter a valid name. ' + Piece(FNewList, '^', 2))
       else
         ok := true;
     end;
@@ -90,6 +94,13 @@ begin
     Key := #0;
     beep;
   end;
+end;
+
+procedure TfrmOptionsNewList.FormCreate(Sender: TObject);
+begin
+  inherited;
+  grpVisibility.ItemIndex := 0;
+  txtNewList.Text := '';
 end;
 
 procedure TfrmOptionsNewList.txtNewListChange(Sender: TObject);

@@ -5,14 +5,16 @@ unit ORFn;
 interface  // --------------------------------------------------------------------------------
 
 uses SysUtils, Windows, Messages, Classes, Controls, StdCtrls, ExtCtrls, ComCtrls, Forms,
-     Graphics, Menus, RichEdit;
+     Graphics, Menus, RichEdit, Buttons;
 
 const
   U = '^';
   CRLF = #13#10;
   BOOLCHAR: array[Boolean] of Char = ('0', '1');
   UM_STATUSTEXT = (WM_USER + 302);               // used to send update status msg to main form
-  COLOR_CREAM   = $F0FBFF;
+
+var
+  ScrollBarHeight: integer = 0;
 
 type
   TFMDateTime = Double;
@@ -65,6 +67,9 @@ procedure SetPieces(var x: string; Delim: Char; Pieces: Array of Integer;
 procedure SortByPiece(AList: TStringList; ADelim: Char; PieceNum: Integer);
 function DelimCount(const Str, Delim: string): integer;
 procedure QuickCopy(AFrom, ATo: TObject);
+procedure QuickAdd(AFrom, ATo: TObject);
+procedure FastAssign(source, destination: TStrings);
+procedure FastAddStrings(source, destination: TStrings);
 function ValidFileName(const InitialFileName: string): string;
 
 { Display functions }
@@ -83,6 +88,7 @@ procedure RedrawActivate(AHandle: HWnd);
 procedure ResetSelectedForList(AListBox: TListBox);
 procedure ResizeFormToFont(AForm: TForm);
 procedure ResizeAnchoredFormToFont( AForm: TForm);
+procedure AdjustForWindowsXPStyleTitleBar(AForm: TForm);
 function ResizeWidth( OldFont: TFont; NewFont: TFont; OldWidth: integer): integer;
 function ResizeHeight( OldFont: TFont; NewFont: TFont; OldHeight: integer): integer;
 procedure ResizeToFont(FontSize: Integer; var W, H: Integer);
@@ -95,7 +101,12 @@ function WrappedTextHeightByFont(Canvas: TCanvas; NewFont: TFont; ItemText: stri
 function NumCharsFitInWidth(AFontHandle: THandle; const x: string; const MaxLen: integer): Integer;
 function PopupComponent(Sender: TObject; PopupMenu: TPopupMenu): TComponent;
 procedure ReformatMemoParagraph(AMemo: TCustomMemo);
-function ReadOnlyColor: TColor;
+
+function BlackColorScheme: Boolean;
+function NormalColorScheme: Boolean;
+function Get508CompliantColor(Color: TColor): TColor;
+procedure UpdateColorsFor508Compliance(control: TControl; InputEditControl: boolean = FALSE);
+procedure UpdateReadOnlyColorScheme(Control: TControl; ReadOnly: boolean);
 
 { ListBox Grid functions }
 procedure ListGridDrawCell(AListBox: TListBox; AHeader: THeaderControl; ARow, AColumn: Integer;
@@ -115,11 +126,12 @@ procedure CallWhenIdleNotifyWhenDone(CallProc, DoneProc: TORIdleCallProc; Msg: S
 procedure menuHideAllBut(aMenuItem: tMenuItem; butItems: array of tMenuItem);
 function TabIsPressed : Boolean;
 function ShiftTabIsPressed : Boolean;
+function EnterIsPressed : Boolean;
 
 implementation  // ---------------------------------------------------------------------------
 
 uses
-  ORCtrls, Grids, Chart, CheckLst;
+  ORCtrls, Grids, Chart, CheckLst, VAUtils;
 
 const
   { names of months used by FormatFMDateTime }
@@ -605,31 +617,13 @@ end;
 
 function Piece(const S: string; Delim: char; PieceNum: Integer): string;
 { returns the Nth piece (PieceNum) of a string delimited by Delim }
-var
-  i: Integer;
-  Strt, Next: PChar;
 begin
-  i := 1;
-  Strt := PChar(S);
-  Next := StrScan(Strt, Delim);
-  while (i < PieceNum) and (Next <> nil) do
-  begin
-    Inc(i);
-    Strt := Next + 1;
-    Next := StrScan(Strt, Delim);
-  end;
-  if Next = nil then Next := StrEnd(Strt);
-  if i < PieceNum then Result := '' else SetString(Result, Strt, Next - Strt);
+  Result := VAUtils.Piece(S, Delim, PieceNum);
 end;
 
 function Pieces(const S: string; Delim: char; FirstNum, LastNum: Integer): string;
-{ returns several contiguous pieces }
-var
-  PieceNum: Integer;
 begin
-  Result := '';
-  for PieceNum := FirstNum to LastNum do Result := Result + Piece(S, Delim, PieceNum) + Delim;
-  if Length(Result) > 0 then Delete(Result, Length(Result), 1);
+  Result := VAUtils.Pieces(S, Delim, FirstNum, LastNum);
 end;
 
 function ComparePieces(P1, P2: string; Pieces: array of integer; Delim:
@@ -779,6 +773,12 @@ var
     if obj is TListBox then
       str[idx] := TListBox(obj).Items
     else
+    if obj is TORComboBox then
+      str[idx] := TORComboBox(obj).Items
+    else
+    if obj is TComboBox then
+      str[idx] := TComboBox(obj).Items
+    else
     if obj is TRichEdit then
     begin
       with TRichEdit(obj) do
@@ -814,6 +814,127 @@ begin
   end;
   if fix[0] then TRichEdit(AFrom).PlainText := FALSE;
   if fix[1] then TRichEdit(ATo).PlainText := FALSE;
+  if ATo is TRichEdit then
+    TRichEdit(ATo).SelStart := Length(TRichEdit(ATo).Lines.Text); //CQ: 16461
+end;
+
+type
+  QuickAddError = class(Exception);
+
+procedure QuickAdd(AFrom, ATo: TObject);
+var
+  ms: TMemoryStream;
+  idx: integer;
+  str: array[0..1] of TStrings;
+  fix: array[0..1] of boolean;
+
+  procedure GetStrings(obj: TObject);
+  begin
+    if (CompareText(obj.ClassName, 'TRichEditStrings') = 0) then
+      raise QuickCopyError.Create('You must pass the TRichEdit object into QuickAdd, NOT it''s Lines property.');
+    if obj is TStrings then
+      str[idx] := TStrings(obj)
+    else
+    if obj is TMemo then
+      str[idx] := TMemo(obj).Lines
+    else
+    if obj is TORListBox then
+      str[idx] := TORListBox(obj).Items
+    else
+    if obj is TListBox then
+      str[idx] := TListBox(obj).Items
+    else
+    if obj is TORComboBox then
+      str[idx] := TORComboBox(obj).Items
+    else
+    if obj is TComboBox then
+      str[idx] := TComboBox(obj).Items
+    else
+    if obj is TRichEdit then
+    begin
+      with TRichEdit(obj) do
+      begin
+        str[idx] := Lines;
+        if not PlainText then
+        begin
+          fix[idx] := TRUE;
+          PlainText := TRUE;
+        end;
+      end;
+    end
+    else
+      raise QuickAddError.Create('Unsupported object type (' + obj.ClassName +
+                                  ') passed into QuickAdd.');
+    inc(idx);
+  end;
+
+
+begin
+  fix[0] := FALSE;
+  fix[1] := FALSE;
+  idx := 0;
+  GetStrings(AFrom);
+  GetStrings(ATo);
+  ms := TMemoryStream.Create;
+  try
+    str[1].SaveToStream(ms);
+    ms.Seek(0, soFromEnd);
+    str[0].SaveToStream(ms);
+    ms.Seek(0, soFromBeginning);
+    str[1].Clear;
+    str[1].LoadFromStream(ms);
+  finally
+    ms.Free;
+  end;
+  if fix[0] then TRichEdit(AFrom).PlainText := FALSE;
+  if fix[1] then TRichEdit(ATo).PlainText := FALSE;
+end;
+
+procedure FastAssign(source, destination: TStrings);
+// do not use this with RichEdit Lines unless source is RichEdit with PlainText
+var
+  ms: TMemoryStream;
+begin
+  destination.Clear;
+  if (source is TStringList) and (destination is TStringList) then
+    destination.Assign(source)
+  else
+  if (CompareText(source.ClassName, 'TRichEditStrings') = 0) then
+    destination.Assign(source)
+  else
+  begin
+    ms := TMemoryStream.Create;
+    try
+      source.SaveToStream(ms);
+      ms.Seek(0, soFromBeginning);
+      destination.LoadFromStream(ms);
+    finally
+      ms.Free;
+    end;
+  end;
+end;
+
+procedure FastAddStrings(source, destination: TStrings);
+// do not use this with RichEdit Lines unless source and destination are RichEdit with PlainText
+var
+  ms: TMemoryStream;
+begin
+  if (source is TStringList) and (destination is TStringList) then
+    destination.AddStrings(source)
+  else
+  begin
+    ms := TMemoryStream.Create;
+    try
+      destination.SaveToStream(ms);
+      ms.Seek(0, soFromEnd);
+      source.SaveToStream(ms);
+      ms.Seek(0, soFromBeginning);
+      destination.Clear;
+      destination.LoadFromStream(ms);
+    finally
+      ms.Free;
+    end;
+  end;
 end;
 
 function ValidFileName(const InitialFileName: string): string;
@@ -860,7 +981,7 @@ begin
       else NewList.Add(AList[i]);
     end; {for i}
     AList.Clear;
-    AList.Assign(NewList);
+    FastAssign(NewList, AList);
   finally
     NewList.Free;
   end;
@@ -1247,42 +1368,179 @@ begin
     Rect.Right := Frame.Right;
 end;
 
+var
+  AlignList, AnchorList: TStringList;
+
+function AnchorsToStr(Control: TControl): string;
+var
+  j: TAnchorKind;
+
+begin
+  Result := '';
+  for j := low(TAnchorKind) to high(TAnchorKind) do
+    if j in Control.Anchors then
+      Result := result + '1'
+    else
+      Result := result + '0'
+end;
+
+function StrToAnchors(i: integer): TAnchors;
+var
+  j: TAnchorKind;
+  value: string;
+  idx : integer;
+begin
+  Result := [];
+  value := AnchorList[i];
+  idx := 1;
+  for j := low(TAnchorKind) to high(TAnchorKind) do
+  begin
+    if copy(value,idx,1) = '1' then
+      include(Result, j);
+    inc(idx);
+  end;
+end;
+
+procedure SuspendAlign(AForm: TForm);
+var
+  i: integer;
+  control: TControl;
+begin
+  AForm.DisableAlign;
+  AlignList.Clear;
+  AnchorList.Clear;
+  for i := 0 to AForm.ControlCount-1 do
+  begin
+    control := AForm.Controls[i];
+    AlignList.Add(IntToStr(ord(control.align)));
+    control.Align := alNone;
+    AnchorList.Add(AnchorsToStr(control));
+    control.Anchors := [];
+  end;
+end;
+
+procedure RestoreAlign(AForm: TForm);
+var
+  i: integer;
+  control: TControl;
+begin
+  try
+    for i := 0 to AForm.ControlCount-1 do
+    begin
+      control := AForm.Controls[i];
+      control.Align := TAlign(StrToIntDef(AlignList[i],0));
+      control.Anchors := StrToAnchors(i);
+    end;
+    AlignList.Clear;
+    AnchorList.Clear;
+  finally
+    AForm.EnableAlign;
+  end;
+end;
+
 procedure ResizeFormToFont(AForm: TForm);
 var
   Rect: TRect;
+  OldResize: TNotifyEvent;
 begin
+// CQ# 11481 apply size changes to form all at once, instead of piece by piece.  Otherwise,
+// multiple calls to fAutoSz.FormResize, even if the form has not resized, can distort
+// the controls beyond the size of the form.
   with AForm do begin
-    ClientWidth := ResizeWidth( Font, MainFont, ClientWidth);
-    ClientHeight := ResizeHeight( Font, MainFont, ClientHeight);
-    HorzScrollBar.Range := ResizeWidth( Font, MainFont, HorzScrollBar.Range);
-    VertScrollBar.Range := ResizeHeight( Font, MainFont, VertScrollBar.Range);
-    Rect := BoundsRect;
-    ForceInsideWorkArea(Rect);
-    BoundsRect := Rect;
-    ResizeFontsInDescendants( Font, MainFont, AForm);
-    //Important: We are using the font to calculate everything, so don't
-    //change font until now.
-    Font.Size := MainFont.Size;
+    OldResize := AForm.OnResize;
+    AForm.OnResize := nil;
+    try
+      SuspendAlign(AForm);
+      try
+        HorzScrollBar.Range := ResizeWidth( Font, MainFont, HorzScrollBar.Range);
+        VertScrollBar.Range := ResizeHeight( Font, MainFont, VertScrollBar.Range);
+        ClientWidth := ResizeWidth( Font, MainFont, ClientWidth);
+        ClientHeight := ResizeHeight( Font, MainFont, ClientHeight);
+        Rect := BoundsRect;
+        ForceInsideWorkArea(Rect);
+        BoundsRect := Rect;
+      finally
+        RestoreAlign(AForm);
+      end;
+      ResizeFontsInDescendants( Font, MainFont, AForm);
+      //Important: We are using the font to calculate everything, so don't
+      //change font until now.
+      Font.Size := MainFont.Size;
+    finally
+      if(Assigned(OldResize)) then
+      begin
+        AForm.OnResize := OldResize;
+        OldResize(AForm);
+      end;
+    end;
   end;
 end;
 
 procedure ResizeAnchoredFormToFont( AForm: TForm);
 var
   Rect: TRect;
+  OldResize: TNotifyEvent;
+
 begin
   with AForm do begin
-    ClientWidth  := ResizeWidth( Font, MainFont, ClientWidth);
-    ClientHeight := ResizeHeight( Font, MainFont, ClientHeight);
-    HorzScrollBar.Range := ResizeWidth( Font, MainFont, HorzScrollBar.Range);
-    VertScrollBar.Range := ResizeHeight( Font, MainFont, VertScrollBar.Range);
-    Rect := BoundsRect;
-    ForceInsideWorkArea(Rect);
-    BoundsRect := Rect;
-    ResizeDescendants( Font, MainFont, AForm);
-    ResizeFontsInDescendants( Font, MainFont, AForm);
-    //Important: We are using the font to calculate everything, so don't
-    //change font until now.
-    Font.Size := MainFont.Size;
+  // CQ# 11481 - see ResizeFormToFont
+    OldResize := AForm.OnResize;
+    AForm.OnResize := nil;
+    try
+      HorzScrollBar.Range := ResizeWidth( Font, MainFont, HorzScrollBar.Range);
+      VertScrollBar.Range := ResizeHeight( Font, MainFont, VertScrollBar.Range);
+      ClientWidth  := ResizeWidth( Font, MainFont, ClientWidth);
+      ClientHeight := ResizeHeight( Font, MainFont, ClientHeight);
+      Rect := BoundsRect;
+      ForceInsideWorkArea(Rect);
+      BoundsRect := Rect;
+      ResizeDescendants( Font, MainFont, AForm);
+      ResizeFontsInDescendants( Font, MainFont, AForm);
+      //Important: We are using the font to calculate everything, so don't
+      //change font until now.
+      Font.Size := MainFont.Size;
+    finally
+      if(Assigned(OldResize)) then
+      begin
+        AForm.OnResize := OldResize;
+        OldResize(AForm);
+      end;
+    end;
+  end;
+end;
+
+// CQ 11485 - Adjusts all forms  - adds additional height to the form to
+// adjust for Windows XP style title bars, and for large fonts in title bar
+procedure AdjustForWindowsXPStyleTitleBar(AForm: TForm);
+const
+  DEFAULT_CAPTION_HEIGHT = 19;
+  DEFAULT_MENU_HEIGHT = 19;
+
+var
+  dxsb, dysb, dy, menuDY: integer;
+
+begin
+// Call GetSystemMetrics each time because values can change between calls
+  dy := GetSystemMetrics(SM_CYCAPTION) - DEFAULT_CAPTION_HEIGHT;
+  if (AForm.Menu <> nil) then
+  begin
+    menuDY := GetSystemMetrics(SM_CYMENU) - DEFAULT_MENU_HEIGHT;
+    inc(dy, menuDY);
+  end;
+  if dy <> 0 then
+  begin
+    SuspendAlign(AForm);
+    try
+    // Assitional adjustment to allow scroll bars to dissappear
+      dxsb := GetSystemMetrics(SM_CXVSCROLL);
+      dysb := GetSystemMetrics(SM_CYHSCROLL);
+      AForm.Height := AForm.Height + dy + dysb;
+      AForm.Width := AForm.Width + dxsb;
+      AForm.Height := AForm.Height - dysb;
+      AForm.Width := AForm.Width - dxsb;
+    finally
+      RestoreAlign(AForm);
+    end;
   end;
 end;
 
@@ -1328,11 +1586,17 @@ var
   TextSize: TSize;
 begin
   DC := GetDC(0);
-  SaveFont := SelectObject(DC, AFontHandle);
-  GetTextExtentPoint32(DC, PChar(x), Length(x), TextSize);
-  Result := TextSize.cx;
-  SelectObject(DC, SaveFont);
-  ReleaseDC(0, DC);
+  try
+    SaveFont := SelectObject(DC, AFontHandle);
+    try
+      GetTextExtentPoint32(DC, PChar(x), Length(x), TextSize);
+      Result := TextSize.cx;
+    finally
+      SelectObject(DC, SaveFont);
+    end;
+  finally
+    ReleaseDC(0, DC);
+  end;
 end;
 
 function TextHeightByFont(AFontHandle: THandle; const x: string): Integer;
@@ -1343,11 +1607,19 @@ var
 
 begin
   DC := GetDC(0);
-  SaveFont := SelectObject(DC, AFontHandle);
-  GetTextExtentPoint32(DC, PChar(x), Length(x), TextSize);
-  Result := TextSize.cy;
-  SelectObject(DC, SaveFont);
-  ReleaseDC(0, DC);
+  try
+    SaveFont := SelectObject(DC, AFontHandle);
+    try
+      GetTextExtentPoint32(DC, PChar(x), Length(x), TextSize);
+      Result := TextSize.cy;
+    finally
+      SelectObject(DC, SaveFont);
+    end;
+  finally
+    ReleaseDC(0, DC);
+  end;
+  if Result > 255 then // CQ 11493
+    Result := 255; // This is maximum allowed by a Windows
 end;
 
 function WrappedTextHeightByFont(Canvas: TCanvas; NewFont: TFont; ItemText: string; var ARect: TRect): integer;
@@ -1392,6 +1664,8 @@ begin
       DeleteObject( MyFontHandle );
     end;
   end;
+  if Result > 255 then // CQ 11492
+    Result := 255; // This is maximum allowed by a Windows
 end;
 
 function NumCharsFitInWidth(AFontHandle: THandle; const x: string; const MaxLen: integer): Integer;
@@ -1470,20 +1744,215 @@ begin
 end;
 
 var
-  uReadOnlyColor: TColor;
-  uHaveReadOnlyColor: boolean = FALSE;
+  uNormalColorScheme: boolean = false;
+  uBlackColorScheme: boolean = false;
+  uWhiteColorScheme: boolean = false;
+  uMaroonColorWhenBlack: TColor = clMaroon;
+  uCheckColorScheme: boolean = true;
+  PURE_BLACK: longint = 0;
 
-function ReadOnlyColor: TColor;
+const
+  uBorderlessWindowColorWhenBlack: TColor = clNavy;
+
+
+procedure CheckColorScheme;
 begin
-  if not uHaveReadOnlyColor then
+  if uCheckColorScheme then
   begin
-    uHaveReadOnlyColor := TRUE;
-    if ColorToRGB(clWindow) = ColorToRGB(clWhite) then
-      uReadOnlyColor := $00F0FBFF
-    else
-      uReadOnlyColor := clWindow;
+    uNormalColorScheme :=
+      ((ColorToRGB(clWindow)      = ColorToRGB(clWhite)) and
+       (ColorToRGB(clWindowText)  = ColorToRGB(clBlack)) and
+       (ColorToRGB(clInfoText)    = ColorToRGB(clBlack)) and
+       (ColorToRGB(clInfoBk)     <> ColorToRGB(clWhite)));
+
+    uBlackColorScheme := ((ColorToRGB(clBtnFace) = ColorToRGB(clBlack)) and
+                          (ColorToRGB(clWindow) = ColorToRGB(clBlack)));
+    uWhiteColorScheme := ((ColorToRGB(clBtnFace) = ColorToRGB(clWhite)) and
+                          (ColorToRGB(clWindow) = ColorToRGB(clWhite)));
+
+    if uBlackColorScheme then
+    begin
+      if(ColorToRGB(clGrayText) = ColorToRGB(clWindowText)) then
+        uMaroonColorWhenBlack := clHighlightText
+      else
+        uMaroonColorWhenBlack := clGrayText;
+    end;
+
+    uCheckColorScheme := FALSE;
   end;
-  Result := uReadOnlyColor;
+end;
+
+function BlackColorScheme: Boolean;
+begin
+  if uCheckColorScheme then CheckColorScheme;
+  Result := uBlackColorScheme;
+end;
+
+function NormalColorScheme: Boolean;
+begin
+  if uCheckColorScheme then CheckColorScheme;
+  Result := uNormalColorScheme;
+end;
+
+function Get508CompliantColor(Color: TColor): TColor;
+begin
+  Result := Color;
+  if NormalColorScheme then exit;
+
+  case Color of
+    clCream:    Result := clInfoBk;
+    clBlack:    Result := clWindowText;
+    clWhite:    Result := clWindow;
+  end;
+
+  if uBlackColorScheme then
+  begin
+    case Color of
+      clBlue:     Result := clAqua;
+      clMaroon:   Result := uMaroonColorWhenBlack;
+  //    clRed:      Result := clFuchsia;
+    end;
+  end;
+
+  if uWhiteColorScheme then
+  begin
+    case Color of
+      clGrayText: Result := clGray;
+    end;
+  end;
+end;
+
+type
+  TExposedControl = class(TControl)
+  public
+    property Color;
+    property Font;
+  end;
+
+  TExposedCustomEdit = class(TCustomEdit)
+  public
+    property BorderStyle;
+    property ReadOnly;
+  end;
+
+procedure UpdateColorsFor508Compliance(control: TControl; InputEditControl: boolean = FALSE);
+var
+  BitMapLevelCheck: integer;
+  Level: integer;
+
+
+  procedure BlackColorSchemeUpdate(control: TControl);
+  var
+    bitmap: TBitMap;
+    edit: TExposedCustomEdit;
+    x,y: integer;
+    cbmCtrl: IORBlackColorModeCompatible;
+
+  begin
+    if uBlackColorScheme then
+    begin
+      if Level < BitMapLevelCheck then
+      begin
+        if control.GetInterface(IORBlackColorModeCompatible, cbmCtrl) then
+        begin
+          cbmCtrl.SetBlackColorMode(TRUE);
+          BitMapLevelCheck := Level;
+          cbmCtrl := nil;
+        end
+        else
+        begin
+          if (control is TBitBtn) then
+          begin
+            bitmap := TBitBtn(control).Glyph;
+            for x := 0 to bitmap.Width-1 do
+            begin
+              for y := 0 to bitmap.Height-1 do
+              begin
+                if ColorToRGB(bitmap.Canvas.Pixels[x,y]) = PURE_BLACK then
+                  bitmap.Canvas.Pixels[x,y] := clWindowText;
+              end;
+            end;
+          end;
+        end;
+      end;
+
+      if (control is TCustomEdit) and InputEditControl then
+      begin
+        edit := TExposedCustomEdit(control);
+        if (edit.BorderStyle = bsNone) then
+          edit.Color := uBorderlessWindowColorWhenBlack;
+      end;
+
+    end;
+  end;
+
+  procedure ComponentUpdateColorsFor508Compliance(control: TControl);
+  var
+    OldComponentColor, OldFontColor, NewComponentColor, NewFontColor: TColor;
+  begin
+    OldComponentColor := TExposedControl(control).Color;
+    OldFontColor := TExposedControl(control).Font.Color;
+    NewComponentColor := Get508CompliantColor(OldComponentColor);
+    if NewComponentColor = clInfoBk then
+    begin
+      if (OldFontColor = clInfoBk) or (OldFontColor = clCream) then
+        NewFontColor := clInfoBk // used for hiding text
+      else
+        NewFontColor := clInfoText;
+    end
+    else
+      NewFontColor := Get508CompliantColor(OldFontColor);
+    if NewComponentColor <> OldComponentColor then
+      TExposedControl(control).Color := NewComponentColor;
+    if NewFontColor <> OldFontColor then
+      TExposedControl(control).Font.Color := NewFontColor;
+    BlackColorSchemeUpdate(control);
+  end;
+
+  procedure ScanAllComponents(control: TControl);
+  var
+    i: integer;
+
+  begin
+    ComponentUpdateColorsFor508Compliance(Control);
+    if control is TWinControl then
+    begin
+      inc(Level);
+      try
+        for i := 0 to TWinControl(Control).ControlCount-1 do
+        begin
+          ScanAllComponents(TWinControl(Control).Controls[i]);
+        end;
+      finally
+        dec(Level);
+        if BitMapLevelCheck = Level then
+          BitMapLevelCheck := MaxInt; 
+      end;
+    end;
+  end;
+
+begin
+  if NormalColorScheme then exit;
+  BitMapLevelCheck := MaxInt;
+  Level := 0;
+  ScanAllComponents(control);
+end;
+
+procedure UpdateReadOnlyColorScheme(Control: TControl; ReadOnly: boolean);
+begin
+  with TExposedControl(Control) do
+  begin
+    if ReadOnly then
+    begin
+      Color := Get508CompliantColor(clCream);
+      Font.Color := clInfoText;
+    end
+    else
+    begin
+      Color := clWindow;
+      Font.Color := clWindowText;
+    end;
+  end;
 end;
 
 { ListBox Grid functions }
@@ -1520,7 +1989,7 @@ begin
       Canvas.Font.Color := clHighlightText
     end;
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     Canvas.MoveTo(ARect.Left, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);
     RightSide := -2;
@@ -1713,21 +2182,33 @@ end;
 function TabIsPressed : Boolean;
 begin
   Result := Boolean(Hi(GetKeyState(VK_TAB))) and not Boolean(Hi(GetKeyState(VK_SHIFT)));
+  Result := Result and not Boolean(Hi(GetKeyState(VK_CONTROL)));
 end;
 
 function ShiftTabIsPressed : Boolean;
 begin
   Result := Boolean(Hi(GetKeyState(VK_TAB))) and Boolean(Hi(GetKeyState(VK_SHIFT)));
+  Result := Result and not Boolean(Hi(GetKeyState(VK_CONTROL)));
 end;
 
+function EnterIsPressed : Boolean;
+begin
+  Result := Boolean(Hi(GetKeyState(VK_RETURN)));
+end;
 
 initialization
   FBaseFont := TFont.Create;
   FBaseFont.Name := BaseFontName;
   FBaseFont.Size := BaseFontSize;
+  ScrollBarHeight := GetSystemMetrics(SM_CYHSCROLL);
+  AlignList := TStringList.Create;
+  AnchorList := TStringList.Create;
+  PURE_BLACK := ColorToRGB(clBlack);
 
 finalization
   FBaseFont.Free;
   KillObj(@IdleCaller);
+  FreeAndNil(AlignList);
+  FreeAndNil(AnchorList);
 
 end.

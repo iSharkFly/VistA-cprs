@@ -111,12 +111,12 @@ begin
      end;
   end;
 
-   BAOrderList.Assign(holdOrderList); //assign signable orders to BAOrderList for further processing
+   FastAssign(holdOrderList, BAOrderList); //assign signable orders to BAOrderList for further processing
    holdOrderList.Clear; // CQ5025
 
     //call with passList determine if LRMP
      if rpcOrderRequiresDx(passList) then
-      BAOrderList.Assign(updatedBAOrderList);
+      FastAssign(updatedBAOrderList, BAOrderList);
 
     // check of all orders dx columns are flagged with N/A.....
     if UBACore.IsAllOrdersNA(BAOrderList) then
@@ -164,7 +164,7 @@ var x: string;
          end;
     end
     else
-       updatedList.Assign(pList);
+       FastAssign(pList, updatedList);
 
     // call returns boolean, orders is billable=1 or nonbillable=0 or discontinued = 0
     tCallV(returnList,'ORWDBA1 ORPKGTYP',[updatedList]);
@@ -212,7 +212,7 @@ begin
   except
      on EListError do
         begin
-        {$ifdef debug}ShowMessage('EListError in UBACore.IsOrderBillable()');{$endif}
+        {$ifdef debug}Show508Message('EListError in UBACore.IsOrderBillable()');{$endif}
         raise;
         end;
   end;
@@ -333,6 +333,7 @@ begin
         if  (sCallV('ORWDBA4 GETBAUSR', [encProvider]) = '1') then
         begin
            // Verify Patient is Insured
+           // OR Switch = 2 ask questions for all patients.
            if  rpcIsPatientInsured(pPatientDFN)  then
               BILLING_AWARE := TRUE;
         end;
@@ -406,7 +407,7 @@ begin
        except
        on EListError do
        begin
-         {$ifdef debug}ShowMessage('EListError in UBACore.rpcSaveBillingDxEntered()');{$endif}
+         {$ifdef debug}Show508Message('EListError in UBACore.rpcSaveBillingDxEntered()');{$endif}
          raise;
      end;
   end;
@@ -418,6 +419,11 @@ end;
 
 procedure rpcGetSC4Orders;
 begin
+//  ****** RPC Logic returning SC/TF codes for COPAY  ********
+//     if (CIDC is ON) and (PatientInsured is True) then
+//        return SC/TF for OutPatient Meds, Labs, Prosthetics, Imaging.
+//     else
+//       return SC/TF for Outpatient Meds only. 
    RPCBrokerV.Param[0].PType := literal;
    RPCBrokerV.Param[0].Value := Patient.DFN;
    RPCBrokerV.RemoteProcedure := 'ORWDBA1 SCLST';
@@ -433,7 +439,7 @@ begin
     tmplst.clear;
     uDxLst.Clear;
     tCallV(tmplst, 'ORWDBA2 GETDUDC', [ProviderIEN, PatientIEN]);
-    UBACore.UDxLst.Assign(tmplst);
+    FastAssign(tmplst, UBACore.UDxLst);
     tmplst.clear;
 end;
 
@@ -510,7 +516,7 @@ end;
 
 function  rpcIsPatientInsured(pPatientDFN: string):boolean;
 begin
-   Result := (sCallV('ORWDBA7 ISWITCH',[pPatientDFN]) = '1');
+   Result := (sCallV('ORWDBA7 ISWITCH',[pPatientDFN]) > '0');
      
 end;
 
@@ -551,7 +557,7 @@ begin
   except
      on EListError do
         begin
-        {$ifdef debug}ShowMessage('EListError in UBACore.OrdersHaveDx()');{$endif}
+        {$ifdef debug}Show508Message('EListError in UBACore.OrdersHaveDx()');{$endif}
         raise;
         end;
   end;
@@ -633,7 +639,8 @@ begin
    UBAGlobals.EC  := Copy(x,4,1);
    UBAGlobals.MST := Copy(x,5,1);
    UBAGlobals.HNC := Copy(x,6,1);
-   UBAGlobals.CV :=  Copy(x,7,1);
+   UBAGlobals.CV  := Copy(x,7,1);
+   UBAGlobals.SHD := Copy(x,8,1);
 end;
 
 
@@ -692,8 +699,12 @@ begin
           if StrPos(PChar(strTFactors),PChar(HEAD_NECK_CANCER)) <> nil then
              UBAGlobals.HNC := 'C';
 
+       if UBAGlobals.SHD <> 'N' then
+          if StrPos(PChar(strTFactors),PChar(SHIPBOARD_HAZARD_DEFENSE)) <> nil then
+             UBAGlobals.SHD := 'C';
+
        //  Build Treatment Factor List to be passed to fOrdersSign form
-       strFlagsOut := (SC + AO + IR + EC + MST + HNC + CV);
+       strFlagsOut := (SC + AO + IR + EC + MST + HNC + CV + SHD);
        UBAGlobals.BAFlagsOUT.Add(IDX + '^' + strFlagsOut );
      end;
   end;
@@ -723,7 +734,7 @@ begin
   except
      on EListError do
         begin
-        {$ifdef debug}ShowMessage('EListError in UBACore.AddProviderPatientDaysDx()');{$endif}
+        {$ifdef debug}Show508Message('EListError in UBACore.AddProviderPatientDaysDx()');{$endif}
         raise;
         end;
   end;
@@ -750,7 +761,7 @@ begin
   except
      on EListError do
         begin
-        {$ifdef debug}ShowMessage('EListError in UBACore.OrderRequiresSCEI()');{$endif}
+        {$ifdef debug}Show508Message('EListError in UBACore.OrderRequiresSCEI()');{$endif}
         raise;
         end;
   end;
@@ -874,7 +885,7 @@ begin
      except
      on EListError do
         begin
-        {$ifdef debug}ShowMessage('EListError in UBACore.CompleteUnsignedBillingInfo()');{$endif}
+        {$ifdef debug}Show508Message('EListError in UBACore.CompleteUnsignedBillingInfo()');{$endif}
         raise;
         end;
   end;
@@ -897,7 +908,7 @@ begin
   except
      on EListError do
         begin
-        {$ifdef debug}ShowMessage('EListError in UBACore.GetUnsignedOrderFlags()');{$endif}
+        {$ifdef debug}Show508Message('EListError in UBACore.GetUnsignedOrderFlags()');{$endif}
         raise;
         end;
   end;
@@ -971,16 +982,24 @@ begin
                else
                  if piece(x,U,1) = COMBAT_VETERAN then
                  begin
-                  if piece(x,U,2) = '1' then
-                     UBAGlobals.BAFactorsRec.FBAFactorCV := Piece(x,U,3)
-                  else
-                     UBAGlobals.BAFactorsRec.FBAFactorCV := (UBAGlobals.BAFactorsRec.FBAFactorCV + CRLF + Piece(x,U,3) );
-               end;
-         end;
+                   if piece(x,U,2) = '1' then
+                      UBAGlobals.BAFactorsRec.FBAFactorCV := Piece(x,U,3)
+                   else
+                      UBAGlobals.BAFactorsRec.FBAFactorCV := (UBAGlobals.BAFactorsRec.FBAFactorCV + CRLF + Piece(x,U,3) );
+                 end
+                 else
+                    if piece(x,U,1) = SHIPBOARD_HAZARD_DEFENSE then
+                    begin
+                       if piece(x,U,2) = '1' then
+                          UBAGlobals.BAFactorsRec.FBAFactorSHAD := Piece(x,U,3)
+                      else
+                         UBAGlobals.BAFactorsRec.FBAFactorSHAD := (UBAGlobals.BAFactorsRec.FBAFactorSHAD + CRLF + Piece(x,U,3) );
+                  end;
+            end;
   except
      on EListError do
         begin
-        {$ifdef debug}ShowMessage('EListError in UBACore.BuileTFHintRec()');{$endif}
+        {$ifdef debug}Show508Message('EListError in UBACore.BuileTFHintRec()');{$endif}
         raise;
         end;
   end;
@@ -1046,7 +1065,7 @@ begin
   except
      on EListError do
         begin
-           {$ifdef debug}ShowMessage('EListError in UBACore.ClearSelectedORdersDiagnoses()');{$endif}
+           {$ifdef debug}Show508Message('EListError in UBACore.ClearSelectedORdersDiagnoses()');{$endif}
            raise;
         end;
   end;
@@ -1132,7 +1151,7 @@ begin
   except
      on EListError do
         begin
-        {$ifdef debug}ShowMessage('EListError in UBACore.LoadConsultOrderRec()');{$endif}
+        {$ifdef debug}Show508Message('EListError in UBACore.LoadConsultOrderRec()');{$endif}
         raise;
         end;
   end;
@@ -1152,7 +1171,7 @@ procedure LoadTFactorsInRec(var thisRetVal: TBATreatmentFactorsInRec; pOrderID:s
 begin
      with thisRetVal do
      begin
-        FBAOrderID := pOrderID;
+        FBAOrderID    := pOrderID;
         FBAEligible   := pEligible;
         FBATFactors   := pTFactors;
      end;
@@ -1165,7 +1184,7 @@ var
   orderList : TStringList;
   tmpOrderList: TStringList;
 begin
-    orderList := TStringList.Create;
+    orderList    := TStringList.Create;
     tmpOrderList := TStringList.Create;
     orderList.Clear;
     tmpOrderList.Clear;
@@ -1240,8 +1259,8 @@ begin
     strFlagsAsIs  := pFlagsAsIs; // flags from pims
     strTFactors   :=  pPLFactors;  // value selected from problem list
     strFlagsOut   := '';   // flags updated with selected values from problem list
-    x := strFlagsAsIs;
-    Result := '';
+    x             := strFlagsAsIs;
+    Result        := '';
 
     UBAGlobals.SC  := Copy(x,1,1);
     UBAGlobals.AO  := Copy(x,2,1);
@@ -1249,7 +1268,8 @@ begin
     UBAGlobals.EC  := Copy(x,4,1);
     UBAGlobals.MST := Copy(x,5,1);
     UBAGlobals.HNC := Copy(x,6,1);
-    UBAGlobals.CV :=  Copy(x,7,1); // load factors to global vars;
+    UBAGlobals.CV  :=  Copy(x,7,1); // load factors to global vars;
+    UBAGlobals.SHD := Copy(x,8,1);
 
   if UBAGlobals.SC  <> 'N' then
        if StrPos(PChar(strTFactors),PChar(SERVICE_CONNECTED)) <> nil then
@@ -1283,9 +1303,13 @@ begin
        if StrPos(PChar(strTFactors),PChar(COMBAT_VETERAN)) <> nil then
           UBAGlobals.CV := 'C';
 
+    if UBAGlobals.SHD <> 'N' then
+       if StrPos(PChar(strTFactors),PChar(SHIPBOARD_HAZARD_DEFENSE)) <> nil then
+          UBAGlobals.SHD := 'C';
+
      strFlagsOut := (UBAGlobals.SC + UBAGlobals.AO + UBAGlobals.IR +
                      UBAGlobals.EC + UBAGlobals.MST + UBAGlobals.HNC +
-                     UBAGlobals.CV);
+                     UBAGlobals.CV + UBAGlobals.SHD);
   Result := strFlagsOut;
 end;
 
@@ -1384,7 +1408,7 @@ var i:integer;
 begin
    holdList := TStringList.Create;
    holdList.Clear;
-   holdList.Assign(UBAGlobals.BACopiedOrderFlags);
+   FastAssign(UBAGlobals.BACopiedOrderFlags, holdList);
    UBAGlobals.BACopiedOrderFlags.Clear;
    for i := 0 to holdList.Count-1 do
    begin
@@ -1411,7 +1435,7 @@ begin
    begin
       holdList := TStringList.Create;
       holdList.Clear;
-      holdList.Assign(UBAGlobals.BAConsultPLFlags);
+      FastAssign(UBAGlobals.BAConsultPLFlags, holdList);
       UBAGlobals.BAConsultPLFlags.Clear;
       for i := 0 to holdList.Count-1 do
       begin

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fPCEBase, StdCtrls, Buttons, ExtCtrls, Grids, ORFn, ORNet, ORCtrls,
-  ORDtTm, ComCtrls, fPCEBaseGrid, Menus;
+  ORDtTm, ComCtrls, fPCEBaseGrid, Menus, VA508AccessibilityManager;
 
 type
   TfrmGAF = class(TfrmPCEBaseGrid)
@@ -46,7 +46,7 @@ var
 
 implementation
 
-uses rPCE, rCore, uCore, uPCE, fEncounterFrame;
+uses rPCE, rCore, uCore, uPCE, fEncounterFrame, VA508AccessibilityRouter;
 
 {$R *.DFM}
 
@@ -201,6 +201,10 @@ begin
   inherited;
   FTabName := CT_GAFNm;
   btnURL.Visible := (User.WebAccess and (GAFURL <> ''));
+  FormActivate(Sender);
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmGAF);
 
 end.

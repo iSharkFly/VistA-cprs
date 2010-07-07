@@ -1,22 +1,15 @@
-object frmOrdersPrint: TfrmOrdersPrint
+inherited frmOrdersPrint: TfrmOrdersPrint
   Left = 353
   Top = 194
-  Width = 364
-  Height = 315
   Caption = 'Print orders'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
+  ClientHeight = 288
+  ClientWidth = 356
   OldCreateOrder = True
   Position = poScreenCenter
   OnKeyUp = FormKeyUp
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 356
@@ -220,5 +213,62 @@ object frmOrdersPrint: TfrmOrdersPrint
       TabOrder = 13
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = lblPartOne'
+        'Status = stsDefault')
+      (
+        'Component = lblPart2'
+        'Status = stsDefault')
+      (
+        'Component = ckChartCopy'
+        'Status = stsDefault')
+      (
+        'Component = ckLabels'
+        'Status = stsDefault')
+      (
+        'Component = ckRequisitions'
+        'Status = stsDefault')
+      (
+        'Component = ckWorkCopy'
+        'Status = stsDefault')
+      (
+        'Component = lstChartDevice'
+        'Status = stsDefault')
+      (
+        'Component = lstLabelDevice'
+        'Status = stsDefault')
+      (
+        'Component = lstReqDevice'
+        'Status = stsDefault')
+      (
+        'Component = lstWorkDevice'
+        'Status = stsDefault')
+      (
+        'Component = cmdChart'
+        'Status = stsDefault')
+      (
+        'Component = cmdLabels'
+        'Status = stsDefault')
+      (
+        'Component = cmdReqs'
+        'Status = stsDefault')
+      (
+        'Component = cmdWork'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmOrdersPrint'
+        'Status = stsDefault'))
   end
 end

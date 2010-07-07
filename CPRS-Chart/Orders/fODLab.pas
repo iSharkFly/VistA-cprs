@@ -5,7 +5,7 @@ interface
 uses
   SysUtils, WinTypes, WinProcs, Messages, Classes, Graphics, Controls,
   Forms, Dialogs, StdCtrls, ORCtrls, ORfn, fODBase, ExtCtrls, ComCtrls, uConst,
-  ORDtTm, Buttons, Menus;
+  ORDtTm, Buttons, Menus, VA508AccessibilityManager;
 
 type
   TfrmODLab = class(TfrmODBase)
@@ -105,6 +105,7 @@ type
     FEvtDelayLoc: integer;
     FEvtDivision: integer;
     procedure ReadServerVariables;
+    procedure DisplayChangedOrders(ACollType: string);
   public
     procedure SetupDialog(OrderAction: Integer; const ID: string); override;
     procedure LoadRequiredComment(CmtType: integer);
@@ -239,11 +240,11 @@ begin
       EvtDelayLoc := StrToIntDef(GetEventLoc1(IntToStr(Self.EvtID)),0);
       EvtDivision := StrToIntDef(GetEventDiv1(IntToStr(Self.EvtID)),0);
       if EvtDelayLoc>0 then
-        AList.Assign(ODForLab(EvtDelayLoc,EvtDivision))
+        FastAssign(ODForLab(EvtDelayLoc, EvtDivision), AList)
       else
-        AList.Assign(ODForLab(Encounter.Location,EvtDivision));
+        FastAssign(ODForLab(Encounter.Location, EvtDivision), AList);
     end else
-      AList.Assign(ODForLab(Encounter.Location)); // ODForLab returns TStrings with defaults
+      FastAssign(ODForLab(Encounter.Location), AList); // ODForLab returns TStrings with defaults
     CtrlInits.LoadDefaults(AList);
     InitDialog;
     with CtrlInits do
@@ -456,7 +457,7 @@ begin
         begin
           OneSamp := TStringList.Create;
           try
-            OneSamp.Assign(GetOneCollSamp(StrToInt(LRFSAMP)));
+            FastAssign(GetOneCollSamp(StrToInt(LRFSAMP)), OneSamp);
             FillCollSampList(OneSamp, CollSampList.Count);
           finally
             OneSamp.Free;
@@ -650,7 +651,7 @@ begin
   if ObtainSpecimen then
     begin
       if SpecimenList.Count = 0 then LoadSpecimens(SpecimenList) ;
-      AComboBox.Items.Assign(SpecimenList);
+      FastAssign(SpecimenList, AComboBox.Items);
       AComboBox.Items.Add('0^Other...');
       with QuickOrderResponses do tmpResp := FindResponseByName('SPECIMEN'  ,1);
       if (LRFSPEC <> '') and (tmpResp = nil) then
@@ -901,6 +902,7 @@ var
   d1, d2: TDateTime;
   Days, MsgTxt: Double;
   x: string;
+  ACollType: string;
 const
   TX_NO_TIME        = 'Collection Time is required.' ;
   TX_NO_TCOLLTYPE   = 'Collection Type is required.' ;
@@ -1125,6 +1127,53 @@ begin
             end;
         end;
     end;
+
+  if (AnErrMsg <> '') or (Self.EvtID > 0) then exit;
+    
+  // add check and display for auto-change from LC to WC - v27.1 - CQ #10226
+  ACollType := Responses.FindResponseByName('COLLECT', 1).EValue;
+  if ((ACollType = 'LC') or (ACollType = 'I')) then DisplayChangedOrders(ACollType);
+end;
+
+procedure TfrmODLab.DisplayChangedOrders(ACollType: string);
+var
+  AStartDate, ASchedule, ADuration: string;
+  ChangedOrdersList, AList: TStringlist;
+  i, j, k: integer;
+begin
+  ChangedOrdersList := TStringList.Create;
+  try
+    AStartDate := Responses.FindResponseByName('START', 1).IValue;
+    ASchedule  := Responses.FindResponseByName('SCHEDULE', 1).IValue;
+    if txtDays.Enabled then ADuration := Responses.FindResponseByName('DAYS', 1).EValue else ADuration := '';
+    CheckForChangeFromLCtoWCOnAccept(ChangedOrdersList, Encounter.Location, AStartDate, ACollType, ASchedule, ADuration);
+    if ChangedOrdersList.Text <> '' then
+    begin
+      AList := TStringList.Create;
+      try
+        AList.Text := Responses.OrderText;
+        with ChangedOrdersList do
+        begin
+          Insert(5, 'Order   :' + #9 + AList[0]);
+          k := Length(ChangedOrdersList[5]);
+          i := 0;
+          if AList.Count > 1 then
+            for j := 1 to AList.Count - 1 do
+            begin
+              Insert(5 + j, StringOfChar(' ', 9) + #9 + AList[j]);
+              k := HigherOf(k, Length(ChangedOrdersList[5 + j]));
+              i := j;
+            end;
+          Insert(5 + i + 1, StringOfChar('-', k + 4));
+        end;
+        ReportBox(ChangedOrdersList, 'Changed Orders', TRUE);
+      finally
+        AList.Free;
+      end;
+    end;
+  finally
+    ChangedOrdersList.Free;
+  end;
 end;
 
 procedure TfrmODLab.cboAvailTestNeedData(Sender: TObject;

@@ -17,14 +17,14 @@ object ORfrmDateRange: TORfrmDateRange
   object lblStart: TLabel
     Left = 8
     Top = 44
-    Width = 53
+    Width = 52
     Height = 13
     Caption = 'Begin Date'
   end
   object lblStop: TLabel
     Left = 145
     Top = 44
-    Width = 45
+    Width = 44
     Height = 13
     Caption = 'End Date'
   end

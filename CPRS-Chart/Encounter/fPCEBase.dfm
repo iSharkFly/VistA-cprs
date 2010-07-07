@@ -1,47 +1,52 @@
-object frmPCEBase: TfrmPCEBase
+inherited frmPCEBase: TfrmPCEBase
   Left = 194
   Top = 170
-  AutoScroll = False
   Caption = 'Basic Page'
   ClientHeight = 400
   ClientWidth = 624
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = True
   OnClose = FormClose
   OnCreate = FormCreate
-  OnShow = FormShow
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   DesignSize = (
     624
     400)
   PixelsPerInch = 96
   TextHeight = 13
-  object btnOK: TBitBtn
+  object btnOK: TBitBtn [0]
     Left = 467
     Top = 376
     Width = 75
     Height = 21
     Anchors = [akRight, akBottom]
-    Caption = 'OK'
+    Caption = '&OK'
     ModalResult = 1
     TabOrder = 0
     OnClick = btnOKClick
     NumGlyphs = 2
   end
-  object btnCancel: TBitBtn
+  object btnCancel: TBitBtn [1]
     Left = 547
     Top = 376
     Width = 75
     Height = 21
     Anchors = [akRight, akBottom]
-    Caption = 'Cancel'
+    Caption = '&Cancel'
     ModalResult = 2
     TabOrder = 1
     OnClick = btnCancelClick
     NumGlyphs = 2
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmPCEBase'
+        'Status = stsDefault'))
   end
 end

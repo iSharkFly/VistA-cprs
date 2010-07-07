@@ -48,7 +48,7 @@ inherited frmODVitals: TfrmODVitals
     OnChange = ControlChange
     Caption = 'Additional Instructions'
   end
-  object cboMeasurement: TORComboBox
+  object cboMeasurement: TORComboBox [10]
     Left = 6
     Top = 21
     Width = 130
@@ -72,7 +72,7 @@ inherited frmODVitals: TfrmODVitals
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object cboSchedule: TORComboBox
+  object cboSchedule: TORComboBox [11]
     Left = 144
     Top = 21
     Width = 130
@@ -96,7 +96,7 @@ inherited frmODVitals: TfrmODVitals
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object calStart: TORDateBox
+  object calStart: TORDateBox [12]
     Left = 282
     Top = 21
     Width = 115
@@ -108,7 +108,7 @@ inherited frmODVitals: TfrmODVitals
     RequireTime = False
     Caption = 'Start Date'
   end
-  object calStop: TORDateBox
+  object calStop: TORDateBox [13]
     Left = 282
     Top = 64
     Width = 115
@@ -119,7 +119,7 @@ inherited frmODVitals: TfrmODVitals
     RequireTime = False
     Caption = 'Stop Date'
   end
-  object grpCallHO: TGroupBox
+  object grpCallHO: TGroupBox [14]
     Left = 407
     Top = 9
     Width = 107
@@ -222,11 +222,9 @@ inherited frmODVitals: TfrmODVitals
       Width = 15
       Height = 21
       Associate = txtBPsys
-      Min = 0
       Max = 300
       Position = 100
       TabOrder = 5
-      Wrap = False
     end
     object spnBPdia: TUpDown
       Left = 82
@@ -234,11 +232,9 @@ inherited frmODVitals: TfrmODVitals
       Width = 15
       Height = 21
       Associate = txtBPDia
-      Min = 0
       Max = 300
       Position = 120
       TabOrder = 6
-      Wrap = False
     end
     object spnPulseLT: TUpDown
       Left = 82
@@ -246,11 +242,9 @@ inherited frmODVitals: TfrmODVitals
       Width = 15
       Height = 21
       Associate = txtPulseLT
-      Min = 0
       Max = 500
       Position = 60
       TabOrder = 7
-      Wrap = False
     end
     object spnPulseGT: TUpDown
       Left = 82
@@ -258,11 +252,9 @@ inherited frmODVitals: TfrmODVitals
       Width = 15
       Height = 21
       Associate = txtPulGT
-      Min = 0
       Max = 300
       Position = 120
       TabOrder = 8
-      Wrap = False
     end
     object spnTemp: TUpDown
       Left = 82
@@ -270,14 +262,12 @@ inherited frmODVitals: TfrmODVitals
       Width = 15
       Height = 21
       Associate = txtTemp
-      Min = 0
       Max = 120
       Position = 101
       TabOrder = 9
-      Wrap = False
     end
   end
-  object chkCallHO: TCheckBox
+  object chkCallHO: TCheckBox [15]
     Left = 414
     Top = 8
     Width = 73
@@ -285,5 +275,77 @@ inherited frmODVitals: TfrmODVitals
     Caption = 'Call HO on'
     TabOrder = 9
     Visible = False
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = txtComment'
+        'Status = stsDefault')
+      (
+        'Component = cboMeasurement'
+        'Status = stsDefault')
+      (
+        'Component = cboSchedule'
+        'Status = stsDefault')
+      (
+        'Component = calStart'
+        'Status = stsDefault')
+      (
+        'Component = calStop'
+        'Status = stsDefault')
+      (
+        'Component = grpCallHO'
+        'Status = stsDefault')
+      (
+        'Component = txtBPsys'
+        'Status = stsDefault')
+      (
+        'Component = txtBPDia'
+        'Status = stsDefault')
+      (
+        'Component = txtPulseLT'
+        'Status = stsDefault')
+      (
+        'Component = txtPulGT'
+        'Status = stsDefault')
+      (
+        'Component = txtTemp'
+        'Status = stsDefault')
+      (
+        'Component = spnBPsys'
+        'Status = stsDefault')
+      (
+        'Component = spnBPdia'
+        'Status = stsDefault')
+      (
+        'Component = spnPulseLT'
+        'Status = stsDefault')
+      (
+        'Component = spnPulseGT'
+        'Status = stsDefault')
+      (
+        'Component = spnTemp'
+        'Status = stsDefault')
+      (
+        'Component = chkCallHO'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODVitals'
+        'Status = stsDefault'))
   end
 end

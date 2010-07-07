@@ -104,7 +104,7 @@ begin
       Param[2].Mult[IntToStr(i+1)+',0'] := BoilerPlate[i];
     CallBroker;
     RPCBrokerV.Results.Delete(0);
-    BoilerPlate.Assign(RPCBrokerV.Results);
+    FastAssign(RPCBrokerV.Results, BoilerPlate);
     RPCBrokerV.Results.Clear;
   end;
 end;
@@ -259,10 +259,10 @@ begin
   CallV('TIU REMINDER DIALOGS', []);
   TmpList := TStringList.Create;
   try
-    TmpList.Assign(RPCBrokerV.Results);
+    FastAssign(RPCBrokerV.Results, TmpList);
     SortByPiece(TmpList, U, 2);
     MixedCaseList(TmpList);
-    RPCBrokerV.Results.Assign(TmpList);
+    FastAssign(TmpList, RPCBrokerV.Results);
   finally
     TmpList.Free;
   end;
@@ -376,7 +376,7 @@ end;
 procedure CheckTemplateFields(ResultString: TStrings);
 begin
   CallV('TIU FIELD CHECK',[nil]);
-  ResultString.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, ResultString);
 end;
 
 function IsTemplateFieldNameUnique(const FldName, IEN: string): boolean;
@@ -397,7 +397,7 @@ begin
       Param[0].Mult[IntToStr(i+1)+',0'] := Text[i];
     CallBroker;
   end;
-  Text.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Text);
 end;
 
 function BuildTemplateFields(XMLString: TStrings): boolean;   //Simply builds XML fields on the server
@@ -448,7 +448,7 @@ function ImportLoadedFields(ResultSet: TStrings): boolean;
 begin
   Result := TRUE;
   CallV('TIU FIELD LIST IMPORT',[nil]);
-  ResultSet.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, ResultSet);
   if ResultSet.Count < 1 then
     Result := FALSE;
 end;

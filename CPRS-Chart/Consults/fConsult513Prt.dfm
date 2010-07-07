@@ -1,29 +1,19 @@
-object frm513Print: Tfrm513Print
+inherited frm513Print: Tfrm513Print
   Left = 116
   Top = 375
-  AutoScroll = False
   Caption = 'Print SF 513'
-  ClientHeight = 308
-  ClientWidth = 427
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = True
+  ClientHeight = 306
   Position = poScreenCenter
-  OnCreate = FormCreate
-  OnDestroy = FormDestroy
+  ExplicitHeight = 340
   PixelsPerInch = 96
   TextHeight = 13
-  object lblPrintTo: TLabel
+  object lblPrintTo: TLabel [0]
     Left = 7
     Top = 265
     Width = 3
     Height = 13
   end
-  object lblConsultTitle: TMemo
+  object lblConsultTitle: TMemo [1]
     Left = 10
     Top = 8
     Width = 301
@@ -35,7 +25,7 @@ object frm513Print: Tfrm513Print
     ReadOnly = True
     TabOrder = 0
   end
-  object grpChooseCopy: TGroupBox
+  object grpChooseCopy: TGroupBox [2]
     Left = 321
     Top = 4
     Width = 98
@@ -63,7 +53,7 @@ object frm513Print: Tfrm513Print
       OnClick = radWorkCopyClick
     end
   end
-  object grpDevice: TGroupBox
+  object grpDevice: TGroupBox [3]
     Left = 8
     Top = 69
     Width = 411
@@ -130,9 +120,10 @@ object frm513Print: Tfrm513Print
       TabOrder = 0
       OnChange = cboDeviceChange
       OnNeedData = cboDeviceNeedData
+      CharsNeedMatch = 1
     end
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [4]
     Left = 267
     Top = 272
     Width = 72
@@ -142,7 +133,7 @@ object frm513Print: Tfrm513Print
     TabOrder = 4
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [5]
     Left = 347
     Top = 272
     Width = 72
@@ -152,13 +143,52 @@ object frm513Print: Tfrm513Print
     TabOrder = 5
     OnClick = cmdCancelClick
   end
-  object chkDefault: TCheckBox
+  object chkDefault: TCheckBox [6]
     Left = 7
     Top = 288
     Width = 166
     Height = 17
     Caption = 'Save as user'#39's default printer'
     TabOrder = 3
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblConsultTitle'
+        'Status = stsDefault')
+      (
+        'Component = grpChooseCopy'
+        'Status = stsDefault')
+      (
+        'Component = radChartCopy'
+        'Status = stsDefault')
+      (
+        'Component = radWorkCopy'
+        'Status = stsDefault')
+      (
+        'Component = grpDevice'
+        'Status = stsDefault')
+      (
+        'Component = txtRightMargin'
+        'Status = stsDefault')
+      (
+        'Component = txtPageLength'
+        'Status = stsDefault')
+      (
+        'Component = cboDevice'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = chkDefault'
+        'Status = stsDefault')
+      (
+        'Component = frm513Print'
+        'Status = stsDefault'))
   end
   object dlgWinPrinter: TPrintDialog
     Left = 268

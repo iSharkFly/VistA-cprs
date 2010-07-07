@@ -1,4 +1,4 @@
-object frmOptionsDays: TfrmOptionsDays
+inherited frmOptionsDays: TfrmOptionsDays
   Left = 516
   Top = 90
   HelpContext = 9010
@@ -7,60 +7,53 @@ object frmOptionsDays: TfrmOptionsDays
   Caption = 'Date Range Defaults on Cover Sheet'
   ClientHeight = 337
   ClientWidth = 328
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   HelpFile = 'CPRSWT.HLP'
-  OldCreateOrder = False
   Position = poDefault
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object bvlTop: TBevel
+  object bvlTop: TBevel [0]
     Left = 11
     Top = 9
     Width = 310
     Height = 2
   end
-  object bvlMiddle: TBevel
+  object bvlMiddle: TBevel [1]
     Left = 11
     Top = 155
     Width = 310
     Height = 2
   end
-  object lblVisitStop: TLabel
+  object lblVisitStop: TLabel [2]
     Left = 15
     Top = 251
     Width = 25
     Height = 13
     Caption = 'Stop:'
   end
-  object lblVisitStart: TLabel
+  object lblVisitStart: TLabel [3]
     Left = 15
     Top = 197
     Width = 25
     Height = 13
     Caption = 'Start:'
   end
-  object lblLabOutpatient: TLabel
+  object lblLabOutpatient: TLabel [4]
     Left = 15
     Top = 103
     Width = 77
     Height = 13
     Caption = 'Outpatient days:'
   end
-  object lblLabInpatient: TLabel
+  object lblLabInpatient: TLabel [5]
     Left = 15
     Top = 47
     Width = 69
     Height = 13
     Caption = 'Inpatient days:'
   end
-  object lblVisitValue: TMemo
+  object lblVisitValue: TMemo [6]
     Left = 136
     Top = 219
     Width = 169
@@ -73,7 +66,7 @@ object frmOptionsDays: TfrmOptionsDays
     ReadOnly = True
     TabOrder = 13
   end
-  object lblLabValue: TMemo
+  object lblLabValue: TMemo [7]
     Left = 136
     Top = 71
     Width = 169
@@ -86,7 +79,7 @@ object frmOptionsDays: TfrmOptionsDays
     ReadOnly = True
     TabOrder = 14
   end
-  object lblVisit: TStaticText
+  object lblVisit: TStaticText [8]
     Left = 15
     Top = 164
     Width = 115
@@ -94,7 +87,7 @@ object frmOptionsDays: TfrmOptionsDays
     Caption = 'Appointments and visits'
     TabOrder = 11
   end
-  object lblLab: TStaticText
+  object lblLab: TStaticText [9]
     Left = 15
     Top = 16
     Width = 55
@@ -102,7 +95,7 @@ object frmOptionsDays: TfrmOptionsDays
     Caption = 'Lab results'
     TabOrder = 12
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [10]
     Left = 0
     Top = 304
     Width = 328
@@ -142,7 +135,7 @@ object frmOptionsDays: TfrmOptionsDays
       TabOrder = 1
     end
   end
-  object txtLabInpatient: TCaptionEdit
+  object txtLabInpatient: TCaptionEdit [11]
     Left = 15
     Top = 66
     Width = 42
@@ -155,22 +148,20 @@ object frmOptionsDays: TfrmOptionsDays
     OnKeyPress = txtLabInpatientKeyPress
     Caption = 'Inpatient days'
   end
-  object spnLabInpatient: TUpDown
+  object spnLabInpatient: TUpDown [12]
     Left = 57
     Top = 66
     Width = 16
     Height = 21
     HelpContext = 9013
     Associate = txtLabInpatient
-    Min = 0
     Max = 999
     Position = 1
     TabOrder = 1
     Thousands = False
-    Wrap = False
     OnClick = spnLabInpatientClick
   end
-  object txtLabOutpatient: TCaptionEdit
+  object txtLabOutpatient: TCaptionEdit [13]
     Left = 15
     Top = 121
     Width = 42
@@ -183,22 +174,20 @@ object frmOptionsDays: TfrmOptionsDays
     OnKeyPress = txtLabInpatientKeyPress
     Caption = 'Outpatient days'
   end
-  object spnLabOutpatient: TUpDown
+  object spnLabOutpatient: TUpDown [14]
     Left = 57
     Top = 121
     Width = 16
     Height = 21
     HelpContext = 9014
     Associate = txtLabOutpatient
-    Min = 0
     Max = 999
     Position = 1
     TabOrder = 3
     Thousands = False
-    Wrap = False
     OnClick = spnLabOutpatientClick
   end
-  object txtVisitStart: TCaptionEdit
+  object txtVisitStart: TCaptionEdit [15]
     Tag = -180
     Left = 15
     Top = 214
@@ -213,7 +202,7 @@ object frmOptionsDays: TfrmOptionsDays
     OnKeyUp = txtVisitStartKeyUp
     Caption = 'Start'
   end
-  object spnVisitStart: TUpDown
+  object spnVisitStart: TUpDown [16]
     Tag = -180
     Left = 94
     Top = 214
@@ -223,13 +212,11 @@ object frmOptionsDays: TfrmOptionsDays
     Associate = txtVisitStart
     Min = -999
     Max = 999
-    Position = 0
     TabOrder = 6
     Thousands = False
-    Wrap = False
     OnClick = spnVisitStartClick
   end
-  object txtVisitStop: TCaptionEdit
+  object txtVisitStop: TCaptionEdit [17]
     Tag = 30
     Left = 15
     Top = 269
@@ -244,7 +231,7 @@ object frmOptionsDays: TfrmOptionsDays
     OnKeyUp = txtVisitStopKeyUp
     Caption = 'Stop'
   end
-  object spnVisitStop: TUpDown
+  object spnVisitStop: TUpDown [18]
     Tag = 30
     Left = 94
     Top = 269
@@ -254,13 +241,11 @@ object frmOptionsDays: TfrmOptionsDays
     Associate = txtVisitStop
     Min = -999
     Max = 999
-    Position = 0
     TabOrder = 8
     Thousands = False
-    Wrap = False
     OnClick = spnVisitStopClick
   end
-  object btnLabDefaults: TButton
+  object btnLabDefaults: TButton [19]
     Left = 245
     Top = 32
     Width = 75
@@ -276,7 +261,7 @@ object frmOptionsDays: TfrmOptionsDays
     TabOrder = 4
     OnClick = btnLabDefaultsClick
   end
-  object btnVisitDefaults: TButton
+  object btnVisitDefaults: TButton [20]
     Left = 245
     Top = 184
     Width = 75
@@ -291,5 +276,62 @@ object frmOptionsDays: TfrmOptionsDays
     ParentFont = False
     TabOrder = 9
     OnClick = btnVisitDefaultsClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblVisitValue'
+        'Status = stsDefault')
+      (
+        'Component = lblLabValue'
+        'Status = stsDefault')
+      (
+        'Component = lblVisit'
+        'Status = stsDefault')
+      (
+        'Component = lblLab'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = txtLabInpatient'
+        'Status = stsDefault')
+      (
+        'Component = spnLabInpatient'
+        'Status = stsDefault')
+      (
+        'Component = txtLabOutpatient'
+        'Status = stsDefault')
+      (
+        'Component = spnLabOutpatient'
+        'Status = stsDefault')
+      (
+        'Component = txtVisitStart'
+        'Status = stsDefault')
+      (
+        'Component = spnVisitStart'
+        'Status = stsDefault')
+      (
+        'Component = txtVisitStop'
+        'Status = stsDefault')
+      (
+        'Component = spnVisitStop'
+        'Status = stsDefault')
+      (
+        'Component = btnLabDefaults'
+        'Status = stsDefault')
+      (
+        'Component = btnVisitDefaults'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsDays'
+        'Status = stsDefault'))
   end
 end

@@ -5,22 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fPCEBase, ORDtTm, StdCtrls, ORCtrls, ExtCtrls, Buttons, fAutoSz, ORFn,
-  rvitals, ComCtrls, ORNet, uVitals
-  , TRPCB // Vitals Lite 2004-05-21 ===========================================
-  ;
-{== Vitals Lite 2004-05-21 ===================================================}
-type
-  TGMV_GetInputPanel = function(
-    var anApp: TApplication;
-    aB: TRPCBroker;
-    aP,         // Patient DFN
-    aL,         // Hospitals IEN
-    aSig,       // Application signature
-    aTemplate   // Vitals Input template
-        : String;
-    aNow        // Input Date/Time
-        :TDateTime):TCustomForm;
-{== Vitals Lite 2004-05-21 ===================================================}
+  rvitals, ComCtrls, ORNet, uVitals, VAUtils, TRPCB, VA508AccessibilityManager;
 
 type
   TfrmEncVitals = class(TfrmPCEBase)
@@ -62,8 +47,10 @@ type
     txtMeasPulse: TCaptionEdit;
     txtMeasHt: TCaptionEdit;
     pnlBottom: TPanel;
-    btnEnterVitals: TButton;
     lvVitals: TCaptionListView;
+    btnEnterVitals: TButton;
+    btnOKkludge: TButton;
+    btnCancelkludge: TButton;
     procedure SetVitPointer(Sender: TObject);
     procedure txtMeasBPExit(Sender: TObject);
     procedure cboTempChange(Sender: TObject);
@@ -86,8 +73,6 @@ type
     procedure txtMeasTempExit(Sender: TObject);
     procedure txtMeasHtExit(Sender: TObject);
     procedure txtMeasWtExit(Sender: TObject);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
     procedure btnEnterVitalsClick(Sender: TObject); //vitals lite
   private
     FDataLoaded: boolean;
@@ -119,7 +104,7 @@ implementation
 uses UCore, rCore, rPCE, fPCELex, fPCEOther, fVitals,fVisit, fFrame, fEncnt,
      fEncounterFrame, uInit
   //   , fGMV_InputTemp // Vitals Lite 2004-05-21
-     ;
+     , VA508AccessibilityRouter;
 
 const
   TX_VDATE_REQ1 = 'Entered vitals information can not be saved without a Date.' + CRLF +
@@ -417,7 +402,11 @@ begin
   uVitalNew.free;
 
 {== Vitals Lite 2004-05-21 ===================================================}
-  FreeLibrary(VitalsDLLHandle);
+  if VitalsDLLHandle <> 0 then
+  begin
+    FreeLibrary(VitalsDLLHandle);
+    VitalsDLLHandle := 0;
+  end;
 {== Vitals Lite 2004-05-21 ===================================================}
   inherited;
 end;
@@ -447,7 +436,8 @@ begin
   {Visit is Assumed to Be selected when Opening Encounter Dialog}
   GMV_LibName :='GMV_VitalsViewEnter.dll';
   GMV_LibName := GetProgramFilesPath + SHARE_DIR + GMV_LibName;
-  VitalsDLLHandle := LoadLibrary(PChar(GMV_LibName));
+  if VitalsDLLHandle = 0 then
+    VitalsDLLHandle := LoadLibrary(PChar(GMV_LibName));
   if VitalsDLLHandle = 0 then // No Handle found
     MessageDLG('Can''t find library "'+GMV_LibName+'".',mtError,[mbok],0)
   else
@@ -556,29 +546,6 @@ begin
   cboPain.text      := '';
 end;
 
-procedure TfrmEncVitals.FormKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-  {capture return key press if on the vital screen}
-  begin
-    inherited;
-    if (ActiveCtrl.tag in VitalDateTagSet)then
-    begin
-      if Key = VK_RETURN then
-      begin
-        Key := 0;
-        if (ActiveCtrl.Tag = TAG_VITPAIN) then
-          ChangeFocus(btnOK)
-        else
-        begin
-          GetParentForm(Self).Perform(WM_NEXTDLGCTL,0,0);
-          SetVitPointer(Sender);
-        end;
-      end;
-    end;
-  end;
-end;
-
 //Begin Vitals Lite
 procedure TfrmEncVitals.LoadVitalView(VitalsList: TStringList);
 var
@@ -635,7 +602,7 @@ begin
     );
   end
   else
-    MessageDLG('Can not find function "'+GMV_FName+'".',mtError,[mbok],0);
+    MessageDLG('Unable to find function "'+GMV_FName+'".',mtError,[mbok],0);
   @VLPtVitals := nil;
   LoadVitalsList;
 end;
@@ -651,7 +618,7 @@ begin
   @VLPtVitals := GetProcAddress(VitalsDLLHandle,PChar(GMV_FName));
   if assigned(VLPtVitals) then
   begin
-    frmFrame.VitalsDLLActive := True;  // need this flag for CCOW (RV)
+//    frmFrame.DLLActive := True;  // need this flag for CCOW (RV)
     VitalsList := VLPtVitals(RPCBrokerV,Patient.DFN,U,false);
     if assigned(VitalsList) then
       LoadVitalView(VitalsList);
@@ -659,8 +626,11 @@ begin
   else
     MessageDLG('Can''t find function "'+GMV_FName+'".',mtError,[mbok],0);
   @VLPtVitals := nil;
-  frmFrame.VitalsDLLActive := False;  // need this flag for CCOW (RV)
+//  frmFrame.DLLActive := False;  // need this flag for CCOW (RV)
 end;
 //End Vitals Lite
+
+initialization
+  SpecifyFormIsNotADialog(TfrmEncVitals);
 
 end.

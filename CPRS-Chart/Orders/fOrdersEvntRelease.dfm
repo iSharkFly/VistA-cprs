@@ -1,23 +1,18 @@
-object frmOrdersEvntRelease: TfrmOrdersEvntRelease
+inherited frmOrdersEvntRelease: TfrmOrdersEvntRelease
   Left = 196
   Top = 66
-  Width = 451
-  Height = 355
   Caption = 'Auto DC/Release Event Orders'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 328
+  ClientWidth = 443
   OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   OnShow = FormShow
+  ExplicitWidth = 451
+  ExplicitHeight = 355
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlTop: TPanel
+  object pnlTop: TPanel [0]
     Left = 0
     Top = 0
     Width = 443
@@ -72,7 +67,6 @@ object frmOrdersEvntRelease: TfrmOrdersEvntRelease
           Max = 10000
           Position = 5
           TabOrder = 1
-          Wrap = False
           OnClick = updown1Click
         end
         object edtNumber: TEdit
@@ -99,7 +93,7 @@ object frmOrdersEvntRelease: TfrmOrdersEvntRelease
         object Label2: TLabel
           Left = 1
           Top = 1
-          Width = 290
+          Width = 244
           Height = 13
           Align = alTop
           Caption = '  Enter the number of events you would like to view '
@@ -108,7 +102,7 @@ object frmOrdersEvntRelease: TfrmOrdersEvntRelease
         object Label3: TLabel
           Left = 1
           Top = 14
-          Width = 290
+          Width = 156
           Height = 13
           Align = alTop
           Caption = '  (Input "ALL" to view all events):'
@@ -116,7 +110,7 @@ object frmOrdersEvntRelease: TfrmOrdersEvntRelease
       end
     end
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 85
     Width = 443
@@ -182,5 +176,47 @@ object frmOrdersEvntRelease: TfrmOrdersEvntRelease
         310
         125)
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = lblPtInfo'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = btnApply'
+        'Status = stsDefault')
+      (
+        'Component = updown1'
+        'Status = stsDefault')
+      (
+        'Component = edtNumber'
+        'Status = stsDefault')
+      (
+        'Component = Panel3'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = grdEvtList'
+        'Status = stsDefault')
+      (
+        'Component = frmOrdersEvntRelease'
+        'Status = stsDefault'))
   end
 end

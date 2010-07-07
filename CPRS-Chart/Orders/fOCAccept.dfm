@@ -2,14 +2,17 @@ inherited frmOCAccept: TfrmOCAccept
   Left = 305
   Top = 257
   BorderIcons = []
-  BorderStyle = bsDialog
   Caption = 'Order Checking'
   ClientHeight = 169
   ClientWidth = 472
   Position = poScreenCenter
+  ExplicitLeft = 305
+  ExplicitTop = 257
+  ExplicitWidth = 480
+  ExplicitHeight = 203
   PixelsPerInch = 96
   TextHeight = 13
-  object memChecks: TRichEdit
+  object memChecks: TRichEdit [0]
     Left = 0
     Top = 0
     Width = 472
@@ -20,7 +23,7 @@ inherited frmOCAccept: TfrmOCAccept
     TabOrder = 0
     WantReturns = False
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 136
     Width = 472
@@ -48,5 +51,23 @@ inherited frmOCAccept: TfrmOCAccept
       ModalResult = 7
       TabOrder = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memChecks'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmOCAccept'
+        'Status = stsDefault'))
   end
 end

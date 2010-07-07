@@ -1,21 +1,17 @@
-object frmODChild: TfrmODChild
+inherited frmODChild: TfrmODChild
   Left = 433
   Top = 271
-  Width = 512
-  Height = 453
   Caption = 'Associated Complex Orders'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 426
+  ClientWidth = 504
   OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
+  ExplicitWidth = 512
+  ExplicitHeight = 453
   PixelsPerInch = 96
   TextHeight = 13
-  object lblWarning: TLabel
+  object lblWarning: TLabel [0]
     Left = 0
     Top = 0
     Width = 504
@@ -29,11 +25,11 @@ object frmODChild: TfrmODChild
       'nue all of these orders?'
     WordWrap = True
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [1]
     Left = 0
     Top = 59
     Width = 504
-    Height = 325
+    Height = 326
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 3
@@ -43,7 +39,7 @@ object frmODChild: TfrmODChild
       Left = 3
       Top = 3
       Width = 494
-      Height = 315
+      Height = 316
       Style = lbOwnerDrawVariable
       Align = alClient
       ItemHeight = 16
@@ -52,9 +48,9 @@ object frmODChild: TfrmODChild
       OnMeasureItem = lstODComplexMeasureItem
     end
   end
-  object Panel2: TPanel
+  object Panel2: TPanel [2]
     Left = 0
-    Top = 384
+    Top = 385
     Width = 504
     Height = 41
     Align = alBottom
@@ -82,5 +78,26 @@ object frmODChild: TfrmODChild
       TabOrder = 1
       OnClick = btnCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = lstODComplex'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmODChild'
+        'Status = stsDefault'))
   end
 end

@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORFn, ExtCtrls, ORCtrls;
+  fAutoSz, StdCtrls, ORFn, ExtCtrls, ORCtrls, VA508AccessibilityManager;
 
 type
   TfrmChangeEventDisp = class(TfrmAutoSz)
@@ -63,7 +63,7 @@ begin
   with lstCVOrders do
   begin
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     Canvas.MoveTo(0, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);
     if Index < Items.Count then

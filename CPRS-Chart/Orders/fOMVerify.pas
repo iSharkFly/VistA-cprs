@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ComCtrls;
+  fAutoSz, StdCtrls, ComCtrls, VA508AccessibilityManager;
 
 type
   TfrmOMVerify = class(TfrmAutoSz)

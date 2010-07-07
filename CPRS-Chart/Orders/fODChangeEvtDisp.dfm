@@ -1,20 +1,16 @@
-object frmChangeEventDisp: TfrmChangeEventDisp
+inherited frmChangeEventDisp: TfrmChangeEventDisp
   Left = 344
   Top = 230
-  Width = 408
-  Height = 444
   Caption = 'Change release event'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 417
+  ClientWidth = 400
   OldCreateOrder = False
   Position = poDesktopCenter
+  ExplicitWidth = 408
+  ExplicitHeight = 444
   PixelsPerInch = 96
   TextHeight = 13
-  object lblTop: TMemo
+  object lblTop: TMemo [0]
     Left = 0
     Top = 0
     Width = 400
@@ -26,7 +22,7 @@ object frmChangeEventDisp: TfrmChangeEventDisp
     ReadOnly = True
     TabOrder = 2
   end
-  object pnlTop: TPanel
+  object pnlTop: TPanel [1]
     Left = 0
     Top = 37
     Width = 400
@@ -39,21 +35,24 @@ object frmChangeEventDisp: TfrmChangeEventDisp
       Top = 1
       Width = 394
       Height = 333
+      Style = lbOwnerDrawVariable
       Align = alClient
       ItemHeight = 13
-      Style = lbOwnerDrawVariable
       TabOrder = 0
       OnDrawItem = lstCVOrdersDrawItem
       OnMeasureItem = lstCVOrdersMeasureItem
     end
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [2]
     Left = 0
     Top = 376
     Width = 400
     Height = 41
     Align = alBottom
     TabOrder = 1
+    DesignSize = (
+      400
+      41)
     object cmdOK: TButton
       Left = 230
       Top = 12
@@ -74,5 +73,29 @@ object frmChangeEventDisp: TfrmChangeEventDisp
       TabOrder = 1
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblTop'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = lstCVOrders'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmChangeEventDisp'
+        'Status = stsDefault'))
   end
 end

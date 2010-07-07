@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORFn, CheckLst, ORCtrls, fAutoSz;
+  StdCtrls, ExtCtrls, ORFn, CheckLst, ORCtrls, fAutoSz, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOrdersReleaseEvent = class(TForm)
+  TfrmOrdersReleaseEvent = class(TfrmBase508Form)
     pnlMiddle: TPanel;
     pnlBottom: TPanel;
     btnOK: TButton;
@@ -43,7 +44,9 @@ function ExecuteReleaseEventOrders(AnOrderList: TList): boolean;
 implementation
 {$R *.DFM}
 
-uses rCore, rOrders, uConst, fOrdersPrint, uCore, uOrders, fOrders;
+uses rCore, rOrders, uConst, fOrdersPrint, uCore, uOrders, fOrders, rODLab, fRptBox,
+  VAUtils;
+
 const
   TX_SAVERR1 = 'The error, ';
   TX_SAVERR2 = ', occurred while trying to release:' + CRLF + CRLF;
@@ -59,6 +62,7 @@ var
   OrdersLst: TStringlist;
   OrderText, LastCheckedPtEvt, SpeCap: string;
   frmOrdersReleaseEvent: TfrmOrdersReleaseEvent;
+  AList: TStringList;
 
   function FindOrderText(const AnID: string): string;
   var
@@ -118,8 +122,23 @@ begin
         if Pos('E', Piece(OrdersLst[i], U, 2)) > 0 then
         begin
           OrderText := FindOrderText(Piece(OrdersLst[i], U, 1));
-          InfoBox(TX_SAVERR1 + Piece(OrdersLst[i], U, 4) + TX_SAVERR2 + OrderText,TC_SAVERR, MB_OK);
+          if Piece(OrdersLst[i],U,4) = 'Invalid Pharmacy order number' then
+          InfoBox(TX_SAVERR1 + Piece(OrdersLst[i], U, 4) + TX_SAVERR2 + OrderText + CRLF + CRLF +
+                  'The changes to this order have not been saved.  You must contact Pharmacy to complete any action on this order.',
+                  TC_SAVERR, MB_OK)
+          else
+          InfoBox(TX_SAVERR1 + Piece(OrdersLst[i], U, 4) + TX_SAVERR2 + OrderText,
+                  TC_SAVERR, MB_OK);
         end;
+      end;
+      //  CQ 10226, PSI-05-048 - advise of auto-change from LC to WC on lab orders
+      AList := TStringList.Create;
+      try
+        CheckForChangeFromLCtoWCOnRelease(AList, Encounter.Location, OrdersLst);
+        if AList.Text <> '' then
+          ReportBox(AList, 'Changed Orders', TRUE);
+      finally
+        AList.Free;
       end;
       PrintOrdersOnSignRelease(OrdersLst, NO_PROVIDER);
 
@@ -193,7 +212,7 @@ begin
   end;
   if not beSelected then
   begin
-    ShowMessage('You have to select at least one order!');
+    ShowMsg('You have to select at least one order!');
     Exit;
   end;
   OKPressed := True;
@@ -237,7 +256,7 @@ begin
   with cklstOrders do
   begin
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     Canvas.MoveTo(0, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);
     if Index < Items.Count then

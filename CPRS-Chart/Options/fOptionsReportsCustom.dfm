@@ -1,4 +1,4 @@
-object frmOptionsReportsCustom: TfrmOptionsReportsCustom
+inherited frmOptionsReportsCustom: TfrmOptionsReportsCustom
   Left = 414
   Top = 329
   BorderIcons = [biSystemMenu, biHelp]
@@ -6,28 +6,19 @@ object frmOptionsReportsCustom: TfrmOptionsReportsCustom
   Caption = 'Individual CPRS Report Settings'
   ClientHeight = 383
   ClientWidth = 503
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
-  OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object Bevel3: TBevel
+  object Bevel3: TBevel [0]
     Left = 0
     Top = 352
     Width = 503
     Height = 2
     Align = alBottom
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [1]
     Left = 0
     Top = 354
     Width = 503
@@ -67,7 +58,7 @@ object frmOptionsReportsCustom: TfrmOptionsReportsCustom
       OnClick = btnOKClick
     end
   end
-  object Panel2: TPanel
+  object Panel2: TPanel [2]
     Left = 0
     Top = 0
     Width = 503
@@ -171,5 +162,47 @@ object frmOptionsReportsCustom: TfrmOptionsReportsCustom
         Caption = 'Type the first few letters of the report you are looking for:'
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = btnApply'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = grdReport'
+        'Status = stsDefault')
+      (
+        'Component = edtMax'
+        'Status = stsDefault')
+      (
+        'Component = odbStop'
+        'Status = stsDefault')
+      (
+        'Component = odbStart'
+        'Status = stsDefault')
+      (
+        'Component = odbTool'
+        'Status = stsDefault')
+      (
+        'Component = Panel3'
+        'Status = stsDefault')
+      (
+        'Component = edtSearch'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsReportsCustom'
+        'Status = stsDefault'))
   end
 end

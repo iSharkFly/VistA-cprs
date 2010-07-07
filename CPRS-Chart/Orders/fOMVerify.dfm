@@ -1,15 +1,17 @@
 inherited frmOMVerify: TfrmOMVerify
   Left = 328
   Top = 243
-  Width = 587
-  Height = 208
   BorderIcons = []
   Caption = 'New Order'
+  ClientHeight = 181
+  ClientWidth = 579
   OnClose = FormClose
   OnCreate = FormCreate
+  ExplicitWidth = 587
+  ExplicitHeight = 208
   PixelsPerInch = 96
   TextHeight = 13
-  object cmdAccept: TButton
+  object cmdAccept: TButton [0]
     Left = 165
     Top = 154
     Width = 72
@@ -19,7 +21,7 @@ inherited frmOMVerify: TfrmOMVerify
     TabOrder = 0
     OnClick = cmdAcceptClick
   end
-  object cmdEdit: TButton
+  object cmdEdit: TButton [1]
     Left = 253
     Top = 154
     Width = 72
@@ -28,7 +30,7 @@ inherited frmOMVerify: TfrmOMVerify
     TabOrder = 1
     OnClick = cmdEditClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [2]
     Left = 341
     Top = 154
     Width = 72
@@ -38,7 +40,7 @@ inherited frmOMVerify: TfrmOMVerify
     TabOrder = 2
     OnClick = cmdCancelClick
   end
-  object memText: TRichEdit
+  object memText: TRichEdit [3]
     Left = 6
     Top = 6
     Width = 567
@@ -67,5 +69,23 @@ inherited frmOMVerify: TfrmOMVerify
     WantTabs = True
     WordWrap = False
     OnKeyUp = memTextKeyUp
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdEdit'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = memText'
+        'Status = stsDefault')
+      (
+        'Component = frmOMVerify'
+        'Status = stsDefault'))
   end
 end

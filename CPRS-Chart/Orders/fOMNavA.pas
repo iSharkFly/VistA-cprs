@@ -6,15 +6,17 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Buttons, Grids, StdCtrls, ORCtrls, ExtCtrls, uConst, rOrders, uOrders, fFrame;
+  Buttons, Grids, StdCtrls, ORCtrls, ExtCtrls, uConst, rOrders, uOrders, fFrame, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOMNavA = class(TForm)
+  TfrmOMNavA = class(TfrmBase508Form)
     pnlTool: TPanel;
     cmdDone: TORAlignButton;
     grdMenu: TCaptionStringGrid;
     cmdPrev: TBitBtn;
     cmdNext: TBitBtn;
+    accEventsGrdMenu: TVA508ComponentAccessibility;
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
@@ -41,6 +43,10 @@ type
     procedure grdMenuKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure FormResize(Sender: TObject);
+    procedure accEventsGrdMenuCaptionQuery(Sender: TObject;
+      var Text: string);
+    procedure accEventsGrdMenuValueQuery(Sender: TObject;
+      var Text: string);
   private
     FOrderingMenu: Integer;
     FLastCol: Integer;
@@ -87,7 +93,7 @@ implementation
 {$R *.DFM}
 
 uses rODBase, ORFn, fODBase,fODGen, fODAuto, fOMVerify, uCore, rMisc, uODBase,
-  fOrders, uAccessibleStringGrid;
+  fOrders, VAUtils;
 
 const
   TX_NOFORM    = 'This selection does not have an associated windows form.';
@@ -270,7 +276,7 @@ begin
   FQuickBitmap.LoadFromResourceName(hInstance, 'BMP_QO_THIN');
   NoFresh := True;
   ResizeFont;
-  TAccessibleStringGrid.WrapControl(grdMenu);
+//  TAccessibleStringGrid.WrapControl(grdMenu);
 end;
 
 procedure TfrmOMNavA.CreateParams(var Params: TCreateParams);
@@ -287,13 +293,19 @@ begin
   Self.SetFocus;
 end;
 
+procedure TfrmOMNavA.accEventsGrdMenuCaptionQuery(Sender: TObject;
+  var Text: string);
+begin
+  Text := pnlTool.Caption;
+end;
+
 procedure TfrmOMNavA.FormDestroy(Sender: TObject);
 var
   i, j: Integer;
   OrderMenu: TOrderMenu;
   OrderMenuItem: TOrderMenuItem;
 begin
-  TAccessibleStringGrid.UnwrapControl(grdMenu);
+//  TAccessibleStringGrid.UnwrapControl(grdMenu);
   ClearMenuGrid;
   for i := 0 to FMenuHits.Count - 1 do
   begin
@@ -370,8 +382,7 @@ begin
       Font.Color := clWindowText;
       if Selected    then
       begin
-         if ColorToRGB(clWindowText) = ColorToRGB(clBlack) then
-          Font.Color := clBlue;
+        Font.Color := Get508CompliantColor(clBlue);
         Font.Style := Font.Style + [fsUnderline];
       end;
       if Display = 2 then
@@ -469,7 +480,8 @@ begin
     end;
     //frmFrame.UpdatePtInfoOnRefresh;
     FOrderMenuItem := TOrderMenuItem(Objects[Col, Row]);
-    if FOrderMenuItem.Display > 0 then FOrderMenuItem := nil;          // display only
+    if Assigned(FOrderMenuItem) then
+      if FOrderMenuItem.Display > 0 then FOrderMenuItem := nil;          // display only
     if FOrderMenuItem <> nil then
     begin
       FOrderMenuItem.Selected := True;
@@ -626,6 +638,19 @@ begin
   end;
 end;
 
+procedure TfrmOMNavA.accEventsGrdMenuValueQuery(Sender: TObject;
+  var Text: string);
+var
+  OrderMenuItem : TOrderMenuItem;
+begin
+  inherited;
+  if grdMenu.Objects[grdMenu.Col, grdMenu.Row] is TOrderMenuItem then begin
+    OrderMenuItem := TOrderMenuItem(grdMenu.Objects[grdMenu.Col, grdMenu.Row]);
+    if OrderMenuItem.AutoAck then
+      Text := 'Auto Accept, '+ OrderMenuItem.ItemText;
+  end;
+end;
+
 procedure TfrmOMNavA.ActivateDialog(AnItem: TOrderMenuItem);
 var
   MenuPath: TMenuPath;
@@ -659,14 +684,14 @@ begin
          end; {if}
        end; {'M'}
   'Q': ActivateOrderDialog(IntToStr(AnItem.IEN), FDelayEvent, Self, 0);
-  'P': ShowMessage('Order Dialogs of type "Prompt" cannot be processed.');
+  'P': ShowMsg('Order Dialogs of type "Prompt" cannot be processed.');
   'O': begin
          // disable initially, since the 1st item in the set may be a menu
          Self.Enabled := False;
          if not ActivateOrderSet(IntToStr(AnItem.IEN), FDelayEvent, Self, 0)
            then Self.Enabled := True;
        end;
-  else ShowMessage('Unknown Order Dialog type: ' + AnItem.DlgType);
+  else ShowMsg('Unknown Order Dialog type: ' + AnItem.DlgType);
   end; {case}
 end;
 

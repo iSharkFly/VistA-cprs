@@ -1,21 +1,15 @@
-object frmODRadApproval: TfrmODRadApproval
+inherited frmODRadApproval: TfrmODRadApproval
   Left = 295
   Top = 167
   BorderStyle = bsDialog
   Caption = 'Select Approving Radiologist'
   ClientHeight = 262
   ClientWidth = 259
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 259
@@ -67,11 +61,31 @@ object frmODRadApproval: TfrmODRadApproval
       ItemTipEnable = True
       ListItemsOnly = True
       LongList = False
+      LookupPiece = 0
       MaxLength = 0
       Pieces = '2'
       Sorted = True
       SynonymChars = '<>'
       TabOrder = 0
+      CharsNeedMatch = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cboRadiologist'
+        'Status = stsDefault')
+      (
+        'Component = frmODRadApproval'
+        'Status = stsDefault'))
   end
 end

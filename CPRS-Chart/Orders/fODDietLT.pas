@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, ExtCtrls, StdCtrls, ORFn;
+  fAutoSz, ExtCtrls, StdCtrls, ORFn, fODBase, rODBase, VA508AccessibilityManager;
 
 type
   TfrmODDietLT = class(TfrmAutoSz)
@@ -35,6 +35,8 @@ type
   end;
 
 procedure CheckLateTray(const StartTime: string; var LateTrayFields: TLateTrayFields; IsOutpatient: boolean; AMeal: char = #0);
+procedure LateTrayCheck(SomeResponses: TResponses; EventId: integer; IsOutpatient: boolean; var LateTrayFields: TLateTrayFields);
+procedure LateTrayOrder(LateTrayFields: TLateTrayFields; IsInpatient: boolean);
 
 implementation
 
@@ -188,6 +190,64 @@ If it's between the LATE BREAKFAST ALARM BEGIN and ALARM END then I ask if they 
     end; {with frmODDietLT}
   finally
     frmODDietLT.Release;
+  end;
+end;
+
+procedure LateTrayCheck(SomeResponses: TResponses; EventId: integer; IsOutpatient: boolean; var LateTrayFields: TLateTrayFields);
+var
+  AResponse, AnotherResponse: TResponse;
+begin
+  if IsOutpatient then
+  begin
+    AResponse := SomeResponses.FindResponseByName('ORDERABLE', 1);
+    if (EventID = 0) and (AResponse <> nil) and (Copy(AResponse.EValue, 1, 3) <> 'NPO') then
+    begin
+      AResponse := SomeResponses.FindResponseByName('START', 1);
+      AnotherResponse := SomeResponses.FindResponseByName('MEAL', 1);
+      if (AResponse <> nil) and (AnotherResponse <> nil) then
+        CheckLateTray(AResponse.IValue, LateTrayFields, True, CharAt(AnotherResponse.IValue, 1));
+    end;
+  end
+  else
+  begin
+    AResponse := SomeResponses.FindResponseByName('ORDERABLE', 1);
+    if (EventID = 0) and (AResponse <> nil) and (Copy(AResponse.EValue, 1, 3) <> 'NPO') then
+    begin
+      AResponse := SomeResponses.FindResponseByName('START', 1);
+      if AResponse <> nil then CheckLateTray(AResponse.IValue, LateTrayFields, False);
+    end;
+  end;
+end;
+
+procedure LateTrayOrder(LateTrayFields: TLateTrayFields; IsInpatient: boolean);
+const
+  TX_EL_SAVE_ERR    = 'An error occurred while saving this late tray order.';
+  TC_EL_SAVE_ERR    = 'Error Saving Late Tray Order';
+var
+  NewOrder: TOrder;
+  CanSign: integer;
+begin
+  NewOrder := TOrder.Create;
+  try
+    with LateTrayFields do OrderLateTray(NewOrder, LateMeal, LateTime, IsBagged);
+    if NewOrder.ID <> '' then
+    begin
+      if IsInpatient then
+        begin
+          if (Encounter.Provider = User.DUZ) and User.CanSignOrders
+            then CanSign := CH_SIGN_YES
+            else CanSign := CH_SIGN_NA;
+        end
+      else
+        begin
+          CanSign := CH_SIGN_NA;
+        end;
+      Changes.Add(CH_ORD, NewOrder.ID, NewOrder.Text, '', CanSign);
+      SendMessage(Application.MainForm.Handle, UM_NEWORDER, ORDER_NEW, Integer(NewOrder))
+    end
+    else InfoBox(TX_EL_SAVE_ERR, TC_EL_SAVE_ERR, MB_OK);
+  finally
+    NewOrder.Free;
   end;
 end;
 

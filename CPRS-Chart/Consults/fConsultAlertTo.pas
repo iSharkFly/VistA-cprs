@@ -3,10 +3,10 @@ unit fConsultAlertTo;
 interface
 
 uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
-  Buttons, ORCtrls, ORfn, ExtCtrls;
+  Buttons, ORCtrls, ORfn, ExtCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmConsultAlertsTo = class(TForm)
+  TfrmConsultAlertsTo = class(TfrmBase508Form)
     cmdOK: TButton;
     cmdCancel: TButton;
     cboSrcList: TORComboBox;
@@ -14,6 +14,8 @@ type
     SrcLabel: TLabel;
     DstLabel: TLabel;
     pnlBase: TORAutoPanel;
+    btnAdd: TButton;
+    btnRemove: TButton;
     procedure cboSrcListNeedData(Sender: TObject; const StartFrom: String;
       Direction, InsertAt: Integer);
     procedure cmdOKClick(Sender: TObject);

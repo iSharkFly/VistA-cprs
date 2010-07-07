@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, ORCtrls, StdCtrls, ORFn;
+  ExtCtrls, ORCtrls, StdCtrls, ORFn, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmODLabOthSpec = class(TForm)
+  TfrmODLabOthSpec = class(TfrmBase508Form)
     pnlBase: TORAutoPanel;
     cboOtherSpec: TORComboBox;
     cmdOK: TButton;
@@ -51,7 +51,7 @@ begin
       ClientHeight := H; pnlBase.Height := H;
       with cboOtherSpec do
         begin
-          {MItems.Assign(SpecimenList);
+          {FastAssign(SpecimenList, MItems);
           InsertSeparator; }
           InitLongList('');
         end;

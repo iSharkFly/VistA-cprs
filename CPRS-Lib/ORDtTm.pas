@@ -6,10 +6,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, StdCtrls, Buttons,
-  Grids, Calendar, ExtCtrls, ORFn, ORNet, ORDtTmCal, Mask, ComCtrls, ORCtrls;
+  Grids, Calendar, ExtCtrls, ORFn, ORNet, ORDtTmCal, Mask, ComCtrls, OR2006Compatibility,
+  ORCtrls, VAClasses;
 
 type
-  TORfrmDtTm = class(TForm)
+  TORfrmDtTm = class(Tfrm2006Compatibility)
     bvlFrame: TBevel;
     lblDate: TPanel;
     txtTime: TEdit;
@@ -50,6 +51,8 @@ type
     FFromSelf: Boolean;
     FNowPressed:  Boolean;
     TimeIsRequired: Boolean;
+  protected
+    procedure Loaded; override;
   end;
 
   { TORDateTimeDlg }
@@ -74,6 +77,9 @@ type
     property RequireTime: Boolean     read FRequireTime    write SetRequireTime;
   end;
 
+  // 508 class
+  TORDateButton = class (TBitBtn);
+
   { TORDateBox }
 
   TORDateEdit = class(TEdit)
@@ -81,16 +87,17 @@ type
     procedure CreateParams(var Params: TCreateParams); override;
   end;
 
-  TORDateBox = class(TORDateEdit)
+  TORDateBox = class(TORDateEdit, IVADynamicProperty, IORBlackColorModeCompatible)
   private
     FFMDateTime: TFMDateTime;
     FDateOnly: Boolean;
     FRequireTime: Boolean;
-    FButton: TBitBtn;
+    FButton: TORDateButton;
     FFormat: string;
     FTimeIsNow: Boolean;
     FTemplateField: boolean;
     FCaption: TStaticText;
+    FBlackColorMode: boolean;
     procedure ButtonClick(Sender: TObject);
     function GetFMDateTime: TFMDateTime;
     function GetRelativeTime: string;
@@ -103,14 +110,17 @@ type
     procedure SetTemplateField(const Value: boolean);
     procedure SetCaption(const Value: string);
     function  GetCaption(): string;
-                                                             
   protected
     procedure Change; override;
     procedure KeyDown(var Key: Word; Shift: TShiftState); override;
+    property DateButton: TORDateButton read FButton;
   public
     constructor Create(AOwner: TComponent); override;
     function IsValid: Boolean;
     procedure Validate(var ErrMsg: string);
+    procedure SetBlackColorMode(Value: boolean);
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
     property Format: string read FFormat write FFormat;
     property RelativeTime: string     read GetRelativeTime;
     property TemplateField: boolean read FTemplateField write SetTemplateField;
@@ -121,14 +131,27 @@ type
     property Caption: string read GetCaption write SetCaption;
   end;
 
-  TORDateCombo = class(TCustomPanel)
+  // 508 classes
+  TORDayCombo = class (TORComboBox);
+  TORMonthCombo = class (TORComboBox);
+  TORYearEdit = class(TMaskEdit)
+  private
+    FTemplateField: boolean;
+    procedure SetTemplateField(const Value: boolean);
+  protected
+    property TemplateField: boolean read FTemplateField write SetTemplateField;
+  end;
+
+  TORYearEditClass = Class of TORYearEdit;
+
+  TORDateCombo = class(TCustomPanel, IORBlackColorModeCompatible)
   private
     FYearChanging: boolean;
-    FMonthCombo: TORComboBox;
-    FDayCombo: TORComboBox;
-    FYearEdit: TMaskEdit;
+    FMonthCombo: TORMonthCombo;
+    FDayCombo: TORDayCombo;
+    FYearEdit: TORYearEdit;
     FYearUD: TUpDown;
-    FCalBtn: TSpeedButton;
+    FCalBtn: TORDateButton;
     FIncludeMonth: boolean;
     FIncludeDay: boolean;
     FIncludeBtn: boolean;
@@ -140,6 +163,8 @@ type
     FOnChange: TNotifyEvent;
     FRebuilding: boolean;
     FTemplateField: boolean;
+    FBlackColorMode: boolean;
+    FORYearEditClass: TORYearEditClass;
     procedure SetIncludeBtn(const Value: boolean);
     procedure SetIncludeDay(Value: boolean);
     procedure SetIncludeMonth(const Value: boolean);
@@ -152,7 +177,7 @@ type
     procedure CMFontChanged(var Message: TMessage); message CM_FONTCHANGED;
     procedure SetTemplateField(const Value: boolean);
   protected
-    procedure Rebuild;
+    procedure Rebuild; virtual;
     function InitDays(GetSize: boolean): integer;
     function InitMonths(GetSize: boolean): integer;
     function GetYearSize: integer;
@@ -168,10 +193,17 @@ type
     procedure Loaded; override;
     procedure Paint; override;
     procedure Resized(Sender: TObject);
+    property MonthCombo: TORMonthCombo read FMonthCombo;
+    property DayCombo: TORDayCombo read FDayCombo;
+    property YearEdit: TORYearEdit read FYearEdit;
+    property YearUD: TUpDown read FYearUD;
+    property CalBtn: TORDateButton read FCalBtn;
+    property ORYearEditClass: TORYearEditClass read FORYearEditClass write FORYearEditClass;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function DateText: string;
+    procedure SetBlackColorMode(Value: boolean);
     property TemplateField: boolean read FTemplateField write SetTemplateField;
     property FMDate: TFMDateTime read GetFMDate write SetFMDate;
   published
@@ -279,6 +311,17 @@ begin
   if ATime <> '@00:00' then Result := Result + ATime;
 end;
 
+procedure LoadEllipsis(bitmap: TBitMap; BlackColorMode: boolean);
+var
+  ResName: string;
+begin
+  if BlackColorMode then
+    ResName := 'BLACK_BMP_ELLIPSIS'
+  else
+    ResName := 'BMP_ELLIPSIS';
+  bitmap.LoadFromResourceName(hInstance, ResName);
+end;
+
 { TfrmORDtTm -------------------------------------------------------------------------------- }
 
 procedure TORfrmDtTm.FormCreate(Sender: TObject);
@@ -350,6 +393,7 @@ end;
 
 procedure TORfrmDtTm.lstHourClick(Sender: TObject);
 begin
+  if lstHour.ItemIndex = 0 then lstMinute.Items[0] := ':01  --' else lstMinute.Items[0] := ':00  --'; //<------ NEW CODE
   if lstMinute.ItemIndex < 0 then lstMinute.ItemIndex := 0;
   lstMinuteClick(Self);
 end;
@@ -373,6 +417,7 @@ begin
   AnHour := lstHour.ItemIndex;
 
   AMinute := lstMinute.ItemIndex * 5;
+  if (AnHour = 0) and (AMinute = 0) then AMinute := 1;  //<-------------- NEW CODE
   FFromSelf := True;
   // if ampm time -
   //txtTime.Text := Format('%d:%.2d ' + AmPm, [AnHour, AMinute]);
@@ -409,7 +454,8 @@ begin
   if Length(txtTime.Text) > 0 then
   begin
     x := Trim(txtTime.Text);
-    if (x='00:00') or (x='0:00') or (x='00:00:00') or (x='0:00:00') then x := '00:00:01';
+    //if (x='00:00') or (x='0:00') or (x='00:00:00') or (x='0:00:00') then x := '00:00:01';
+    if (x='00:00') or (x='0:00') or (x='00:00:00') or (x='0:00:00') then x := '00:01';  //<------- CHANGED CODE
     StrToTime(x);
     txtTime.Text := x;
   end;
@@ -419,6 +465,12 @@ end;
 procedure TORfrmDtTm.cmdCancelClick(Sender: TObject);
 begin
   ModalResult := mrCancel;
+end;
+
+procedure TORfrmDtTm.Loaded;
+begin
+  inherited Loaded;
+  UpdateColorsFor508Compliance(Self);
 end;
 
 { TORDateTimeDlg }
@@ -514,13 +566,14 @@ end;
 constructor TORDateBox.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FButton := TBitBtn.Create(Self);
+  FButton := TORDateButton.Create(Self);
   FButton.Parent := Self;
   FButton.Width := 18;
   FButton.Height := 17;
   FButton.OnClick := ButtonClick;
   FButton.TabStop := False;
-  FButton.Glyph.LoadFromResourceName(hInstance, 'BMP_ELLIPSIS');
+  FBlackColorMode := False;
+  LoadEllipsis(FButton.Glyph, FALSE);
   FButton.Visible := True;
   FFormat := FMT_DATETIME;
 end;
@@ -564,6 +617,11 @@ begin
       BorderStyle := bsSingle;
     end;
   end;
+end;
+
+function TORDateBox.SupportsDynamicProperty(PropertyID: integer): boolean;
+begin
+  Result := (PropertyID = DynaPropAccesibilityCaption);
 end;
 
 procedure TORDateBox.ButtonClick(Sender: TObject);
@@ -697,6 +755,15 @@ begin
   if Length(Text) = 0 then Result := False;
 end;
 
+procedure TORDateBox.SetBlackColorMode(Value: boolean);
+begin
+  if FBlackColorMode <> Value then
+  begin
+    FBlackColorMode := Value;
+    LoadEllipsis(FButton.Glyph, FBlackColorMode);
+  end;
+end;
+
 procedure TORDateBox.SetCaption(const Value: string);
 begin
     if not Assigned(FCaption) then begin
@@ -714,6 +781,14 @@ end;
 function TORDateBox.GetCaption(): string;
 begin
     result := FCaption.Caption;
+end;
+
+function TORDateBox.GetDynamicProperty(PropertyID: integer): string;
+begin
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := GetCaption
+  else
+    Result := '';
 end;
 
 function IsLeapYear(AYear: Integer): Boolean;
@@ -744,18 +819,9 @@ const
   FirstYear = 1800;
   LastYear = 2200;
 
-type
-  TORDateComboEdit = class(TMaskEdit)
-  private
-    FTemplateField: boolean;
-    procedure SetTemplateField(const Value: boolean);
-  protected
-    property TemplateField: boolean read FTemplateField write SetTemplateField;
-  end;
-
 { TORDateComboEdit }
 
-procedure TORDateComboEdit.SetTemplateField(const Value: boolean);
+procedure TORYearEdit.SetTemplateField(const Value: boolean);
 begin
   if(FTemplateField <> Value) then
   begin
@@ -778,6 +844,7 @@ begin
   FIncludeDay := TRUE;
   FIncludeBtn := TRUE;
   OnResize := Resized;
+  FORYearEditClass := TORYearEdit;
 end;
 
 destructor TORDateCombo.Destroy;
@@ -867,12 +934,13 @@ begin
         begin
           if(not assigned(FMonthCombo)) then
           begin
-            FMonthCombo := TORComboBox.Create(Self);
+            FMonthCombo := TORMonthCombo.Create(Self);
             FMonthCombo.Parent := Self;
             FMonthCombo.Top := 0;
             FMonthCombo.Left := 0;
             FMonthCombo.Style := orcsDropDown;
             FMonthCombo.DropDownCount := 13;
+            FMonthCombo.ListItemsOnly := True;
             FMonthCombo.OnChange := MonthChanged;
           end;
           FMonthCombo.Font := Font;
@@ -887,10 +955,11 @@ begin
           begin
             if(not assigned(FDayCombo)) then
             begin
-              FDayCombo := TORComboBox.Create(Self);
+              FDayCombo := TORDayCombo.Create(Self);
               FDayCombo.Parent := Self;
               FDayCombo.Top := 0;
               FDayCombo.Style := orcsDropDown;
+              FDayCombo.ListItemsOnly := True;
               FDayCombo.OnChange := DayChanged;
               FDayCombo.DropDownCount := 11;
             end;
@@ -913,7 +982,7 @@ begin
         end;
         if(not assigned(FYearEdit)) then
         begin
-          FYearEdit := TORDateComboEdit.Create(Self);
+          FYearEdit := FORYearEditClass.Create(Self);
           FYearEdit.Parent := Self;
           FYearEdit.Top := 0;
           FYearEdit.EditMask := '9999;1; ';
@@ -921,7 +990,7 @@ begin
           FYearEdit.OnChange := YearChanged;
         end;
         FYearEdit.Font := Font;
-        TORDateComboEdit(FYearEdit).TemplateField := FTemplateField;
+        FYearEdit.TemplateField := FTemplateField;
         Wide := GetYearSize;
         FYearEdit.Width := Wide;
         FYearEdit.Height := Y;
@@ -946,10 +1015,11 @@ begin
         begin
           if(not assigned(FCalBtn)) then
           begin
-            FCalBtn := TSpeedButton.Create(Self);
+            FCalBtn := TORDateButton.Create(Self);
+            FCalBtn.TabStop := FALSE;
             FCalBtn.Parent := Self;
             FCalBtn.Top := 0;
-            FCalBtn.Glyph.LoadFromResourceName(hInstance, 'BMP_ELLIPSIS');
+            LoadEllipsis(FCalBtn.Glyph, FBlackColorMode);
             FCalBtn.OnClick := BtnClicked;
           end;
           Wide := FYearEdit.Height;
@@ -972,6 +1042,16 @@ begin
     finally
       FRebuilding := FALSE;
     end;
+  end;
+end;
+
+procedure TORDateCombo.SetBlackColorMode(Value: boolean);
+begin
+  if FBlackColorMode <> Value then
+  begin
+    FBlackColorMode := Value;
+    if assigned(FCalBtn) then    
+      LoadEllipsis(FCalBtn.Glyph, FBlackColorMode);
   end;
 end;
 

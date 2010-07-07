@@ -1,20 +1,22 @@
 inherited frmWardComments: TfrmWardComments
   Left = 334
   Top = 234
-  Height = 289
   Caption = 'Comments for Order'
+  ClientHeight = 262
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 320
+  ExplicitHeight = 289
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TLabel [0]
     Left = 8
     Top = 80
     Width = 52
     Height = 13
     Caption = 'Comments:'
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [1]
     Left = 267
     Top = 233
     Width = 72
@@ -24,7 +26,7 @@ inherited frmWardComments: TfrmWardComments
     TabOrder = 1
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [2]
     Left = 347
     Top = 233
     Width = 72
@@ -34,7 +36,7 @@ inherited frmWardComments: TfrmWardComments
     TabOrder = 2
     OnClick = cmdCancelClick
   end
-  object memOrder: TMemo
+  object memOrder: TMemo [3]
     Left = 8
     Top = 8
     Width = 411
@@ -47,7 +49,7 @@ inherited frmWardComments: TfrmWardComments
     TabOrder = 3
     WantReturns = False
   end
-  object memComments: TRichEdit
+  object memComments: TRichEdit [4]
     Left = 8
     Top = 94
     Width = 411
@@ -56,5 +58,23 @@ inherited frmWardComments: TfrmWardComments
     TabOrder = 0
     WantTabs = True
     OnKeyUp = memCommentsKeyUp
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = memComments'
+        'Status = stsDefault')
+      (
+        'Component = frmWardComments'
+        'Status = stsDefault'))
   end
 end

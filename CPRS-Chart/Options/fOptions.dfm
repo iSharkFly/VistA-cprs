@@ -1,4 +1,4 @@
-object frmOptions: TfrmOptions
+inherited frmOptions: TfrmOptions
   Left = 315
   Top = 110
   Width = 435
@@ -8,19 +8,20 @@ object frmOptions: TfrmOptions
   BorderIcons = [biSystemMenu, biHelp]
   BorderStyle = bsDialog
   Caption = 'Options'
-  Color = clBtnFace
-  ParentFont = True
+  Font.Name = 'Tahoma'
   HelpFile = 'CPRSWT.HLP'
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  ExplicitWidth = 435
+  ExplicitHeight = 397
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [0]
     Left = 0
-    Top = 340
-    Width = 427
+    Top = 335
+    Width = 429
     Height = 30
     HelpContext = 9999
     Align = alBottom
@@ -62,11 +63,11 @@ object frmOptions: TfrmOptions
       OnClick = btnApplyClick
     end
   end
-  object pnlMain: TPanel
+  object pnlMain: TPanel [1]
     Left = 0
     Top = 0
-    Width = 427
-    Height = 340
+    Width = 429
+    Height = 335
     Align = alClient
     BevelOuter = bvNone
     BorderWidth = 5
@@ -75,19 +76,19 @@ object frmOptions: TfrmOptions
     object pagOptions: TPageControl
       Left = 5
       Top = 5
-      Width = 417
-      Height = 330
+      Width = 419
+      Height = 325
       HelpContext = 9999
-      ActivePage = tsListsTeams
+      ActivePage = tsCprsReports
       Align = alClient
-      TabIndex = 3
       TabOrder = 0
+      OnEnter = pagOptionsEnter
       object tsCoverSheet: TTabSheet
         HelpContext = 9000
         Caption = 'General'
         DesignSize = (
-          409
-          302)
+          411
+          297)
         object bvlCoverDays: TBevel
           Left = 125
           Top = 16
@@ -438,7 +439,7 @@ object frmOptions: TfrmOptions
         object lblNotificationsOptions: TStaticText
           Left = 125
           Top = 27
-          Width = 158
+          Width = 164
           Height = 17
           Caption = 'Change your notification options.'
           TabOrder = 4
@@ -487,8 +488,8 @@ object frmOptions: TfrmOptions
         end
         object lvwNotifications: TCaptionListView
           Left = 0
-          Top = 136
-          Width = 409
+          Top = 138
+          Width = 411
           Height = 159
           HelpContext = 9035
           Align = alBottom
@@ -654,8 +655,8 @@ object frmOptions: TfrmOptions
         end
         object lvwOrderChecks: TCaptionListView
           Left = 0
-          Top = 87
-          Width = 409
+          Top = 89
+          Width = 411
           Height = 208
           HelpContext = 9041
           Align = alBottom
@@ -795,8 +796,8 @@ object frmOptions: TfrmOptions
           Color = clBtnFace
           Lines.Strings = (
             'Change the defaults for selecting patients. If your List '
-            'Source is Combination, the criteria is defined using Source '
-            'Combinations.')
+            'Source is Combination, the criteria is defined using '
+            'Source Combinations.')
           ReadOnly = True
           TabOrder = 7
         end
@@ -809,9 +810,9 @@ object frmOptions: TfrmOptions
           BorderStyle = bsNone
           Color = clBtnFace
           Lines.Strings = (
-            'Edit your personal lists of patients and diagnoses. View the '
-            'teams you are on and the patients associated with those '
-            'teams.')
+            'Edit your personal lists of patients and diagnoses. View '
+            'the teams you are on and the patients associated with '
+            'those teams.')
           ReadOnly = True
           TabOrder = 8
         end
@@ -922,8 +923,8 @@ object frmOptions: TfrmOptions
         Caption = 'Notes'
         ImageIndex = 4
         DesignSize = (
-          409
-          302)
+          411
+          297)
         object bvlNotesNotes: TBevel
           Left = 88
           Top = 16
@@ -1292,7 +1293,8 @@ object frmOptions: TfrmOptions
           BorderStyle = bsNone
           Color = clBtnFace
           Lines.Strings = (
-            'Change the default date range and occurrence limits for '
+            'Change the default date range and occurrence limits '
+            'for '
             'all reports on the CPRS Reports tab (excluding health '
             'summary reports) .')
           ReadOnly = True
@@ -1316,7 +1318,7 @@ object frmOptions: TfrmOptions
         object lblReports: TStaticText
           Left = 13
           Top = 9
-          Width = 55
+          Width = 56
           Height = 17
           Caption = 'All Reports'
           TabOrder = 2
@@ -1324,7 +1326,7 @@ object frmOptions: TfrmOptions
         object lblReport1: TStaticText
           Left = 9
           Top = 101
-          Width = 89
+          Width = 91
           Height = 17
           Caption = 'Individual Reports'
           TabOrder = 3
@@ -1350,7 +1352,7 @@ object frmOptions: TfrmOptions
         object lblReport2: TStaticText
           Left = 5
           Top = 197
-          Width = 91
+          Width = 90
           Height = 17
           Caption = 'Remote Data Tool'
           TabOrder = 6
@@ -1359,37 +1361,24 @@ object frmOptions: TfrmOptions
           Left = 128
           Top = 213
           Width = 273
-          Height = 28
+          Height = 47
           TabStop = False
           BorderStyle = bsNone
           Color = clBtnFace
           Lines.Strings = (
-            'Change the default tool for viewing Remote Patient Data')
+            'Users now have direct '#39'one-click'#39' access to VistaWeb '
+            'and RDV from the CPRS Toolbar.  You no longer have '
+            'to change your Remote Data Tool settings.')
           ReadOnly = True
           TabOrder = 7
-        end
-        object rdoRDV: TRadioGroup
-          Left = 120
-          Top = 244
-          Width = 277
-          Height = 37
-          Hint = 'Select RDV for Remote Data Views (classic) or WebVista'
-          Caption = 'How do you want to view remote data'
-          Columns = 2
-          ItemIndex = 0
-          Items.Strings = (
-            'RDV (Classic)'
-            'VistaWeb')
-          TabOrder = 8
-          OnClick = rdoRDVClick
         end
       end
       object tsGraphs: TTabSheet
         Caption = 'Graphs'
         ImageIndex = 6
         DesignSize = (
-          409
-          302)
+          411
+          297)
         object bvlGraphSettings: TBevel
           Left = 104
           Top = 16
@@ -1471,7 +1460,7 @@ object frmOptions: TfrmOptions
         object lblGraphSettings: TStaticText
           Left = 13
           Top = 145
-          Width = 79
+          Width = 81
           Height = 17
           Caption = 'Default Settings'
           TabOrder = 0
@@ -1534,5 +1523,194 @@ object frmOptions: TfrmOptions
         end
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnApply'
+        'Status = stsDefault')
+      (
+        'Component = pnlMain'
+        'Status = stsDefault')
+      (
+        'Component = pagOptions'
+        'Status = stsDefault')
+      (
+        'Component = tsCoverSheet'
+        'Status = stsDefault')
+      (
+        'Component = lblCoverReminderDesc'
+        'Status = stsDefault')
+      (
+        'Component = lblCoverReminders'
+        'Status = stsDefault')
+      (
+        'Component = lblCoverDaysDesc'
+        'Status = stsDefault')
+      (
+        'Component = lblCoverDays'
+        'Status = stsDefault')
+      (
+        'Component = lblOtherParameters'
+        'Status = stsDefault')
+      (
+        'Component = lblOtherParametersDesc'
+        'Status = stsDefault')
+      (
+        'Component = btnCoverDays'
+        'Status = stsDefault')
+      (
+        'Component = btnCoverReminders'
+        'Status = stsDefault')
+      (
+        'Component = btnOtherParameters'
+        'Status = stsDefault')
+      (
+        'Component = tsNotifications'
+        'Status = stsDefault')
+      (
+        'Component = lblNotificationsOptions'
+        'Status = stsDefault')
+      (
+        'Component = lblNotifications'
+        'Status = stsDefault')
+      (
+        'Component = lblNotificationsSurrogate'
+        'Status = stsDefault')
+      (
+        'Component = lblNotificationsSurrogateText'
+        'Status = stsDefault')
+      (
+        'Component = lvwNotifications'
+        'Status = stsDefault')
+      (
+        'Component = btnNotificationsRemove'
+        'Status = stsDefault')
+      (
+        'Component = chkNotificationsFlagged'
+        'Status = stsDefault')
+      (
+        'Component = btnSurrogate'
+        'Status = stsDefault')
+      (
+        'Component = tsOrderChecks'
+        'Status = stsDefault')
+      (
+        'Component = lblOrderChecks'
+        'Status = stsDefault')
+      (
+        'Component = lvwOrderChecks'
+        'Status = stsDefault')
+      (
+        'Component = tsListsTeams'
+        'Status = stsDefault')
+      (
+        'Component = lblPatientSelectionDesc'
+        'Status = stsDefault')
+      (
+        'Component = lblTeamsDesc'
+        'Status = stsDefault')
+      (
+        'Component = lblPatientSelection'
+        'Status = stsDefault')
+      (
+        'Component = lblTeams'
+        'Status = stsDefault')
+      (
+        'Component = btnPatientSelection'
+        'Status = stsDefault')
+      (
+        'Component = btnPersonalLists'
+        'Status = stsDefault')
+      (
+        'Component = btnTeams'
+        'Status = stsDefault')
+      (
+        'Component = btnCombinations'
+        'Status = stsDefault')
+      (
+        'Component = btnDiagnoses'
+        'Status = stsDefault')
+      (
+        'Component = tsNotes'
+        'Status = stsDefault')
+      (
+        'Component = lblNotesNotesDesc'
+        'Status = stsDefault')
+      (
+        'Component = lblNotesTitlesDesc'
+        'Status = stsDefault')
+      (
+        'Component = lblNotesNotes'
+        'Status = stsDefault')
+      (
+        'Component = lblNotesTitles'
+        'Status = stsDefault')
+      (
+        'Component = btnNotesNotes'
+        'Status = stsDefault')
+      (
+        'Component = btnNotesTitles'
+        'Status = stsDefault')
+      (
+        'Component = tsCprsReports'
+        'Status = stsDefault')
+      (
+        'Component = memReports'
+        'Status = stsDefault')
+      (
+        'Component = memReport1'
+        'Status = stsDefault')
+      (
+        'Component = lblReports'
+        'Status = stsDefault')
+      (
+        'Component = lblReport1'
+        'Status = stsDefault')
+      (
+        'Component = btnReports'
+        'Status = stsDefault')
+      (
+        'Component = btnReport1'
+        'Status = stsDefault')
+      (
+        'Component = lblReport2'
+        'Status = stsDefault')
+      (
+        'Component = memReport2'
+        'Status = stsDefault')
+      (
+        'Component = tsGraphs'
+        'Status = stsDefault')
+      (
+        'Component = lblGraphSettings'
+        'Status = stsDefault')
+      (
+        'Component = btnGraphSettings'
+        'Status = stsDefault')
+      (
+        'Component = lblGraphViews'
+        'Status = stsDefault')
+      (
+        'Component = btnGraphViews'
+        'Status = stsDefault')
+      (
+        'Component = memGraphSettings'
+        'Status = stsDefault')
+      (
+        'Component = memGraphViews'
+        'Status = stsDefault')
+      (
+        'Component = frmOptions'
+        'Status = stsDefault'))
   end
 end

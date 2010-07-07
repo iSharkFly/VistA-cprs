@@ -1,36 +1,30 @@
-object frmTemplateView: TfrmTemplateView
+inherited frmTemplateView: TfrmTemplateView
   Left = 257
   Top = 105
-  Width = 578
-  Height = 372
   Caption = 'View Template'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
+  ClientHeight = 343
+  ClientWidth = 568
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  OnShow = FormShow
+  ExplicitWidth = 576
+  ExplicitHeight = 370
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [0]
     Left = 0
-    Top = 315
-    Width = 570
+    Top = 313
+    Width = 568
     Height = 30
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      570
+      568
       30)
     object btnClose: TButton
-      Left = 494
+      Left = 492
       Top = 6
       Width = 75
       Height = 21
@@ -51,7 +45,7 @@ object frmTemplateView: TfrmTemplateView
       OnClick = cbStayOnTopClick
     end
     object btnPrint: TButton
-      Left = 414
+      Left = 412
       Top = 6
       Width = 75
       Height = 21
@@ -61,11 +55,11 @@ object frmTemplateView: TfrmTemplateView
       OnClick = btnPrintClick
     end
   end
-  object reMain: TRichEdit
+  object reMain: TRichEdit [1]
     Left = 0
     Top = 0
-    Width = 570
-    Height = 315
+    Width = 568
+    Height = 313
     Align = alClient
     Color = clCream
     Font.Charset = ANSI_CHARSET
@@ -81,6 +75,27 @@ object frmTemplateView: TfrmTemplateView
     TabOrder = 0
     WantReturns = False
     WordWrap = False
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnClose'
+        'Status = stsDefault')
+      (
+        'Component = cbStayOnTop'
+        'Status = stsDefault')
+      (
+        'Component = btnPrint'
+        'Status = stsDefault')
+      (
+        'Component = reMain'
+        'Status = stsDefault')
+      (
+        'Component = frmTemplateView'
+        'Status = stsDefault'))
   end
   object popView: TPopupMenu
     OnPopup = popViewPopup

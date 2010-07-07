@@ -43,6 +43,8 @@ var
 {$ENDIF}
   RPCLastCall: string;
 
+  AppStartedCursorForm: TForm = nil;
+
 implementation
 
 uses Winsock;
@@ -262,7 +264,7 @@ begin
   end;
   AStringList.Add(' ');
   AStringList.Add('Results -----------------------------------------------------------------');
-  AStringList.AddStrings(RPCBrokerV.Results);
+  FastAddStrings(RPCBrokerV.Results, AStringList);
   uCallList.Add(AStringList);
   if uShowRPCs then StatusText('');
   RPCLastCall := RPCBrokerV.RemoteProcedure + ' (completed)';
@@ -346,13 +348,26 @@ begin
   Result := #1 + glvn;
 end;
 
+function GetRPCCursor: TCursor;
+var
+  pt: TPoint;
+begin
+  Result := crHourGlass;
+  if assigned(AppStartedCursorForm) and (AppStartedCursorForm.Visible) then
+  begin
+    pt := Mouse.CursorPos;
+    if PtInRect(AppStartedCursorForm.BoundsRect, pt) then
+      Result := crAppStart;    
+  end;
+end;
+
 procedure CallV(const RPCName: string; const AParam: array of const);
 { calls the broker leaving results in results property which must be read by caller }
 var
   SavedCursor: TCursor;
 begin
   SavedCursor := Screen.Cursor;
-  Screen.Cursor := crHourGlass;
+  Screen.Cursor := GetRPCCursor;
   SetParams(RPCName, AParam);
   CallBroker;  //RPCBrokerV.Call;
   Screen.Cursor := SavedCursor;
@@ -364,7 +379,7 @@ var
   SavedCursor: TCursor;
 begin
   SavedCursor := Screen.Cursor;
-  Screen.Cursor := crHourGlass;
+  Screen.Cursor := GetRPCCursor;
   SetParams(RPCName, AParam);
   CallBroker;  //RPCBrokerV.Call;
   if RPCBrokerV.Results.Count > 0 then Result := RPCBrokerV.Results[0] else Result := '';
@@ -378,10 +393,10 @@ var
 begin
   if ReturnData = nil then raise Exception.Create('TString not created');
   SavedCursor := Screen.Cursor;
-  Screen.Cursor := crHourGlass;
+  Screen.Cursor := GetRPCCursor;
   SetParams(RPCName, AParam);
   CallBroker;  //RPCBrokerV.Call;
-  ReturnData.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, ReturnData);
   Screen.Cursor := SavedCursor;
 end;
 
@@ -394,7 +409,7 @@ var
   SavedCursor: TCursor;
 begin
   SavedCursor := Screen.Cursor;
-  Screen.Cursor := crHourGlass;
+  Screen.Cursor := GetRPCCursor;
   SetParams(RPCName, AParam);
   RPCBrokerV.Call;
   pCallV := StrNew(RPCBrokerV.Results.GetText);
@@ -449,7 +464,7 @@ end;
 
 procedure LoadRPCData(Dest: TStrings; ID: Integer);
 begin
-  if (ID > -1) and (ID < uCallList.Count) then Dest.Assign(TStringList(uCallList.Items[ID]));
+  if (ID > -1) and (ID < uCallList.Count) then FastAssign(TStringList(uCallList.Items[ID]), Dest);
 end;
 
 function DottedIPStr: string;

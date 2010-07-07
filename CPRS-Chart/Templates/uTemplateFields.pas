@@ -4,11 +4,13 @@ interface
 
 uses
   Forms, SysUtils, Classes, Dialogs, StdCtrls, ExtCtrls, Controls, Contnrs,
-  Graphics, ORClasses, ComCtrls, ORDtTm;
+  Graphics, ORClasses, ComCtrls, ORDtTm, uDlgComponents, TypInfo, ORFn, StrUtils;
 
 type
   TTemplateFieldType = (dftUnknown, dftEditBox, dftComboBox, dftButton, dftCheckBoxes,
-                        dftRadioButtons, dftDate, dftNumber, dftHyperlink, dftWP, dftText);
+    dftRadioButtons, dftDate, dftNumber, dftHyperlink, dftWP, dftText,
+// keep dftScreenReader as last entry - users can not create this type of field
+    dftScreenReader);
 
   TTmplFldDateType = (dtUnknown, dtDate, dtDateTime, dtDateReqTime,
                                  dtCombo, dtYear, dtYearMonth);
@@ -29,7 +31,7 @@ type
   private
     FID: string;
     FFont: TFont;
-    FPanel: TPanel;
+    FPanel: TDlgFieldPanel;
     FControls: TStringList;
     FIndents: TStringList;
     FFirstBuild: boolean;
@@ -46,6 +48,7 @@ type
     function GetFieldValues: string;
     procedure SetFieldValues(const Value: string);
     procedure SetAutoDestroyOnPanelFree(const Value: boolean);
+    function StripCode(var txt: string; code: char): boolean;
   protected
     procedure UpDownChange(Sender: TObject);
     procedure DoChange(Sender: TObject);
@@ -56,7 +59,8 @@ type
   public
     constructor Create(AParent: TWinControl; AID, Text: string);
     destructor Destroy; override;
-    function GetPanel(MaxLen: integer; AParent: TWinControl): TPanel;
+    function GetPanel(MaxLen: integer; AParent: TWinControl;
+                      OwningCheckBox: TCPRSDialogParentCheckBox): TDlgFieldPanel;
     function GetText: string;
     property Text: string read FText write FText;
     property InternalID: string read FInternalID write FInternalID;
@@ -173,11 +177,40 @@ function BoilerplateTemplateFieldsOK(const AText: string; Msg: string = ''): boo
 procedure EnsureText(edt: TEdit; ud: TUpDown);
 procedure ConvertCodes2Text(sl: TStrings; Short: boolean);
 function StripEmbedded(iItems: string): string;
+procedure StripScreenReaderCodes(var Text: string); overload;
+procedure StripScreenReaderCodes(SL: TStrings); overload;
+function HasScreenReaderBreakCodes(SL: TStrings): boolean;
 
 const
-  TemplateFieldBeginSignature = '{FLD:';
+  TemplateFieldSignature = '{FLD';
+  TemplateFieldBeginSignature = TemplateFieldSignature + ':';
   TemplateFieldEndSignature = '}';
+  ScreenReaderCodeSignature = '{SR-';
+  ScreenReaderCodeType = '  Screen Reader Code';
+  ScreenReaderCodeCount = 2;
+  ScreenReaderShownCount = 1;
+  ScreenReaderStopCode = ScreenReaderCodeSignature + 'STOP' + TemplateFieldEndSignature;
+  ScreenReaderStopCodeLen = Length(ScreenReaderStopCode);
+  ScreenReaderStopCodeID = '-43';
+  ScreenReaderStopName = 'SCREEN READER STOP CODE **';
+  ScreenReaderStopCodeLine = ScreenReaderStopCodeID + U + ScreenReaderStopName + U + ScreenReaderCodeType;
+  ScreenReaderContinueCode = ScreenReaderCodeSignature + 'CONT' + TemplateFieldEndSignature;
+  ScreenReaderContinueCodeLen = Length(ScreenReaderContinueCode);
+  ScreenReaderContinueCodeOld = ScreenReaderCodeSignature + 'CONTINUE' + TemplateFieldEndSignature;
+  ScreenReaderContinueCodeOldLen = Length(ScreenReaderContinueCodeOld);
+  ScreenReaderContinueCodeID = '-44';
+  ScreenReaderContinueCodeName = 'SCREEN READER CONTINUE CODE ***';
+  ScreenReaderContinueCodeLine = ScreenReaderContinueCodeID + U + ScreenReaderContinueCodeName + U + ScreenReaderCodeType;
   MissingFieldsTxt = 'One or more required fields must still be entered.';
+
+  ScreenReaderCodes:     array[0..ScreenReaderCodeCount] of string  =
+      (ScreenReaderStopCode, ScreenReaderContinueCode, ScreenReaderContinueCodeOld);
+  ScreenReaderCodeLens:  array[0..ScreenReaderCodeCount] of integer =
+      (ScreenReaderStopCodeLen, ScreenReaderContinueCodeLen, ScreenReaderContinueCodeOldLen);
+  ScreenReaderCodeIDs:   array[0..ScreenReaderShownCount] of string  =
+      (ScreenReaderStopCodeID, ScreenReaderContinueCodeID);
+  ScreenReaderCodeLines: array[0..ScreenReaderShownCount] of string  =
+      (ScreenReaderStopCodeLine, ScreenReaderContinueCodeLine); 
 
   TemplateFieldTypeCodes: array[TTemplateFieldType] of string[1] =
                          {  dftUnknown      } ('',
@@ -190,20 +223,22 @@ const
                          {  dftNumber       }  'N',
                          {  dftHyperlink    }  'H',
                          {  dftWP           }  'W',
-                         {  dftText         }  'T');
+                         {  dftText         }  'T',
+                         {  dftScreenReader }  'S');
 
   TemplateFieldTypeDesc: array[TTemplateFieldType, boolean] of string =
                          {  dftUnknown      } (('',''),
-                         {  dftEditBox      }  ('Edit Box',       'Edit'),
-                         {  dftComboBox     }  ('Combo Box',      'Combo'),
-                         {  dftButton       }  ('Button',         'Button'),
-                         {  dftCheckBoxes   }  ('Check Boxes',    'Check'),
-                         {  dftRadioButtons }  ('Radio Buttons',  'Radio'),
-                         {  dftDate         }  ('Date',           'Date'),
-                         {  dftNumber       }  ('Number',         'Num'),
-                         {  dftHyperlink    }  ('Hyperlink',      'Link'),
-                         {  dftWP           }  ('Word Processing','WP'),
-                         {  dftWP           }  ('Display Text',   'Text'));
+                         {  dftEditBox      }  ('Edit Box',           'Edit'),
+                         {  dftComboBox     }  ('Combo Box',          'Combo'),
+                         {  dftButton       }  ('Button',             'Button'),
+                         {  dftCheckBoxes   }  ('Check Boxes',        'Check'),
+                         {  dftRadioButtons }  ('Radio Buttons',      'Radio'),
+                         {  dftDate         }  ('Date',               'Date'),
+                         {  dftNumber       }  ('Number',             'Num'),
+                         {  dftHyperlink    }  ('Hyperlink',          'Link'),
+                         {  dftWP           }  ('Word Processing',    'WP'),
+                         {  dftText         }  ('Display Text',       'Text'),
+                         {  dftScreenReader }  ('Screen Reader Stop', 'SRStop'));
 
   TemplateDateTypeDesc: array[TTmplFldDateType, boolean] of string =
                          { dtUnknown        } (('',''),
@@ -225,7 +260,8 @@ const
                    { dftNumber       }  'NUMB',
                    { dftHyperlink    }  'LINK',
                    { dftWP           }  'WRDP',
-                   { dftTExt         }  'TEXT');
+                   { dftTExt         }  'TEXT',
+                   { dftScreenReader }  'SRST');
 
   TemplateFieldDateCodes: array[TTmplFldDateType] of string[1] =
                          { dtUnknown        } ('',
@@ -238,27 +274,12 @@ const
 
   MaxTFWPLines = 20;
   MaxTFEdtLen = 70;
-
-type
-  TFieldPanel = class(TPanel)  {This is the panel associated with the child}
-  private                      {dialog checkboxes in reminders dialogs}
-    FOnDestroy: TNotifyEvent;
-    FCanvas: TControlCanvas;    {used to draw focus rect}
-    function GetFocus: boolean;
-    procedure SetTheFocus(const Value: boolean);
-  protected                     {used to draw focus rect}
-    procedure Paint; override;  {used to draw focus rect}
-  public
-    destructor Destroy; override;
-    property OnDestroy: TNotifyEvent read FOnDestroy write FOnDestroy;
-    property Focus:  boolean read GetFocus write SetTheFocus; {to draw focus rect}
-    property OnKeyPress;        {to click the checkbox when spacebar is pressed}
-  end;
-
+  
 implementation
 
 uses
-  ORFn, rTemplates, ORCtrls, mTemplateFieldButton, dShared, uConst, uCore, rCore, Windows;
+  rTemplates, ORCtrls, mTemplateFieldButton, dShared, uConst, uCore, rCore, Windows,
+  VAUtils, VA508AccessibilityManager, VA508AccessibilityRouter;
 
 const
   NewTemplateField = 'NEW TEMPLATE FIELD';
@@ -278,22 +299,6 @@ const
   FieldIDDelim = '`';
   FieldIDLen = 6;
   NewLine = 'NL';
-
-type
-  TFieldLabel = class(TLabel)
-  private
-    FExclude: boolean;
-  public
-    property Exclude: boolean read FExclude;
-  end;
-  
-  TWebLabel = class(TFieldLabel)
-  private
-    FAddr: string;
-    procedure Clicked(Sender: TObject);
-  public
-    procedure Init(Addr: string);
-  end;
 
 function GetNewFieldID: string;
 begin
@@ -693,7 +698,7 @@ begin
     msg := DUPFLD;
   Result := (msg <> '');
   if(Result) then
-    ShowMessage(msg);
+    ShowMsg(msg);
 end;
 
 function SaveTemplateFieldErrors: string;
@@ -860,7 +865,7 @@ begin
         if(AList.Count > 0) then
           AList.Add('');
         AList.Add('The following inactive template fields were found:');
-        AList.AddStrings(InactiveList);
+        FastAddStrings(InactiveList, AList);
       end;
       if(AList.Count > 0) then
       begin
@@ -1078,10 +1083,9 @@ var
   btn: TfraTemplateFieldButton;
   dbox: TORDateBox;
   dcbo: TORDateCombo;
-  lbl: TFieldLabel;
+  lbl: TCPRSTemplateFieldLabel;
   re: TRichEdit;
-  pnl: TPanel;
-  ud: TUpDown;
+  pnl: TCPRSDialogNumber;
   DefDate: TFMDateTime;
   ctrl: TControl;
 
@@ -1122,7 +1126,8 @@ begin
     case FFldType of
       dftEditBox:
         begin
-          edt := TEdit.Create(nil);
+          edt := TCPRSDialogFieldEdit.Create(nil);
+          (edt as ICPRSDialogComponent).RequiredField := Required;
           edt.Parent := Entry.FPanel;
           edt.BorderStyle := bsNone;
           edt.Height := ht;
@@ -1134,12 +1139,14 @@ begin
           edt.Text := FEditDefault;
           edt.Tag := CtrlID;
           edt.OnChange := Entry.DoChange;
+          UpdateColorsFor508Compliance(edt, TRUE);
           ctrl := edt;
         end;
 
       dftComboBox:
         begin
-          cbo := TORComboBox.Create(nil);
+          cbo := TCPRSDialogComboBox.Create(nil);
+          (cbo as ICPRSDialogComponent).RequiredField := Required;
           cbo.Parent := Entry.FPanel;
           cbo.TemplateField := TRUE;
           w := Width;
@@ -1164,12 +1171,14 @@ begin
             cbo.Width := (wdth * w) + 18;
             cbo.DropDownCount := cbo.Items.Count;
           end;
+          UpdateColorsFor508Compliance(cbo, TRUE);
           ctrl := cbo;
         end;
 
       dftButton:
         begin
           btn := TfraTemplateFieldButton.Create(nil);
+          (btn as ICPRSDialogComponent).RequiredField := Required;
           btn.Parent := Entry.FPanel;
           {Clear out embedded fields}
           btn.Items.Text := StripEmbedded(Items);
@@ -1178,6 +1187,7 @@ begin
           btn.Width := (wdth * Width) + 6;
           btn.Tag := CtrlID;
           btn.OnChange := Entry.DoChange;
+          UpdateColorsFor508Compliance(btn);
           ctrl := btn;
         end;
 
@@ -1191,7 +1201,9 @@ begin
             TmpSL.Text := StripEmbedded(Items);
             for i := 0 to TmpSL.Count-1 do
             begin
-              cb := TORCheckBox.Create(nil);
+              cb := TCPRSDialogCheckBox.Create(nil);
+              if i = 0 then
+                (cb as ICPRSDialogComponent).RequiredField := Required;
               cb.Parent := Entry.FPanel;
               cb.Caption := TmpSL[i];
               cb.AutoSize := TRUE;
@@ -1209,6 +1221,7 @@ begin
               if FSepLines and (FFldType in SepLinesTypes) then
                 cb.StringData := NewLine;
               cb.OnClick := Entry.DoChange;
+              UpdateColorsFor508Compliance(cb);
               inc(Index);
               Entry.FControls.InsertObject(Index, '', cb);
               if (i=0) or FSepLines then
@@ -1227,7 +1240,8 @@ begin
             DefDate := 0;
           if FDateType in DateComboTypes then
           begin
-            dcbo := TORDateCombo.Create(nil);
+            dcbo := TCPRSDialogDateCombo.Create(nil);
+            (dcbo as ICPRSDialogComponent).RequiredField := Required;
             dcbo.Parent := Entry.FPanel;
             dcbo.Tag := CtrlID;
             dcbo.IncludeBtn := (FDateType = dtCombo);
@@ -1236,11 +1250,13 @@ begin
             dcbo.FMDate := DefDate;
             dcbo.TemplateField := TRUE;
             dcbo.OnChange := Entry.DoChange;
+            UpdateColorsFor508Compliance(dcbo, TRUE);
             ctrl := dcbo;
           end
           else
           begin
-            dbox := TORDateBox.Create(nil);
+            dbox := TCPRSDialogDateBox.Create(nil);
+            (dbox as ICPRSDialogComponent).RequiredField := Required;
             dbox.Parent := Entry.FPanel;
             dbox.Tag := CtrlID;
             dbox.DateOnly := (FDateType = dtDate);
@@ -1253,51 +1269,43 @@ begin
               tmp := 17;
             dbox.Width := (wdth * tmp) + 18;
             dbox.OnChange := Entry.DoChange;
+            UpdateColorsFor508Compliance(dbox, TRUE);
             ctrl := dbox;
           end;
         end;
 
       dftNumber:
         begin
-          pnl := TPanel.Create(nil);
+          pnl := TCPRSDialogNumber.CreatePanel(nil);
+          (pnl as ICPRSDialogComponent).RequiredField := Required;
           pnl.Parent := Entry.FPanel;
           pnl.BevelOuter := bvNone;
           pnl.Tag := CtrlID;
-          edt := TEdit.Create(pnl);
-          edt.Parent := pnl;
-          edt.BorderStyle := bsNone;
-          edt.Height := ht;
-          edt.Width := (wdth * 5 + 4);
-          edt.Top := 0;
-          edt.Left := 0;
-          edt.AutoSelect := True; 
-          ud := TUpDown.Create(pnl);
-          ud.Parent := pnl;
-          ud.Associate := edt;
-          ud.Min := MinVal;
-          ud.Max := MaxVal;
-          ud.Min := MinVal; // Both ud.Min settings are needeed!
+          pnl.Edit.Height := ht;
+          pnl.Edit.Width := (wdth * 5 + 4);
+          pnl.UpDown.Min := MinVal;
+          pnl.UpDown.Max := MaxVal;
+          pnl.UpDown.Min := MinVal; // Both ud.Min settings are needeed!
           i := Increment;
           if i < 1 then i := 1;
-          ud.Increment := i;
-          ud.Thousands := FALSE;
-          ud.Position := StrToIntDef(EditDefault, 0);
-          edt.Tag := Integer(ud);
-          edt.OnChange := Entry.UpDownChange;
-          pnl.Height := edt.Height;
-          pnl.Width := edt.Width + ud.Width;
+          pnl.UpDown.Increment := i;
+          pnl.UpDown.Position := StrToIntDef(EditDefault, 0);
+          pnl.Edit.OnChange := Entry.UpDownChange;
+          pnl.Height := pnl.Edit.Height;
+          pnl.Width := pnl.Edit.Width + pnl.UpDown.Width;
+          UpdateColorsFor508Compliance(pnl, TRUE);
           ctrl := pnl;
         end;
 
       dftHyperlink, dftText:
         begin
           if (FFldType = dftHyperlink) and User.WebAccess then
-            lbl := TWebLabel.Create(nil)
+            lbl := TCPRSDialogHyperlinkLabel.Create(nil)
           else
-            lbl := TFieldLabel.Create(nil);
+            lbl := TCPRSTemplateFieldLabel.Create(nil);
           lbl.Parent := Entry.FPanel;
           lbl.ShowAccelChar := FALSE;
-          lbl.FExclude := FSepLines;
+          lbl.Exclude := FSepLines;
           if (FFldType = dftHyperlink) then
           begin
             if FEditDefault <> '' then
@@ -1312,15 +1320,17 @@ begin
               delete(STmp,length(STmp)-1,2);
             lbl.Caption := STmp;
           end;
-          if lbl is TWebLabel then
-            TWebLabel(lbl).Init(FURL);
+          if lbl is TCPRSDialogHyperlinkLabel then
+            TCPRSDialogHyperlinkLabel(lbl).Init(FURL);
           lbl.Tag := CtrlID;
+          UpdateColorsFor508Compliance(lbl);
           ctrl := lbl;
         end;
 
       dftWP:
         begin
-          re := TRichEdit.Create(nil);
+          re := TCPRSDialogRichEdit.Create(nil);
+          (re as ICPRSDialogComponent).RequiredField := Required;
           re.Parent := Entry.FPanel;
           re.Tag := CtrlID;
           tmp := FMaxLen;
@@ -1338,6 +1348,7 @@ begin
           re.ScrollBars := ssVertical;
           re.Lines.Text := Items;
           re.OnChange := Entry.DoChange;
+          UpdateColorsFor508Compliance(re, TRUE);
           ctrl := re;
         end;
     end;
@@ -1357,7 +1368,7 @@ begin
     FLocked := LockTemplateField(FID);
     Result := FLocked;
     if(not FLocked) then
-      ShowMessage('Template Field ' + FFldName + ' is currently being edited by another user.');
+      ShowMsg('Template Field ' + FFldName + ' is currently being edited by another user.');
   end
   else
     Result := TRUE;
@@ -1706,6 +1717,7 @@ end;
 { TTemplateDialogEntry }
 const
   EOL_MARKER = #182;
+  SR_BREAK   = #186;
 
 procedure PanelDestroy(AData: Pointer; Sender: TObject);
 var
@@ -1736,14 +1748,19 @@ begin
   FFont.Assign(TORExposedControl(AParent).Font);
   FControls.Text := Text;
   if(FControls.Count > 1) then
+  begin
     for i := 1 to FControls.Count-1 do
       FControls[i] := EOL_MARKER + FControls[i];
+    if not ScreenReaderSystemActive then
+      StripScreenReaderCodes(FControls);
+  end;
   FFirstBuild := TRUE;
-  FPanel := TFieldPanel.Create(AParent.Owner);
+  FPanel := TDlgFieldPanel.Create(AParent.Owner);
   FPanel.Parent := AParent;
   FPanel.BevelOuter := bvNone;
   FPanel.Caption := '';
   FPanel.Font.Assign(FFont);
+  UpdateColorsFor508Compliance(FPanel, TRUE);
   idx := 0;
   while (idx < FControls.Count) do
   begin
@@ -1770,7 +1787,14 @@ begin
         begin
           FControls[idx] := copy(txt,1,i-1);
           if(Fld.Required) then
+          begin
+            if ScreenReaderSystemActive then
+            begin
+              if Fld.FFldType in [dftCheckBoxes, dftRadioButtons] then
+                FControls[idx] := FControls[idx] + ScreenReaderStopCode;
+            end;
             FControls[idx] := FControls[idx] + '*';
+          end;
           Fld.CreateDialogControls(Self, idx, CtrlID);
           FControls.Insert(idx+1,copy(txt,i,MaxInt));
         end
@@ -1788,6 +1812,22 @@ begin
       end;
     end;
     inc(idx);
+  end;
+  if ScreenReaderSystemActive then
+  begin
+    idx := 0;
+    while (idx < FControls.Count) do
+    begin
+      txt := FControls[idx];
+      i := pos(ScreenReaderStopCode, txt);
+      if i > 0 then
+      begin
+        FControls[idx] := copy(txt, 1, i-1);
+        txt := copy(txt, i + ScreenReaderStopCodeLen, MaxInt);
+        FControls.Insert(idx+1, SR_BREAK + txt);
+      end;
+      inc(idx);
+    end;
   end;
 end;
 
@@ -1866,9 +1906,9 @@ begin
         else
           ind := 0;
       end;
-      if(Ctrl is TFieldLabel) then
+      if(Ctrl is TCPRSTemplateFieldLabel) then
       begin
-        if not TFieldLabel(Ctrl).Exclude then begin
+        if not TCPRSTemplateFieldLabel(Ctrl).Exclude then begin
           if emField <> '' then begin
             iField := GetTemplateField(emField,FALSE);
             case iField.FldType of
@@ -1883,11 +1923,11 @@ begin
                               Result := iString;
                             end;
             else {case}
-              Result := TFieldLabel(Ctrl).Caption
+              Result := TCPRSTemplateFieldLabel(Ctrl).Caption
             end; {case iField.FldType}
             end {if emField}
           else
-            Result := TFieldLabel(Ctrl).Caption;
+            Result := TCPRSTemplateFieldLabel(Ctrl).Caption;
         end;
       end
       else
@@ -2013,29 +2053,165 @@ begin
   end;
 end;
 
-function TTemplateDialogEntry.GetPanel(MaxLen: integer; AParent: TWinControl): TPanel;
+function TTemplateDialogEntry.GetPanel(MaxLen: integer; AParent: TWinControl;
+                                       OwningCheckBox: TCPRSDialogParentCheckBox): TDlgFieldPanel;
 var
-  i, x, y, cnt, idx, ind, yinc, ybase, MaxX: integer; 
+  i, x, y, cnt, idx, ind, yinc, ybase, MaxX: integer;
   MaxTextLen: integer;  {Max num of chars per line in pixels}
   MaxChars: integer;    {Max num of chars per line}
   txt: string;
   ctrl: TControl;
   LastLineBlank: boolean;
+  sLbl: TCPRSDialogStaticLabel;
+  nLbl: TVA508ChainedLabel;
+  sLblHeight: integer;
+  TabOrdr: integer;
+
 const
   FOCUS_RECT_MARGIN = 2; {The margin around the panel so the label won't
                         overlay the focus rect on its parent panel.}
+
+  procedure Add2TabOrder(ctrl: TWinControl);
+  begin
+    ctrl.TabOrder := TabOrdr;
+    inc(TabOrdr);
+  end;
+
+  function StripSRCode(var txt: string; code: string; len: integer): integer;
+  begin
+    Result := pos(code, txt);
+    if Result > 0 then
+    begin
+      delete(txt,Result,len);
+      dec(Result);
+    end
+    else
+      Result := -1;
+  end;
+
   procedure DoLabel(Atxt: string);
   var
-    lbl: TLabel;
+    ctrl: TControl;
+    tempLbl: TVA508ChainedLabel;
 
   begin
-    lbl := TLabel.Create(nil);
-    lbl.Parent := FPanel;
-    lbl.ShowAccelChar := FALSE;
-    lbl.Caption := Atxt;
-    lbl.Left := x;
-    lbl.Top := y;
-    inc(x, lbl.Width);
+    if ScreenReaderSystemActive then
+    begin
+      if assigned(sLbl) then
+      begin
+        tempLbl := TVA508ChainedLabel.Create(nil);
+        if assigned(nLbl) then
+          nLbl.NextLabel := tempLbl
+        else
+          sLbl.NextLabel := tempLbl;
+        nLbl := tempLbl;
+        ctrl := nLbl;
+      end
+      else
+      begin
+        sLbl := TCPRSDialogStaticLabel.Create(nil);
+        ctrl := sLbl;
+      end;
+    end
+    else
+      ctrl := TLabel.Create(nil);
+    SetOrdProp(ctrl, ShowAccelCharProperty, ord(FALSE));
+    SetStrProp(ctrl, CaptionProperty, Atxt);
+    ctrl.Parent := FPanel;
+    ctrl.Left := x;
+    ctrl.Top := y;
+    if ctrl = sLbl then
+    begin
+      Add2TabOrder(sLbl);
+      sLbl.Height := sLblHeight;
+      ScreenReaderSystem_CurrentLabel(sLbl);
+    end;
+    if ScreenReaderSystemActive then
+      ScreenReaderSystem_AddText(Atxt);
+    UpdateColorsFor508Compliance(ctrl);
+    inc(x, ctrl.Width);
+  end;
+
+  procedure Init;
+  var
+    lbl : TLabel;
+  begin
+    if(FFirstBuild) then
+      FFirstBuild := FALSE
+    else
+      KillLabels;
+    y := FOCUS_RECT_MARGIN; {placement of labels on panel so they don't cover the}
+    x := FOCUS_RECT_MARGIN; {focus rectangle}
+    MaxX := 0;
+    //ybase := FontHeightPixel(FFont.Handle) + 1 + (FOCUS_RECT_MARGIN * 2);  AGP commentout line for
+                                                                           //reminder spacing
+    ybase := FontHeightPixel(FFont.Handle) + 2;
+    yinc := ybase;
+    LastLineBlank := FALSE;
+    sLbl := nil;
+    nLbl := nil;
+    TabOrdr := 0;
+    if ScreenReaderSystemActive then
+    begin
+      ScreenReaderSystem_CurrentCheckBox(OwningCheckBox);
+      lbl := TLabel.Create(nil);
+      try
+        lbl.Parent := FPanel;
+        sLblHeight := lbl.Height + 2;
+      finally
+        lbl.Free;
+      end;
+
+    end;
+  end;
+
+  procedure Text508Work;
+  var
+    ContinueCode: boolean;
+  begin
+    if StripCode(txt, SR_BREAK) then
+    begin
+      ScreenReaderSystem_Stop;
+      nLbl := nil;
+      sLbl := nil;
+    end;
+
+    ContinueCode := FALSE;
+    while StripSRCode(txt, ScreenReaderContinueCode, ScreenReaderContinueCodeLen) >= 0 do
+      ContinueCode := TRUE;
+    while StripSRCode(txt, ScreenReaderContinueCodeOld, ScreenReaderContinueCodeOldLen) >= 0 do
+      ContinueCode := TRUE;
+    if ContinueCode then
+      ScreenReaderSystem_Continue;
+  end;
+
+  procedure Ctrl508Work(ctrl: TControl);
+  var
+    lbl: TCPRSTemplateFieldLabel;
+  begin
+    if (Ctrl is TCPRSTemplateFieldLabel) and (not (Ctrl is TCPRSDialogHyperlinkLabel)) then
+    begin
+      lbl := Ctrl as TCPRSTemplateFieldLabel;
+      if trim(lbl.Caption) <> '' then
+      begin
+        ScreenReaderSystem_CurrentLabel(lbl);
+        ScreenReaderSystem_AddText(lbl.Caption);
+      end
+      else
+      begin
+        lbl.TabStop := FALSE;
+        ScreenReaderSystem_Stop;
+      end;
+    end
+    else
+    begin
+      if ctrl is TWinControl then
+        Add2TabOrder(TWinControl(ctrl));
+      if Supports(ctrl, ICPRSDialogComponent) then
+        ScreenReaderSystem_CurrentComponent(ctrl as ICPRSDialogComponent);
+    end;
+    sLbl := nil;
+    nLbl := nil;
   end;
 
   procedure NextLine;
@@ -2051,26 +2227,16 @@ begin
   MaxTextLen := MaxLen - (FOCUS_RECT_MARGIN * 2);{save room for the focus rectangle on the panel}
   if(FFirstBuild or (FPanel.Width <> MaxLen)) then
   begin
-    if(FFirstBuild) then
-      FFirstBuild := FALSE
-    else
-      KillLabels;
-    y := FOCUS_RECT_MARGIN; {placement of labels on panel so they don't cover the}
-    x := FOCUS_RECT_MARGIN; {focus rectangle}
-    MaxX := 0;
-    //ybase := FontHeightPixel(FFont.Handle) + 1 + (FOCUS_RECT_MARGIN * 2);  AGP commentout line for
-                                                                           //reminder spacing
-    ybase := FontHeightPixel(FFont.Handle);
-    yinc := ybase;
-    LastLineBlank := FALSE;
+    Init;
     for i := 0 to FControls.Count-1 do
     begin
       txt := FControls[i];
-      if(copy(txt,1,1) = EOL_MARKER) then
+      if ScreenReaderSystemActive then
+        Text508Work;
+      if StripCode(txt,EOL_MARKER) then
       begin
         if((x <> 0) or LastLineBlank) then
           NextLine;
-        delete(txt,1,1);
         LastLineBlank := (txt = '');
       end;
       if(txt <> '') then
@@ -2119,6 +2285,8 @@ begin
         ctrl := TControl(FControls.Objects[i]);
         if(assigned(ctrl)) then
         begin
+          if ScreenReaderSystemActive then
+            Ctrl508Work(ctrl);
           idx := FIndents.IndexOfObject(Ctrl);
           if idx >= 0 then
             ind := StrToIntDef(Piece(FIndents[idx], U, 1), 0)
@@ -2136,7 +2304,7 @@ begin
           Ctrl.Top := y;
           inc(x, Ctrl.Width + 4);
           if yinc <= Ctrl.Height then
-            yinc := Ctrl.Height + 1;
+            yinc := Ctrl.Height + 2;
           if (x < MaxLen) and ((Ctrl is TRichEdit) or
              ((Ctrl is TLabel) and (pos(CRLF, TLabel(Ctrl).Caption) > 0))) then
             x := MaxLen;
@@ -2149,6 +2317,8 @@ begin
   end;
   if(FFieldValues <> '') then
     SetFieldValues(FFieldValues);
+  if ScreenReaderSystemActive then
+    ScreenReaderSystem_Stop;
   Result := FPanel;
 end;
 
@@ -2161,18 +2331,27 @@ procedure TTemplateDialogEntry.KillLabels;
 var
   i, idx: integer;
   obj: TObject;
+  max: integer;
 
 begin
   if(assigned(FPanel)) then
   begin
-    for i := FPanel.ControlCount-1 downto 0 do
-      if(FPanel.Controls[i] is TLabel) then
+    max := FPanel.ControlCount-1;
+    for i := max downto 0 do
+    begin
+// deleting TVA508StaticText can delete several TVA508ChainedLabel components
+      if i < FPanel.ControlCount then
       begin
         obj := FPanel.Controls[i];
-        idx := FControls.IndexOfObject(obj);
-        if idx < 0 then
-          obj.Free;
+        if (not (obj is TVA508ChainedLabel)) and
+           ((obj is TLabel) or (obj is TVA508StaticText)) then
+        begin
+          idx := FControls.IndexOfObject(obj);
+          if idx < 0 then
+            obj.Free;
+        end;
       end;
+    end;
   end;
 end;
 
@@ -2187,10 +2366,10 @@ begin
   begin
     M.Data := Self;
     M.Code := @PanelDestroy;
-    TFieldPanel(FPanel).OnDestroy := TNotifyEvent(M);
+    FPanel.OnDestroy := TNotifyEvent(M);
   end
   else
-    TFieldPanel(FPanel).OnDestroy := nil;
+    FPanel.OnDestroy := nil;
 end;
 
 procedure TTemplateDialogEntry.SetControlText(CtrlID: integer; AText: string);
@@ -2231,6 +2410,7 @@ begin
         if(Ctrl is TORCheckBox) then
         begin
           Done := FALSE;
+          TORCheckBox(Ctrl).Checked := FALSE;        //<-PSI-06-170-ADDED THIS LINE - v27.23 - RV
           if(cnt = 0) then
             cnt := DelimCount(AText, '|') + 1;
           for j := 1 to cnt do
@@ -2277,74 +2457,26 @@ begin
   end;
 end;
 
-procedure TTemplateDialogEntry.UpDownChange(Sender: TObject);
-begin
-  EnsureText(TEdit(Sender), TUpDown(TEdit(Sender).Tag));
-  DoChange(Sender);
-end;
-
-{ TFieldPanel }
-
-destructor TFieldPanel.Destroy;
-begin
-  if(assigned(FOnDestroy)) then
-    FOnDestroy(Self);
-  inherited;
-end;
-
-{intercept the paint event to draw the focus rect if FFocused is true}
-function TFieldPanel.GetFocus: boolean;
-begin
-  result := Focused;
-end;
-
-procedure TFieldPanel.Paint;
+function TTemplateDialogEntry.StripCode(var txt: string; code: char): boolean;
 var
-  DC: HDC;
-  R: TRect;
-
+  p: integer;
 begin
-  inherited;
-  if(Focused) then
+  p := pos(code, txt);
+  Result := (p > 0);
+  if Result then
   begin
-    if(not assigned(FCanvas)) then
-      FCanvas := TControlCanvas.Create;
-    DC := GetWindowDC(Handle);
-    try
-      FCanvas.Handle := DC;
-      R := ClientRect;
-      InflateRect(R, -1, -1);
-      FCanvas.DrawFocusRect(R);
-    finally
-      ReleaseDC(Handle, DC);
+    while p > 0 do
+    begin
+      delete(txt, p, 1);
+      p := pos(code, txt);
     end;
   end;
 end;
 
-procedure TFieldPanel.SetTheFocus(const Value: boolean);
+procedure TTemplateDialogEntry.UpDownChange(Sender: TObject);
 begin
-  if Value then
-    SetFocus;
-end;
-
-{ TWebLabel }
-
-procedure TWebLabel.Clicked(Sender: TObject);
-begin
-  GotoWebPage(FAddr);
-end;
-
-procedure TWebLabel.Init(Addr: string);
-begin
-  FAddr := Addr;
-  OnClick := Clicked;
-  Font.Assign(TORExposedControl(Parent).Font);
-  Font.Color := clActiveCaption;
-  Font.Style := Font.Style + [fsUnderline];
-  AdjustBounds; // make sure we have the right width
-  AutoSize := FALSE;
-  Height := Height + 1; // Courier New doesn't support underline unless it's higher
-  Cursor := crHandPoint;
+  EnsureText(TEdit(Sender), TUpDown(TEdit(Sender).Tag));
+  DoChange(Sender);
 end;
 
 function StripEmbedded(iItems: string): string;
@@ -2368,6 +2500,50 @@ Begin
         p1 := 0;
     end;
   Result := iItems;
+end;
+
+procedure StripScreenReaderCodes(var Text: string);
+var
+  p, j: integer;
+begin
+  for j := low(ScreenReaderCodes) to high(ScreenReaderCodes) do
+  begin
+    p := 1;
+    while (p > 0) do
+    begin
+      p := posex(ScreenReaderCodes[j], Text, p);
+      if p > 0 then
+        delete(Text, p, ScreenReaderCodeLens[j]);
+    end;
+  end;
+end;
+
+procedure StripScreenReaderCodes(SL: TStrings);
+var
+  temp: string;
+  i: integer;
+
+begin
+  for i := 0 to SL.Count - 1 do
+  begin
+    temp := SL[i];
+    StripScreenReaderCodes(temp);
+    SL[i] := temp;
+  end;
+end;
+
+function HasScreenReaderBreakCodes(SL: TStrings): boolean;
+var
+  i: integer;
+
+begin
+  Result := TRUE;
+  for i := 0 to SL.Count - 1 do
+  begin
+    if pos(ScreenReaderCodeSignature, SL[i]) > 0 then
+      exit;
+  end;
+  Result := FALSE;
 end;
 
 initialization

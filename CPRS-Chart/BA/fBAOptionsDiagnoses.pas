@@ -6,7 +6,7 @@ uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, fAutoSz, StdCtrls, ORCtrls, ExtCtrls, ORFn, UCore, RCore, ORNet,
   UBAGlobals, fPCELex, rPCE, Buttons, UBACore, UBAMessages, UBAConst,
-  ComCtrls;
+  ComCtrls, VA508AccessibilityManager;
 
 type
   TfrmBAOptionsDiagnoses = class(TfrmAutoSz)

@@ -5,29 +5,37 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fPCEBase, StdCtrls, CheckLst, ORCtrls, ExtCtrls, Buttons, uPCE, rPCE, ORFn, rCore,
-  ComCtrls, mVisitRelated;
+  ComCtrls, mVisitRelated, VA508AccessibilityManager;
 
 type
   TfrmVisitType = class(TfrmPCEBase)
-    lblVType: TLabel;
+    pnlTop: TPanel;
+    splLeft: TSplitter;
+    splRight: TSplitter;
+    pnlLeft: TPanel;
+    lstVTypeSection: TORListBox;
+    pnlMiddle: TPanel;
+    fraVisitRelated: TfraVisitRelated;
+    pnlSC: TPanel;
     lblSCDisplay: TLabel;
-    lblVTypeSection: TLabel;
     memSCDisplay: TCaptionMemo;
-    lbProviders: TORListBox;
-    lblCurrentProv: TLabel;
-    cboPtProvider: TORComboBox;
-    lblProvider: TLabel;
+    pnlBottom: TPanel;
     btnAdd: TButton;
     btnDelete: TButton;
     btnPrimary: TButton;
-    fraVisitRelated: TfraVisitRelated;
-    lstVTypeSection: TORListBox;
-    lbxVisits: TORListBox;
+    pnlBottomLeft: TPanel;
+    lblProvider: TLabel;
+    cboPtProvider: TORComboBox;
+    pnlBottomRight: TPanel;
+    lbProviders: TORListBox;
+    lblCurrentProv: TLabel;
+    lblVTypeSection: TLabel;
+    pnlModifiers: TPanel;
     lbMods: TORListBox;
     lblMod: TLabel;
-    pnlMain: TPanel;
-    pnlLeft: TPanel;
-    splLeft: TSplitter;
+    pnlSection: TPanel;
+    lbxVisits: TORListBox;
+    lblVType: TLabel;
     procedure lstVTypeSectionClick(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
@@ -42,10 +50,9 @@ type
     procedure lbProvidersDblClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure lbxVisitsClickCheck(Sender: TObject; Index: Integer);
-    procedure splLeftMoved(Sender: TObject);
-    procedure splRightMoved(Sender: TObject);
     procedure lbModsClickCheck(Sender: TObject; Index: Integer);
     procedure lbxVisitsClick(Sender: TObject);
+    procedure memSCDisplayEnter(Sender: TObject);
   protected
     FSplitterMove: boolean;
     procedure ShowModifiers;
@@ -75,7 +82,7 @@ implementation
 {$R *.DFM}
 
 uses
-  fEncounterFrame, uCore, uConst;
+  fEncounterFrame, uCore, uConst, VA508AccessibilityRouter;
 
 const
   FN_NEW_PERSON = 200;
@@ -197,6 +204,7 @@ begin
   end;
   RefreshProviders;
   FLastMods := uEncPCEData.VisitType.Modifiers;
+  fraVisitRelated.TabStop := FALSE;
 end;
 
 (*procedure TfrmVisitType.SynchEncounterProvider;
@@ -324,29 +332,45 @@ procedure TfrmVisitType.FormResize(Sender: TObject);
 var
   v, i: integer;
   s: string;
+  padding, size: integer;
+  btnOffset: integer;
 begin
   if FSplitterMove then
     FSplitterMove := FALSE
   else
+  begin
+//      inherited;
+    FSectionTabs[0] := -(lbxVisits.width - LBCheckWidthSpace - MainFontWidth - ScrollBarWidth);
+    FSectionTabs[1] := -(lbxVisits.width - (6*MainFontWidth) - ScrollBarWidth);
+    if(FSectionTabs[0] <= FSectionTabs[1]) then FSectionTabs[0] := FSectionTabs[1]+2;
+    lbxVisits.TabPositions := SectionString;
+    v := (lbMods.width - LBCheckWidthSpace - (4*MainFontWidth) - ScrollBarWidth);
+    s := '';
+    for i := 1 to 20 do
     begin
-      inherited;
-      FSectionTabs[0] := -(lbxVisits.width - LBCheckWidthSpace - MainFontWidth - ScrollBarWidth);
-      FSectionTabs[1] := -(lbxVisits.width - (6*MainFontWidth) - ScrollBarWidth);
-      if(FSectionTabs[0] <= FSectionTabs[1]) then FSectionTabs[0] := FSectionTabs[1]+2;
-      lbxVisits.TabPositions := SectionString;
-      v := (lbMods.width - LBCheckWidthSpace - (4*MainFontWidth) - ScrollBarWidth);
-      s := '';
-      for i := 1 to 20 do
-      begin
-        if s <> '' then s := s + ',';
-        s := s + inttostr(v);
-        if(v<0) then
-          dec(v,32)
-        else
-          inc(v,32);
-      end;
-      lbMods.TabPositions := s;
+      if s <> '' then s := s + ',';
+      s := s + inttostr(v);
+      if(v<0) then
+        dec(v,32)
+      else
+        inc(v,32);
     end;
+    lbMods.TabPositions := s;
+  end;
+  btnOffset := btnAdd.Width div 7;
+  padding := btnAdd.Width + (btnOffset * 2);
+  size := (ClientWidth - padding) div 2;
+  pnlBottomLeft.Width := size;
+  pnlBottomRight.Width := size;
+  btnAdd.Left := size + btnOffset;
+  btnDelete.Left := size + btnOffset;
+  btnPrimary.Left := size + btnOffset;
+  btnOK.top := ClientHeight - btnOK.Height - 4;
+  btnCancel.top := btnOK.Top;
+  btnCancel.Left := ClientWidth - btnCancel.Width - 4;
+  btnOK.Left := btnCancel.Left - btnOK.Width - 4;
+  size := ClientHeight - btnOK.Height - pnlMiddle.Height - pnlBottom.Height - 8;
+  pnlTop.Height := size;
 end;
 
 procedure TfrmVisitType.lbxVisitsClickCheck(Sender: TObject;
@@ -478,22 +502,6 @@ begin
   end;
 end;
 
-procedure TfrmVisitType.splLeftMoved(Sender: TObject);
-begin
-  inherited;
-  lblVType.Left := lbxVisits.Left + pnlMain.Left;
-  FSplitterMove := TRUE;
-  FormResize(Sender);
-end;
-
-procedure TfrmVisitType.splRightMoved(Sender: TObject);
-begin
-  inherited;
-  lblMod.Left := lbMods.Left + pnlMain.Left;
-  FSplitterMove := TRUE;
-  FormResize(Sender);
-end;
-
 procedure TfrmVisitType.lbModsClickCheck(Sender: TObject; Index: Integer);
 var
   idx: integer;
@@ -526,7 +534,15 @@ begin
   ShowModifiers;
 end;
 
+procedure TfrmVisitType.memSCDisplayEnter(Sender: TObject);
+begin
+  inherited;
+  memSCDisplay.SelStart := 0;
+end;
+
 initialization
+  SpecifyFormIsNotADialog(TfrmVisitType);
+
 //frmVisitType.CreateProviderList;
 
 finalization

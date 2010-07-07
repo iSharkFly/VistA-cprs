@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, ORCtrls, StdCtrls, ORFn;
+  ExtCtrls, ORCtrls, StdCtrls, ORFn, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmODLabOthCollSamp = class(TForm)
+  TfrmODLabOthCollSamp = class(TfrmBase508Form)
     pnlBase: TORAutoPanel;
     cboOtherCollSamp: TORComboBox;
     cmdOK: TButton;

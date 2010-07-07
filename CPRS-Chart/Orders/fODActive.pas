@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ORFn, uCore, StdCtrls, CheckLst, ComCtrls,ExtCtrls,rOrders,fOrders,uOrders,
-  fFrame,ORCtrls,fAutoSz;
+  fFrame,ORCtrls,fAutoSz, VA508AccessibilityManager;
 
 type
   TfrmODActive = class(TfrmAutoSz)
@@ -47,6 +47,9 @@ procedure CopyActiveOrdersToEvent(AnOrderView: TOrderView; AnEvent: TOrderDelayE
 
 implementation
 
+uses
+  VA2006Utils;
+
 {$R *.DFM}
 
 const
@@ -82,6 +85,8 @@ var
   TheVerify : boolean;
   DoesDestEvtOccur:boolean;
 begin
+  try
+  self.btnOK.Enabled := false;
   DoesDestEvtOccur := False;
   uAutoAC := True;
   frmFrame.UpdatePtInfoOnRefresh;
@@ -103,6 +108,9 @@ begin
     SelectedList.Free;
     uAutoAC := False;
   end;
+  finally
+    self.btnOK.Enabled := True;
+  end;
   Close;
 end;
 
@@ -113,6 +121,7 @@ end;
 
 procedure TfrmODActive.FormCreate(Sender: TObject);
 begin
+  FixHeaderControlDelphi2006Bug(hdControl);
   ActiveOrderList := TList.Create;
   FOrderView      := TOrderView.Create;
   FDefaultEventOrder := '';
@@ -207,7 +216,7 @@ begin
   begin
     ARect := TheeRect;
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     Canvas.MoveTo(ARect.Left, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);
     RightSide := -2;

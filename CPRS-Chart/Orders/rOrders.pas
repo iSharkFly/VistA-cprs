@@ -38,6 +38,7 @@ type
     ParentID    : string;
     LinkObject:   TObject;
     EnteredInError:     Integer; //AGP Changes 26.12 PSI-04-053
+    DCOriginalOrder: boolean;
     procedure Assign(Source: TOrder);
     procedure Clear;
   end;
@@ -199,9 +200,9 @@ procedure SendOrders(OrderList: TStringList; const ESCode: string);
 procedure SendReleaseOrders(OrderList: TStringList);
 procedure SendAndPrintOrders(OrderList, ErrList: TStrings; const ESCode: string; const DeviceInfo: string);
 procedure ExecutePrintOrders(SelectedList: TStringList; const DeviceInfo: string);
-procedure PrintOrdersOnReview(OrderList: TStringList; const DeviceInfo: string);  {*KCM*}
-procedure PrintServiceCopies(OrderList: TStringList);  {*REV*}
-procedure OrderPrintDeviceInfo(OrderList: TStringList; var PrintParams: TPrintParams; Nature: Char); {*KCM*}
+procedure PrintOrdersOnReview(OrderList: TStringList; const DeviceInfo: string; PrintLoc: Integer = 0);  {*KCM*}
+procedure PrintServiceCopies(OrderList: TStringList; PrintLoc: Integer = 0);  {*REV*}
+procedure OrderPrintDeviceInfo(OrderList: TStringList; var PrintParams: TPrintParams; Nature: Char; PrintLoc: Integer = 0); {*KCM*}
 function UseNewMedDialogs: Boolean;
 
 { Order Actions }
@@ -220,7 +221,7 @@ procedure RenewOrder(AnOrder: TOrder; RenewFields: TOrderRenewFields; IsComplex:
 procedure HoldOrder(AnOrder: TOrder);
 procedure ListDCReasons(Dest: TStrings; var DefaultIEN: Integer);
 function GetREQReason: Integer;
-procedure DCOrder(AnOrder: TOrder; AReason: Integer; var DCType: Integer);
+procedure DCOrder(AnOrder: TOrder; AReason: Integer; NewOrder: boolean; var DCType: Integer);
 procedure ReleaseOrderHold(AnOrder: TOrder);
 procedure AlertOrder(AnOrder: TOrder; AlertRecip: Int64);
 procedure FlagOrder(AnOrder: TOrder; const FlagReason: string; AlertRecip: Int64);
@@ -237,6 +238,7 @@ procedure UpdateOrderDGIfNeeded(AnID: string);
 function CanEditSuchRenewedOrder(AnID: string; IsTxtOrder: integer): boolean;
 function IsPSOSupplyDlg(DlgID, QODlg: integer): boolean;
 procedure SaveChangesOnRenewOrder(var AnOrder: TOrder; AnID, TheRefills, ThePickup: string; IsTxtOrder: integer);
+function DoesOrderStatusMatch(OrderArray: TStringList): boolean;
 //function GetPromptandDeviceParameters(Location: integer; OrderList: TStringList; Nature: string): TPrintParams;
 
 { Order Information }
@@ -339,7 +341,7 @@ function IsValidSchStr(ASchStr: string): boolean;
 
 implementation
 
-uses Windows, rCore, uConst, TRPCB, ORCtrls, UBAGlobals, UBACore;
+uses Windows, rCore, uConst, TRPCB, ORCtrls, UBAGlobals, UBACore, VAUtils;
 
 var
   uDGroupMap: TStringList;          // each string is DGroupIEN=Sequence^TopName^Name
@@ -575,8 +577,8 @@ begin
 end;
 
 procedure SetOrderFields(AnOrder: TOrder; const x, y, z: string);
-{           1   2    3     4      5     6   7   8   9    10    11    12    13    14     15     16  17    18
-{ Pieces: ~IFN^Grp^ActTm^StrtTm^StopTm^Sts^Sig^Nrs^Clk^PrvID^PrvNam^ActDA^Flag^DCType^ChrtRev^DEA#^VA#^DigSig}
+{           1   2    3     4      5     6   7   8   9    10    11    12    13    14     15     16  17    18    19     20
+{ Pieces: ~IFN^Grp^ActTm^StrtTm^StopTm^Sts^Sig^Nrs^Clk^PrvID^PrvNam^ActDA^Flag^DCType^ChrtRev^DEA#^VA#^DigSig^IMO^DCOrigOrder}
 begin
   with AnOrder do
   begin
@@ -599,7 +601,8 @@ begin
     Flagged   := Piece(x, U, 13) = '1';
     Retrieved := True;
     OrderLocIEN  := Piece(Piece(x,U,19),':',2);   //imo
-    OrderLocName := Piece(Piece(x,U,19),':',1);   //imo
+    if Piece(Piece(x,U,19),':',1) = '0;SC(' then OrderLocName := 'Unknown'
+    else OrderLocName := Piece(Piece(x,U,19),':',1);   //imo
     Text := y;
     XMLText := z;
     DGroupSeq  := SeqOfDGroup(DGroup);
@@ -608,6 +611,8 @@ begin
     if (pos('Entered in error',Text)>0) then AnOrder.EnteredInError := 1
     else AnOrder.EnteredInError := 0;
     //if DGroupName = 'Non-VA Meds' then Text := 'Non-VA  ' + Text;
+    if Piece(x,U,20) = '1' then DCOriginalOrder := True
+    else DCOriginalOrder := False;
   end;
 end;
 
@@ -654,11 +659,13 @@ var
   i: Integer;
   AnOrder: TOrder;
   FilterTS: string;
+  AlertedUserOnly: boolean;
 begin
   ClearOrders(Dest);
   if uDGroupMap = nil then LoadDGroupMap;  // to make sure broker not called while looping thru Results
   FilterTS := IntToStr(AView.Filter) + U + IntToStr(AView.EventDelay.Specialty);
-  CallV('ORWORR AGET', [Patient.DFN, FilterTS, AView.DGroup, AView.TimeFrom, AView.TimeThru, APtEvtID]);
+  AlertedUserOnly := (Notifications.Active and (AView.Filter = 12));
+  CallV('ORWORR AGET', [Patient.DFN, FilterTS, AView.DGroup, AView.TimeFrom, AView.TimeThru, APtEvtID, AlertedUserOnly]);
   if ((Piece(RPCBrokerV.Results[0], U, 1) = '0') or (Piece(RPCBrokerV.Results[0], U, 1) = '')) and (AView.Filter = 5) then      // if no expiring orders found display expired orders)
   begin
     CallV('ORWORR AGET', [Patient.DFN, '27^0', AView.DGroup, ExpiredOrdersStartDT, FMNow, APtEvtID]);
@@ -755,8 +762,8 @@ procedure LoadOrderSheets(Dest: TStrings);
 begin
   CallV('ORWOR SHEETS', [Patient.DFN]);
   MixedCaseByPiece(RPCBrokerV.Results, U, 2);
-  Dest.Assign(RPCBrokerV.Results);
-end;
+  FastAssign(RPCBrokerV.Results, Dest);
+ end;
 
 procedure LoadOrderSheetsED(Dest: TStrings);
 var
@@ -770,7 +777,7 @@ begin
     RPCBrokerV.Results.Delete(0);
     for i := 0 to RPCbrokerV.Results.Count - 1 do
       RPCBrokerV.Results[i] := RPCBrokerV.Results[i] + ' Orders';
-    Dest.AddStrings(RPCBrokerV.Results);
+    FastAddStrings(RPCBrokerV.Results, Dest);
   end;
 end;
 
@@ -811,7 +818,7 @@ begin
     Param[1].Mult['0'] := '';  // (to prevent broker from hanging if empty list)
     for i := 0 to Pred(HaveList.Count) do Param[1].Mult['"' + HaveList[i] + '"'] := '';
     CallBroker;
-    IDList.Assign(Results);
+    FastAssign(RPCBrokerV.Results,IDList);
   end;
 end;
 
@@ -1014,14 +1021,14 @@ end;
 procedure ListDGroupAll(Dest: TStrings);
 begin
   CallV('ORWORDG ALLTREE', [nil]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListSpecialties(Dest: TStrings);
 begin
   CallV('ORWOR TSALL', [nil]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListSpecialtiesED(AType: Char; Dest: TStrings);
@@ -1031,11 +1038,13 @@ var
   admitEvts: TStringList;
   otherEvts: TStringList;
   commonList: TStringList;
+  IsObservation: boolean;
 begin
   if Encounter <> nil then
     Currloc := Encounter.Location
   else
     Currloc := 0;
+  IsObservation := (Piece(GetCurrentSpec(Patient.DFN), U, 3) = '1');
   commonList := TStringList.Create;
   CallV('OREVNTX1 CMEVTS',[Currloc]);
   //MixedCaseList(RPCBrokerV.Results);
@@ -1052,6 +1061,12 @@ begin
         Continue;
       commonList.Add(Results[i]);
     end
+    else if IsObservation then
+    begin
+      if (Piece(Results[i],'^',3) = 'T') then
+        Continue;
+      commonList.Add(Results[i]);
+    end
     else
     begin
      if Length(Results[i])> 0 then
@@ -1060,7 +1075,7 @@ begin
   end;
   if commonList.Count > 0 then
   begin
-    Dest.AddStrings(TStrings(commonList));
+    FastAddStrings(TStrings(commonList), Dest);
     Dest.Add('^^^^^^^^___________________________________________________________________________________________');
     Dest.Add(LLS_SPACE);
   end;
@@ -1073,19 +1088,22 @@ begin
     if RPCBrokerV.Results.Count > 0 then
     begin
       RPCBrokerV.Results.Delete(0);
-      admitEvts.AddStrings(RPCBrokerV.Results);
+      FastAddStrings(RPCBrokerV.Results, admitEvts);
     end;
-    CallV('OREVNTX ACTIVE',['T^O^M^D']);
+    if IsObservation then
+      CallV('OREVNTX ACTIVE',['O^M^D'])
+    else
+      CallV('OREVNTX ACTIVE',['T^O^M^D']);
     //MixedCaseList(RPCBrokerV.Results);
     if RPCBrokerV.Results.Count > 0 then
     begin
       RPCBrokerV.Results.Delete(0);
-      otherEvts.AddStrings(RPCBrokerV.Results);
+      FastAddStrings(RPCBrokerV.Results, otherEvts);
     end;
-    Dest.AddStrings(TStrings(otherEvts));
+    FastAddStrings(TStrings(otherEvts), Dest);
     Dest.Add('^^^^^^^^_____________________________________________________________________________________________');
     Dest.Add(LLS_SPACE);
-    Dest.AddStrings(TStrings(admitEvts));
+    FastAddStrings(TStrings(admitEvts), Dest);
     admitEvts.Free;
     otherEvts.Free;
   end
@@ -1095,7 +1113,7 @@ begin
     //MixedCaseList(RPCBrokerV.Results);
     if RPCBrokerV.Results.Count > 0 then
       RPCBrokerV.Results.Delete(0);
-    Dest.AddStrings(RPCBrokerV.Results);
+    FastAddStrings(RPCBrokerV.Results, Dest);
   end
   else
   begin
@@ -1103,21 +1121,21 @@ begin
     //MixedCaseList(RPCBrokerV.Results);
     if RPCBrokerV.Results.Count > 0 then
       RPCBrokerV.Results.Delete(0);
-    Dest.AddStrings(RPCBrokerV.Results);
+    FastAddStrings(RPCBrokerV.Results, Dest);
   end;
 end;
 
 procedure ListOrderFilters(Dest: TStrings);
 begin
   CallV('ORWORDG REVSTS', [nil]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 
 procedure ListOrderFiltersAll(Dest: TStrings);
 begin
   CallV('ORWORDG REVSTS', [nil]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 { Write Orders }
@@ -1171,7 +1189,7 @@ begin
        RESERVED_PIECE               + U +   // 9
        RESERVED_PIECE               + U +   // 10
        KeyVars;
-  CallV('ORWDXM1 BLDQRSP', [ResolvedDialog.InputID, x, ForIMOResponses]);
+  CallV('ORWDXM1 BLDQRSP', [ResolvedDialog.InputID, x, ForIMOResponses, Encounter.Location]);
   // LST(0)=QuickLevel^ResponseID(ORIT;$H)^Dialog^Type^FormID^DGrp
   with RPCBrokerV do
   begin
@@ -1274,13 +1292,13 @@ begin
     KeyVars  := Copy(x, Pos(U, x) + 1, Length(x));
     RPCBrokerV.Results.Delete(0);
   end;
-  SetItems.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, SetItems);
 end;
 
 procedure LoadWriteOrders(Dest: TStrings);
 begin
   CallV('ORWDX WRLST', [Encounter.Location]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure LoadWriteOrdersED(Dest: TStrings; EvtID: string);
@@ -1289,7 +1307,7 @@ begin
   if RPCBrokerV.Results.count > 0 then
   begin
     Dest.Clear;
-    Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
   end
 end;
 
@@ -1309,7 +1327,7 @@ begin
     if Piece(Results[i], U, 4) = 'This order requires a signature.'
       then Results[i] := Piece(Results[i], U, 1);
   OrderList.Clear;
-  OrderList.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, OrderList);
 end;
 
 procedure SendReleaseOrders(OrderList: TStringList);
@@ -1323,7 +1341,7 @@ begin
   Loc := IntToStr(Encounter.Location);
   CallV('ORWDX SENDED',[OrderList,CurrTS,Loc]);
   OrderList.Clear;
-  OrderList.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, OrderList);
 end;
 
 procedure SendAndPrintOrders(OrderList, ErrList: TStrings; const ESCode: string; const DeviceInfo: string);
@@ -1338,14 +1356,22 @@ begin
       then ErrList.Add(Results[i]);
 end;
 
-procedure PrintOrdersOnReview(OrderList: TStringList; const DeviceInfo: string);
+procedure PrintOrdersOnReview(OrderList: TStringList; const DeviceInfo: string; PrintLoc: Integer = 0);
+var
+Loc: Integer;
 begin
-  CallV('ORWD1 RVPRINT',  [Encounter.Location, DeviceInfo, OrderList]);
+  if (PrintLoc > 0) and (PrintLoc <> Encounter.Location) then Loc := PrintLoc
+  else Loc := Encounter.Location;
+  CallV('ORWD1 RVPRINT',  [Loc, DeviceInfo, OrderList]);
 end;
 
-procedure PrintServiceCopies(OrderList: TStringList);  {*REV*}
+procedure PrintServiceCopies(OrderList: TStringList; PrintLoc: Integer = 0);  {*REV*}
+var
+Loc: Integer;
 begin
-  CallV('ORWD1 SVONLY',  [Encounter.Location, OrderList]);
+  if (PrintLoc > 0) and (PrintLoc <> Encounter.Location) then Loc := PrintLoc
+  else Loc := Encounter.Location;
+  CallV('ORWD1 SVONLY',  [Loc, OrderList]);
 end;
 
 procedure ExecutePrintOrders(SelectedList: TStringList; const DeviceInfo: string);
@@ -1431,7 +1457,7 @@ procedure IsLatestAction(const ID: string; var ErrList: TStringList);
 begin
   CallV('ORWOR ACTION TEXT',[ID]);
   if RPCBrokerV.Results.Count > 0 then
-    Errlist.Assign(RPCBrokerV.Results);
+    FastAssign(RPCBrokerV.Results, Errlist);
 end;
 
 procedure ChangeOrder(AnOrder: TOrder; ResponseList: TList);
@@ -1514,7 +1540,7 @@ end;
 
 procedure ListDCReasons(Dest: TStrings; var DefaultIEN: Integer);
 begin
-  CallV('ORWDXA DCREASON', [nil]);
+  CallV('ORWDX2 DCREASON', [nil]);
   ExtractItems(Dest, RPCBrokerV.Results, 'DCReason');
   //AGP Change 26.15 for PSI-04-63
   //DefaultIEN := StrToIntDef(Piece(ExtractDefault(RPCBrokerV.Results, 'DCReason'), U, 1), 0);
@@ -1525,12 +1551,14 @@ begin
   Result := StrToIntDef(sCallV('ORWDXA DCREQIEN', [nil]), 0);
 end;
 
-procedure DCOrder(AnOrder: TOrder; AReason: Integer; var DCType: Integer);
+procedure DCOrder(AnOrder: TOrder; AReason: Integer; NewOrder: boolean; var DCType: Integer);
 var
-  AParentID : string;
+  AParentID, DCOrigOrder: string;
 begin
   AParentID := AnOrder.ParentID;
-  CallV('ORWDXA DC', [AnOrder.ID, Encounter.Provider, Encounter.Location, AReason]);
+  if AnOrder.DCOriginalOrder = true then DCOrigOrder := '1'
+  else DCOrigOrder := '0';
+  CallV('ORWDXA DC', [AnOrder.ID, Encounter.Provider, Encounter.Location, AReason, DCOrigOrder, NewOrder]);
   UBACore.DeleteDCOrdersFromCopiedList(AnOrder.ID);
   DCType := StrToIntDef(Piece(RPCBrokerV.Results[0], U, 14), 0);
   SetOrderFromResults(AnOrder);
@@ -1552,7 +1580,7 @@ end;
 procedure LoadFlagReason(Dest: TStrings; const ID: string);
 begin
   CallV('ORWDXA FLAGTXT', [ID]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure UnflagOrder(AnOrder: TOrder; const AComment: string);
@@ -1564,7 +1592,7 @@ end;
 procedure LoadWardComments(Dest: TStrings; const ID: string);
 begin
   CallV('ORWDXA WCGET', [ID]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure PutWardComments(Src: TStrings; const ID: string; var ErrMsg: string);
@@ -1613,7 +1641,7 @@ begin
     with RPCBrokerV do
       if piece(Results[0],'^',1) = '-1' then
         begin
-          ShowMessage('Storage of Digital Signature FAILED: ' + piece(Results[0],'^',2) + CRLF + CRLF +
+          ShowMsg('Storage of Digital Signature FAILED: ' + piece(Results[0],'^',2) + CRLF + CRLF +
             'This error will prevent this order from being sent to the service for processing. Please cancel the order and try again.' + CRLF + CRLF +
             'If this problem persists, then there is a problem in the CPRS PKI interface, and it needs to be reported through the proper channels, to the developer Cary Malmrose.');
           AError := '1';
@@ -1650,6 +1678,11 @@ procedure SaveChangesOnRenewOrder(var AnOrder: TOrder; AnID, TheRefills, ThePick
 begin
   SCallV('ORWDXR01 SAVCHG',[AnID,TheRefills,ThePickup,IsTxtOrder]);
   SetOrderFromResults(AnOrder);
+end;
+
+function DoesOrderStatusMatch(OrderArray: TStringList): boolean;
+begin
+ Result := StrtoIntDef(SCallV('ORWDX1 ORDMATCH',[Patient.DFN, OrderArray]),0)=1;
 end;
 
 { Order Information }
@@ -1697,7 +1730,7 @@ procedure LESValidationForChangedLabOrder(var RejectedReason: TStringList; AnOrd
 begin
   CallV('ORWDPS5 LESAPI',[AnOrderInfo]);
   if RPCBrokerV.Results.Count > 0 then
-    RejectedReason.Assign(RPCBrokerV.Results);
+    FastAssign(RPCBrokerV.Results, RejectedReason);
 end;
 
 procedure ChangeEvent(AnOrderList: TStringList; APtEvtId: string);
@@ -2075,7 +2108,7 @@ begin
     begin
       MixedCaseList( RPCBrokerV.Results );
       RPCBrokerV.Results.Delete(0);
-      Dest.Assign(RPCBrokerV.Results);
+      FastAssign(RPCBrokerV.Results, Dest);
     end;
   end;
 end;
@@ -2086,7 +2119,7 @@ begin
   if RPCBrokerV.Results.Count > 0 then
   begin
     SortByPiece(TStringList(RPCBrokerV.Results),'^',2);
-    Dest.Assign(RPCBrokerV.Results);
+    FastAssign(RPCBrokerV.Results, Dest);
   end;
 end;
 
@@ -2187,7 +2220,7 @@ begin
   if OIList.Count > 0
     then CallV('ORWDXC ACCEPT', [Patient.DFN, FillerID, StartDtTm, Encounter.Location, OIList, DupORIFN])
     else CallV('ORWDXC ACCEPT', [Patient.DFN, FillerID, StartDtTm, Encounter.Location]);
-  ListOfChecks.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, ListOfChecks);
 end;
 
 procedure OrderChecksOnDelay(ListOfChecks: TStringList; const FillerID, StartDtTm: string;
@@ -2197,13 +2230,13 @@ begin
   if OIList.Count > 0
     then CallV('ORWDXC DELAY', [Patient.DFN, FillerID, StartDtTm, Encounter.Location, OIList])
     else CallV('ORWDXC DELAY', [Patient.DFN, FillerID, StartDtTm, Encounter.Location]);
-  ListOfChecks.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, ListOfChecks);
 end;
 
 procedure OrderChecksForSession(ListOfChecks, OrderList: TStringList);
 begin
   CallV('ORWDXC SESSION', [Patient.DFN, OrderList]);
-  ListOfChecks.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, ListOfChecks);
 end;
 
 procedure SaveOrderChecksForSession(const AReason: string; ListOfChecks: TStringList);
@@ -2252,7 +2285,7 @@ begin
                                   (PromptForRequisitions in ['1','2']) or
                                   (PromptForWorkCopy     in ['1','2']));
         RPCBrokerV.Results.Delete(0);
-        OrdersToPrint.Assign(RPCBrokerV.Results);
+        FastAssign(RPCBrokerV.Results, OrdersToPrint);
       end;
     Result := TempParams;
   finally
@@ -2261,14 +2294,20 @@ begin
 end;
 *)
 
-procedure OrderPrintDeviceInfo(OrderList: TStringList; var PrintParams: TPrintParams; Nature: Char);
+procedure OrderPrintDeviceInfo(OrderList: TStringList; var PrintParams: TPrintParams; Nature: Char; PrintLoc: Integer = 0);
 var
   x: string;
 begin
   if Nature <> #0 then
-    CallV('ORWD2 DEVINFO', [Encounter.Location, Nature, OrderList])
+    begin
+       if PrintLoc > 0 then CallV('ORWD2 DEVINFO', [PrintLoc, Nature, OrderList])
+       else CallV('ORWD2 DEVINFO', [Encounter.Location, Nature, OrderList]);
+    end
   else
-    CallV('ORWD2 MANUAL', [Encounter.Location, OrderList]);
+    begin
+      if PrintLoc > 0 then CallV('ORWD2 MANUAL', [PrintLoc, OrderList])
+      else CallV('ORWD2 MANUAL', [Encounter.Location, OrderList]);
+    end;
   x := RPCBrokerV.Results[0];
   FillChar(PrintParams, SizeOf(PrintParams), #0);
   with PrintParams do
@@ -2294,7 +2333,7 @@ begin
     begin
       RPCBrokerV.Results.Delete(0);
       OrderList.Clear;
-      OrderList.Assign(RPCBrokerV.Results);
+      FastAssign(RPCBrokerV.Results, OrderList);
     end;
 end;
 

@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, StdCtrls, ORCtrls, ORFn;
+  ExtCtrls, StdCtrls, ORCtrls, ORFn, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmOptionsTitles = class(TForm)
+  TfrmOptionsTitles = class(TfrmBase508Form)
     lblDocumentClass: TLabel;
     lblDocumentTitles: TLabel;
     lblYourTitles: TLabel;
@@ -100,7 +100,7 @@ begin
   FLastClass := -1;
   with cboDocumentClass do
   begin
-    Items.Assign(rpcGetClasses);
+    FastAssign(rpcGetClasses, cboDocumentClass.Items);
     Items.Add(IntToStr(IdentifyConsultsClass) + U + 'Consults');
     for i := 0 to Items.Count - 1 do
       if Piece(Items[i], '^', 2) = 'Progress Notes' then
@@ -138,9 +138,9 @@ begin
   aList := TStringList.Create;
   with lstYourTitles do
   begin
-    aList.Assign(rpcGetTitlesForUser(cboDocumentClass.ItemIEN));
+    FastAssign(rpcGetTitlesForUser(cboDocumentClass.ItemIEN), aList);
     SortByPiece(aList, '^', 3);
-    Items.Assign(aList);
+    FastAssign(aList, lstYourTitles.Items);
     defaultIEN := rpcGetTitleDefault(cboDocumentClass.ItemIEN);
     if defaultIEN > 0 then SelectByIEN(defaultIEN)
     else ItemIndex := -1;

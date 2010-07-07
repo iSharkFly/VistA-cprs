@@ -1,599 +1,730 @@
 inherited frmODBBank: TfrmODBBank
-  Left = 272
-  Top = 171
-  Width = 543
-  Height = 507
+  Left = 409
+  Top = 244
+  HorzScrollBar.Range = 0
+  VertScrollBar.Range = 0
   Caption = 'Blood Component and Diagnostic Test Order Form'
+  ClientHeight = 600
+  ClientWidth = 709
+  ExplicitWidth = 717
+  ExplicitHeight = 634
   PixelsPerInch = 96
   TextHeight = 13
-  inherited memOrder: TCaptionMemo
-    Top = 431
-    Width = 423
-    Anchors = [akLeft, akRight, akBottom]
-  end
-  inherited cmdAccept: TButton
-    Left = 435
-    Top = 427
-    Anchors = [akRight, akBottom]
-  end
-  inherited cmdQuit: TButton
-    Left = 435
-    Top = 454
-    Anchors = [akRight, akBottom]
-  end
-  inherited pnlMessage: TPanel
+  object pnlComments: TPanel [0]
     Left = 12
-    Top = 433
-    Width = 389
-    Anchors = [akLeft, akRight, akBottom]
-  end
-  object pnlBB: TPanel
-    Left = 4
-    Top = 4
-    Width = 525
-    Height = 413
+    Top = 25
+    Width = 534
+    Height = 368
     TabOrder = 5
-    object pnlFull: TPanel
-      Left = 1
-      Top = 1
-      Width = 523
-      Height = 411
-      Align = alClient
-      Caption = 'pnlFull'
+    Visible = False
+    object lblOrdComment: TLabel
+      Left = 25
+      Top = 3
+      Width = 87
+      Height = 13
+      Caption = 'Order Comment'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentFont = False
+    end
+    object btnUpdateComments: TButton
+      Left = 372
+      Top = 174
+      Width = 115
+      Height = 25
+      Caption = 'Update Comments'
       TabOrder = 0
-      object pgeProduct: TPageControl
+      OnClick = btnUpdateCommentsClick
+    end
+    object btnCancelComment: TButton
+      Left = 279
+      Top = 174
+      Width = 75
+      Height = 25
+      Caption = 'Cancel'
+      TabOrder = 1
+      OnClick = btnCancelCommentClick
+    end
+  end
+  inherited memOrder: TCaptionMemo
+    Left = 0
+    Top = 399
+    Width = 449
+    Height = 59
+    Visible = False
+    ExplicitLeft = 0
+    ExplicitTop = 399
+    ExplicitWidth = 449
+    ExplicitHeight = 59
+  end
+  object pgeProduct: TPageControl [2]
+    Left = 0
+    Top = 0
+    Width = 709
+    Height = 393
+    ActivePage = TabDiag
+    Align = alTop
+    TabOrder = 6
+    TabStop = False
+    OnChange = pgeProductChange
+    object TabInfo: TTabSheet
+      Caption = 'Patient Information'
+      ImageIndex = 3
+      object edtInfo: TCaptionRichEdit
         Left = 0
-        Top = 4
-        Width = 521
-        Height = 411
-        ActivePage = TabDiag
+        Top = 8
+        Width = 556
+        Height = 337
+        TabStop = False
+        BevelInner = bvNone
+        BevelOuter = bvNone
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -11
-        Font.Name = 'MS Sans Serif'
+        Font.Name = 'Courier New'
         Font.Style = []
-        Images = ImageList1
         ParentFont = False
-        TabIndex = 1
+        ReadOnly = True
+        ScrollBars = ssBoth
         TabOrder = 0
-        OnChange = pgeProductChange
-        object tabInfo: TTabSheet
-          Caption = 'Patient Information'
-          ImageIndex = 3
-          object edtInfo: TCaptionRichEdit
-            Left = 0
-            Top = 8
-            Width = 513
-            Height = 369
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Courier New'
-            Font.Style = []
-            ParentFont = False
-            ReadOnly = True
-            ScrollBars = ssBoth
-            TabOrder = 0
-            Caption = 'Patient Info'
-          end
-        end
-        object TabDiag: TTabSheet
-          Caption = 'Orders'
-          ImageIndex = 2
-          object lblReqComment: TOROffsetLabel
-            Left = 300
-            Top = 25
-            Width = 104
-            Height = 33
-            HorzOffset = 2
-            Transparent = False
-            VertOffset = 2
-            WordWrap = False
-          end
-          object pnlFields: TPanel
-            Left = 0
-            Top = 87
-            Width = 513
-            Height = 162
-            Hint = 'Data entered into these fields apply to the entire order.'
-            ParentShowHint = False
-            ShowHint = True
-            TabOrder = 0
-            object lblDiagComment: TOROffsetLabel
-              Left = 8
-              Top = 114
-              Width = 46
-              Height = 15
-              Caption = 'Comment'
-              HorzOffset = 2
-              Transparent = False
-              VertOffset = 2
-              WordWrap = True
-            end
-            object lblUrgency: TLabel
-              Left = 8
-              Top = 80
-              Width = 40
-              Height = 13
-              Caption = 'Urgency'
-            end
-            object lblCollType: TLabel
-              Left = 8
-              Top = 41
-              Width = 73
-              Height = 13
-              Caption = 'Collection Type'
-            end
-            object lblPreparation: TLabel
-              Left = 352
-              Top = 41
-              Width = 54
-              Height = 13
-              Caption = 'Preparation'
-              Enabled = False
-              Visible = False
-            end
-            object lblWanted: TLabel
-              Left = 352
-              Top = 5
-              Width = 90
-              Height = 13
-              Caption = 'Date Time Wanted'
-            end
-            object lblReason: TLabel
-              Left = 332
-              Top = 114
-              Width = 95
-              Height = 13
-              Caption = 'Reason for Request'
-            end
-            object lblSurgery: TLabel
-              Left = 352
-              Top = 80
-              Width = 36
-              Height = 13
-              Hint = 
-                'Enter the name of the surgical procedure that this request is fo' +
-                'r.'
-              Caption = 'Surgery'
-            end
-            object lblCollTime: TLabel
-              Left = 8
-              Top = 5
-              Width = 100
-              Height = 13
-              Caption = 'Collection Date/Time'
-            end
-            object cmdImmedColl: TSpeedButton
-              Left = 132
-              Top = 21
-              Width = 24
-              Height = 17
-              Font.Charset = DEFAULT_CHARSET
-              Font.Color = clWindowText
-              Font.Height = -16
-              Font.Name = 'MS Sans Serif'
-              Font.Style = [fsBold]
-              Glyph.Data = {
-                D6000000424DD60000000000000076000000280000000C0000000C0000000100
-                0400000000006000000000000000000000001000000010000000000000000000
-                80000080000000808000800000008000800080800000C0C0C000808080000000
-                FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
-                0000333333333333000033333333333300003333333333330000300330033003
-                0000300330033003000033333333333300003333333333330000333333333333
-                0000333333333333000033333333333300003333333333330000}
-              ParentFont = False
-              ParentShowHint = False
-              ShowHint = False
-              OnClick = cmdImmedCollClick
-            end
-            object txtDiagComment: TCaptionEdit
-              Left = 8
-              Top = 132
-              Width = 293
-              Height = 21
-              MaxLength = 240
-              TabOrder = 6
-              OnChange = txtDiagCommentChange
-            end
-            object cboUrgency: TORComboBox
-              Left = 8
-              Top = 96
-              Width = 112
-              Height = 21
-              Style = orcsDropDown
-              AutoSelect = True
-              Caption = 'Urgency'
-              Color = clWindow
-              DropDownCount = 8
-              ItemHeight = 13
-              ItemTipColor = clWindow
-              ItemTipEnable = True
-              ListItemsOnly = True
-              LongList = False
-              LookupPiece = 0
-              MaxLength = 0
-              Pieces = '2'
-              Sorted = False
-              SynonymChars = '<>'
-              TabOrder = 5
-              OnChange = cboUrgencyChange
-              CharsNeedMatch = 1
-            end
-            object cboCollType: TORComboBox
-              Left = 8
-              Top = 57
-              Width = 149
-              Height = 21
-              Style = orcsDropDown
-              AutoSelect = True
-              Caption = 'Collection Type'
-              Color = clWindow
-              DropDownCount = 8
-              ItemHeight = 13
-              ItemTipColor = clWindow
-              ItemTipEnable = True
-              ListItemsOnly = True
-              LongList = False
-              LookupPiece = 0
-              MaxLength = 0
-              Pieces = '2'
-              Sorted = False
-              SynonymChars = '<>'
-              TabOrder = 4
-              OnChange = cboCollTypeChange
-              CharsNeedMatch = 1
-            end
-            object chkConsent: TCheckBox
-              Left = 192
-              Top = 21
-              Width = 112
-              Height = 17
-              Hint = 'Informed Consent Signed On Chart?'
-              Alignment = taLeftJustify
-              Caption = 'Informed Consent?'
-              ParentShowHint = False
-              ShowHint = True
-              TabOrder = 11
-              OnClick = chkConsentClick
-            end
-            object calWantTime: TORDateBox
-              Left = 352
-              Top = 17
-              Width = 149
-              Height = 21
-              TabOrder = 7
-              OnChange = calWantTimeChange
-              DateOnly = False
-              RequireTime = False
-            end
-            object tReason: TEdit
-              Left = 332
-              Top = 132
-              Width = 169
-              Height = 21
-              MaxLength = 80
-              TabOrder = 10
-              OnChange = tReasonChange
-            end
-            object cboSurgery: TORComboBox
-              Left = 352
-              Top = 92
-              Width = 149
-              Height = 21
-              Style = orcsDropDown
-              AutoSelect = True
-              Caption = 'Surgery'
-              Color = clWindow
-              DropDownCount = 8
-              ItemHeight = 13
-              ItemTipColor = clWindow
-              ItemTipEnable = True
-              ListItemsOnly = False
-              LongList = False
-              LookupPiece = 0
-              MaxLength = 0
-              Pieces = '2'
-              Sorted = False
-              SynonymChars = '<>'
-              TabOrder = 9
-              OnChange = cboSurgeryChange
-              CharsNeedMatch = 1
-            end
-            object txtImmedColl: TCaptionEdit
-              Left = 12
-              Top = 17
-              Width = 145
-              Height = 21
-              Color = clBtnFace
-              ReadOnly = True
-              TabOrder = 2
-              Text = 'txtImmedColl'
-            end
-            object cboCollTime: TORComboBox
-              Left = 8
-              Top = 17
-              Width = 149
-              Height = 21
-              Style = orcsDropDown
-              AutoSelect = True
-              Caption = 'Collection Date/Time'
-              Color = clWindow
-              DropDownCount = 8
-              ItemHeight = 13
-              ItemTipColor = clWindow
-              ItemTipEnable = True
-              ListItemsOnly = False
-              LongList = False
-              LookupPiece = 0
-              MaxLength = 0
-              Pieces = '2'
-              Sorted = False
-              SynonymChars = '<>'
-              TabOrder = 0
-              CharsNeedMatch = 1
-            end
-            object pnlCollTimeButton: TKeyClickPanel
-              Left = 137
-              Top = 19
-              Width = 20
-              Height = 19
-              BevelOuter = bvNone
-              Caption = 'Select collection time'
-              TabOrder = 3
-              TabStop = True
-            end
-            object calCollTime: TORDateBox
-              Left = 8
-              Top = 17
-              Width = 149
-              Height = 21
-              TabOrder = 1
-              OnChange = calCollTimeChange
-              DateOnly = False
-              RequireTime = False
-            end
-            object cboPreparation: TORComboBox
-              Left = 352
-              Top = 56
-              Width = 149
-              Height = 21
-              Style = orcsDropDown
-              AutoSelect = True
-              Color = clWindow
-              DropDownCount = 8
-              Enabled = False
-              Items.Strings = (
-                'I^Immediate'
-                'H^Hold')
-              ItemHeight = 13
-              ItemTipColor = clWindow
-              ItemTipEnable = True
-              ListItemsOnly = False
-              LongList = False
-              LookupPiece = 0
-              MaxLength = 0
-              Pieces = '2'
-              Sorted = False
-              SynonymChars = '<>'
-              TabOrder = 8
-              Visible = False
-              OnChange = cboPreparationChange
-              CharsNeedMatch = 1
-            end
-          end
-          object pnlTop: TPanel
-            Left = 0
-            Top = 1
-            Width = 513
-            Height = 84
-            TabOrder = 1
-            object pnlSelect: TPanel
-              Left = 5
-              Top = 1
-              Width = 511
-              Height = 76
-              TabOrder = 0
-              object pnlDiagTests: TGroupBox
-                Left = 8
-                Top = 0
-                Width = 245
-                Height = 73
-                Caption = 'Diagnostic Tests'
-                Font.Charset = DEFAULT_CHARSET
-                Font.Color = clWindowText
-                Font.Height = -11
-                Font.Name = 'MS Sans Serif'
-                Font.Style = []
-                ParentFont = False
-                TabOrder = 0
-                object lblTNS: TLabel
-                  Left = 8
-                  Top = 52
-                  Width = 3
-                  Height = 13
-                  Color = clActiveBorder
-                  Font.Charset = DEFAULT_CHARSET
-                  Font.Color = clMaroon
-                  Font.Height = -11
-                  Font.Name = 'MS Sans Serif'
-                  Font.Style = []
-                  ParentColor = False
-                  ParentFont = False
-                end
-                object cboAvailTest: TORComboBox
-                  Left = 7
-                  Top = 18
-                  Width = 226
-                  Height = 21
-                  Style = orcsDropDown
-                  AutoSelect = True
-                  Caption = 'Available Lab Tests'
-                  Color = clWindow
-                  DropDownCount = 8
-                  ItemHeight = 13
-                  ItemTipColor = clWindow
-                  ItemTipEnable = True
-                  ListItemsOnly = True
-                  LongList = True
-                  LookupPiece = 0
-                  MaxLength = 0
-                  Pieces = '2'
-                  Sorted = False
-                  SynonymChars = '<>'
-                  TabOrder = 0
-                  OnClick = cboAvailTestSelect
-                  OnExit = cboAvailTestExit
-                  OnNeedData = cboAvailTestNeedData
-                  CharsNeedMatch = 1
-                end
-              end
-              object pnlBloodComponents: TGroupBox
-                Left = 252
-                Top = 0
-                Width = 253
-                Height = 73
-                Caption = 'Blood Components'
-                TabOrder = 1
-                object lblQuantity: TLabel
-                  Left = 198
-                  Top = 0
-                  Width = 39
-                  Height = 13
-                  Caption = 'Quantity'
-                end
-                object lblModifiers: TLabel
-                  Left = 10
-                  Top = 48
-                  Width = 42
-                  Height = 13
-                  Caption = 'Modifiers'
-                end
-                object cboAvailComp: TORComboBox
-                  Left = 8
-                  Top = 18
-                  Width = 181
-                  Height = 21
-                  Style = orcsDropDown
-                  AutoSelect = True
-                  Caption = 'Available Lab Tests'
-                  Color = clWindow
-                  DropDownCount = 8
-                  ItemHeight = 13
-                  ItemTipColor = clWindow
-                  ItemTipEnable = True
-                  ListItemsOnly = True
-                  LongList = True
-                  LookupPiece = 0
-                  MaxLength = 0
-                  Pieces = '2'
-                  Sorted = False
-                  SynonymChars = '<>'
-                  TabOrder = 0
-                  OnClick = cboAvailCompSelect
-                  OnExit = cboAvailCompExit
-                  OnNeedData = cboAvailCompNeedData
-                  CharsNeedMatch = 1
-                end
-                object tQuantity: TEdit
-                  Left = 200
-                  Top = 16
-                  Width = 25
-                  Height = 21
-                  TabOrder = 1
-                  Text = '0'
-                end
-                object upQuantity: TUpDown
-                  Left = 225
-                  Top = 16
-                  Width = 15
-                  Height = 21
-                  Associate = tQuantity
-                  Min = 0
-                  Position = 0
-                  TabOrder = 2
-                  Wrap = False
-                end
-                object cboModifiers: TORComboBox
-                  Left = 56
-                  Top = 44
-                  Width = 133
-                  Height = 21
-                  Style = orcsDropDown
-                  AutoSelect = True
-                  Caption = 'Modifier'
-                  Color = clWindow
-                  DropDownCount = 8
-                  ItemHeight = 13
-                  ItemTipColor = clWindow
-                  ItemTipEnable = True
-                  ListItemsOnly = True
-                  LongList = False
-                  LookupPiece = 0
-                  MaxLength = 0
-                  Sorted = False
-                  SynonymChars = '<>'
-                  TabOrder = 3
-                  CharsNeedMatch = 1
-                end
-              end
-            end
-          end
-        end
-        object TabResults: TTabSheet
-          Caption = 'Lab Results'
-          Enabled = False
-          object edtResults: TCaptionRichEdit
-            Left = 0
-            Top = 8
-            Width = 513
-            Height = 369
-            Font.Charset = DEFAULT_CHARSET
-            Font.Color = clWindowText
-            Font.Height = -11
-            Font.Name = 'Courier New'
-            Font.Style = []
-            ParentFont = False
-            TabOrder = 0
-          end
-        end
+        Caption = 'Patient Info'
       end
-      object pnlSelectedTests: TGroupBox
-        Left = 4
-        Top = 292
-        Width = 518
-        Height = 117
-        Caption = 'Selected Components and Tests'
-        TabOrder = 1
-        Visible = False
-        object btnAddTests: TORAlignSpeedButton
-          Left = 426
-          Top = 17
-          Width = 75
-          Height = 21
-          Caption = 'Add'
+    end
+    object TabDiag: TTabSheet
+      Caption = 'Blood Bank Orders'
+      ImageIndex = 2
+      object lblReqComment: TOROffsetLabel
+        Left = 298
+        Top = 25
+        Width = 108
+        Height = 37
+        HorzOffset = 2
+        Transparent = False
+        VertOffset = 2
+        WordWrap = False
+      end
+      object pnlFields: TPanel
+        Left = 0
+        Top = 163
+        Width = 701
+        Height = 99
+        Hint = 'Data entered into these fields apply to the entire order.'
+        Align = alTop
+        BevelEdges = []
+        BevelOuter = bvNone
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 2
+        object lblDiagComment: TOROffsetLabel
+          Left = 257
+          Top = 35
+          Width = 46
+          Height = 15
+          Caption = 'Comment'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
           Font.Name = 'MS Sans Serif'
           Font.Style = []
-          Glyph.Data = {
-            F6000000424DF600000000000000760000002800000010000000100000000100
-            0400000000008000000000000000000000001000000000000000000000000000
-            8000008000000080800080000000800080008080000080808000C0C0C0000000
-            FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
-            3333333333333333333333333333333333333333333003333333333333300333
-            3333333333300333333333333330033333333330000000000333333000000000
-            0333333333300333333333333330033333333333333003333333333333300333
-            3333333333333333333333333333333333333333333333333333}
+          HorzOffset = 2
           ParentFont = False
-          OnClick = btnAddTestsClick
+          Transparent = False
+          VertOffset = 2
+          WordWrap = True
         end
-        object lvSelectionList: TCaptionListView
+        object lblUrgency: TLabel
+          Left = 8
+          Top = -2
+          Width = 44
+          Height = 13
+          Caption = 'Urgency*'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object lblReason: TLabel
+          Left = 10
+          Top = 35
+          Width = 99
+          Height = 13
+          Caption = 'Reason for Request*'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object lblSurgery: TLabel
+          Left = 115
+          Top = -2
+          Width = 36
+          Height = 13
+          Hint = 
+            'Enter the name of the surgical procedure that this request is fo' +
+            'r.'
+          Caption = 'Surgery'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+        end
+        object lblRequiredField: TLabel
+          Left = 10
+          Top = 75
+          Width = 122
+          Height = 13
+          Caption = '* Indicates a required field'
+        end
+        object cboUrgency: TORComboBox
+          Left = 12
+          Top = 12
+          Width = 98
+          Height = 21
+          Style = orcsDropDown
+          AutoSelect = True
+          Caption = 'Urgency'
+          Color = clWindow
+          DropDownCount = 8
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ItemHeight = 13
+          ItemTipColor = clWindow
+          ItemTipEnable = True
+          ListItemsOnly = True
+          LongList = False
+          LookupPiece = 0
+          MaxLength = 0
+          ParentFont = False
+          Pieces = '2'
+          Sorted = False
+          SynonymChars = '<>'
+          TabOrder = 0
+          OnChange = cboUrgencyChange
+          OnExit = cboUrgencyExit
+          CharsNeedMatch = 1
+        end
+        object chkConsent: TCheckBox
+          Left = 351
+          Top = 10
+          Width = 112
+          Height = 17
+          Hint = 'Informed Consent Signed On Chart?'
+          Alignment = taLeftJustify
+          Caption = 'Informed Consent?'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 3
+          Visible = False
+          OnClick = chkConsentClick
+        end
+        object cboSurgery: TORComboBox
+          Left = 115
+          Top = 12
+          Width = 218
+          Height = 21
+          Style = orcsDropDown
+          AutoSelect = True
+          Caption = 'Surgery'
+          Color = clWindow
+          DropDownCount = 8
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ItemHeight = 13
+          ItemTipColor = clWindow
+          ItemTipEnable = True
+          ListItemsOnly = False
+          LongList = False
+          LookupPiece = 0
+          MaxLength = 0
+          ParentFont = False
+          Pieces = '2'
+          Sorted = False
+          SynonymChars = '<>'
+          TabOrder = 1
+          OnChange = cboSurgeryChange
+          OnClick = cboSurgeryClick
+          CharsNeedMatch = 1
+        end
+        object cboReasons: TORComboBox
+          Left = 12
+          Top = 51
+          Width = 239
+          Height = 21
+          Style = orcsDropDown
+          AutoSelect = True
+          Color = clWindow
+          DropDownCount = 8
+          ItemHeight = 13
+          ItemTipColor = clWindow
+          ItemTipEnable = True
+          ListItemsOnly = False
+          LongList = False
+          LookupPiece = 0
+          MaxLength = 0
+          Sorted = False
+          SynonymChars = '<>'
+          TabOrder = 2
+          OnChange = cboReasonsChange
+          OnEnter = cboReasonsEnter
+          OnExit = cboReasonsExit
+          CharsNeedMatch = 1
+        end
+        object memDiagComment: TRichEdit
+          Left = 257
+          Top = 51
+          Width = 250
+          Height = 48
+          TabOrder = 4
+          OnChange = memDiagCommentChange
+        end
+      end
+      object pnlSelect: TPanel
+        Left = 0
+        Top = 35
+        Width = 701
+        Height = 128
+        Align = alTop
+        BevelEdges = []
+        BevelOuter = bvNone
+        TabOrder = 1
+        object lblTNS: TLabel
+          Left = 298
+          Top = 109
+          Width = 14
+          Height = 13
+          Caption = 'tns'
+          Color = clActiveBorder
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clMaroon
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentColor = False
+          ParentFont = False
+          Visible = False
+        end
+        object pnlDiagnosticTests: TGroupBox
+          Left = 256
+          Top = 0
+          Width = 267
+          Height = 110
+          Caption = 'Diagnostic Tests'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 1
+          object lblCollType: TLabel
+            Left = 13
+            Top = 33
+            Width = 77
+            Height = 13
+            Caption = 'Collection Type*'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+          end
+          object lblCollTime: TLabel
+            Left = 12
+            Top = 70
+            Width = 104
+            Height = 13
+            Caption = 'Collection Date/Time*'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+          end
+          object cmdImmedColl: TSpeedButton
+            Left = 148
+            Top = 89
+            Width = 21
+            Height = 11
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -16
+            Font.Name = 'MS Sans Serif'
+            Font.Style = [fsBold]
+            Glyph.Data = {
+              D6000000424DD60000000000000076000000280000000C0000000C0000000100
+              0400000000006000000000000000000000001000000010000000000000000000
+              80000080000000808000800000008000800080800000C0C0C000808080000000
+              FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333333333
+              0000333333333333000033333333333300003333333333330000300330033003
+              0000300330033003000033333333333300003333333333330000333333333333
+              0000333333333333000033333333333300003333333333330000}
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            OnClick = cmdImmedCollClick
+          end
+          object pnlCollTimeButton: TKeyClickPanel
+            Left = 85
+            Top = 89
+            Width = 20
+            Height = 13
+            BevelOuter = bvNone
+            Caption = 'Select collection time'
+            TabOrder = 5
+            TabStop = True
+          end
+          object cboAvailTest: TORComboBox
+            Left = 13
+            Top = 13
+            Width = 234
+            Height = 21
+            Style = orcsDropDown
+            AutoSelect = True
+            Caption = 'Diagnostic Tests'
+            Color = clWindow
+            DropDownCount = 8
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ItemHeight = 13
+            ItemTipColor = clWindow
+            ItemTipEnable = True
+            ListItemsOnly = False
+            LongList = True
+            LookupPiece = 0
+            MaxLength = 0
+            ParentFont = False
+            Pieces = '2'
+            Sorted = False
+            SynonymChars = '<>'
+            TabOrder = 0
+            TabStop = True
+            OnExit = cboAvailTestExit
+            OnMouseClick = cboAvailTestSelect
+            OnNeedData = cboAvailTestNeedData
+            CharsNeedMatch = 1
+          end
+          object cboCollType: TORComboBox
+            Left = 12
+            Top = 46
+            Width = 165
+            Height = 21
+            Style = orcsDropDown
+            AutoSelect = True
+            Caption = 'Collection Type'
+            Color = clWindow
+            DropDownCount = 8
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ItemHeight = 13
+            ItemTipColor = clWindow
+            ItemTipEnable = True
+            ListItemsOnly = True
+            LongList = False
+            LookupPiece = 0
+            MaxLength = 0
+            ParentFont = False
+            Pieces = '2'
+            Sorted = False
+            SynonymChars = '<>'
+            TabOrder = 1
+            OnChange = cboCollTypeChange
+            CharsNeedMatch = 1
+          end
+          object cboCollTime: TORComboBox
+            Left = 12
+            Top = 82
+            Width = 165
+            Height = 21
+            Style = orcsDropDown
+            AutoSelect = True
+            Caption = 'Collection Date/Time'
+            Color = clWindow
+            DropDownCount = 8
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ItemHeight = 13
+            ItemTipColor = clWindow
+            ItemTipEnable = True
+            ListItemsOnly = False
+            LongList = False
+            LookupPiece = 0
+            MaxLength = 0
+            ParentFont = False
+            Pieces = '2'
+            Sorted = False
+            SynonymChars = '<>'
+            TabOrder = 2
+            OnChange = cboCollTimeChange
+            CharsNeedMatch = 1
+          end
+          object calCollTime: TORDateBox
+            Left = 12
+            Top = 82
+            Width = 165
+            Height = 21
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 3
+            OnChange = calCollTimeChange
+            DateOnly = False
+            RequireTime = False
+          end
+          object txtImmedColl: TCaptionEdit
+            Left = 12
+            Top = 82
+            Width = 165
+            Height = 21
+            Color = clBtnFace
+            ReadOnly = True
+            TabOrder = 4
+            Text = 'txtImmedColl'
+          end
+        end
+        object pnlBloodComponents: TGroupBox
           Left = 4
-          Top = 16
-          Width = 409
-          Height = 93
+          Top = 0
+          Width = 246
+          Height = 110
+          Caption = 'Blood Components'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 0
+          object lblQuantity: TLabel
+            Left = 198
+            Top = 0
+            Width = 43
+            Height = 13
+            Caption = 'Quantity*'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+          end
+          object lblModifiers: TLabel
+            Left = 7
+            Top = 33
+            Width = 42
+            Height = 13
+            Caption = 'Modifiers'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+          end
+          object lblWanted: TLabel
+            Left = 7
+            Top = 70
+            Width = 96
+            Height = 13
+            Caption = 'Date/Time Wanted*'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+          end
+          object cboAvailComp: TORComboBox
+            Left = 11
+            Top = 13
+            Width = 181
+            Height = 21
+            Style = orcsDropDown
+            AutoSelect = True
+            Caption = 'Blood Components'
+            Color = clWindow
+            DropDownCount = 8
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ItemHeight = 13
+            ItemTipColor = clWindow
+            ItemTipEnable = True
+            ListItemsOnly = False
+            LongList = False
+            LookupPiece = 0
+            MaxLength = 0
+            ParentFont = False
+            Pieces = '2'
+            Sorted = False
+            SynonymChars = '<>'
+            TabOrder = 0
+            TabStop = True
+            OnChange = cboAvailCompChange
+            OnExit = cboAvailCompExit
+            OnMouseClick = cboAvailCompSelect
+            OnNeedData = cboAvailCompNeedData
+            CharsNeedMatch = 1
+          end
+          object tQuantity: TEdit
+            Left = 198
+            Top = 13
+            Width = 25
+            Height = 21
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 1
+            OnChange = tQuantityChange
+            OnClick = tQuantityClick
+            OnEnter = tQuantityEnter
+          end
+          object cboModifiers: TORComboBox
+            Left = 11
+            Top = 46
+            Width = 133
+            Height = 21
+            Style = orcsDropDown
+            AutoSelect = True
+            Caption = 'Modifier'
+            Color = clWindow
+            DropDownCount = 8
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ItemHeight = 13
+            ItemTipColor = clWindow
+            ItemTipEnable = True
+            ListItemsOnly = True
+            LongList = False
+            LookupPiece = 0
+            MaxLength = 0
+            ParentFont = False
+            Sorted = False
+            SynonymChars = '<>'
+            TabOrder = 2
+            OnChange = cboModifiersChange
+            CharsNeedMatch = 1
+          end
+          object calWantTime: TORDateBox
+            Left = 11
+            Top = 82
+            Width = 149
+            Height = 21
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 3
+            OnChange = calWantTimeChange
+            DateOnly = False
+            RequireTime = False
+          end
+        end
+      end
+      object GroupBox1: TGroupBox
+        Left = 0
+        Top = 0
+        Width = 701
+        Height = 35
+        Align = alTop
+        Caption = ' Personal Quick Orders'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+        object cboQuick: TORComboBox
+          Left = 15
+          Top = 11
+          Width = 488
+          Height = 21
+          Style = orcsDropDown
+          AutoSelect = True
+          Color = clWindow
+          DropDownCount = 8
+          ItemHeight = 13
+          ItemTipColor = clWindow
+          ItemTipEnable = True
+          ListItemsOnly = False
+          LongList = True
+          LookupPiece = 0
+          MaxLength = 0
+          Pieces = '2'
+          Sorted = False
+          SynonymChars = '<>'
+          TabOrder = 0
+          OnClick = cboQuickClick
+          CharsNeedMatch = 1
+        end
+      end
+      object pnlSelectedTests: TGroupBox
+        Left = 0
+        Top = 262
+        Width = 701
+        Height = 112
+        Align = alTop
+        Caption = 'Selected Components and Tests'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 3
+        Visible = False
+        object lvSelectionList: TCaptionListView
+          Left = 5
+          Top = 12
+          Width = 417
+          Height = 91
+          Color = clBtnFace
           Columns = <
             item
               AutoSize = True
@@ -608,454 +739,248 @@ inherited frmODBBank: TfrmODBBank
               Caption = 'Modifiers'
             end
             item
-              Caption = 'ID'
+              Caption = 'ModifierItemIndex'
+              Width = 0
+            end
+            item
+              Caption = 'TestIEN'
               Width = 0
             end>
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = [fsBold]
+          ReadOnly = True
           RowSelect = True
+          ParentFont = False
           TabOrder = 0
+          TabStop = False
           ViewStyle = vsReport
+          OnClick = lvSelectionListClick
           Caption = 'lvSelectionList'
         end
         object btnRemove: TButton
-          Left = 426
-          Top = 42
+          Left = 428
+          Top = 37
           Width = 75
           Height = 21
           Caption = 'Remove'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
           TabOrder = 1
           OnClick = btnRemoveClick
         end
         object btnRemoveAll: TButton
-          Left = 426
-          Top = 68
+          Left = 428
+          Top = 64
           Width = 75
           Height = 21
           Caption = 'Remove All'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
           TabOrder = 2
           OnClick = btnRemoveAllClick
         end
       end
     end
+    object TabResults: TTabSheet
+      Caption = 'Lab Results'
+      object edtResults: TCaptionRichEdit
+        Left = -4
+        Top = 57
+        Width = 517
+        Height = 290
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Courier New'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 0
+      end
+    end
+  end
+  inherited cmdAccept: TButton
+    Left = 455
+    Top = 399
+    TabOrder = 2
+    Visible = False
+    ExplicitLeft = 455
+    ExplicitTop = 399
+  end
+  inherited cmdQuit: TButton
+    Left = 455
+    Top = 426
+    Width = 52
+    TabOrder = 3
+    ExplicitLeft = 455
+    ExplicitTop = 426
+    ExplicitWidth = 52
+  end
+  inherited pnlMessage: TPanel
+    Left = 8
+    Top = 409
+    Width = 409
+    Height = 49
+    TabOrder = 1
+    ExplicitLeft = 8
+    ExplicitTop = 409
+    ExplicitWidth = 409
+    ExplicitHeight = 49
+    inherited memMessage: TRichEdit
+      Left = 42
+      Top = 5
+      Width = 360
+      ExplicitLeft = 42
+      ExplicitTop = 5
+      ExplicitWidth = 360
+    end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODBBank'
+        'Status = stsDefault')
+      (
+        'Component = pnlComments'
+        'Status = stsDefault')
+      (
+        'Component = btnUpdateComments'
+        'Status = stsDefault')
+      (
+        'Component = btnCancelComment'
+        'Status = stsDefault')
+      (
+        'Component = pgeProduct'
+        'Status = stsDefault')
+      (
+        'Component = TabInfo'
+        'Status = stsDefault')
+      (
+        'Component = edtInfo'
+        'Status = stsDefault')
+      (
+        'Component = TabDiag'
+        'Status = stsDefault')
+      (
+        'Component = TabResults'
+        'Status = stsDefault')
+      (
+        'Component = edtResults'
+        'Status = stsDefault')
+      (
+        'Component = pnlFields'
+        'Status = stsDefault')
+      (
+        'Component = cboUrgency'
+        'Status = stsDefault')
+      (
+        'Component = chkConsent'
+        'Status = stsDefault')
+      (
+        'Component = cboSurgery'
+        'Status = stsDefault')
+      (
+        'Component = pnlSelect'
+        'Status = stsDefault')
+      (
+        'Component = pnlDiagnosticTests'
+        'Status = stsDefault')
+      (
+        'Component = cboAvailTest'
+        'Status = stsDefault')
+      (
+        'Component = pnlBloodComponents'
+        'Status = stsDefault')
+      (
+        'Component = cboAvailComp'
+        'Status = stsDefault')
+      (
+        'Component = tQuantity'
+        'Status = stsDefault')
+      (
+        'Component = cboModifiers'
+        'Status = stsDefault')
+      (
+        'Component = GroupBox1'
+        'Status = stsDefault')
+      (
+        'Component = cboQuick'
+        'Status = stsDefault')
+      (
+        'Component = pnlSelectedTests'
+        'Status = stsDefault')
+      (
+        'Component = lvSelectionList'
+        'Status = stsDefault')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = btnRemoveAll'
+        'Status = stsDefault')
+      (
+        'Component = cboReasons'
+        'Text = Applies to entire order'
+        'Status = stsOK')
+      (
+        'Component = memDiagComment'
+        'Status = stsDefault')
+      (
+        'Component = cboCollType'
+        'Status = stsDefault')
+      (
+        'Component = cboCollTime'
+        'Status = stsDefault')
+      (
+        'Component = calWantTime'
+        'Status = stsDefault')
+      (
+        'Component = calCollTime'
+        'Status = stsDefault')
+      (
+        'Component = txtImmedColl'
+        'Status = stsDefault')
+      (
+        'Component = pnlCollTimeButton'
+        'Status = stsDefault'))
   end
   object dlgLabCollTime: TORDateTimeDlg
-    FMDateTime = 2980923
+    FMDateTime = 2980923.000000000000000000
     DateOnly = False
     RequireTime = True
     Left = 435
-    Top = 12
+    Top = 72
   end
   object ORWanted: TORDateTimeDlg
-    FMDateTime = 2980923
+    FMDateTime = 2980923.000000000000000000
     DateOnly = False
     RequireTime = True
-    Left = 335
-    Top = 12
-  end
-  object ImageList1: TImageList
-    Left = 388
-    Top = 12
-    Bitmap = {
-      494C010104000900040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
-      0000000000003600000028000000400000003000000001002000000000000030
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000A0A0A002F2F2F00222222000C0C
-      0C0015151500262626002A2A2A001F1F1F0001010100171717001C1C1C001313
-      13001B1B1B00181818001616160000000000CFCFD000D9D9D900E2E2E200E9EA
-      EA00F1F1F300FAFDF600FFFFFE00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
-      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0017171700A2A2A200FFFFFF00FAFA
-      FA00A7B8110045BC3B0032C32100E0ED4B00DEF65200D8E34600B0B81800C4CC
-      2B00E3F45100D0F14900D5E34500AFA31D000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000700040005D0250006D6320006D8
-      260007F9070012FC0E0008FC000008FB0C000311ED000000FD00100ADF000000
-      110000000000000000000000000002020200DDDEDF00E5E5E600E8E8ED009896
-      A6004B4992004240BC003734BE003734C4003F3DCB005250D50079779700FFFF
-      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0056151700B2A09F00FAFAFA00F5F5
-      F500BD9E070036E1370096D53200DEEE4300E8E73F00D5EE4600B99D1000BEB7
-      1400E9E74200C7D12300AFD73B00D28229000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000600040001FF000001FF000001FF
-      000001FF000001FF000001FF000000FF05000EC4360004ED000004E119000000
-      270000000000000000000000000002020200E4E4E500E9EAE80063606B005C59
-      CB00544FCD004E48CD004944BC004540C800433FCD004A48D3006060DE009695
-      BD00FFFFFF00FFFFFF00FFFFFF00FFFFFF00BF191800EDA6A300FCFCFC00FCFC
-      FC00A4A103005ECF770080D32A0046BD140081DD36009CE03500F2F54B007FCF
-      28006FCE2900EFF55400BAA81B00C78F20000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000500030001FF000001FF000001FF
-      000001FF000001FF000001FF000001FF000001FF000010FD020005FF05000500
-      000000000000000000000000000002020200E9EAE7009D99BF007773EC007A75
-      F6007C75F700756EF4006D66E800635DDA00514DD0004A47D3005451D8006E6C
-      DB00FFFFFF00FFFFFF00FFFFFF00FFFFFF00CF292800F2ABA800FCFCFC00FCFC
-      FC00C2B91600CFC8250066C61B0036DB340021AB0600DCEF4C00F0F8510047BB
-      140022BE1900F4F34F00C2911700B7B415000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000801060001FF000001FF000001FF
-      000001FF000001FF000001FF000001FF000001FF000010FD020005FF05000500
-      000000000000000000000000000002020200EBEBED00A9A6D7009691F6009B95
-      FB00AAA3FF00A79EFF009B93FF00837AF2006761D5005651C3005753D6006C6A
-      DE00FDFEFF00FFFFFF00FFFFFF00FFFFFF00D57C2C00F2CAAE00FEFEFE00FCFC
-      FC00F4FC5500E4F14F0057C41A003EE33C0043BD1500C0E94000F2F14900B0DD
-      3A000DB60C00EFF24800D0F04500E1AD7E000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000500030001FF000001FF000001FF
-      000001FF000001FF000001FF000001FF000001FF000010FD020005FF05000500
-      000000000000000000000000000002020200EDEDEE00EAEAEE00ABA5F600BAB5
-      FB00E9E6FC00FFFFFF00D4D1FF009A92FD007770E400615CCB005F5BD400726F
-      D900FFFFFF00FFFFFF00FFFFFF00FFFFFF00CFCF2900F0ECA500FCFCFC00FCFC
-      FC0042F0450019B215001CBC160017B70B0079D42B0025D52A00E9F64E004BC0
-      17002FC31700D9F34C003FB90F00FFFFF3000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000D060B0001FF000000EB110000FF
-      0B000DFE070001FF000001FF000001FF000000EE0F000AFD080006F806000802
-      030000000000000000000000000002020200EDEDEE00F1F1F200EDECEF00B9B3
-      F800C1BBFC00D1D0FE00BEB6FF00968DFF007973EC006863D4006B67CA008381
-      B800FFFFFF00FFFFFF00FFFFFF00FFFFFF009ED52A00D5EFA300FCFCFC00FCFC
-      FC005DE8610050F57C009FDE3A003FE33E001EBA150027C017008AD92E003EC3
-      1F0026BB14007FDE3A0037BB1000FFF2FA000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000500030001FF000000DC1D0001FF
-      000006FF000001FF000001FF000001FF00000BFF070010FD020001FF00000500
-      000000000000000000000000000002020200EBEBEC00EFEFEF00F2F1F300F4F3
-      F300ABA7F100A39DF7009E8EFE00887AFF006D69E2006965CF007471C500E9EB
-      F900FFFFFF00FFFFFF00FFFFFF00FFFFFF001DBF2A00A2E79E00FCFCFC00FCFC
-      FC00BAAA670078EBD80034DE48004FF6870034D6360086CB2E00A1E032009FE2
-      430022D931007DF96900E2F2F900FCFCFC000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000801060001FF000000E1220001FF
-      000006FF000001FF000000FE000001FF000009FF070010FD020001FF00000500
-      000000000000000000000000000002020200E5E5E500E9E9EA00ECECED00EFEF
-      F000EFEEF1008A85E200736EF600635EF700615EC9006B68B000BCBCDC00FFFF
-      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0050FB9F00B0FFD800F9F9F900FBFB
-      FB00FCFCFC00FAFAFA006EB247002FFF860017AD13009BD53A000FB0000025C1
-      2700DCE2D100FCFCFC00FCFCFC00FCFCFC000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000C00030001FF000000E1220001FF
-      000006FF000001FF00000EFC000007FC02000AE4210010FF000002FF00000901
-      010000000000000000000000000002020200DBDBDB00E0E0E100E5E5E600E8E8
-      E900EAE9EA00E7EBE6005F5EDE005858EF005F60A2008989B300FCFBFD00FFFF
-      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0042DBEA00ACECF700FFFFFF00FBFB
-      FB00FCFCFC00FDFDFD00FFE9FF00EEDDC200127DBA0035D73C0043C70800E2C5
-      A000FFFEFF00FCFCFC00FCFCFC00FCFCFC000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000500030003FF000000DD2A0001FF
-      000006FF000002FD020005FF000000FF000000180A0004FF07001ECB16000002
-      000000000000000000000000000002020200C9C9CA00D0D0D100D7D8D800DCDC
-      DD00DEDFE000E0E1E100E1E0E0005353E3005A5D7500EDF0F100F6F9F900FAFB
-      FB00FDFDFE00FEFEFE00FFFFFF00FFFFFF006393E500BAD2EE00FCFCFC00FCFC
-      FC00FCFCFC00FCFCFC00FCFCFC00FFFFF800DE39D600167EB90044D8EE00F5FA
-      FF00FCFCFC00FCFCFC00FCFCFC00FCFCFC000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000902070000FF000000DD2A0001FF
-      000006FF00000DF6060015751A0007FF00000806060003FF0000001000000005
-      000000000000000000000000000002020200B7B8B800BCBDBD00C4C5C500CCCD
-      CD00D1D1D100D4D5D500D7D7D800C6C5D0004D4EA900E5E6E300EDEEED00F3F4
-      F400F8F8F800FBFBFB00FCFCFC00FCFDFD00DC3BD300F0AAF000FDFDFD00FCFC
-      FC00FCFCFC00FCFCFC00FCFCFC00F1F2FF00C820B9001EA8B4005BCAFA00EAEC
-      FF00FCFCFC00FCFCFC00FCFCFC00FCFCFC000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000500030000FF000000DD2A0001FF
-      000006FF00000DB0000020001C0000F500001300140025000D00000200000401
-      000000000000000000000000000002020200A5A5A600A5A5A600ACADAD00B5B5
-      B500BDBCBD0000000000C6C7C800CBC8CB00B1B0C400BDBDC100DDDDDB00E4E4
-      E400EAEAEA00EEEFEF00F1F2F200F2F3F300E03FD700F3ADF300F8F8F800FCFC
-      FC00FCFCFC00FCFCFC00FCFCFC00CCC7C600AD68C900515ADA0035C83600B185
-      8600FCFCFC00FCFCFC00FCFCFC00FCFCFC000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000A03080000FF000000D7240001FF
-      0000000600001D3F160000010000219024000000070000000000020103000000
-      0000000000000000000000000000020202008F8F8F008F8F8F008F8F8F009596
-      96009D9E9E00A5A5A600AAABAB00B0B0B100B6B6B700BAB8BA009C9DA100C5C6
-      C700CDCECE00D2D2D300D5D5D600D6D6D600A71BC200DE9FE500FCFCFC00FCFC
-      FC00FCFCFC00FCFCFC00FCFCFC00DA971200AFB91300CEA42100E86B2100677E
-      AE00FCFCFC00FCFCFC00FCFCFC00FCFCFC000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000903000014F70600130830000BED
-      00000200010008000A0003020400000700000000070000000000020103000000
-      0000000000000000000000000000020202007C7D7D007C7D7D007C7D7D007C7D
-      7D007E7E7E00848585008B8B8C0091919200979798009C9D9D00A1A1A000A3A4
-      A200A8A9A900AEAEAE00B1B1B100B2B2B3003A2EFF00B0ADFD00FEFEFE00FFFF
-      FF00FCFCFC00FCFCFC00FFFCFF00AAD83100FAF8FE00511C1900FAE7F000EDD8
-      E000FCFCFC00FCFCFC00FCFCFC00FCFCFC000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000000013131300161616000A0D11000000
-      0000030408000101010001010100010101000000030001010100000100000101
-      0100010101000101010001010100020202006B6B6C006B6B6C006B6B6C006B6B
-      6C006B6B6C006B6B6C006B6B6C006D6D6E0072727200767677007A7B7B007E7E
-      7E00818182008484840087878700888889000C04F10099A0F000F7F7F700FBFB
-      FB00FCFCFC00FCFCFC00FDFFFF00FFF7FF0057262400CE5C45009A252200B8C9
-      C600FCFCFC00FCFCFC00FCFCFC00FCFCFC00424D3E000000000000003E000000
-      2800000040000000300000000100010000000000800100000000000000000000
-      000000000000000000000000FFFFFF0000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      00000000000000000000000000000000FFFF000000000000FFFF000000000000
-      FFFF000000000000FFFF000000000000FFFF000000000000FFFF000000000000
-      FFFF000000000000FFFF000000000000FFFF000000000000FFFF000000000000
-      FFFF000000000000FFFF000000000000FFFF000004000000FFFF000000000000
-      FFFF000000000000FFFF00000000000000000000000000000000000000000000
-      000000000000}
+    Left = 343
+    Top = 72
   end
 end

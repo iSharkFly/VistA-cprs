@@ -4,7 +4,8 @@ inherited frmODDiet: TfrmODDiet
   Width = 532
   Height = 291
   Caption = 'Diet Order'
-  OnKeyDown = FormKeyDown
+  ExplicitWidth = 532
+  ExplicitHeight = 291
   PixelsPerInch = 96
   TextHeight = 13
   object nbkDiet: TPageControl [0]
@@ -14,7 +15,6 @@ inherited frmODDiet: TfrmODDiet
     Height = 194
     ActivePage = pgeOutPt
     Align = alTop
-    TabIndex = 1
     TabOrder = 4
     TabStop = False
     OnChange = nbkDietChange
@@ -997,26 +997,257 @@ inherited frmODDiet: TfrmODDiet
   end
   inherited memOrder: TCaptionMemo
     Top = 208
+    ExplicitTop = 208
   end
   inherited cmdAccept: TButton
     Left = 445
     Top = 208
     TabOrder = 2
+    ExplicitLeft = 445
+    ExplicitTop = 208
   end
   inherited cmdQuit: TButton
     Left = 445
     Top = 235
     TabOrder = 3
+    ExplicitLeft = 445
+    ExplicitTop = 235
   end
   inherited pnlMessage: TPanel
     Top = 197
     Height = 57
     TabOrder = 1
+    ExplicitTop = 197
+    ExplicitHeight = 57
     inherited imgMessage: TImage
       Top = 10
+      ExplicitTop = 10
     end
     inherited memMessage: TRichEdit
       Height = 45
+      ExplicitHeight = 45
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = nbkDiet'
+        'Status = stsDefault')
+      (
+        'Component = pgeDiet'
+        'Status = stsDefault')
+      (
+        'Component = cboDietAvail'
+        'Status = stsDefault')
+      (
+        'Component = lstDietSelect'
+        'Status = stsDefault')
+      (
+        'Component = cmdRemove'
+        'Status = stsDefault')
+      (
+        'Component = txtDietComment'
+        'Status = stsDefault')
+      (
+        'Component = calDietStart'
+        'Status = stsDefault')
+      (
+        'Component = calDietStop'
+        'Status = stsDefault')
+      (
+        'Component = cboDelivery'
+        'Status = stsDefault')
+      (
+        'Component = chkCancelTubefeeding'
+        'Status = stsDefault')
+      (
+        'Component = pgeOutPt'
+        'Status = stsDefault')
+      (
+        'Component = grpOPMeal'
+        'Status = stsDefault')
+      (
+        'Component = grpOPDoW'
+        'Status = stsDefault')
+      (
+        'Component = chkOPMonday'
+        'Status = stsDefault')
+      (
+        'Component = chkOPTuesday'
+        'Status = stsDefault')
+      (
+        'Component = chkOPWednesday'
+        'Status = stsDefault')
+      (
+        'Component = chkOPThursday'
+        'Status = stsDefault')
+      (
+        'Component = chkOPFriday'
+        'Status = stsDefault')
+      (
+        'Component = chkOPSaturday'
+        'Status = stsDefault')
+      (
+        'Component = chkOPSunday'
+        'Status = stsDefault')
+      (
+        'Component = calOPStart'
+        'Status = stsDefault')
+      (
+        'Component = calOPStop'
+        'Status = stsDefault')
+      (
+        'Component = cboOPDietAvail'
+        'Status = stsDefault')
+      (
+        'Component = txtOPDietComment'
+        'Status = stsDefault')
+      (
+        'Component = cboOPDelivery'
+        'Status = stsDefault')
+      (
+        'Component = lstOPDietSelect'
+        'Status = stsDefault')
+      (
+        'Component = cmdOPRemove'
+        'Status = stsDefault')
+      (
+        'Component = chkOPCancelTubefeeding'
+        'Status = stsDefault')
+      (
+        'Component = pgeTubefeeding'
+        'Status = stsDefault')
+      (
+        'Component = cboProduct'
+        'Status = stsDefault')
+      (
+        'Component = txtTFComment'
+        'Status = stsDefault')
+      (
+        'Component = grdSelected'
+        'Status = stsDefault')
+      (
+        'Component = cmdTFRemove'
+        'Status = stsDefault')
+      (
+        'Component = chkCancelTrays'
+        'Status = stsDefault')
+      (
+        'Component = txtQuantity'
+        'Status = stsDefault')
+      (
+        'Component = cboStrength'
+        'Status = stsDefault')
+      (
+        'Component = calOPTFStart'
+        'Status = stsDefault')
+      (
+        'Component = cboOPTFRecurringMeals'
+        'Status = stsDefault')
+      (
+        'Component = pgeEarlyLate'
+        'Status = stsDefault')
+      (
+        'Component = grpMeal'
+        'Status = stsDefault')
+      (
+        'Component = grpMealTime'
+        'Status = stsDefault')
+      (
+        'Component = radET1'
+        'Status = stsDefault')
+      (
+        'Component = radET2'
+        'Status = stsDefault')
+      (
+        'Component = radET3'
+        'Status = stsDefault')
+      (
+        'Component = radLT1'
+        'Status = stsDefault')
+      (
+        'Component = radLT2'
+        'Status = stsDefault')
+      (
+        'Component = radLT3'
+        'Status = stsDefault')
+      (
+        'Component = calELStart'
+        'Status = stsDefault')
+      (
+        'Component = calELStop'
+        'Status = stsDefault')
+      (
+        'Component = grpDoW'
+        'Status = stsDefault')
+      (
+        'Component = chkMonday'
+        'Status = stsDefault')
+      (
+        'Component = chkTuesday'
+        'Status = stsDefault')
+      (
+        'Component = chkWednesday'
+        'Status = stsDefault')
+      (
+        'Component = chkThursday'
+        'Status = stsDefault')
+      (
+        'Component = chkFriday'
+        'Status = stsDefault')
+      (
+        'Component = chkSaturday'
+        'Status = stsDefault')
+      (
+        'Component = chkSunday'
+        'Status = stsDefault')
+      (
+        'Component = chkBagged'
+        'Status = stsDefault')
+      (
+        'Component = cboOPELRecurringMeals'
+        'Status = stsDefault')
+      (
+        'Component = pgeIsolations'
+        'Status = stsDefault')
+      (
+        'Component = lstIsolation'
+        'Status = stsDefault')
+      (
+        'Component = txtIPComment'
+        'Status = stsDefault')
+      (
+        'Component = txtIPCurrent'
+        'Status = stsDefault')
+      (
+        'Component = pgeAdditional'
+        'Status = stsDefault')
+      (
+        'Component = txtAOComment'
+        'Status = stsDefault')
+      (
+        'Component = calOPAOStart'
+        'Status = stsDefault')
+      (
+        'Component = cboOPAORecurringMeals'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODDiet'
+        'Status = stsDefault'))
   end
 end

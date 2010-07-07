@@ -1,4 +1,4 @@
-object frmOptionsTitles: TfrmOptionsTitles
+inherited frmOptionsTitles: TfrmOptionsTitles
   Left = 271
   Top = 271
   HelpContext = 9230
@@ -7,40 +7,33 @@ object frmOptionsTitles: TfrmOptionsTitles
   Caption = 'Document Titles'
   ClientHeight = 237
   ClientWidth = 527
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   HelpFile = 'CPRSWT.HLP'
-  OldCreateOrder = False
   Position = poScreenCenter
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object lblDocumentClass: TLabel
+  object lblDocumentClass: TLabel [0]
     Left = 8
     Top = 17
     Width = 79
     Height = 13
     Caption = 'Document class:'
   end
-  object lblDocumentTitles: TLabel
+  object lblDocumentTitles: TLabel [1]
     Left = 8
     Top = 57
     Width = 76
     Height = 13
     Caption = 'Document titles:'
   end
-  object lblYourTitles: TLabel
+  object lblYourTitles: TLabel [2]
     Left = 299
     Top = 78
     Width = 76
     Height = 13
     Caption = 'Your list of titles:'
   end
-  object lblDefaultTitle: TStaticText
+  object lblDefaultTitle: TStaticText [3]
     Left = 299
     Top = 43
     Width = 41
@@ -48,7 +41,7 @@ object frmOptionsTitles: TfrmOptionsTitles
     Caption = 'Default:'
     TabOrder = 10
   end
-  object lblDefault: TStaticText
+  object lblDefault: TStaticText [4]
     Left = 299
     Top = 59
     Width = 108
@@ -57,7 +50,7 @@ object frmOptionsTitles: TfrmOptionsTitles
     ShowAccelChar = False
     TabOrder = 11
   end
-  object lblDocumentPreference: TStaticText
+  object lblDocumentPreference: TStaticText [5]
     Left = 199
     Top = 6
     Width = 132
@@ -65,7 +58,7 @@ object frmOptionsTitles: TfrmOptionsTitles
     Caption = 'Document List Preferences'
     TabOrder = 12
   end
-  object cboDocumentClass: TORComboBox
+  object cboDocumentClass: TORComboBox [6]
     Left = 8
     Top = 31
     Width = 200
@@ -81,14 +74,16 @@ object frmOptionsTitles: TfrmOptionsTitles
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = False
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = True
     SynonymChars = '<>'
     TabOrder = 0
     OnClick = cboDocumentClassClick
+    CharsNeedMatch = 1
   end
-  object lstYourTitles: TORListBox
+  object lstYourTitles: TORListBox [7]
     Left = 299
     Top = 93
     Width = 200
@@ -107,7 +102,7 @@ object frmOptionsTitles: TfrmOptionsTitles
     Pieces = '2'
     OnChange = lstYourTitlesChange
   end
-  object btnAdd: TButton
+  object btnAdd: TButton [8]
     Left = 211
     Top = 93
     Width = 85
@@ -123,7 +118,7 @@ object frmOptionsTitles: TfrmOptionsTitles
     TabOrder = 2
     OnClick = btnAddClick
   end
-  object btnRemove: TButton
+  object btnRemove: TButton [9]
     Left = 211
     Top = 121
     Width = 85
@@ -139,7 +134,7 @@ object frmOptionsTitles: TfrmOptionsTitles
     TabOrder = 3
     OnClick = btnRemoveClick
   end
-  object btnDefault: TButton
+  object btnDefault: TButton [10]
     Left = 211
     Top = 178
     Width = 85
@@ -156,7 +151,7 @@ object frmOptionsTitles: TfrmOptionsTitles
     TabOrder = 5
     OnClick = btnDefaultClick
   end
-  object btnSaveChanges: TButton
+  object btnSaveChanges: TButton [11]
     Left = 211
     Top = 150
     Width = 85
@@ -173,7 +168,7 @@ object frmOptionsTitles: TfrmOptionsTitles
     TabOrder = 4
     OnClick = btnSaveChangesClick
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [12]
     Left = 0
     Top = 204
     Width = 527
@@ -214,7 +209,7 @@ object frmOptionsTitles: TfrmOptionsTitles
       TabOrder = 1
     end
   end
-  object cboDocumentTitles: TORComboBox
+  object cboDocumentTitles: TORComboBox [13]
     Left = 8
     Top = 72
     Width = 200
@@ -230,6 +225,7 @@ object frmOptionsTitles: TfrmOptionsTitles
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = True
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = True
@@ -238,8 +234,9 @@ object frmOptionsTitles: TfrmOptionsTitles
     OnChange = cboDocumentTitlesChange
     OnDblClick = btnAddClick
     OnNeedData = cboDocumentTitlesNeedData
+    CharsNeedMatch = 1
   end
-  object btnUp: TButton
+  object btnUp: TButton [14]
     Left = 504
     Top = 110
     Width = 22
@@ -249,7 +246,7 @@ object frmOptionsTitles: TfrmOptionsTitles
     TabOrder = 7
     OnClick = btnUpClick
   end
-  object btnDown: TButton
+  object btnDown: TButton [15]
     Left = 504
     Top = 150
     Width = 22
@@ -258,5 +255,56 @@ object frmOptionsTitles: TfrmOptionsTitles
     Caption = 'v'
     TabOrder = 8
     OnClick = btnDownClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblDefaultTitle'
+        'Status = stsDefault')
+      (
+        'Component = lblDefault'
+        'Status = stsDefault')
+      (
+        'Component = lblDocumentPreference'
+        'Status = stsDefault')
+      (
+        'Component = cboDocumentClass'
+        'Status = stsDefault')
+      (
+        'Component = lstYourTitles'
+        'Status = stsDefault')
+      (
+        'Component = btnAdd'
+        'Status = stsDefault')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = btnDefault'
+        'Status = stsDefault')
+      (
+        'Component = btnSaveChanges'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = cboDocumentTitles'
+        'Status = stsDefault')
+      (
+        'Component = btnUp'
+        'Status = stsDefault')
+      (
+        'Component = btnDown'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsTitles'
+        'Status = stsDefault'))
   end
 end

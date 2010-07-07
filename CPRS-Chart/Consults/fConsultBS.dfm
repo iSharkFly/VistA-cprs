@@ -1,21 +1,15 @@
-object frmConsultsByService: TfrmConsultsByService
+inherited frmConsultsByService: TfrmConsultsByService
   Left = 339
   Top = 175
-  Width = 328
-  Height = 412
   BorderIcons = []
   Caption = 'List Consults by Service'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 385
+  ClientWidth = 320
   OldCreateOrder = True
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 320
@@ -89,6 +83,7 @@ object frmConsultsByService: TfrmConsultsByService
       ItemTipEnable = True
       ListItemsOnly = True
       LongList = False
+      LookupPiece = 0
       MaxLength = 0
       Pieces = '2'
       Sorted = True
@@ -96,6 +91,31 @@ object frmConsultsByService: TfrmConsultsByService
       TabOrder = 0
       OnKeyPause = cboServiceSelect
       OnMouseClick = cboServiceSelect
+      CharsNeedMatch = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = radSort'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = treService'
+        'Status = stsDefault')
+      (
+        'Component = cboService'
+        'Status = stsDefault')
+      (
+        'Component = frmConsultsByService'
+        'Status = stsDefault'))
   end
 end

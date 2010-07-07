@@ -1,4 +1,4 @@
-object frmTemplateAutoGen: TfrmTemplateAutoGen
+inherited frmTemplateAutoGen: TfrmTemplateAutoGen
   Left = 361
   Top = 230
   ActiveControl = rgSource
@@ -7,18 +7,11 @@ object frmTemplateAutoGen: TfrmTemplateAutoGen
   Caption = 'Generate Template'
   ClientHeight = 213
   ClientWidth = 415
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object lblTop: TMemo
+  object lblTop: TMemo [0]
     Left = 256
     Top = 8
     Width = 147
@@ -34,7 +27,7 @@ object frmTemplateAutoGen: TfrmTemplateAutoGen
       'source.')
     TabOrder = 5
   end
-  object lblSelect: TStaticText
+  object lblSelect: TStaticText [1]
     Left = 0
     Top = 0
     Width = 241
@@ -45,7 +38,7 @@ object frmTemplateAutoGen: TfrmTemplateAutoGen
     Caption = 'Select Source of Template Generation ...'
     TabOrder = 6
   end
-  object rgSource: TKeyClickRadioGroup
+  object rgSource: TKeyClickRadioGroup [2]
     Left = 256
     Top = 88
     Width = 153
@@ -58,7 +51,7 @@ object frmTemplateAutoGen: TfrmTemplateAutoGen
     TabStop = True
     OnClick = rgSourceClick
   end
-  object cbxObjects: TORComboBox
+  object cbxObjects: TORComboBox [3]
     Left = 0
     Top = 0
     Width = 249
@@ -73,6 +66,7 @@ object frmTemplateAutoGen: TfrmTemplateAutoGen
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = False
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '1'
     Sorted = False
@@ -80,8 +74,9 @@ object frmTemplateAutoGen: TfrmTemplateAutoGen
     TabOrder = 1
     Visible = False
     OnDblClick = cbxObjectsDblClick
+    CharsNeedMatch = 1
   end
-  object btnOK: TButton
+  object btnOK: TButton [4]
     Left = 257
     Top = 190
     Width = 75
@@ -91,7 +86,7 @@ object frmTemplateAutoGen: TfrmTemplateAutoGen
     ModalResult = 1
     TabOrder = 3
   end
-  object btnCancel: TButton
+  object btnCancel: TButton [5]
     Left = 337
     Top = 190
     Width = 75
@@ -101,7 +96,7 @@ object frmTemplateAutoGen: TfrmTemplateAutoGen
     ModalResult = 2
     TabOrder = 4
   end
-  object cbxTitles: TORComboBox
+  object cbxTitles: TORComboBox [6]
     Left = 0
     Top = 0
     Width = 249
@@ -116,6 +111,7 @@ object frmTemplateAutoGen: TfrmTemplateAutoGen
     ItemTipEnable = True
     ListItemsOnly = True
     LongList = True
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = False
@@ -124,5 +120,33 @@ object frmTemplateAutoGen: TfrmTemplateAutoGen
     Visible = False
     OnDblClick = cbxTitlesDblClick
     OnNeedData = cbxTitlesNeedData
+    CharsNeedMatch = 1
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblTop'
+        'Status = stsDefault')
+      (
+        'Component = lblSelect'
+        'Status = stsDefault')
+      (
+        'Component = rgSource'
+        'Status = stsDefault')
+      (
+        'Component = cbxObjects'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = cbxTitles'
+        'Status = stsDefault')
+      (
+        'Component = frmTemplateAutoGen'
+        'Status = stsDefault'))
   end
 end

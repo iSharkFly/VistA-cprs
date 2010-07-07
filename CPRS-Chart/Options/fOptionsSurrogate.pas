@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ORDtTmRng, ORFn, ExtCtrls;
+  StdCtrls, ORCtrls, ORDtTmRng, ORFn, ExtCtrls, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOptionsSurrogate = class(TForm)
+  TfrmOptionsSurrogate = class(TfrmBase508Form)
     lblSurrogate: TLabel;
     cboSurrogate: TORComboBox;
     btnSurrogateDateRange: TButton;
@@ -155,16 +156,23 @@ var
   info, msg: string;
   ok: boolean;
 begin
-  rpcCheckSurrogate(TempSurrogate.IEN, ok, msg);
+  //rpcCheckSurrogate(TempSurrogate.IEN, ok, msg);   chack is now in rpcSetSurrogateInfo (v27.29 - RV)
+  ok := TRUE;
+  info := '';
+  info := info + IntToStr(TempSurrogate.IEN) + '^';
+  info := info + FloatToStr(TempSurrogate.Start) + '^';
+  info := info + FloatToStr(TempSurrogate.Stop) + '^';
+  rpcSetSurrogateInfo(info, ok, msg);
   if not ok then
   begin
     beep;
     InfoBox(msg, 'Warning', MB_OK or MB_ICONWARNING);
+    with cboSurrogate do ItemIndex := SetExactByIEN(Surrogate.IEN, Surrogate.Name);
+    cboSurrogateChange(Self);
     ModalResult := mrNone;
   end
   else
   begin
-    ModalResult := mrOK;
     with Surrogate do
     begin
       IEN := TempSurrogate.IEN;
@@ -172,11 +180,7 @@ begin
       Start := TempSurrogate.Start;
       Stop := TempSurrogate.Stop;
     end;
-    info := '';
-    info := info + IntToStr(Surrogate.IEN) + '^';
-    info := info + FloatToStr(Surrogate.Start) + '^';
-    info := info + FloatToStr(Surrogate.Stop) + '^';
-    rpcSetSurrogateInfo(info);
+    ModalResult := mrOK;
   end;
 end;
 

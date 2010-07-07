@@ -152,7 +152,7 @@ procedure Register;
 { used by Delphi to put components on the Palette }
 begin
   RegisterComponents('CPRS',
-    [TORStaticText, TORListBox, TORComboBox, TORAutoPanel, TOROffsetLabel, TORAlignEdit,
+    [TORListBox, TORComboBox, TORAutoPanel, TOROffsetLabel, TORAlignEdit,
     TORAlignButton, TORAlignSpeedButton, TORTreeView, TORCheckBox, TORListView,
     TKeyClickPanel, TKeyClickRadioGroup, TCaptionListBox, TCaptionCheckListBox,
     TCaptionMemo, TCaptionEdit, TCaptionTreeView, TCaptionComboBox,

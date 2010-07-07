@@ -16,7 +16,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, ExtCtrls, uConst,
   StdCtrls, fAutoSz, Buttons, ORCtrls, ORFn, uPCE, ORDtTm, Checklst,
-  ComCtrls;
+  ComCtrls, VA508AccessibilityManager, fBase508Form;
 
 type
   TfrmPCEBase = class(TfrmAutoSz)
@@ -26,7 +26,6 @@ type
     procedure btnCancelClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject); virtual;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormShow(Sender: TObject);
   private
     FDisplayCount: Integer;                      // number of times page displayed
     FPatientCount: Integer;                      // number of times page displayed for given pt
@@ -70,7 +69,7 @@ implementation
 {$R *.DFM}
 
 uses
-  fEncounterFrame;
+  fEncounterFrame, VA508AccessibilityRouter;
 
 
 {///////////////////////////////////////////////////////////////////////////////
@@ -367,10 +366,8 @@ begin
   FindNextControl(self, True, True, False).SetFocus;
 end;
 
-procedure TfrmPCEBase.FormShow(Sender: TObject);
-begin
-  inherited;
-  FocusFirstControl;
-end;
+initialization
+  SpecifyFormIsNotADialog(TfrmPCEBase);
+
 
 end.

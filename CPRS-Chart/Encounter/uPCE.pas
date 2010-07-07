@@ -1,5 +1,5 @@
 unit uPCE;
-
+                                                                       
 interface
 
 uses Windows, SysUtils, Classes, ORFn, uConst, ORCtrls, ORClasses,UBAGlobals;
@@ -219,6 +219,7 @@ type
     FMSTRelated:   Integer;                        //
     FHNCRelated:   Integer;                        //
     FCVRelated:    Integer;                        //
+    FSHADRelated:   Integer;                        //
     FVisitType:    TPCEProc;                       //
     FProviders:    TPCEProviderList;
     FDiagnoses:    TList;                          //pointer list for diagnosis
@@ -247,6 +248,7 @@ type
     procedure SetMSTRelated(Value: Integer);
     procedure SetHNCRelated(Value: Integer);
     procedure SetCVRelated(Value: Integer);
+    procedure SetSHADRelated(Value: Integer);
     procedure SetEncUseCurr(Value: Boolean);
     function GetHasData: Boolean;
     procedure GetHasCPTList(AList: TStrings);
@@ -285,7 +287,7 @@ type
     function StrHealthFactors: string;
     function StrExams: string;
     function StrVisitType(const ASCRelated, AAORelated, AIRRelated, AECRelated,
-                                AMSTRelated, AHNCRelated, ACVRelated: Integer): string; overload;
+                                AMSTRelated, AHNCRelated, ACVRelated, ASHADRelated: Integer): string; overload;
     function StrVisitType: string; overload;
     function StandAlone: boolean;
     procedure AddStrData(List: TStrings);
@@ -310,6 +312,7 @@ type
     property MSTRelated:   Integer  read FMSTRelated  write SetMSTRelated;
     property HNCRelated:   Integer  read FHNCRelated  write SetHNCRelated;
     property CVRelated:    Integer  read FCVRelated  write SetCVRelated;
+    property SHADRelated:   Integer  read FSHADRelated write SetSHADRelated;
     property VisitType:    TPCEProc read FVisitType   write SetVisitType;
     property VisitString:  string   read GetVisitString;
     property VisitCategory:char     read FEncSvcCat   write FEncSvcCat;
@@ -595,7 +598,7 @@ begin
       if(assigned(TempSL)) then
       begin
         Result := PCESetsOfCodes.Add(Hdr);
-        PCESetsOfCodes.AddStrings(TempSL);
+        FastAddStrings(TempSL, PCESetsOfCodes);
       end;
     finally
       KillObj(@TempSL);
@@ -617,7 +620,7 @@ var
       HistLocations.SortByPiece(2);
       HistLocations.Insert(0,'0');
     end;
-    List.AddStrings(HistLocations);
+    FastAddStrings(HistLocations, List);
   end
   else
   begin
@@ -753,7 +756,7 @@ begin
         if(assigned(TempSL)) then
         begin
           idx := PCESetsOfCodes.Add(Hdr);
-          PCESetsOfCodes.AddStrings(TempSL);
+          FastAddStrings(TempSL, PCESetsOfCodes);
         end;
       finally
         KillObj(@TempSL);
@@ -1638,6 +1641,7 @@ begin
   FMSTRelated  := SCC_NA;
   FHNCRelated  := SCC_NA;
   FCVRelated   := SCC_NA;
+  FSHADRelated := SCC_NA;
   FSCChanged   := False;
 end;
 
@@ -1694,6 +1698,7 @@ begin
   FMSTRelated := SCC_NA;
   FHNCRelated := SCC_NA;
   FCVRelated  := SCC_NA;
+  FSHADRelated := SCC_NA;
 
   ClearList(FDiagnoses);
   ClearList(FProcedures);
@@ -2074,25 +2079,18 @@ begin
         Add('VST^PR^' + FParent);                 // Parent for secondary visit
       if(FileCat = 'E') and (FHistoricalLocation <> '') then
         Add('VST^OL^' + FHistoricalLocation);     // Outside Location
+      FastAddStrings(FProviders, PCEList);
 
-      //Add('PRV^' + IntToStr(FEncProvider));       // Encounter Provider
-      //Add('PRV^' + IntToStr(UProvider.IEN));      // Encounter Provider
-      {with FProviders do for i := 0 to Count - 1 do with TPCEProvider(Items[i]) do
-        begin
-          PCEList.Add(DelimitedStr);
-        end;}
-      PCEList.AddStrings(FProviders);
-      
       if FSCChanged then
       begin
-        if FSCRelated <> SCC_NA then  Add('VST^SC^'  + IntToStr(FSCRelated));
-        if FAORelated <> SCC_NA then  Add('VST^AO^'  + IntToStr(FAORelated));
-        if FIRRelated <> SCC_NA then  Add('VST^IR^'  + IntToStr(FIRRelated));
-        if FECRelated <> SCC_NA then  Add('VST^EC^'  + IntToStr(FECRelated));
-        if FMSTRelated <> SCC_NA then Add('VST^MST^' + IntToStr(FMSTRelated));
-//        if HNCOK and (FHNCRelated <> SCC_NA) then
-        if FHNCRelated <> SCC_NA then Add('VST^HNC^' + IntToStr(FHNCRelated));
-        if FCVRelated <> SCC_NA then Add('VST^CV^' + IntToStr(FCVRelated));                                      
+        if FSCRelated  <> SCC_NA then  Add('VST^SC^'  + IntToStr(FSCRelated));
+        if FAORelated  <> SCC_NA then  Add('VST^AO^'  + IntToStr(FAORelated));
+        if FIRRelated  <> SCC_NA then  Add('VST^IR^'  + IntToStr(FIRRelated));
+        if FECRelated  <> SCC_NA then  Add('VST^EC^'  + IntToStr(FECRelated));
+        if FMSTRelated <> SCC_NA then  Add('VST^MST^' + IntToStr(FMSTRelated));
+        if FHNCRelated  <> SCC_NA then Add('VST^HNC^'+ IntToStr(FHNCRelated));
+        if FCVRelated   <> SCC_NA then Add('VST^CV^' + IntToStr(FCVRelated));
+        if FSHADRelated <> SCC_NA then Add('VST^SHD^'+ IntToStr(FSHADRelated));
       end;
      with FDiagnoses  do for i := 0 to Count - 1 do with TPCEDiag(Items[i]) do
         if FSend then
@@ -2265,9 +2263,7 @@ var
   i: Integer;
 begin
   Result := -1;
-//  with AList do for i := 0 to Count - 1 do with TPCEItem(Items[i]) do if Match(AnItem) and MatchProvider(AnItem)then
   with AList do for i := 0 to Count - 1 do with TPCEItem(Items[i]) do if Match(AnItem) and MatchProvider(AnItem)then
-//  with AList do for i := 0 to Count - 1 do with TPCEItem(Items[i]) do if Match(AnItem) then
   begin
     Result := i;
     break;
@@ -2288,9 +2284,7 @@ begin
     with PostList do for j := 0 to Count - 1 do
     begin
       PostItem := TPCEItem(Objects[j]);
-//      if (PreItem.Match(PostItem) and (PreItem.MatchProvider(PostItem))) then MatchFound := True;
       if (PreItem.Match(PostItem) and (PreItem.MatchProvider(PostItem))) then MatchFound := True;
-//      if (PreItem.Match(PostItem)) then MatchFound := True;
     end;
     if not MatchFound then
     begin
@@ -2422,14 +2416,12 @@ begin
       if CurImmunization.Series = '' then CurImmunization.Series := NoPCEValue;
       if CurImmunization.Reaction = '' then CurImmunization.Reaction := NoPCEValue;
 
-//      if (SrcImmunization.Provider <> CurImmunization.Provider) or
       if(SrcImmunization.Series <> CurImmunization.Series) or
         (SrcImmunization.Reaction <> CurImmunization.Reaction) or
         (SrcImmunization.Refused <> CurImmunization.Refused) or
         (SrcImmunization.Contraindicated <> CurImmunization.Contraindicated) or
         (CurImmunization.Comment <> SrcImmunization.Comment)then  
       begin
-//        CurImmunization.Provider        := SrcImmunization.Provider;
         CurImmunization.Series          := SrcImmunization.Series;
         CurImmunization.Reaction        := SrcImmunization.Reaction;
         CurImmunization.Refused         := SrcImmunization.Refused;
@@ -2464,15 +2456,15 @@ begin
       CurSkinTest := TPCESKin(FSkinTests.Items[MatchIndex]);
       if CurSkinTest.Results = '' then CurSkinTest.Results := NoPCEValue;
       if SrcSkinTest.Results = '' then SrcSkinTest.Results := NoPCEValue;
-//      if (SrcSkinTest.Provider <> CurSkinTest.Provider) or
+
       if(SrcSkinTest.Results <> CurSkinTest.Results) or
         (SrcSkinTest.Reading <> CurSkinTest.Reading) or
-        (CurSkinTest.Comment <> SrcSkinTest.Comment) then 
+        (CurSkinTest.Comment <> SrcSkinTest.Comment) then
       begin
-//        CurSkinTest.Provider := SrcSkinTest.Provider;
+
         CurSkinTest.Results := SrcSkinTest.Results;
         CurSkinTest.Reading := SrcSkinTest.Reading;
-        CurSkinTest.Comment := SrcSkinTest.Comment;  
+        CurSkinTest.Comment := SrcSkinTest.Comment;
         CurSkinTest.FSend := True;
       end;
     end else
@@ -2501,11 +2493,9 @@ begin
 
       if CurPatientEd.level = '' then CurPatientEd.level := NoPCEValue;
       if SrcPatientEd.level = '' then SrcPatientEd.level := NoPCEValue;
-//      if (SrcPatientEd.Provider <> CurPatientEd.Provider) or
       if(SrcPatientEd.Level <> CurPatientEd.Level) or
         (CurPatientEd.Comment <> SrcPatientEd.Comment) then
       begin
-//        CurPatientEd.Provider := SrcPatientEd.Provider;
         CurPatientEd.Level  := SrcPatientEd.Level;
         CurPatientEd.Comment := SrcPatientEd.Comment;  
         CurPatientEd.FSend := True;
@@ -2538,11 +2528,9 @@ begin
 
       if CurHealthFactor.level = '' then CurHealthFactor.level := NoPCEValue;
       if SrcHealthFactor.level = '' then SrcHealthFactor.level := NoPCEValue;
-//      if (SrcHealthFactor.Provider <> CurHealthFactor.Provider) or
       if(SrcHealthFactor.Level <> CurHealthFactor.Level) or
         (CurHealthFactor.Comment <> SrcHealthFactor.Comment) then  
       begin
-//        CurHealthFactor.Provider := SrcHealthFactor.Provider;
         CurHealthFactor.Level  := SrcHealthFactor.Level;
         CurHealthFactor.Comment := SrcHealthFactor.Comment;  
         CurHealthFactor.FSend := True;
@@ -2577,11 +2565,9 @@ begin
       CurExam := TPCEExams(FExams.Items[MatchIndex]);
       if CurExam.Results = '' then CurExam.Results := NoPCEValue;
       if SrcExam.Results = '' then SrcExam.Results := NoPCEValue;
-//      if (SrcExam.Provider <> CurExam.Provider) or
       if(SrcExam.Results <> CurExam.Results) or
         (CurExam.Comment <> SrcExam.Comment) then  
       begin
-//        CurExam.Provider := SrcExam.Provider;
         CurExam.Results  := SrcExam.Results;
         CurExam.Comment := SrcExam.Comment;  
         CurExam.Fsend := True;
@@ -2682,6 +2668,15 @@ begin
   end;
 end;
 
+procedure TPCEData.SetSHADRelated(Value: Integer);
+begin
+  if (Value <> FSHADRelated) then
+  begin
+    FSHADRelated := Value;
+    FSCChanged   := True;
+  end;
+end;
+
 procedure TPCEData.SetEncUseCurr(Value: Boolean);
 begin
   FEncUseCurr := Value;
@@ -2693,10 +2688,8 @@ begin
     FEncSvcCat    := Encounter.VisitCategory;
     FStandAlone   := Encounter.StandAlone;
     FStandAloneLoaded := TRUE;
-    //FCPTRequired  := Encounter.StandAlone;  
     FEncInpatient := Encounter.Inpatient;
-    //if FEncInpatient then FCPTRequired := False;   
-    //SetDefaultProvider(FProviders, FEncLocation, FNoteIEN, PersonClassDate);
+
   end else
   begin
     FEncDateTime  := 0;
@@ -2705,12 +2698,10 @@ begin
     FStandAloneLoaded := FALSE;
     FProviders.PrimaryIdx := -1;
     FEncSvcCat    := 'A';
-    //FCPTRequired  := False;    
     FEncInpatient := False;
   end;
   //
   SetRPCEncLocation(FEncLocation);
-//  SetRPCEncDateTime(FEncDateTime);
 end;
 
 function TPCEData.StrDiagnoses: string;
@@ -2797,7 +2788,7 @@ begin
 end;
 
 function TPCEData.StrVisitType(const ASCRelated, AAORelated, AIRRelated,
-  AECRelated, AMSTRelated, AHNCRelated, ACVRelated: Integer): string;
+  AECRelated, AMSTRelated, AHNCRelated, ACVRelated, ASHADRelated: Integer): string;
 { returns as a string the type of encounter (according to CPT) & related contitions treated }
 
   procedure AddTxt(txt: string);
@@ -2831,7 +2822,7 @@ begin
       if Length(ModText) > 0 then Result := Result + ModText + ', ';
     end;
   Result := Trim(Result + StrVisitType(FSCRelated, FAORelated, FIRRelated,
-                                       FECRelated, FMSTRelated, FHNCRelated, FCVRelated));
+                                       FECRelated, FMSTRelated, FHNCRelated, FCVRelated, FSHADRelated));
 end;
 
 function TPCEData.StandAlone: boolean;
@@ -2900,6 +2891,7 @@ begin
   Dest.FMSTRelated   := FMSTRelated;
   Dest.FHNCRelated   := FHNCRelated;
   Dest.FCVRelated    := FCVRelated;
+  Dest.FSHADRelated  := FSHADRelated;
   FVisitType.CopyProc(Dest.VisitType);
   Dest.FProviders.Assign(FProviders);
 
@@ -2927,7 +2919,6 @@ begin
   Result := [];
   if(not FutureEncounter(Self)) then
   begin
-//    if(PromptForWorkload(FNoteIEN, FNoteTitle, FEncSvcCat, StandAlone) or CPTRequiredForNote(FNoteIEN)) then
     if(PromptForWorkload(FNoteIEN, FNoteTitle, FEncSvcCat, StandAlone)) then
     begin
       if(fdiagnoses.count <= 0) then
@@ -2958,7 +2949,7 @@ begin
         if(EC.MSTAllow and (MSTRelated = SCC_NA)) then NeedSC := TRUE;
 //        if HNCOK and (EC.HNCAllow and (HNCRelated = SCC_NA)) then NeedSC := TRUE;
         if(EC.HNCAllow and (HNCRelated = SCC_NA)) then NeedSC := TRUE;
-        if(EC.CVAllow and (CVRelated = SCC_NA)) then NeedSC := TRUE;
+        if(EC.CVAllow and (CVRelated = SCC_NA) and (SHADRelated = SCC_NA)) then NeedSC := TRUE;
         if(NeedSC) then
           Include(Result, ndSC);
       end;
@@ -3273,6 +3264,7 @@ begin
 //  if(Result) and HNCOK then Result := (FHNCRelated = SCC_NA);
   if(Result) then Result := (FHNCRelated = SCC_NA);
   if(Result) then Result := (FCVRelated = SCC_NA);
+  if(Result) then Result := (FSHADRelated = SCC_NA);
   if(Result) then Result := (FDiagnoses.Count = 0);
   if(Result) then Result := (FProcedures.Count = 0);
   if(Result) then Result := (FImmunizations.Count = 0);

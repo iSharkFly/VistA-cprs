@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ORDtTm, ExtCtrls, ORFn;
+  StdCtrls, ORCtrls, ORDtTm, ExtCtrls, ORFn, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmODLabImmedColl = class(TForm)
+  TfrmODLabImmedColl = class(TfrmBase508Form)
     memImmedCollect: TCaptionMemo;
     calImmedCollect: TORDateBox;
     cmdOK: TORAlignButton;
@@ -92,7 +93,7 @@ end;
 
 procedure TfrmODLabImmedColl.FormShow(Sender: TObject);
 begin
-  memImmedCollect.Lines.Assign(ImmediateCollectTimes);
+  FastAssign(ImmediateCollectTimes, memImmedCollect.Lines);
   if Length(FCollTime) > 0 then
     calImmedCollect.Text := FCollTime
   else

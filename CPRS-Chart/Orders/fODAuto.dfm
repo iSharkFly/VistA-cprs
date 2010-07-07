@@ -13,4 +13,25 @@ inherited frmODAuto: TfrmODAuto
       ' orders to be treated as any other order dialog.'
     WordWrap = True
   end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODAuto'
+        'Status = stsDefault'))
+  end
 end

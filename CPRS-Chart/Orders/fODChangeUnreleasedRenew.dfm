@@ -1,26 +1,23 @@
-object frmODChangeUnreleasedRenew: TfrmODChangeUnreleasedRenew
+inherited frmODChangeUnreleasedRenew: TfrmODChangeUnreleasedRenew
   Left = 240
   Top = 163
-  Width = 537
-  Height = 198
   Caption = 'Change Unreleased Renewed Order'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 171
+  ClientWidth = 529
   OldCreateOrder = False
   OnCreate = FormCreate
+  ExplicitWidth = 537
+  ExplicitHeight = 198
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel2: TPanel
+  object Panel2: TPanel [0]
     Left = 0
     Top = 57
     Width = 529
-    Height = 81
+    Height = 82
     Align = alClient
     TabOrder = 0
+    ExplicitHeight = 81
     object lblRefill: TLabel
       Left = 9
       Top = 15
@@ -62,15 +59,17 @@ object frmODChangeUnreleasedRenew: TfrmODChangeUnreleasedRenew
       Sorted = False
       SynonymChars = '<>'
       TabOrder = 1
+      CharsNeedMatch = 1
     end
   end
-  object Panel3: TPanel
+  object Panel3: TPanel [1]
     Left = 0
     Top = 57
     Width = 529
-    Height = 81
+    Height = 82
     Align = alClient
     TabOrder = 3
+    ExplicitHeight = 81
     object Label1: TLabel
       Left = 61
       Top = 16
@@ -106,7 +105,7 @@ object frmODChangeUnreleasedRenew: TfrmODChangeUnreleasedRenew
       Caption = 'End Date'
     end
   end
-  object memOrder: TCaptionMemo
+  object memOrder: TCaptionMemo [2]
     Left = 0
     Top = 0
     Width = 529
@@ -121,13 +120,14 @@ object frmODChangeUnreleasedRenew: TfrmODChangeUnreleasedRenew
     ScrollBars = ssVertical
     TabOrder = 2
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [3]
     Left = 0
-    Top = 138
+    Top = 139
     Width = 529
     Height = 32
     Align = alBottom
     TabOrder = 1
+    ExplicitTop = 138
     object btnOK: TButton
       Left = 348
       Top = 7
@@ -146,5 +146,41 @@ object frmODChangeUnreleasedRenew: TfrmODChangeUnreleasedRenew
       TabOrder = 1
       OnClick = btnCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = edtRefill'
+        'Status = stsDefault')
+      (
+        'Component = cboPickup'
+        'Status = stsDefault')
+      (
+        'Component = Panel3'
+        'Status = stsDefault')
+      (
+        'Component = txtStart'
+        'Status = stsDefault')
+      (
+        'Component = txtStop'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmODChangeUnreleasedRenew'
+        'Status = stsDefault'))
   end
 end

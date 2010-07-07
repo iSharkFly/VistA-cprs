@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, ORFN,
-  StdCtrls, ExtCtrls, ORCtrls, ComCtrls, ORDtTm, uConsults, Menus;
+  StdCtrls, ExtCtrls, ORCtrls, ComCtrls, ORDtTm, uConsults, Menus, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmConsultsView = class(TForm)
+  TfrmConsultsView = class(TfrmBase508Form)
     pnlBase: TORAutoPanel;
     lblBeginDate: TLabel;
     calBeginDate: TORDateBox;
@@ -81,8 +82,8 @@ begin
       ClientHeight := H; pnlBase.Height := H;
       FChanged := False;
       with radSort do ItemIndex := 1;
-      //SvcList.Assign(LoadServiceList(CN_SVC_LIST_DISP));                         {RV}
-      SvcList.Assign(LoadServiceListWithSynonyms(CN_SVC_LIST_DISP));           {RV}
+      //FastAssign(LoadServiceList(CN_SVC_LIST_DISP), SvcList);                         {RV}
+      FastAssign(LoadServiceListWithSynonyms(CN_SVC_LIST_DISP), SvcList);           {RV}
       SortByPiece(TStringList(SvcList), U, 2);                                   {RV}
       for i := 0 to SvcList.Count - 1 do
         if cboService.Items.IndexOf(Trim(Piece(SvcList.Strings[i], U, 2))) = -1 then   {RV}
@@ -102,7 +103,7 @@ begin
           cboservice.SelectByID(CurrentService);
           cboServiceSelect(frmConsultsView);
         end;
-      lstStatus.Items.Assign(SubSetOfStatus);
+      FastAssign(SubSetOfStatus, lstStatus.Items);
       CurrentStatus := CurrentContext.Status;
       if CurrentStatus <> '' then with lstStatus do
         begin

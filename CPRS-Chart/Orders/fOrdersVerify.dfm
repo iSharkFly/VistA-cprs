@@ -1,13 +1,15 @@
 inherited frmVerifyOrders: TfrmVerifyOrders
   Left = 341
   Top = 182
-  Height = 367
   Caption = 'Verify Orders'
+  ClientHeight = 340
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 320
+  ExplicitHeight = 367
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
+  object Panel1: TPanel [0]
     Left = 0
     Top = 0
     Width = 427
@@ -26,6 +28,7 @@ inherited frmVerifyOrders: TfrmVerifyOrders
       Height = 13
       Align = alTop
       Caption = 'The following orders will be marked as verified -'
+      ExplicitWidth = 222
     end
     object lstOrders: TCaptionListBox
       Left = 4
@@ -42,7 +45,7 @@ inherited frmVerifyOrders: TfrmVerifyOrders
       Caption = 'The following orders will be released from hold '
     end
   end
-  object Panel2: TPanel
+  object Panel2: TPanel [1]
     Left = 0
     Top = 293
     Width = 427
@@ -85,5 +88,29 @@ inherited frmVerifyOrders: TfrmVerifyOrders
       TabOrder = 3
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = lstOrders'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = txtESCode'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmVerifyOrders'
+        'Status = stsDefault'))
   end
 end

@@ -17,15 +17,16 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, StdCtrls, ComCtrls, ORCtrls, Buttons, Mask, ORFn, ORNet,
-  uTemplates, Menus, ImgList, Clipbrd, ToolWin, MenuBar, TypInfo, MSXML_TLB;
+  uTemplates, Menus, ImgList, Clipbrd, ToolWin, MenuBar, TypInfo, MSXML_TLB, fBase508Form,
+  VA508AccessibilityManager, VA508ImageListLabeler;
 
 type
   TTemplateTreeControl = (tcDel, tcUp, tcDown, tcLbl, tcCopy);
   TTemplateTreeType = (ttShared, ttPersonal);
 
-  TfrmTemplateEditor = class(TForm)
+  TfrmTemplateEditor = class(TfrmBase508Form)
     splMain: TSplitter;
-    pnlBottom: TORAutoPanel;
+    pnlBottom: TPanel;
     btnApply: TButton;
     btnCancel: TButton;
     btnOK: TButton;
@@ -208,6 +209,7 @@ type
     pnlLink: TPanel;
     cbxLink: TORComboBox;
     lblLink: TLabel;
+    imgLblTemplates: TVA508ImageListLabeler;
     procedure btnNewClick(Sender: TObject);
     procedure btnApplyClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -338,13 +340,12 @@ type
     procedure cbxLinkNeedData(Sender: TObject; const StartFrom: String;
       Direction, InsertAt: Integer);
     procedure cbxLinkChange(Sender: TObject);
-    procedure cbxLinkSynonymCheck(Sender: TObject; const Text: String;
-      var IsSynonym: Boolean);
     procedure reBoilKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure reBoilKeyPress(Sender: TObject; var Key: Char);
     procedure reBoilKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FLastRect: TRect;
     FForceContainer: boolean;
@@ -385,7 +386,7 @@ type
     FXMLFieldElement: IXMLDOMNode;
     FCanDoReminders: boolean;
     FCanDoCOMObjects: boolean;
-    FPersonalObjects: TStringList;
+    //FPersonalObjects: TStringList;
     FShowingTemplate: TTemplate;
     FConsultServices: TStringList;
     FNavigatingTab: boolean;
@@ -415,14 +416,27 @@ type
     procedure cbClick(Sender: TCheckBox; Index: integer);
     procedure UpdateInsertsDialogs;
     procedure AutoLongLines(Sender: TObject);
-    procedure UpdatePersonalObjects;
+    //procedure UpdatePersonalObjects;
     procedure UpdateApply(Template: TTemplate);
     procedure TemplateLocked(Sender: TObject);
     procedure InitTrees;
+    procedure AdjustControls4FontChange;
+    procedure ShowGroupBoilerplate(Visible: boolean);
     function GetLinkType(const ANode: TTreeNode): TTemplateLinkType;
   end;
 
 procedure EditTemplates(Form: TForm; NewTemplate: boolean = FALSE; CopiedText: string = ''; Shared: boolean = FALSE);
+
+const
+  TemplateEditorSplitters = 'frmTempEditSplitters';
+  TemplateEditorSplitters2 = 'frmTempEditSplitters2';
+
+var
+  tmplEditorSplitterMiddle: integer = 0;
+  tmplEditorSplitterProperties: integer = 0;
+  tmplEditorSplitterMain: integer = 0;
+  tmplEditorSplitterBoil: integer = 0;
+  tmplEditorSplitterNotes: integer = 0;
 
 implementation
 
@@ -430,7 +444,8 @@ implementation
 
 uses dShared, uCore, rTemplates, fTemplateObjects, uSpell, fTemplateView,
   fTemplateAutoGen, fDrawers, fTemplateFieldEditor, fTemplateFields, XMLUtils,
-  fIconLegend, uReminders, uConst, rCore, rEventHooks, rConsults;
+  fIconLegend, uReminders, uConst, rCore, rEventHooks, rConsults, VAUtils,
+  rMisc, fFindingTemplates;
 
 const
   PropText = ' Template Properties ';
@@ -498,8 +513,8 @@ begin
     if Form is TfrmDrawers then
       Drawers := TFrmDrawers(Form)
     else
-    if IsPublishedProp(Form, 'Drawers') then
-      Drawers := TFrmDrawers(GetOrdProp(Form, 'Drawers'));
+    if IsPublishedProp(Form, DrawersProperty) then
+      Drawers := TFrmDrawers(GetOrdProp(Form, DrawersProperty));
   end;
 
   if assigned(Drawers) then
@@ -723,6 +738,7 @@ begin
   cbPerHide.Checked := TRUE;
 
   BtnApply.Enabled := BackupDiffers;
+  SetFormPosition(Self);
 end;
 
 procedure TfrmTemplateEditor.HideControls;
@@ -872,10 +888,7 @@ begin
     reNotes.ReadOnly := not ok;
   end;
   lblNotes.Enabled := (not reNotes.ReadOnly);
-  if(reNotes.ReadOnly) then
-    reNotes.Color := ReadOnlyColor
-  else
-    reNotes.Color := clWindow;
+  UpdateReadOnlyColorScheme(reNotes, reNotes.ReadOnly);
   cbxType.Enabled := ok;
   lblType.Enabled := ok;
   lblRemDlg.Enabled := ok;
@@ -893,10 +906,7 @@ begin
   udGap.Invalidate;
   lblLines.Enabled := ok;
   reBoil.ReadOnly := not ok;
-  if(ok) then
-    reBoil.Color := clWindow
-  else
-    reBoil.Color := ReadOnlyColor;
+  UpdateReadOnlyColorScheme(reBoil, not ok);
   lblLink.Enabled := ok;
   cbxLink.Enabled := ok;
   ok := ok and FCanDoCOMObjects;
@@ -936,15 +946,31 @@ begin
   MoveCopyButtons;
 end;
 
+procedure TfrmTemplateEditor.ShowGroupBoilerplate(Visible: boolean);
+begin
+  pnlGroupBP.Visible := Visible;
+  splBoil.Visible := Visible;
+  if Visible then
+  begin
+    reBoil.Align := alTop;
+    pnlGroupBP.Align := alClient;
+    reBoil.Height := tmplEditorSplitterBoil;
+    splBoil.Top := pnlGroupBP.Top - splBoil.Height;
+  end
+  else
+  begin
+    pnlGroupBP.Align := alBottom;
+    reBoil.Align := alClient;
+  end;
+end;
+
 procedure TfrmTemplateEditor.ShowInfo(Node: TTreeNode);
 var
   OldUpdating, ClearName, ClearRB, ClearAll: boolean;
   Idx: TTypeIndex;
   CanDoCOM: boolean;
-  LinkTemplate: TTemplate;
   lt: TTemplateLinkType;
   lts: string;
-  i: integer;
 
 begin
   OldUpdating := FUpdating;
@@ -979,15 +1005,10 @@ begin
             if not assigned(FConsultServices) then
             begin
               FConsultServices := TStringList.Create;
-              FConsultServices.Assign(LoadServiceListWithSynonyms(1));
+              FastAssign(LoadServiceListWithSynonyms(1), FConsultServices);
               SortByPiece(FConsultServices, U, 2);
             end;
-            for i := 0 to FConsultServices.Count-1 do
-            begin
-              LinkTemplate := GetLinkedTemplate(piece(FConsultServices[i],U,1), ltConsult);
-              if (not assigned(LinkTemplate)) or (LinkTemplate = FShowingTemplate) then
-                cbxLink.Items.Add(FConsultServices[i]);
-            end;
+            FastAssign(FConsultServices, cbxLink.Items);
           end
           else
           begin
@@ -1170,8 +1191,7 @@ begin
       cbIndent.Checked := FALSE;
       edtGap.Text := '0';
       reBoil.Clear;
-      pnlGroupBP.Visible := FALSE;
-      splBoil.Visible := FALSE;
+      ShowGroupBoilerplate(False);
       pnlBoilerplateResize(Self);
       pnlCOM.Visible := FALSE;
       pnlLink.Visible := FALSE;
@@ -1195,7 +1215,9 @@ var
 
 begin
   if(pnlGroupBP.Visible) and (pnlGroupBP.Height > (pnlBoilerplate.Height-29)) then
+  begin
     pnlGroupBP.Height := pnlBoilerplate.Height-29;
+  end;
   if cbLongLines.checked then
     Max := 240
   else
@@ -1448,15 +1470,12 @@ begin
       else
       begin
         reBoil.ReadOnly := TRUE;
-        reBoil.Color := ReadOnlyColor;
+        UpdateReadOnlyColorScheme(reBoil, TRUE);
         UpdateInsertsDialogs;
       end;
-      pnlGroupBP.Visible := ItemOK;
-      splBoil.Visible := ItemOK;
+      ShowGroupBoilerplate(ItemOK);
       if(not ItemOK) and (IsReminderDialog or IsCOMObject) then
         BPOK := FALSE;
-      if(ItemOK) then
-        splBoil.Top := pnlGroupBP.Top - splBoil.Height;
       pnlBoilerplateResize(Self);
       pnlBoilerplate.Visible := BPOK;
       lblBoilerplate.Visible := BPOK;
@@ -1481,7 +1500,15 @@ begin
     frmTemplateFields.Free;
     frmTemplateFields := nil;
   end;
-  KillObj(@FPersonalObjects);
+  //---------- CQ #8665 - RV --------
+  //KillObj(@FPersonalObjects);
+  if (assigned(uPersonalObjects)) then
+  begin
+    KillObj(@uPersonalObjects);
+    uPersonalObjects.Free;
+    uPersonalObjects := nil;
+  end;
+  // ----  end CQ #8665 -------------
   dmodShared.OnTemplateLock := nil;
   dmodShared.InEditor := FALSE;
   RemoveAllNodes;
@@ -2039,6 +2066,34 @@ begin
   end;
 end;
 
+procedure TfrmTemplateEditor.AdjustControls4FontChange;
+var
+  x: integer;
+
+  procedure Adjust(Control: TWinControl);
+  begin
+    x := x - Control.Width - 2;
+    Control.Left := x;
+  end;
+
+begin
+  if FCanEditShared then
+  begin
+    x := pnlSharedBottom.Width;
+    Adjust(sbSHDelete);
+    Adjust(sbSHDown);
+    Adjust(sbSHUp);
+    cbSHHide.Width := x;
+  end;
+  x := pnlBottom.Width;
+  Adjust(btnApply);
+  Adjust(btnCancel);
+  Adjust(btnOK);
+  cbEditShared.Width := TextWidthByFont(cbEditShared.Font.Handle, cbEditShared.Caption) + 25;
+  cbNotes.Left := cbEditShared.Left + cbEditShared.Width + 60;
+  cbNotes.Width := TextWidthByFont(cbNotes.Font.Handle, cbNotes.Caption) + 25;
+end;
+
 function TfrmTemplateEditor.AllowMove(ADropNode, ADragNode: TTreeNode): boolean;
 var
   i: integer;
@@ -2204,6 +2259,8 @@ begin
   tvShared.ReadOnly := not FCanEditShared;
   MoveCopyButtons;
   tvTreeChange(FCurTree, FCurTree.Selected);
+  if FCanEditShared then
+    AdjustControls4FontChange;
 end;
 
 procedure TfrmTemplateEditor.cbEditSharedClick(Sender: TObject);
@@ -2326,14 +2383,15 @@ end;
 
 procedure TfrmTemplateEditor.btnFindClick(Sender: TObject);
 var
-  Found: boolean;
+  Found: TTreeNode;
   edtSearch: TEdit;
+  IsNext: boolean;
   FindNext: boolean;
   FindWholeWords: boolean;
   FindCase: boolean;
   Tree: TTreeView;
   LastFoundNode, TmpNode: TTreeNode;
-  S1,S2: string;
+//  S1,S2: string;
 
 begin
   if(TTemplateTreeType(TButton(Sender).Tag) = ttShared) then
@@ -2344,15 +2402,6 @@ begin
     FindWholeWords := cbShWholeWords.Checked;
     FindCase := cbShMatchCase.Checked;
     LastFoundNode := FLastFoundShNode;
-    if(FSharedEmptyNodeCount > 0) then
-    begin
-      FInternalHiddenExpand := TRUE;
-      try
-        tvShared.Items.GetFirstNode.Expand(TRUE);
-      finally
-        FInternalHiddenExpand := FALSE;
-      end;
-    end;
   end
   else
   begin
@@ -2362,55 +2411,30 @@ begin
     FindWholeWords := cbPerWholeWords.Checked;
     FindCase := cbPerMatchCase.Checked;
     LastFoundNode := FLastFoundPerNode;
-    if(FPersonalEmptyNodeCount > 0) then
-    begin
-      FInternalHiddenExpand := TRUE;
-      try
-        tvPersonal.Items.GetFirstNode.Expand(TRUE);
-      finally
-        FInternalHiddenExpand := FALSE;
-      end;
-    end;
   end;
   if(edtSearch.text <> '') then
   begin
-    if((FindNext) and assigned (LastFoundNode)) then
-      TmpNode := LastFoundNode.GetNext
+    IsNext := ((FindNext) and assigned (LastFoundNode));
+    if IsNext then
+    
+      TmpNode := LastFoundNode
     else
       TmpNode := Tree.Items.GetFirstNode;
-    Found := FALSE;
-    if(assigned(TmpNode)) then
-    begin
-      S1 := edtSearch.Text;
-      if(not FindCase) then
-        S1 := UpperCase(S1);
-      while (assigned(TmpNode) and (not Found)) do
-      begin
-        S2 := TmpNode.Text;
-        if(not FindCase) then
-          S2 := UpperCase(S2);
-        Found := SearchMatch(S1, S2, FindWholeWords);
-        if(not Found) then
-          TmpNode := TmpNode.GetNext;
-      end;
+    FInternalHiddenExpand := TRUE;
+    try
+      Found := FindTemplate(edtSearch.Text, Tree, Self, TmpNode,
+                            IsNext, not FindCase, FindWholeWords);
+    finally
+      FInternalHiddenExpand := FALSE;
     end;
-    if(Found) then
+    if Assigned(Found) then
     begin
+      Tree.Selected := Found;
       if(Tree = tvShared) then
-        FLastFoundShNode := TmpNode
+        FLastFoundShNode := Found
       else
-        FLastFoundPerNode := TmpNode;
+        FLastFoundPerNode := Found;
       SetFindNext(Tree, TRUE);
-      Tree.Selected := TmpNode;
-    end
-    else
-    begin
-      if(FindNext) then
-        S1 := ''
-      else
-        S1 := '  "' + edtSearch.Text + '" was not Found.';
-      SetFindNext(Tree, FALSE);
-      InfoBox('Search Complete.' + S1, 'Information', MB_OK or MB_ICONINFORMATION);
     end;
   end;
   edtSearch.SetFocus;
@@ -2498,6 +2522,8 @@ begin
       edtName.SelectAll;
     end;
     pnlBoilerplateResize(Self);
+    AdjustControls4FontChange;
+    MoveCopyButtons;
   end;
 end;
 
@@ -2515,16 +2541,16 @@ begin
     if (UserTemplateAccessLevel <> taEditor) then
     begin
       UpdatePersonalObjects;
-      if FPersonalObjects.Count > 0 then
+      if uPersonalObjects.Count > 0 then                                                  // -------- CQ #8665 - RV ------------
       begin
         DoIt := FALSE;
         for i := 0 to dmodShared.TIUObjects.Count-1 do
-          if FPersonalObjects.IndexOf(Piece(dmodShared.TIUObjects[i],U,2)) >= 0 then
+          if uPersonalObjects.IndexOf(Piece(dmodShared.TIUObjects[i],U,2)) >= 0 then      // -------- CQ #8665 - RV ------------
             frmTemplateObjects.cboObjects.Items.Add(dmodShared.TIUObjects[i]);
       end;
     end;
     if DoIt then
-      frmTemplateObjects.cboObjects.Items.Assign(dmodShared.TIUObjects);
+      FastAssign(dmodShared.TIUObjects, frmTemplateObjects.cboObjects.Items);
     frmTemplateObjects.Font := Font;
     frmTemplateObjects.re := reBoil;
     frmTemplateObjects.AutoLongLines := AutoLongLines;
@@ -2632,6 +2658,12 @@ begin
   FOK2Close := TRUE;
 end;
 
+procedure TfrmTemplateEditor.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  SaveUserBounds(Self);
+end;
+
 procedure TfrmTemplateEditor.FormCloseQuery(Sender: TObject;
   var CanClose: Boolean);
 var
@@ -2665,6 +2697,10 @@ end;
 
 procedure TfrmTemplateEditor.splBoilMoved(Sender: TObject);
 begin
+  if pnlBoilerplate.Visible and pnlGroupBP.Visible then
+    tmplEditorSplitterBoil := reBoil.Height;
+  if pnlNotes.Visible then
+    tmplEditorSplitterNotes := pnlNotes.Height;
   pnlBoilerplateResize(Self);
 end;
 
@@ -3104,7 +3140,8 @@ end;
 
 procedure TfrmTemplateEditor.mbMainResize(Sender: TObject);
 begin
-  pnlMenu.Width := mbMain.Width + 3;
+  pnlMenu.Width := mbMain.Width + 4;
+  mbMain.Width := pnlMenu.Width - 3;
 end;
 
 procedure TfrmTemplateEditor.mnuBPCheckGrammarClick(Sender: TObject);
@@ -3178,7 +3215,7 @@ var
 begin
   dmodShared.LoadTIUObjects;
   UpdatePersonalObjects;
-  GetAutoGenText(AName, AText, FPersonalObjects);
+  GetAutoGenText(AName, AText, uPersonalObjects);   // -------- CQ #8665 - RV ------------
   if(AName <> '') and (AText <> '') then
   begin
     btnNewClick(Self);
@@ -3273,7 +3310,12 @@ procedure TfrmTemplateEditor.cbNotesClick(Sender: TObject);
 begin
   pnlNotes.Visible := cbNotes.Checked;
   splNotes.Visible := cbNotes.Checked;
-  splNotes.Top := pnlNotes.Top-3;
+  if cbNotes.Checked then
+  begin
+    pnlNotes.Height := tmplEditorSplitterNotes;
+    pnlNotes.Top := pnlBottom.Top - pnlNotes.Height;
+    splNotes.Top := pnlNotes.Top-3;
+  end;
   pnlBoilerplateResize(Self);
 end;
 
@@ -3396,10 +3438,10 @@ begin
           begin
             if (Flds.Count > 0) then begin
               ExpandEmbeddedFields(Flds);
-              Flds.Assign(ExportTemplateFields(Flds));
+              FastAssign(ExportTemplateFields(Flds), Flds);
               for i := 0 to Flds.Count-1 do
                 Flds[i] := '  ' + Flds[i];
-              Tmpl.AddStrings(Flds);
+              FastAddStrings(Flds, Tmpl);
             end; {if}
             Tmpl.Add('</'+XMLHeader+'>');
             try
@@ -3703,7 +3745,7 @@ begin
           finally
             FUpdating := FALSE;
           end;
-          ShowMessage('Can not assign a Reminder Dialog to a Reason for Request');
+          ShowMsg('Can not assign a Reminder Dialog to a Reason for Request');
         end
         else
         begin
@@ -3789,7 +3831,7 @@ begin
   cbLongLines.Checked := TRUE;
 end;
 
-procedure TfrmTemplateEditor.UpdatePersonalObjects;
+(*procedure TfrmTemplateEditor.UpdatePersonalObjects;
 var
   i: integer;
 
@@ -3802,7 +3844,7 @@ begin
       FPersonalObjects.Add(Piece(RPCBrokerV.Results[i],U,1));
     FPersonalObjects.Sorted := TRUE;
   end;
-end;
+end;*)
 
 (*function TfrmTemplateEditor.ModifyAllowed(const Node: TTreeNode): boolean;
 var
@@ -3874,7 +3916,7 @@ end;
 procedure TfrmTemplateEditor.TemplateLocked(Sender: TObject);
 begin
   Resync([TTemplate(Sender)]);
-  ShowMessage(Format(TemplateLockedText, [TTemplate(Sender).PrintName]));
+  ShowMsg(Format(TemplateLockedText, [TTemplate(Sender).PrintName]));
 end;
 
 procedure TfrmTemplateEditor.cbLockClick(Sender: TObject);
@@ -4073,11 +4115,11 @@ begin
   tmpSL := TStringList.Create;
   try
     case TTemplateLinkType(pnlLink.Tag) of
-      ltTitle:     tmpSL.Assign(SubSetOfAllTitles(StartFrom, Direction));
+      ltTitle:     FastAssign(SubSetOfAllTitles(StartFrom, Direction), tmpSL);
 //      ltConsult:
       ltProcedure:
         begin
-          tmpSL.Assign(SubSetOfProcedures(StartFrom, Direction));
+          FastAssign(SubSetOfProcedures(StartFrom, Direction), tmpSL);
           for i := 0 to tmpSL.Count-1 do
           begin
             tmp := tmpSL[i];
@@ -4095,6 +4137,7 @@ end;
 procedure TfrmTemplateEditor.cbxLinkChange(Sender: TObject);
 var
   Template,LinkTemplate: TTemplate;
+  update: boolean;
 
 begin
   if((not FUpdating) and (assigned(FCurTree)) and (assigned(FCurTree.Selected)) and
@@ -4103,44 +4146,29 @@ begin
     Template := TTemplate(FCurTree.Selected.Data);
     if assigned(Template) and Template.CanModify then
     begin
+      update := true;
       if cbxLink.ItemIEN > 0 then
       begin
         LinkTemplate := GetLinkedTemplate(cbxLink.ItemID, TTemplateLinkType(pnlLink.tag));
         if (assigned(LinkTemplate) and (LinkTemplate <> Template)) then
         begin
-          ShowMessage(GetLinkName(cbxLink.ItemID, TTemplateLinkType(pnlLink.tag)) +
+          ShowMsg(GetLinkName(cbxLink.ItemID, TTemplateLinkType(pnlLink.tag)) +
                       ' is already assigned to another template.');
-          cbxLink.ItemIndex := -1;
+          cbxLink.SelectByID(Template.LinkIEN);
+          update := False;
+        end
+        else
+        begin
+          Template.FileLink := ConvertFileLink(cbxLink.ItemID, TTemplateLinkType(pnlLink.tag));
+          if Template.LinkName <> '' then
+            edtName.Text := copy(Template.LinkName,1,edtName.MaxLength);
         end;
-        Template.FileLink := ConvertFileLink(cbxLink.ItemID, TTemplateLinkType(pnlLink.tag));
-        if Template.LinkName <> '' then
-          edtName.Text := copy(Template.LinkName,1,edtName.MaxLength);
       end
       else
         Template.FileLink := '';
-      UpdateApply(Template);
+      if update then
+        UpdateApply(Template);
     end;
-  end;
-end;
-
-procedure TfrmTemplateEditor.cbxLinkSynonymCheck(Sender: TObject;
-  const Text: String; var IsSynonym: Boolean);
-var
-  LinkTemplate: TTemplate;
-  var IEN: string;
-
-begin
-  IsSynonym := FALSE;
-  if pnlLink.Visible and assigned(FShowingTemplate) then
-  begin
-    IEN := Piece(Text,#9,30);
-    if IEN <> '' then
-    begin
-      LinkTemplate := GetLinkedTemplate(IEN, TTemplateLinkType(pnlLink.Tag));
-      IsSynonym := (assigned(LinkTemplate) and (LinkTemplate <> FShowingTemplate));
-    end
-    else
-      IsSynonym := FALSE;
   end;
 end;
 

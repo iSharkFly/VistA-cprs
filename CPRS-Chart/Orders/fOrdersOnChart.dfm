@@ -1,14 +1,16 @@
 inherited frmOnChartOrders: TfrmOnChartOrders
   Left = 292
   Top = 149
-  Width = 470
-  Height = 368
   Caption = 'Signature on Chart'
+  ClientHeight = 341
+  ClientWidth = 462
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 470
+  ExplicitHeight = 368
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel2: TPanel
+  object Panel2: TPanel [0]
     Left = 0
     Top = 0
     Width = 462
@@ -27,6 +29,7 @@ inherited frmOnChartOrders: TfrmOnChartOrders
         'The following orders will be marked '#39'Signed on Chart'#39' and releas' +
         'ed -'
       Layout = tlBottom
+      ExplicitWidth = 318
     end
     object lstOrders: TCaptionListBox
       Left = 1
@@ -46,7 +49,7 @@ inherited frmOnChartOrders: TfrmOnChartOrders
         'ed '
     end
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [1]
     Left = 0
     Top = 305
     Width = 462
@@ -78,5 +81,26 @@ inherited frmOnChartOrders: TfrmOnChartOrders
       TabOrder = 1
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = lstOrders'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmOnChartOrders'
+        'Status = stsDefault'))
   end
 end

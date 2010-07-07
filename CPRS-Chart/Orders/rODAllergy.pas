@@ -4,7 +4,7 @@ unit rODAllergy;
 
 interface
 
-uses SysUtils, Classes, ORNet, ORFn, rCore, uCore, TRPCB, dialogs, rMisc ;
+uses SysUtils, Classes, ORNet, ORFn, rCore, uCore, TRPCB, dialogs, rMisc,fNotes ;
 
 type
   TAllergyRec = record
@@ -70,6 +70,7 @@ function MarkIDBand: boolean;
 function RequireOriginatorComments: boolean;
 function EnableErrorComments: boolean;
 function IsARTClinicalUser(var AMessage: string): boolean;
+function GetAllergyTitleText: string;
 
 implementation
 
@@ -168,6 +169,7 @@ function SaveAllergy(EditRec: TAllergyRec): string;
 var
   i: integer;
 begin
+
   with RPCBrokerV, EditRec do
     begin
       ClearParameters := True;
@@ -214,6 +216,7 @@ begin
                   for i := 0 to Count - 1 do
                     Mult['"GMRAERRCMTS",' + IntToStr(i+1)] := Strings[i];
                 end;
+
             end ;
           with ChartMarked do if Count > 0 then
             begin
@@ -240,9 +243,17 @@ begin
                 Mult['"GMRACMTS",' + IntToStr(i+1)] := Strings[i];
             end;
         end;
-      CallBroker;
-      Result := Results[0];
-    end;
+        CallBroker;
+        Result := Results[0];
+        // Include "Allergy Entered in Error" items require signature list.
+        //cq-8002  -piece 2 is Allergy Entered in Error (IEN)
+       // code added allowing v27 GUI changes to continue if M change is not released prior.
+       //cq-14842 -  add observed/drug allergies to the fReview/fSignOrders forms for signature.
+       if Length(Piece(Result,'^',2))> 0 then
+         Changes.Add(10, Piece(Result,'^',2), GetAllergyTitleText, '', 1)
+       else
+          exit;
+        end;
 end;
 
 function RPCEnterNKAForPatient: string;
@@ -360,6 +371,12 @@ begin
     Result   := IsClinUser;
     AMessage := ReasonFailed ;
   end;
+end;
+
+function GetAllergyTitleText: string;
+begin
+    Result := FormatFMDateTime('mmm dd,yy', MakeFMDateTime(floatToStr(FMToday))) +
+              '  ' + 'Adverse React/Allergy' + ', ' + Encounter.LocationName + ', ' + User.Name;
 end;
 
 end.

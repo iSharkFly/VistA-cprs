@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ComCtrls, ORCtrls, ORFn, rOrders, uCore, ORDtTm;
+  StdCtrls, ExtCtrls, ComCtrls, ORCtrls, ORFn, rOrders, uCore, ORDtTm, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOptionsOther = class(TForm)
+  TfrmOptionsOther = class(TfrmBase508Form)
     pnlBottom: TPanel;
     btnOK: TButton;
     btnCancel: TButton;
@@ -69,7 +70,7 @@ implementation
 {$R *.DFM}
 
 uses
-  rOptions, uOptions, rCore, rSurgery, uConst, fMeds;
+  rOptions, uOptions, rCore, rSurgery, uConst, fMeds, VAUtils;
 
 procedure DialogOptionsOther(topvalue, leftvalue, fontsize: integer; var actiontype: Integer);
 // create the form and make it modal, return an action
@@ -105,7 +106,7 @@ var
   last: integer;
   values, tab: string;
 begin
-  cboTab.Items.Assign(rpcGetOtherTabs);
+  FastAssign(rpcGetOtherTabs, cboTab.Items);
   if (cboTab.Items.IndexOf('Surgery') > -1) and (not ShowSurgeryTab) then
     cboTab.Items.Delete(cboTab.Items.IndexOf('Surgery'));
   values := rpcGetOther;
@@ -156,7 +157,7 @@ begin
   begin
     if dtStop.FMDateTime < dtStart.FMDateTime then
     begin
-      ShowMessage('The stop time can not prior to the start time.');
+      ShowMsg('The stop time can not prior to the start time.');
       dtStop.FMDateTime := FMToday;
       dtStop.SetFocus;
       Exit;
@@ -181,7 +182,7 @@ procedure TfrmOptionsOther.dtStartExit(Sender: TObject);
 begin
   if dtStart.FMDateTime > FMToday then
   begin
-    ShowMessage('Start time can not greater than today.');
+    ShowMsg('Start time can not greater than today.');
     dtStart.FMDateTime := FMToday;
     dtStart.SetFocus;
     Exit;
@@ -193,7 +194,7 @@ begin
   if (dtStop.FMDateTime > 0) and (dtStart.FMDateTime > 0) then
     if (dtStop.FMDateTime < dtStart.FMDateTime) then
     begin
-      ShowMessage('Stop time can not prior to start time');
+      ShowMsg('Stop time can not prior to start time');
       dtStop.FMDateTime := FMToday;
       dtStop.SetFocus;
       Exit;
@@ -204,7 +205,7 @@ procedure TfrmOptionsOther.dtStartChange(Sender: TObject);
 begin
   if (dtStart.FMDateTime > FMToday) then
   begin
-    ShowMessage('Start time can not greater than today.');
+    ShowMsg('Start time can not greater than today.');
     dtStart.FMDateTime := FMToday;
     dtStart.SetFocus;
     Exit;

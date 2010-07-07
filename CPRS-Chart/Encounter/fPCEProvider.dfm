@@ -1,4 +1,4 @@
-object frmPCEProvider: TfrmPCEProvider
+inherited frmPCEProvider: TfrmPCEProvider
   Left = 192
   Top = 104
   BorderIcons = [biSystemMenu]
@@ -6,25 +6,19 @@ object frmPCEProvider: TfrmPCEProvider
   Caption = 'Primary Encounter Provider'
   ClientHeight = 254
   ClientWidth = 317
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object Spacer1: TLabel
+  object Spacer1: TLabel [0]
     Left = 0
     Top = 0
     Width = 317
     Height = 13
     Align = alTop
+    ExplicitWidth = 3
   end
-  object lblMsg: TMemo
+  object lblMsg: TMemo [1]
     Left = 0
     Top = 13
     Width = 317
@@ -45,7 +39,7 @@ object frmPCEProvider: TfrmPCEProvider
     ReadOnly = True
     TabOrder = 4
   end
-  object cboPrimary: TORComboBox
+  object cboPrimary: TORComboBox [2]
     Left = 6
     Top = 69
     Width = 307
@@ -72,7 +66,7 @@ object frmPCEProvider: TfrmPCEProvider
     OnNeedData = cboPrimaryNeedData
     CharsNeedMatch = 1
   end
-  object btnYes: TButton
+  object btnYes: TButton [3]
     Left = 158
     Top = 40
     Width = 75
@@ -82,7 +76,7 @@ object frmPCEProvider: TfrmPCEProvider
     ModalResult = 6
     TabOrder = 1
   end
-  object btnNo: TButton
+  object btnNo: TButton [4]
     Left = 238
     Top = 40
     Width = 75
@@ -92,7 +86,7 @@ object frmPCEProvider: TfrmPCEProvider
     ModalResult = 7
     TabOrder = 2
   end
-  object btnSelect: TButton
+  object btnSelect: TButton [5]
     Left = 6
     Top = 40
     Width = 90
@@ -100,5 +94,26 @@ object frmPCEProvider: TfrmPCEProvider
     Caption = '&Select Primary'
     TabOrder = 3
     OnClick = btnSelectClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblMsg'
+        'Status = stsDefault')
+      (
+        'Component = cboPrimary'
+        'Status = stsDefault')
+      (
+        'Component = btnYes'
+        'Status = stsDefault')
+      (
+        'Component = btnNo'
+        'Status = stsDefault')
+      (
+        'Component = btnSelect'
+        'Status = stsDefault')
+      (
+        'Component = frmPCEProvider'
+        'Status = stsDefault'))
   end
 end

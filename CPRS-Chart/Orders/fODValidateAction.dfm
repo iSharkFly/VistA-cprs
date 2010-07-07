@@ -1,22 +1,15 @@
-object frmInvalidActionList: TfrmInvalidActionList
+inherited frmInvalidActionList: TfrmInvalidActionList
   Left = 445
   Top = 142
-  Width = 534
-  Height = 553
   Caption = 'Invalidated action orders'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
+  ClientHeight = 519
+  ClientWidth = 526
   Position = poScreenCenter
   OnCreate = FormCreate
   OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlTop: TPanel
+  object pnlTop: TPanel [0]
     Left = 0
     Top = 0
     Width = 526
@@ -37,9 +30,9 @@ object frmInvalidActionList: TfrmInvalidActionList
       Top = 52
       Width = 524
       Height = 176
+      Style = lbOwnerDrawVariable
       Align = alClient
       ItemHeight = 16
-      Style = lbOwnerDrawVariable
       TabOrder = 0
       OnDrawItem = lstActDeniedOrdersDrawItem
       OnMeasureItem = lstActDeniedOrdersMeasureItem
@@ -50,7 +43,6 @@ object frmInvalidActionList: TfrmInvalidActionList
       Top = 25
       Width = 524
       Height = 27
-      DragReorder = False
       Sections = <
         item
           ImageIndex = -1
@@ -67,13 +59,14 @@ object frmInvalidActionList: TfrmInvalidActionList
       OnSectionResize = hdrActionSectionResize
     end
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 229
     Width = 526
-    Height = 256
+    Height = 249
     Align = alClient
     TabOrder = 1
+    ExplicitHeight = 256
     object Label2: TLabel
       Left = 1
       Top = 1
@@ -94,23 +87,27 @@ object frmInvalidActionList: TfrmInvalidActionList
       Left = 1
       Top = 41
       Width = 524
-      Height = 214
+      Height = 207
+      Style = lbOwnerDrawVariable
       Align = alClient
       ItemHeight = 16
-      Style = lbOwnerDrawVariable
       TabOrder = 0
       OnDrawItem = lstValidOrdersDrawItem
       OnMeasureItem = lstValidOrdersMeasureItem
       Caption = 'The following orders will be taken action'
     end
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [2]
     Left = 0
-    Top = 485
+    Top = 478
     Width = 526
     Height = 41
     Align = alBottom
     TabOrder = 2
+    ExplicitTop = 485
+    DesignSize = (
+      526
+      41)
     object btnOK: TButton
       Left = 440
       Top = 12
@@ -121,5 +118,32 @@ object frmInvalidActionList: TfrmInvalidActionList
       TabOrder = 0
       OnClick = btnOKClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = lstActDeniedOrders'
+        'Status = stsDefault')
+      (
+        'Component = hdrAction'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = lstValidOrders'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = frmInvalidActionList'
+        'Status = stsDefault'))
   end
 end

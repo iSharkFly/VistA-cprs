@@ -1,4 +1,4 @@
-object frmOptionsOther: TfrmOptionsOther
+inherited frmOptionsOther: TfrmOptionsOther
   Left = 341
   Top = 96
   Hint = 'Use system default settings'
@@ -9,21 +9,14 @@ object frmOptionsOther: TfrmOptionsOther
   Caption = 'Other Parameters'
   ClientHeight = 436
   ClientWidth = 329
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   HelpFile = 'CPRSWT.HLP'
-  OldCreateOrder = False
   Position = poScreenCenter
   ShowHint = True
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object lblMedsTab: TLabel
+  object lblMedsTab: TLabel [0]
     Left = 7
     Top = 121
     Width = 135
@@ -34,20 +27,20 @@ object frmOptionsOther: TfrmOptionsOther
     ShowHint = True
     WordWrap = True
   end
-  object lblTab: TLabel
+  object lblTab: TLabel [1]
     Left = 8
     Top = 27
     Width = 134
     Height = 13
     Caption = 'Initial tab when CPRS starts:'
   end
-  object Bevel1: TBevel
+  object Bevel1: TBevel [2]
     Left = 1
     Top = 110
     Width = 327
     Height = 2
   end
-  object lblEncAppts: TLabel
+  object lblEncAppts: TLabel [3]
     Left = 8
     Top = 269
     Width = 207
@@ -58,13 +51,13 @@ object frmOptionsOther: TfrmOptionsOther
     ShowHint = True
     WordWrap = True
   end
-  object Bevel2: TBevel
+  object Bevel2: TBevel [4]
     Left = 1
     Top = 256
     Width = 327
     Height = 2
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [5]
     Left = 0
     Top = 403
     Width = 329
@@ -105,7 +98,7 @@ object frmOptionsOther: TfrmOptionsOther
       TabOrder = 1
     end
   end
-  object stStart: TStaticText
+  object stStart: TStaticText [6]
     Left = 7
     Top = 151
     Width = 55
@@ -113,7 +106,7 @@ object frmOptionsOther: TfrmOptionsOther
     Caption = 'Start Date:'
     TabOrder = 1
   end
-  object stStop: TStaticText
+  object stStop: TStaticText [7]
     Left = 7
     Top = 207
     Width = 55
@@ -121,7 +114,7 @@ object frmOptionsOther: TfrmOptionsOther
     Caption = 'Stop Date:'
     TabOrder = 5
   end
-  object dtStart: TORDateBox
+  object dtStart: TORDateBox [8]
     Left = 7
     Top = 170
     Width = 187
@@ -133,7 +126,7 @@ object frmOptionsOther: TfrmOptionsOther
     RequireTime = False
     Caption = 'Start Date'
   end
-  object dtStop: TORDateBox
+  object dtStop: TORDateBox [9]
     Left = 8
     Top = 225
     Width = 186
@@ -144,7 +137,7 @@ object frmOptionsOther: TfrmOptionsOther
     RequireTime = False
     Caption = 'Stop Date'
   end
-  object lblTabDefault: TStaticText
+  object lblTabDefault: TStaticText [10]
     Left = 8
     Top = 6
     Width = 52
@@ -152,7 +145,7 @@ object frmOptionsOther: TfrmOptionsOther
     Caption = 'Chart tabs'
     TabOrder = 0
   end
-  object cboTab: TORComboBox
+  object cboTab: TORComboBox [11]
     Left = 8
     Top = 51
     Width = 217
@@ -177,7 +170,7 @@ object frmOptionsOther: TfrmOptionsOther
     TabStop = True
     CharsNeedMatch = 1
   end
-  object chkLastTab: TCheckBox
+  object chkLastTab: TCheckBox [12]
     Left = 8
     Top = 82
     Width = 312
@@ -186,7 +179,7 @@ object frmOptionsOther: TfrmOptionsOther
     Caption = 'Use last selected tab on patient change'
     TabOrder = 3
   end
-  object stStartEncAppts: TStaticText
+  object stStartEncAppts: TStaticText [13]
     Left = 9
     Top = 296
     Width = 55
@@ -194,7 +187,7 @@ object frmOptionsOther: TfrmOptionsOther
     Caption = 'Start Date:'
     TabOrder = 13
   end
-  object txtTodayMinus: TStaticText
+  object txtTodayMinus: TStaticText [14]
     Left = 38
     Top = 321
     Width = 64
@@ -205,7 +198,7 @@ object frmOptionsOther: TfrmOptionsOther
     ParentColor = False
     TabOrder = 14
   end
-  object txtEncStart: TCaptionEdit
+  object txtEncStart: TCaptionEdit [15]
     Left = 110
     Top = 318
     Width = 50
@@ -218,7 +211,7 @@ object frmOptionsOther: TfrmOptionsOther
     OnExit = txtEncStartExit
     Caption = 'Stop'
   end
-  object txtDaysMinus: TStaticText
+  object txtDaysMinus: TStaticText [16]
     Left = 178
     Top = 322
     Width = 26
@@ -228,7 +221,7 @@ object frmOptionsOther: TfrmOptionsOther
     ParentColor = False
     TabOrder = 16
   end
-  object spnEncStart: TUpDown
+  object spnEncStart: TUpDown [17]
     Tag = 30
     Left = 160
     Top = 318
@@ -238,12 +231,10 @@ object frmOptionsOther: TfrmOptionsOther
     Associate = txtEncStart
     Min = -999
     Max = 999
-    Position = 0
     TabOrder = 17
     Thousands = False
-    Wrap = False
   end
-  object txtDaysPlus: TStaticText
+  object txtDaysPlus: TStaticText [18]
     Left = 180
     Top = 374
     Width = 26
@@ -253,7 +244,7 @@ object frmOptionsOther: TfrmOptionsOther
     ParentColor = False
     TabOrder = 18
   end
-  object spnEncStop: TUpDown
+  object spnEncStop: TUpDown [19]
     Tag = 30
     Left = 162
     Top = 369
@@ -263,12 +254,10 @@ object frmOptionsOther: TfrmOptionsOther
     Associate = txtEncStop
     Min = -999
     Max = 999
-    Position = 0
     TabOrder = 19
     Thousands = False
-    Wrap = False
   end
-  object txtEncStop: TCaptionEdit
+  object txtEncStop: TCaptionEdit [20]
     Left = 112
     Top = 369
     Width = 50
@@ -281,7 +270,7 @@ object frmOptionsOther: TfrmOptionsOther
     OnExit = txtEncStopExit
     Caption = 'Stop'
   end
-  object txtTodayPlus: TStaticText
+  object txtTodayPlus: TStaticText [21]
     Left = 46
     Top = 372
     Width = 56
@@ -292,7 +281,7 @@ object frmOptionsOther: TfrmOptionsOther
     ParentColor = False
     TabOrder = 21
   end
-  object stStopEncAppts: TStaticText
+  object stStopEncAppts: TStaticText [22]
     Left = 10
     Top = 348
     Width = 55
@@ -300,7 +289,7 @@ object frmOptionsOther: TfrmOptionsOther
     Caption = 'Stop Date:'
     TabOrder = 22
   end
-  object btnEncDefaults: TButton
+  object btnEncDefaults: TButton [23]
     Left = 248
     Top = 287
     Width = 75
@@ -315,5 +304,74 @@ object frmOptionsOther: TfrmOptionsOther
     ParentFont = False
     TabOrder = 12
     OnClick = btnEncDefaultsClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = stStart'
+        'Status = stsDefault')
+      (
+        'Component = stStop'
+        'Status = stsDefault')
+      (
+        'Component = dtStart'
+        'Status = stsDefault')
+      (
+        'Component = dtStop'
+        'Status = stsDefault')
+      (
+        'Component = lblTabDefault'
+        'Status = stsDefault')
+      (
+        'Component = cboTab'
+        'Status = stsDefault')
+      (
+        'Component = chkLastTab'
+        'Status = stsDefault')
+      (
+        'Component = stStartEncAppts'
+        'Status = stsDefault')
+      (
+        'Component = txtTodayMinus'
+        'Status = stsDefault')
+      (
+        'Component = txtEncStart'
+        'Status = stsDefault')
+      (
+        'Component = txtDaysMinus'
+        'Status = stsDefault')
+      (
+        'Component = spnEncStart'
+        'Status = stsDefault')
+      (
+        'Component = txtDaysPlus'
+        'Status = stsDefault')
+      (
+        'Component = spnEncStop'
+        'Status = stsDefault')
+      (
+        'Component = txtEncStop'
+        'Status = stsDefault')
+      (
+        'Component = txtTodayPlus'
+        'Status = stsDefault')
+      (
+        'Component = stStopEncAppts'
+        'Status = stsDefault')
+      (
+        'Component = btnEncDefaults'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsOther'
+        'Status = stsDefault'))
   end
 end

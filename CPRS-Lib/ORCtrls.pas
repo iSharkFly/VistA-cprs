@@ -6,7 +6,7 @@ interface  // ------------------------------------------------------------------
 
 uses Windows, Messages, SysUtils, Classes, Graphics, Controls, StdCtrls, Forms,
      ComCtrls, Commctrl, Buttons, ExtCtrls, Grids, ImgList, Menus, CheckLst,
-     Accessibility_TLB, Variants;
+     Variants, VAClasses;
 
 const
   UM_SHOWTIP  = (WM_USER + 9436);                // message id to display item tip         **was 300
@@ -20,16 +20,9 @@ const
   LLS_SPACE = '^ ';
 
 type
-
-  TORStaticText = class(TStaticText)
-  private
-     FOnEnter: TNotifyEvent;
-     FOnExit: TNotifyEvent;
-  published
-     property OnEnter: TNotifyEvent read FOnEnter write FOnEnter;
-     property OnExit: TNotifyEvent read FOnExit write FOnExit;
-     procedure DoEnter; override;
-     procedure DoExit; override;
+  IORBlackColorModeCompatible = interface(IInterface)
+  ['{3554985C-F524-45FA-8C27-4CDD8357DB08}']
+    procedure SetBlackColorMode(Value: boolean);
   end;
 
   TORComboBox = class;                           // forward declaration for FParentCombo
@@ -80,7 +73,7 @@ type
     CheckedState: TCheckBoxState;                // Used to indicate check box values
   end;
 
-  TORListBox = class(TListBox)
+  TORListBox = class(TListBox, IVADynamicProperty, IORBlackColorModeCompatible)
   private
     FFocusIndex: Integer;                        // item with focus when using navigation keys
     FLargeChange: Integer;                       // visible items less one
@@ -126,10 +119,11 @@ type
     FAllowGrayed: boolean;
     FMItems: TORStrings;                         // Used to save corresponding M strings ("the pieces")
     FCaption: TStaticText;                       // Used to supply a title to IAccessible interface
-    FAccessible: IAccessible;
     FCaseChanged: boolean;                       // If true, the names are stored in the database as all caps, but loaded and displayed in mixed-case
     FLookupPiece: integer;                       // If zero, list look-up comes from display string; if non-zero, indicates which piece of the item needs to be used for list lookup
-    procedure WMGetObject(var Message: TMessage); message WM_GETOBJECT;
+    FIsPartOfComboBox: boolean;
+    FBlackColorMode: boolean;
+    FHideSelection: boolean;
     procedure AdjustScrollBar;
     procedure CreateScrollBar;
     procedure FreeScrollBar;
@@ -213,6 +207,7 @@ type
     procedure MeasureItem(Index: Integer; var Height: Integer); override;
     procedure DrawItem(Index: Integer; Rect: TRect; State: TOwnerDrawState); override;
     function GetIndexFromY(YPos :integer) :integer;
+    property isPartOfComboBox: boolean read FIsPartOfComboBox write FIsPartOfComboBox default False;
     property HideSynonyms: boolean read FHideSynonyms write SetHideSynonyms default FALSE;
     property SynonymChars: string read FSynonymChars write SetSynonymChars;
   public
@@ -240,8 +235,11 @@ type
     property CheckedString: string read GetCheckedString write SetCheckedString;
     property CheckedState[Index: Integer]: TCheckBoxState read GetCheckedState write SetCheckedState;
     property MItems: TStrings read GetMItems write SetMItems;
-    procedure MakeAccessible(Accessible: IAccessible);
     function VerifyUnique(SelectIndex: Integer; iText: String): integer;
+    procedure SetBlackColorMode(Value: boolean);
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
+    property HideSelection: boolean read FHideSelection write FHideSelection;
   published
     property AllowGrayed: boolean read FAllowGrayed write FAllowGrayed default FALSE;
     property Caption: string read GetCaption write SetCaption;
@@ -302,7 +300,7 @@ type
     procedure CreateParams(var Params: TCreateParams); override;
   end;
 
-  TORComboBox = class(TWinControl)
+  TORComboBox = class(TWinControl, IVADynamicProperty, IORBlackColorModeCompatible)
   private
     FItems: TStrings;                            // points to Items in FListBox
     FMItems: TStrings;                           // points to MItems in FListBox
@@ -339,6 +337,11 @@ type
     FTemplateField: boolean;
     FCharsNeedMatch: integer;                    // how many text need to be matched for auto selection
     FUniqueAutoComplete: Boolean;                // If true only perform autocomplete for unique list items.
+    FBlackColorMode: boolean;
+    FDisableHints: boolean;                      // true if hints have been disabled because drop down window was opened
+    FDropDownStatusChangedCount: integer;        // prevents multiple calls to disabling hint window
+    procedure DropDownStatusChanged(opened: boolean);
+    procedure ClearDropDownStatus;
     function EditControl: TWinControl;
     procedure AdjustSizeOfSelf;
     procedure DropButtonDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState;
@@ -439,6 +442,7 @@ type
     function GetLookupPiece: integer;
     procedure SetLookupPiece(const Value: integer);
     procedure SetUniqueAutoComplete(const Value: Boolean);
+    procedure LoadComboBoxImage;
   protected
     procedure DropPanelBtnPressed(OKBtn, AutoClose: boolean);
     function GetEditBoxText(Index: Integer): string;
@@ -451,12 +455,14 @@ type
     procedure SetEnabled(Value: boolean); override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     function AddReference(const S: string; AReference: Variant): Integer;
     procedure Clear;
     procedure ClearTop;
     procedure ForDataUse(Strings: TStrings);
     procedure InitLongList(S: string);
     procedure InsertSeparator;
+    procedure Invalidate; override;
     procedure SetTextAutoComplete(TextToMatch : String);
     function GetIEN(AnIndex: Integer): Int64;
     function SelectByIEN(AnIEN: Int64): Integer;
@@ -465,7 +471,9 @@ type
     function IndexOfReference(AReference: Variant): Integer;
     procedure InsertReference(Index: Integer; const S: string; AReference: Variant);
     procedure SelectAll;
-    function MakeAccessible( Accessible: IAccessible): TORListBox;
+    procedure SetBlackColorMode(Value: boolean);
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
     property DisplayText[Index: Integer]: string read GetDisplayText;
     property DroppedDown: Boolean read FDroppedDown write SetDroppedDown;
     property ItemID: Variant read GetItemID;
@@ -647,12 +655,15 @@ type
   TORDraggingEvent = procedure(Sender: TObject; Node: TTreeNode; var CanDrag: boolean) of object;
 
 
-  TCaptionTreeView = class(TTreeView)
+  TCaptionTreeView = class(TTreeView, IVADynamicProperty)
   private
     procedure SetCaption(const Value: string);
     function GetCaption: string;
   protected
     FCaptionComponent: TStaticText;
+  public
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
   published
     property Align;
     property Caption: string read GetCaption write SetCaption;
@@ -664,9 +675,7 @@ type
   private
     FTag: integer;
     FStringData: string;
-    FAccessible: IAccessible;
     FCaption: string;
-    procedure WMGetObject(var Message: TMessage); message WM_GETOBJECT;
     function GetParent: TORTreeNode;
     procedure SetCaption(const Value: string);
   protected
@@ -678,10 +687,8 @@ type
     procedure SetStringData(const Value: string);
     function GetORTreeView: TORTreeView;
   public
-    procedure MakeAccessible(Accessible: IAccessible);
     procedure SetPiece(PieceNum: Integer; const NewPiece: string);
     procedure EnsureVisible;
-    property Accessible: IAccessible read FAccessible write MakeAccessible;
     property Bold: boolean read GetBold write SetBold;
     property Tag: integer read FTag write FTag;
     property StringData: string read FStringData write SetStringData;
@@ -699,10 +706,8 @@ type
     FDelim: Char;
     FPiece: integer;
     FOnAddition: TTVExpandedEvent;
-    FAccessible: IAccessible;
     FShortNodeCaptions: boolean;
     FOnNodeCaptioning: TNodeCaptioningEvent;
-    procedure WMGetObject(var Message: TMessage); message WM_GETOBJECT;
     procedure SetShortNodeCaptions(const Value: boolean);
   protected
     procedure CNNotify(var Message: TWMNotify); message CN_NOTIFY;
@@ -715,7 +720,6 @@ type
     procedure SetNodePiece(const Value: integer);
   public
     constructor Create(AOwner: TComponent); override;
-    procedure MakeAccessible(Accessible: IAccessible);
     function FindPieceNode(Value: string;
                            ParentDelim: Char = #0; StartNode: TTreeNode = nil): TORTreeNode; overload;
     function FindPieceNode(Value: string; APiece: integer;
@@ -775,7 +779,7 @@ type
 
   TGrayedStyle = (gsNormal, gsQuestionMark, gsBlueQuestionMark);
 
-  TORCheckBox = class(TCheckBox)
+  TORCheckBox = class(TCheckBox, IORBlackColorModeCompatible)
   private
     FStringData: string;
     FCanvas: TCanvas;
@@ -792,6 +796,7 @@ type
     FRadioStyle: boolean;
     FAssociate: TControl;
     FFocusOnBox: boolean;
+    FBlackColorMode: boolean;
     procedure SetFocusOnBox(value: boolean);
     procedure CNMeasureItem    (var Message: TWMMeasureItem);   message CN_MEASUREITEM;
     procedure CNDrawItem       (var Message: TWMDrawItem);      message CN_DRAWITEM;
@@ -834,6 +839,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AutoAdjustSize;
+    procedure SetBlackColorMode(Value: boolean);
     property SingleLine: boolean read FSingleLine;
     property StringData: string read FStringData write FStringData;
   published
@@ -898,22 +904,24 @@ type
     constructor Create(AOwner: TComponent); override;
   end;
 
-  TCaptionListBox = class(TListBox)
+  TCaptionListBox = class(TListBox, IVADynamicProperty)
   private
     FHoverItemPos: integer;
-    FAccessible: IAccessible;
     FRightClickSelect: boolean;                  // When true, a right click selects teh item
     FHintOnItem: boolean;
     procedure SetCaption(const Value: string);
     function GetCaption: string;
-    procedure WMGetObject(var Message: TMessage); message WM_GETOBJECT;
     procedure WMRButtonUp(var Message: TWMRButtonUp); message WM_RBUTTONUP;
     procedure WMMouseMove(var Message: TWMMouseMove); message WM_MOUSEMOVE;
+    procedure WMKeyDown(var Message: TWMKeyDown); message WM_KEYDOWN;
+    procedure MoveFocusDown;
+    procedure MoveFocusUp;
   protected
     FCaptionComponent: TStaticText;
     procedure DoEnter; override;
   public
-    procedure MakeAccessible( Accessible: IAccessible);
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
   published
     property RightClickSelect: boolean read FRightClickSelect write FRightClickSelect default FALSE;
     property Caption: string read GetCaption write SetCaption;
@@ -921,77 +929,90 @@ type
     property HintOnItem: boolean read FHintOnItem write FHintOnItem default FALSE;
   end;
 
-  TCaptionCheckListBox = class(TCheckListBox)
+  TCaptionCheckListBox = class(TCheckListBox, IVADynamicProperty)
   private
     procedure SetCaption(const Value: string);
     function GetCaption: string;
   protected
     FCaptionComponent: TStaticText;
+  public
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
   published
     property Caption: string read GetCaption write SetCaption;
   end;
 
-  TCaptionMemo = class(TMemo)
+  TCaptionMemo = class(TMemo, IVADynamicProperty)
   private
     procedure SetCaption(const Value: string);
     function GetCaption: string;
   protected
     FCaptionComponent: TStaticText;
+  public
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
   published
     property Caption: string read GetCaption write SetCaption;
   end;
 
-  TCaptionEdit = class(TEdit)
+  TCaptionEdit = class(TEdit, IVADynamicProperty)
   private
     procedure SetCaption(const Value: string);
     function GetCaption: string;
   protected
     FCaptionComponent: TStaticText;
+  public
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
   published
     property Align;
     property Caption: string read GetCaption write SetCaption;
   end;
 
-  TCaptionRichEdit = class(TRichEdit)
+  TCaptionRichEdit = class(TRichEdit, IVADynamicProperty)
   private
-    FAccessible: IAccessible;
-    procedure WMGetObject(var Message: TMessage); message WM_GETOBJECT;
   protected
     FCaption: string;
   public
-    procedure MakeAccessible(Accessible: IAccessible);
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
   published
     property Align;
     property Caption: string read FCaption write FCaption;
   end;
 
-  TCaptionComboBox = class(TComboBox)
+  TCaptionComboBox = class(TComboBox, IVADynamicProperty)
   private
     procedure SetCaption(const Value: string);
     function GetCaption: string;
   protected
     FCaptionComponent: TStaticText;
+  public
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
   published
     property Caption: string read GetCaption write SetCaption;
   end;
 
-  TCaptionListView = class(TListView)
+  TCaptionListView = class(TListView, IVADynamicProperty)
+  public
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
   published
     property Caption;
   end;
 
-  TCaptionStringGrid = class(TStringGrid)
+  TCaptionStringGrid = class(TStringGrid, IVADynamicProperty)
   private
     FJustToTab: boolean;
     FCaption: string;
-    FAccessible: IAccessible;
-    procedure WMGetObject(var Message: TMessage); message WM_GETOBJECT;
   protected
     procedure KeyUp(var Key: Word; Shift: TShiftState); override;
   public
-    procedure MakeAccessible( Accessible: IAccessible);
     procedure IndexToColRow( index: integer; var Col: integer; var Row: integer);
     function ColRowToIndex( Col: integer; Row: Integer): integer;
+    function SupportsDynamicProperty(PropertyID: integer): boolean;
+    function GetDynamicProperty(PropertyID: integer): string;
   published
     property Caption: string read FCaption write FCaption;
     property JustToTab: boolean read FJustToTab write FJustToTab default FALSE;
@@ -1014,7 +1035,7 @@ implementation  // -------------------------------------------------------------
 {$R ORCTRLS}
 
 uses
-  uAccessAPI;
+  VAUtils;
   
 const
   ALPHA_DISTRIBUTION: array[0..100] of string[3] = ('',' ','ACE','ADG','ALA','AMI','ANA','ANT',
@@ -1423,45 +1444,48 @@ const
     'ORCB_RADIO_UNCHECKED', 'ORCB_RADIO_CHECKED',
     'ORCB_RADIO_DISABLED_UNCHECKED', 'ORCB_RADIO_DISABLED_CHECKED');
 
+   BlackCheckBoxImageResNames: array[TORCBImgIdx] of PChar = (
+    'BLACK_ORLB_FLAT_UNCHECKED', 'BLACK_ORLB_FLAT_CHECKED', 'BLACK_ORLB_FLAT_GRAYED',
+    'BLACK_ORCB_QUESTIONMARK', 'BLACK_ORCB_BLUEQUESTIONMARK',
+    'BLACK_ORCB_DISABLED_UNCHECKED', 'BLACK_ORCB_DISABLED_CHECKED',
+    'BLACK_ORCB_DISABLED_GRAYED', 'BLACK_ORCB_DISABLED_QUESTIONMARK',
+    'BLACK_ORLB_FLAT_UNCHECKED', 'BLACK_ORLB_FLAT_CHECKED', 'BLACK_ORLB_FLAT_GRAYED',
+    'BLACK_ORCB_RADIO_UNCHECKED', 'BLACK_ORCB_RADIO_CHECKED',
+    'BLACK_ORCB_RADIO_DISABLED_UNCHECKED', 'BLACK_ORCB_RADIO_DISABLED_CHECKED');
+  
 var
-  ORCBImages: array[TORCBImgIdx] of TBitMap;
+  ORCBImages: array[TORCBImgIdx, Boolean] of TBitMap;
 
-function GetORCBBitmap(Idx: TORCBImgIdx): TBitmap;
+function GetORCBBitmap(Idx: TORCBImgIdx; BlackMode: boolean): TBitmap;
+var
+  ResName: string;
 begin
-  if(not assigned(ORCBImages[Idx])) then
+  if(not assigned(ORCBImages[Idx, BlackMode])) then
   begin
-    ORCBImages[Idx] := TBitMap.Create;
-    ORCBImages[Idx].LoadFromResourceName(HInstance, CheckBoxImageResNames[Idx]);
+    ORCBImages[Idx, BlackMode] := TBitMap.Create;
+    if BlackMode then
+      ResName := BlackCheckBoxImageResNames[Idx]
+    else
+      ResName := CheckBoxImageResNames[Idx];
+    ORCBImages[Idx, BlackMode].LoadFromResourceName(HInstance, ResName);
   end;
-  Result := ORCBImages[Idx];
+  Result := ORCBImages[Idx, BlackMode];
 end;
 
 procedure DestroyORCBBitmaps; far;
 var
   i: TORCBImgIdx;
+  mode: boolean;
 
 begin
   for i := low(TORCBImgIdx) to high(TORCBImgIdx) do
   begin
-    if(assigned(ORCBImages[i])) then
-      ORCBImages[i].Free;
+    for Mode := false to true do
+    begin
+      if(assigned(ORCBImages[i, Mode])) then
+        ORCBImages[i, Mode].Free;
+    end;
   end;
-end;
-
-{ TORStaticText }
-
-procedure TORStaticText.DoEnter;
-begin
-  inherited DoEnter;
-  if Assigned(FOnEnter) then
-     FOnEnter(Self);
-end;
-
-procedure TORStaticText.DoExit;
-begin
-  inherited DoExit;
-  if Assigned(FOnExit) then
-     FOnExit(Self);
 end;
 
 { TORStrings }
@@ -1657,6 +1681,7 @@ begin
   FFlatCheckBoxes := TRUE;
   FCaseChanged := TRUE;
   FLookupPiece := 0;
+  FIsPartOfComboBox := False;
 end;
 
 destructor TORListBox.Destroy;
@@ -1767,6 +1792,14 @@ begin
   begin
     SetString(Result, Buf, Len);
   end;
+end;
+
+function TORListBox.GetDynamicProperty(PropertyID: integer): string;
+begin
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := GetCaption
+  else
+    Result := '';
 end;
 
 // The following 7 message handling procedures essentially reimplement the TListBoxStrings
@@ -2015,25 +2048,29 @@ begin
   //if Message.CharCode in [VK_RETURN, VK_ESCAPE] then inherited;  // ignore other keys
   case Message.CharCode of
     VK_LBUTTON, VK_RETURN, VK_SPACE:
-    if FocusIndex > -1 then
     begin
-      if MultiSelect then
+      if (FocusIndex < 0) and (CheckBoxes or MultiSelect) and (Count > 0) then // JNM - 508 compliance
+        SetFocusIndex(0);
+      if FocusIndex > -1 then
       begin
-        IsSelected := LongBool(Perform(LB_GETSEL, FocusIndex, 0));
-        Perform(LB_SETSEL, Longint(not IsSelected), FocusIndex);
-      end
-      else Perform(LB_SETCURSEL, FocusIndex, 0);
-      // Send WM_COMMAND here because LBN_SELCHANGE not triggered by LB_SETSEL
-      // and LBN_SELCHANGE is what eventually triggers the Click event.
-      // The LBN_SELCHANGE documentation implies we should send the control id, which is
-      // 32 bits long, in the high word of WPARAM (16 bits).  Since that won't work - we'll
-      // try sending the item index instead.
-      //PostMessage() not SendMessage() is Required here for checkboxes, SendMessage() doesn't
-      //Allow the Checkbox state on the control to be updated
-      if CheckBoxes then
-        PostMessage(Parent.Handle, WM_COMMAND, MAKELONG(FocusIndex, LBN_SELCHANGE), LPARAM(Handle))
-      else
-        SendMessage(Parent.Handle, WM_COMMAND, MAKELONG(FocusIndex, LBN_SELCHANGE), LPARAM(Handle));
+        if MultiSelect then
+        begin
+          IsSelected := LongBool(Perform(LB_GETSEL, FocusIndex, 0));
+          Perform(LB_SETSEL, Longint(not IsSelected), FocusIndex);
+        end
+        else Perform(LB_SETCURSEL, FocusIndex, 0);
+        // Send WM_COMMAND here because LBN_SELCHANGE not triggered by LB_SETSEL
+        // and LBN_SELCHANGE is what eventually triggers the Click event.
+        // The LBN_SELCHANGE documentation implies we should send the control id, which is
+        // 32 bits long, in the high word of WPARAM (16 bits).  Since that won't work - we'll
+        // try sending the item index instead.
+        //PostMessage() not SendMessage() is Required here for checkboxes, SendMessage() doesn't
+        //Allow the Checkbox state on the control to be updated
+        if CheckBoxes then
+          PostMessage(Parent.Handle, WM_COMMAND, MAKELONG(FocusIndex, LBN_SELCHANGE), LPARAM(Handle))
+        else
+          SendMessage(Parent.Handle, WM_COMMAND, MAKELONG(FocusIndex, LBN_SELCHANGE), LPARAM(Handle));
+      end;
     end;
     VK_PRIOR:          SetFocusIndex(FocusIndex - FLargeChange);
     VK_NEXT:           SetFocusIndex(FocusIndex + FLargeChange);
@@ -2235,6 +2272,8 @@ begin
   if ItemIndex <> FLastItemIndex then
   begin
     FLastItemIndex := ItemIndex;
+    if (not isPartOfComboBox) and (ItemIndex <> -1) then
+      SetFocusIndex(ItemIndex);
     if Assigned(FOnChange) then FOnChange(Self);
   end;
 end;
@@ -2247,12 +2286,23 @@ begin
   //This fix has been commented out, becuase it causes problems
 {  if (Items.Count > 0) and (Not IsAMouseButtonDown()) and (ItemIndex = -1) then
     SetFocusIndex(TopIndex);//ItemIndex := TopIndex; }
+  if FHideSelection and (ItemIndex < 0) and (FFocusIndex >= 0) then
+    ItemIndex := FFocusIndex;
   inherited DoEnter;
 end;
 
 procedure TORListBox.DoExit;
+var
+  SaveIndex: integer;
 { make sure item tip is hidden for this listbox when focus shifts to something else }
 begin
+  if FHideSelection then
+  begin
+    SaveIndex := ItemIndex;
+    ItemIndex := -1;
+    FFocusIndex := SaveIndex;
+  end;
+
   uItemTip.Hide;
   FItemTipActive := False;
   inherited DoExit;
@@ -2320,8 +2370,14 @@ end;
 
 procedure TORListBox.KeyPress(var Key: Char);
 begin
+  {inherited KeyPress is changing the ' ' into #0, had to move conditional before inherited.}
+  if (Key = ' ') then begin
+    ToggleCheckBox(ItemIndex);
+    {The space bar causes the focus to jump to an item in the list that starts with
+     a space. Disable that function.}
+    Key := #0;
+  end;
   inherited;
-  if (Key = ' ') then ToggleCheckBox(ItemIndex);
 end;
 
 procedure TORListBox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -2458,32 +2514,32 @@ begin
             cbUnchecked:
               begin
                 if(FFlatCheckBoxes) then
-                  BMap := GetORCBBitmap(iiFlatUnChecked)
+                  BMap := GetORCBBitmap(iiFlatUnChecked, FBlackColorMode)
                 else
-                  BMap := GetORCBBitmap(iiUnchecked);
+                  BMap := GetORCBBitmap(iiUnchecked, FBlackColorMode);
               end;
             cbChecked:
               begin
                 if(FFlatCheckBoxes) then
-                  BMap := GetORCBBitmap(iiFlatChecked)
+                  BMap := GetORCBBitmap(iiFlatChecked, FBlackColorMode)
                 else
-                  BMap := GetORCBBitmap(iiChecked);
+                  BMap := GetORCBBitmap(iiChecked, FBlackColorMode);
               end;
             else // cbGrayed:
               begin
                 if(FFlatCheckBoxes) then
-                  BMap := GetORCBBitmap(iiFlatGrayed)
+                  BMap := GetORCBBitmap(iiFlatGrayed, FBlackColorMode)
                 else
-                  BMap := GetORCBBitmap(iiGrayed);
+                  BMap := GetORCBBitmap(iiGrayed, FBlackColorMode);
               end;
           end;
         end
         else
         begin
           if(FFlatCheckBoxes) then
-            BMap := GetORCBBitmap(iiFlatGrayed)
+            BMap := GetORCBBitmap(iiFlatGrayed, FBlackColorMode)
           else
-            BMap := GetORCBBitmap(iiGrayed);
+            BMap := GetORCBBitmap(iiGrayed, FBlackColorMode);
         end;
         TmpR := Rect;
         TmpR.Right := TmpR.Left;
@@ -2583,10 +2639,11 @@ begin
       end;
     end;
   end;                                              // -- special long list processing - end
-  if (Value = SFI_TOP) or (Value < 0) then Value := 0;
   if (Value = SFI_END) or (not (Value < Items.Count)) then Value := Items.Count - 1;
+  if (Value = SFI_TOP) or (Value < 0) then Value := 0;
   FFocusIndex := Value;
-  ItemIndex := Value;
+  if Focused or (not FHideSelection) then
+    ItemIndex := Value;
   if MultiSelect then Perform(LB_SETCARETINDEX, FFocusIndex, 0) // LPARAM=0, scrolls into view
   else
   begin
@@ -2849,6 +2906,11 @@ begin
   Refresh;
 end;
 
+function TORListBox.SupportsDynamicProperty(PropertyID: integer): boolean;
+begin
+  Result := (PropertyID = DynaPropAccesibilityCaption);
+end;
+
 procedure TORListBox.SetHideSynonyms(Value :boolean);
 var
   TmpIH :integer;
@@ -2929,7 +2991,7 @@ var
   SaveItems: TList;
   Strings: TStringList;
   i, Pos: Integer;
-  ItemRec: PItemRec;
+  ItemRec, ItemRec2: PItemRec;
   SaveListMode: Boolean;
   RealVerify: Boolean;
 begin
@@ -2959,7 +3021,15 @@ begin
       if(assigned(ItemRec)) then
       begin
         Pos := Items.AddObject(Strings[i], ItemRec^.UserObject);
-        References[Pos] := ItemRec^.Reference;
+        // CQ 11491 - Changing TabPositions, etc. was wiping out check box status.
+        FFromSelf := True;
+        ItemRec2 := PItemRec(SendMessage(Handle,LB_GETITEMDATA, Pos, 0));
+        FFromSelf := False;
+        if(assigned(ItemRec2)) then
+        begin
+          ItemRec2^.Reference := ItemRec^.Reference;
+          ItemRec2^.CheckedState := ItemRec^.CheckedState;
+        end;
       end;
     end;
   finally
@@ -3504,6 +3574,11 @@ begin
   inherited;
 end;
 
+procedure TORListBox.SetBlackColorMode(Value: boolean);
+begin
+  FBlackColorMode := Value;
+end;
+
 procedure TORListBox.SetCaption(const Value: string);
 begin
   if not Assigned(FCaption) then begin
@@ -3526,20 +3601,31 @@ begin
   result := FCaption.Caption;
 end;
 
-procedure TORListBox.MakeAccessible(Accessible: IAccessible);
+// In Delphi 2006, hint windows will cause the TORComboBox drop down list to
+// move behind a Stay on Top form.  Hints are also problematic with item tips in
+// the drop down list, so we disable them when ever a drop down list is open,
+// on all forms, not just stay on top forms.
+var
+  uDropPanelOpenCount: integer = 0;
+  uOldShowHintsSetting: boolean;
+
+procedure DropDownPanelOpened;
 begin
-  if Assigned(FAccessible) and Assigned(Accessible) then
-    raise Exception.Create(Caption + ' List Box is already Accessible!')
-  else
-    FAccessible := Accessible;
+  if uDropPanelOpenCount=0 then
+    uOldShowHintsSetting := Application.ShowHint;
+  Application.ShowHint := FALSE;
+  inc(uDropPanelOpenCount);
 end;
 
-procedure TORListBox.WMGetObject(var Message: TMessage);
+procedure DropDownPanelClosed;
 begin
-  if (Message.LParam = integer(OBJID_CLIENT)) and Assigned(FAccessible) then
-    Message.Result := GetLResult(Message.wParam, FAccessible)
-  else
-    inherited;
+  dec(uDropPanelOpenCount);
+  if uDropPanelOpenCount<=0 then
+  begin
+    uDropPanelOpenCount := 0;
+    if not Application.ShowHint then
+      Application.ShowHint := uOldShowHintsSetting
+  end;
 end;
 
 { TORDropPanel ----------------------------------------------------------------------------- }
@@ -3689,7 +3775,8 @@ end;
 { TORComboEdit ----------------------------------------------------------------------------- }
 const
   ComboBoxImages: array[boolean] of string = ('BMP_CBODOWN_DISABLED', 'BMP_CBODOWN');
-  
+  BlackComboBoxImages: array[boolean] of string = ('BLACK_BMP_CBODOWN_DISABLED', 'BLACK_BMP_CBODOWN');
+
 procedure TORComboEdit.CreateParams(var Params: TCreateParams);
 { sets a one line edit box to multiline style so the editing rectangle can be changed }
 begin
@@ -3739,6 +3826,7 @@ begin
   FStyle := orcsSimple;
   FCheckBoxEditColor := clBtnFace;
   FListBox := TORListBox.Create(Self);
+  FListBox.isPartOfComboBox := True;
   FListBox.Parent := Self;
   FListBox.TabStop := False;
   FListBox.OnClick := FwdClick;
@@ -3865,6 +3953,47 @@ begin
   FEditBox.SetFocus;
 end;
 
+procedure TORComboBox.DropDownStatusChanged(opened: boolean);
+begin
+  if opened then
+  begin
+    if not FDropPanel.Visible then
+    begin
+      if FDropDownStatusChangedCount = 0 then
+      begin
+        FDisableHints := TRUE;
+        DropDownPanelOpened;
+      end;
+      inc(FDropDownStatusChangedCount);
+    end;
+  end
+  else
+  begin
+    dec(FDropDownStatusChangedCount);
+    if FDropDownStatusChangedCount <= 0 then
+    begin
+      if FDisableHints then
+      begin
+        DropDownPanelClosed;
+        FDisableHints := FALSE;
+      end;
+      FDropDownStatusChangedCount := 0;
+    end;
+  end;
+end;
+
+procedure TORComboBox.ClearDropDownStatus;
+begin
+  FDropDownStatusChangedCount := 1;
+  DropDownStatusChanged(FALSE);
+end;
+
+destructor TORComboBox.Destroy;
+begin
+  ClearDropDownStatus;
+  inherited;
+end;
+
 procedure TORComboBox.DoEnter;
 {var
   key : word;}
@@ -3901,6 +4030,20 @@ begin
     if FListBox.LongList and FChangePending then FwdChangeDelayed;
   end;
   inherited DoExit;
+end;
+
+procedure TORComboBox.LoadComboBoxImage;
+var
+  imageName: string;
+begin
+  if assigned(FDropBtn) then
+  begin
+    if FBlackColorMode then
+      imageName := BlackComboBoxImages[inherited Enabled]
+    else
+      imageName := ComboBoxImages[inherited Enabled];
+    FDropBtn.Glyph.LoadFromResourceName(hInstance, imageName);
+  end;
 end;
 
 procedure TORComboBox.Loaded;
@@ -4097,15 +4240,26 @@ begin
 end;
 
 procedure TORComboBox.FwdKeyPress(Sender: TObject; var Key: Char);
+var
+  KeyCode: integer;
 { prevents return from being used by editbox (otherwise sends a newline & text vanishes) }
 begin
-  // may want to make the tab beep if tab key (#9) - can't tab until list raised
-  if (Key in [#9, #13]) or (FListBox.FCheckBoxes and (Key = #32)) then
+  KeyCode := ord(Key);
+  if (KeyCode = VK_RETURN) and (Style = orcsDropDown) and DroppedDown then
   begin
+    DroppedDown := FALSE;
     Key := #0;
-    Exit;
+  end
+  else
+  begin
+    // may want to make the tab beep if tab key (#9) - can't tab until list raised
+    if (KeyCode = VK_RETURN) or (KeyCode = VK_TAB) or (FListBox.FCheckBoxes and (KeyCode = VK_SPACE)) then
+    begin
+      Key := #0;
+      Exit;
+    end;
+    if Assigned(FOnKeyPress) then FOnKeyPress(Self, Key);
   end;
-  if Assigned(FOnKeyPress) then FOnKeyPress(Self, Key);
 end;
 
 procedure TORComboBox.FwdKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -4167,6 +4321,7 @@ begin
       FDropPanel.ResetButtons;
       FCheckedState := FListBox.GetCheckedString;
     end;
+    DropDownStatusChanged(TRUE);
     FDropPanel.Visible := True;
     FDropPanel.BringToFront;
     if FListBox.FScrollBar <> nil then FListBox.FScrollBar.BringToFront;
@@ -4177,6 +4332,7 @@ begin
     FListBox.MouseCapture := False;
     uItemTip.Hide;
     FDropPanel.Hide;
+    DropDownStatusChanged(FALSE);
     if(FListBox.FCheckBoxes) and (assigned(FOnChange)) and
       (FCheckedState <> FListBox.GetCheckedString) then
       FOnChange(Self);
@@ -4264,7 +4420,11 @@ begin
     if FStyle = orcsSimple then
     begin
       if FDropBtn <> nil then FDropBtn.Free;
-      if FDropPanel <> nil then FDropPanel.Free;
+      if FDropPanel <> nil then
+      begin
+        ClearDropDownStatus;
+        FDropPanel.Free;
+      end;
       FDropBtn := nil;
       FDropPanel := nil;
       FListBox.FParentCombo := nil;
@@ -4279,7 +4439,8 @@ begin
       FDropBtn.Parent := FEditBox;
       if(assigned(FEditPanel) and (csDesigning in ComponentState)) then
         FEditPanel.ControlStyle := FEditPanel.ControlStyle - [csAcceptsControls];
-      FDropBtn.Glyph.LoadFromResourceName(hInstance, ComboBoxImages[inherited Enabled]);
+      LoadComboBoxImage;
+//      FDropBtn.Glyph.LoadFromResourceName(hInstance, ComboBoxImages[inherited Enabled]);
       FDropBtn.OnMouseDown := DropButtonDown;
       FDropBtn.OnMouseUp := DropButtonUp;
       FDropBtn.TabStop := False;
@@ -4291,6 +4452,7 @@ begin
         FDropPanel.Parent := Self; // parent is really the desktop - see CreateParams
         FListBox.FParentCombo := Self;
         FListBox.Parent := FDropPanel;
+        ClearDropDownStatus;
         if FListBox.FScrollBar <> nil then FListBox.FScrollBar.Parent := FDropPanel;  // if long
       end else
       begin
@@ -4325,6 +4487,11 @@ begin
     KillTimer(Handle, KEY_TIMER_ID);
     FKeyTimerActive := False;
   end;
+end;
+
+function TORComboBox.SupportsDynamicProperty(PropertyID: integer): boolean;
+begin
+  Result := (PropertyID = DynaPropAccesibilityCaption);
 end;
 
 // Since TORComboBox is composed of several controls (FEditBox, FListBox, FDropBtn), the
@@ -4372,6 +4539,19 @@ begin
   FListBox.InsertSeparator;
 end;
 
+procedure TORComboBox.Invalidate;
+begin
+  inherited;
+  FEditBox.Invalidate;
+  FListBox.Invalidate;
+  if assigned(FEditPanel) then
+    FEditPanel.Invalidate;
+  if assigned(FDropBtn) then
+    FDropBtn.Invalidate;
+  if assigned(FDropPanel) then
+    FDropPanel.Invalidate;
+end;
+
 function TORComboBox.GetAutoSelect: Boolean;
 begin
   Result := FEditBox.AutoSelect;
@@ -4390,6 +4570,14 @@ end;
 function TORComboBox.GetDisplayText(Index: Integer): string;
 begin
   Result := FListBox.DisplayText[Index];
+end;
+
+function TORComboBox.GetDynamicProperty(PropertyID: integer): string;
+begin
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := GetCaption
+  else
+    Result := '';
 end;
 
 function TORComboBox.GetItemHeight: Integer;
@@ -4515,6 +4703,16 @@ end;
 procedure TORComboBox.SetAutoSelect(Value: Boolean);
 begin
   FEditBox.AutoSelect := Value;
+end;
+
+procedure TORComboBox.SetBlackColorMode(Value: boolean);
+begin
+  if FBlackColorMode <> Value then
+  begin
+    FBlackColorMode := Value;
+    FListBox.SetBlackColorMode(Value);
+    LoadComboBoxImage;
+  end;
 end;
 
 procedure TORComboBox.SetColor(Value: TColor);
@@ -4773,9 +4971,11 @@ procedure TORComboBox.SetEnabled(Value: boolean);
 begin
   if (inherited GetEnabled <> Value) then
   begin
+    DroppedDown := FALSE;
     inherited SetEnabled(Value);
     if assigned(FDropBtn) then
-      FDropBtn.Glyph.LoadFromResourceName(hInstance, ComboBoxImages[Value]);
+      LoadComboBoxImage;
+//      FDropBtn.Glyph.LoadFromResourceName(hInstance, ComboBoxImages[Value]);
   end;
 end;
 
@@ -4836,12 +5036,6 @@ end;
 function TORComboBox.GetCaption: string;
 begin
   result := FListBox.Caption;
-end;
-
-function TORComboBox.MakeAccessible(Accessible: IAccessible): TORListBox;
-begin
-  FListBox.MakeAccessible(Accessible);
-  result := FListBox;
 end;
 
 function TORComboBox.GetCaseChanged: boolean;
@@ -5262,24 +5456,6 @@ begin
     end;
 end;
 
-procedure TORTreeNode.MakeAccessible(Accessible: IAccessible);
-begin
-  if Assigned(FAccessible) and Assigned(Accessible) then
-    raise Exception.Create(Text + ' Tree Node is already Accessible!')
-  else
-  begin
-    FAccessible := Accessible;
-  end;
-end;
-
-procedure TORTreeNode.WMGetObject(var Message: TMessage);
-begin
-  if (Message.LParam = integer(OBJID_CLIENT)) and Assigned(FAccessible) then
-    Message.Result := GetLResult(Message.wParam, FAccessible)
-  else
-    inherited;
-end;
-
 function CalcShortName( LongName: string; PrevLongName: string): string;
 var
   WordBorder: integer;
@@ -5521,24 +5697,6 @@ begin
   end
   else
     Result := '';
-end;
-
-procedure TORTreeView.MakeAccessible(Accessible: IAccessible);
-begin
-  if Assigned(FAccessible) and Assigned(Accessible) then
-    raise Exception.Create(Text + ' Tree View is already Accessible!')
-  else
-  begin
-    FAccessible := Accessible;
-  end;
-end;
-
-procedure TORTreeView.WMGetObject(var Message: TMessage);
-begin
-  if (Message.LParam = integer(OBJID_CLIENT)) and Assigned(FAccessible) then
-    Message.Result := GetLResult(Message.wParam, FAccessible)
-  else
-    inherited;
 end;
 
 procedure TORTreeView.SetShortNodeCaptions(const Value: boolean);
@@ -5907,7 +6065,7 @@ begin
                 end;
               end;
             end;
-            Bitmap := GetORCBBitmap(ImgIdx);
+            Bitmap := GetORCBBitmap(ImgIdx, FBlackColorMode);
           end
           else
           begin
@@ -6049,8 +6207,10 @@ begin
           if(FWordWrap) then
             R.Top:= FocusRect.Top
           else
+          begin
             R.Top:= ((ClientHeight - Bitmap.Height + 1) div 2) - 1;
-
+            if R.Top < 0 then R.Top := 0            
+          end;
           Draw(R.Left, R.Top, Bitmap);
         end;
       finally
@@ -6141,6 +6301,15 @@ begin
     FAutoSize := Value;
     AutoAdjustSize;
     invalidate;
+  end;
+end;
+
+procedure TORCheckBox.SetBlackColorMode(Value: boolean);
+begin
+  if FBlackColorMode <> Value then
+  begin
+    FBlackColorMode := Value;
+    Invalidate;
   end;
 end;
 
@@ -6275,7 +6444,13 @@ procedure TORCheckBox.UpdateAssociate;
   begin
     if DoCtrl then
       Ctrl.Enabled := Checked;
-    if(Ctrl is TWinControl) then
+
+    // added (csAcceptsControls in Ctrl.ControlStyle) below to prevent disabling of
+    // child sub controls, like the TBitBtn in the TORComboBox.  If the combo box is
+    // already disabled, we don't want to disable the button as well - when we do, we
+    // lose the disabled glyph that is stored on that button for the combo box.
+
+    if(Ctrl is TWinControl) and (csAcceptsControls in Ctrl.ControlStyle) then
     begin
       for i := 0 to TWinControl(Ctrl).ControlCount-1 do
       begin
@@ -6499,12 +6674,25 @@ begin
     result := FCaptionComponent.Caption;
 end;
 
-procedure TCaptionListBox.MakeAccessible(Accessible: IAccessible);
+function TCaptionListBox.GetDynamicProperty(PropertyID: integer): string;
 begin
-  if Assigned(FAccessible) and Assigned(Accessible) then
-    raise Exception.Create(Caption + ' List Box is already Accessible!')
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := GetCaption
   else
-    FAccessible := Accessible;
+    Result := '';
+end;
+
+
+procedure TCaptionListBox.MoveFocusUp;
+begin
+  if ItemIndex > 0 then
+    Perform(LB_SETCARETINDEX, ItemIndex - 1, 0);
+end;
+
+procedure TCaptionListBox.MoveFocusDown;
+begin
+  if ItemIndex < (Items.Count-1) then
+    Perform(LB_SETCARETINDEX, ItemIndex + 1, 0);
 end;
 
 procedure TCaptionListBox.SetCaption(const Value: string);
@@ -6521,12 +6709,27 @@ begin
   FCaptionComponent.Caption := Value;
 end;
 
-procedure TCaptionListBox.WMGetObject(var Message: TMessage);
+function TCaptionListBox.SupportsDynamicProperty(PropertyID: integer): boolean;
 begin
-  if (Message.LParam = integer(OBJID_CLIENT)) and Assigned(FAccessible) then
-    Message.Result := GetLResult(Message.wParam, FAccessible)
-  else
-    inherited;
+  Result := (PropertyID = DynaPropAccesibilityCaption);
+end;
+
+procedure TCaptionListBox.WMKeyDown(var Message: TWMKeyDown);
+var
+  IsSelected: LongBool;
+begin
+  if Boolean(Hi(GetKeyState(VK_CONTROL))) and MultiSelect then
+    case Message.CharCode of
+      VK_SPACE:
+        begin
+          IsSelected := LongBool(Perform(LB_GETSEL, ItemIndex, 0));
+          Perform(LB_SETSEL, Longint(not IsSelected), ItemIndex);
+        end;
+      VK_LEFT, VK_UP: MoveFocusUp;
+      VK_RIGHT, VK_DOWN: MoveFocusDown;
+      else inherited;
+    end
+  else inherited;
 end;
 
 procedure TCaptionListBox.WMMouseMove(var Message: TWMMouseMove);
@@ -6590,6 +6793,14 @@ begin
     result := FCaptionComponent.Caption;
 end;
 
+function TCaptionCheckListBox.GetDynamicProperty(PropertyID: integer): string;
+begin
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := GetCaption
+  else
+    Result := '';
+end;
+
 procedure TCaptionCheckListBox.SetCaption(const Value: string);
 begin
   if not Assigned(FCaptionComponent) then begin
@@ -6604,6 +6815,12 @@ begin
   FCaptionComponent.Caption := Value;
 end;
 
+function TCaptionCheckListBox.SupportsDynamicProperty(
+  PropertyID: integer): boolean;
+begin
+  Result := (PropertyID = DynaPropAccesibilityCaption);
+end;
+
 { TCaptionMemo }
 
 function TCaptionMemo.GetCaption: string;
@@ -6612,6 +6829,14 @@ begin
     result := ''
   else
     result := FCaptionComponent.Caption;
+end;
+
+function TCaptionMemo.GetDynamicProperty(PropertyID: integer): string;
+begin
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := GetCaption
+  else
+    Result := '';
 end;
 
 procedure TCaptionMemo.SetCaption(const Value: string);
@@ -6628,6 +6853,11 @@ begin
   FCaptionComponent.Caption := Value;
 end;
 
+function TCaptionMemo.SupportsDynamicProperty(PropertyID: integer): boolean;
+begin
+  Result := (PropertyID = DynaPropAccesibilityCaption);
+end;
+
 { TCaptionEdit }
 
 function TCaptionEdit.GetCaption: string;
@@ -6636,6 +6866,14 @@ begin
     result := ''
   else
     result := FCaptionComponent.Caption;
+end;
+
+function TCaptionEdit.GetDynamicProperty(PropertyID: integer): string;
+begin
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := GetCaption
+  else
+    Result := '';
 end;
 
 procedure TCaptionEdit.SetCaption(const Value: string);
@@ -6652,22 +6890,25 @@ begin
   FCaptionComponent.Caption := Value;
 end;
 
-{ TCaptionRichEdit }
-
-procedure TCaptionRichEdit.MakeAccessible(Accessible: IAccessible);
+function TCaptionEdit.SupportsDynamicProperty(PropertyID: integer): boolean;
 begin
-  if Assigned(FAccessible) and Assigned(Accessible) then
-    raise Exception.Create(Caption + ' Rich Edit is already Accessible!')
-  else
-    FAccessible := Accessible;
+  Result := (PropertyID = DynaPropAccesibilityCaption);
 end;
 
-procedure TCaptionRichEdit.WMGetObject(var Message: TMessage);
+{ TCaptionRichEdit }
+
+function TCaptionRichEdit.GetDynamicProperty(PropertyID: integer): string;
 begin
-  if (Message.LParam = integer(OBJID_CLIENT)) and Assigned(FAccessible) then
-    Message.Result := GetLResult(Message.wParam, FAccessible)
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := FCaption
   else
-    inherited;
+    Result := '';
+end;
+
+
+function TCaptionRichEdit.SupportsDynamicProperty(PropertyID: integer): boolean;
+begin
+  Result := (PropertyID = DynaPropAccesibilityCaption);
 end;
 
 { TCaptionTreeView}
@@ -6675,6 +6916,14 @@ end;
 function TCaptionTreeView.GetCaption: string;
 begin
     result := inherited Caption;
+end;
+
+function TCaptionTreeView.GetDynamicProperty(PropertyID: integer): string;
+begin
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := GetCaption
+  else
+    Result := '';
 end;
 
 procedure TCaptionTreeView.SetCaption(const Value: string);
@@ -6692,6 +6941,11 @@ begin
   inherited Caption := Value;
 end;
 
+function TCaptionTreeView.SupportsDynamicProperty(PropertyID: integer): boolean;
+begin
+  Result := (PropertyID = DynaPropAccesibilityCaption);
+end;
+
 { TCaptionComboBox }
 
 function TCaptionComboBox.GetCaption: string;
@@ -6700,6 +6954,14 @@ begin
     result := ''
   else
     result := FCaptionComponent.Caption;
+end;
+
+function TCaptionComboBox.GetDynamicProperty(PropertyID: integer): string;
+begin
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := GetCaption
+  else
+    Result := '';
 end;
 
 procedure TCaptionComboBox.SetCaption(const Value: string);
@@ -6714,6 +6976,11 @@ begin
     FCaptionComponent.BringToFront;
   end;
   FCaptionComponent.Caption := Value;
+end;
+
+function TCaptionComboBox.SupportsDynamicProperty(PropertyID: integer): boolean;
+begin
+  Result := (PropertyID = DynaPropAccesibilityCaption);
 end;
 
 { TORAlignSpeedButton }
@@ -6743,6 +7010,14 @@ begin
       (Col - FixedCols) + 1;
 end;
 
+function TCaptionStringGrid.GetDynamicProperty(PropertyID: integer): string;
+begin
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := FCaption
+  else
+    Result := '';
+end;
+
 procedure TCaptionStringGrid.IndexToColRow(index: integer; var Col,
   Row: integer);
 begin
@@ -6760,20 +7035,11 @@ begin
       ColRowToIndex(Col,Row));
 end;
 
-procedure TCaptionStringGrid.MakeAccessible(Accessible: IAccessible);
-begin
-  if Assigned(FAccessible) and Assigned(Accessible) then
-    raise Exception.Create(Caption + 'String Grid is already Accessible!')
-  else
-    FAccessible := Accessible;
-end;
 
-procedure TCaptionStringGrid.WMGetObject(var Message: TMessage);
+function TCaptionStringGrid.SupportsDynamicProperty(
+  PropertyID: integer): boolean;
 begin
-  if (Message.LParam = integer(OBJID_CLIENT)) and Assigned(FAccessible) then
-    Message.Result := GetLResult(Message.wParam, FAccessible)
-  else
-    inherited;
+  Result := (PropertyID = DynaPropAccesibilityCaption);
 end;
 
 function IsAMouseButtonDown : boolean;
@@ -6809,9 +7075,10 @@ begin
   Result := SelectIndex;
     if LongList then
     begin
-      //Currently Do nothing for LongLists
-     { if CompareText(iText, Copy(DisplayText[SelectIndex+1], 1, Length(iText))) = 0 then
-        Result := -1;}
+      //Implemented for CQ: 10092, PSI-04-057
+      //asume long lists are alphabetically ordered...
+      if CompareText(iText, Copy(DisplayText[SelectIndex+1], 1, Length(iText))) = 0 then
+        Result := -1;
     end
     else //Not a LongList
     begin
@@ -6833,6 +7100,21 @@ begin
   Text := TextToMatch;
   SelStart := Length(Text);
   FwdChangeDelayed;
+end;
+
+{ TCaptionListView }
+
+function TCaptionListView.GetDynamicProperty(PropertyID: integer): string;
+begin
+  if PropertyID = DynaPropAccesibilityCaption then
+    Result := Caption
+  else
+    Result := '';
+end;
+
+function TCaptionListView.SupportsDynamicProperty(PropertyID: integer): boolean;
+begin
+  Result := (PropertyID = DynaPropAccesibilityCaption);
 end;
 
 initialization

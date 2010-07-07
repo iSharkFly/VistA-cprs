@@ -30,6 +30,7 @@ type
    PtEnvironmental:boolean;
    PtHNC:boolean;
    PtMST:boolean;
+   PtSHAD:boolean;
    constructor Create(Alist:TStringList);
    function GetGMPDFN(dfn:string;name:String):string;
  public
@@ -110,6 +111,7 @@ end;
      FBAFactorEC        : string;
      FBAFactorHNC       : string;
      FBAFactorCV        : string;
+     FBAFactorSHAD       : string;
   end;
 
   TBAPLFactorsIN = class(TOBject)
@@ -130,6 +132,7 @@ end;
      CB_MST             :string;
      CB_HNC             :string;
      CB_CV              :string;
+     CB_SHAD             :string;
   end;
 
 procedure PutBADxListForOrder(var thisRecord: TBADxRecord; thisOrderID: string); //BAPHII 1.3.1
@@ -204,11 +207,10 @@ var
   Dx4               : string;
   TFactors          : string;
   SC,AO,IR          : string;
-  MST,HNC,CV,EC     : string;
+  MST,HNC,CV,SHD,EC : string;
   PLFactorsIndexes  : TStringList;
   BAHoldPrimaryDx   : string;     //  used to verify primart dx has been changed.
   BAPrimaryDxChanged: boolean;
-//  OrdersReqDxLst    : TStringList;  // List of selected Orders flagged collect DX Y/N
   NonBillableOrderList : TStringList;  // contains reference to those selected orders that are non billable
   OrderListSCEI    : TSTringList;  //   OrderID Exists SCEI are required.
   UnsignedOrders   : TStringList;  //    List of Orders from fReview when "don't sign" action
@@ -219,12 +221,12 @@ var
   BAConsultPLFlags: TStringList;  // orderid^flags contains TF's if dx is selected from Problem list and Problem had TF associated.
   BAFWarningShown: boolean;       // flag used to determine if Inactive ICD Code has been shown.
   BAPersonalDX:  boolean;
-//  BAConsultOrdersRequireDx: TStringList; //orderid  -  if orderid exists - consult order that requires dx...
   BADeltedOrders: TStringList;
 
 implementation
 
-uses fBALocalDiagnoses, fOrdersSign, fReview, uCore, rCore, rPCE,uPCE, UBAConst, UBAMessages, UBACore;
+uses fBALocalDiagnoses, fOrdersSign, fReview, uCore, rCore, rPCE,uPCE, UBAConst, UBAMessages, UBACore,
+  VAUtils;
 
 procedure RemoveOrderFromDxList(thisOrderID: string);
 {
@@ -389,7 +391,7 @@ begin
      except
         on EListError do
            begin
-           {$ifdef debug}ShowMessage('EListError in UBAGlobals.PutBADxListForOrder()');{$endif}
+           {$ifdef debug}ShowMsg('EListError in UBAGlobals.PutBADxListForOrder()');{$endif}
            raise;
            end;
      end;
@@ -488,7 +490,7 @@ begin
                        except
                            on EListError do
                              begin
-                              {$ifdef debug}ShowMessage('EListError in UBAGlobals.AllSelectedDxBlank() - F_ORDERS_SIGN');{$endif}
+                              {$ifdef debug}ShowMsg('EListError in UBAGlobals.AllSelectedDxBlank() - F_ORDERS_SIGN');{$endif}
                               raise;
                              end;
                        end;
@@ -505,7 +507,7 @@ begin
                        except
                            on EListError do
                              begin
-                              {$ifdef debug}ShowMessage('EListError in UBAGlobals.AllSelectedDxBlank() - F_REVIEW');{$endif}
+                              {$ifdef debug}ShowMsg('EListError in UBAGlobals.AllSelectedDxBlank() - F_REVIEW');{$endif}
                               raise;
                              end;
                        end;
@@ -533,7 +535,7 @@ begin
   except
       on EListError do
         begin
-         {$ifdef debug}ShowMessage('EListError in UBAGlobals.GetDxNodeIndex()');{$endif}
+         {$ifdef debug}ShowMsg('EListError in UBAGlobals.GetDxNodeIndex()');{$endif}
          raise;
         end;
   end;
@@ -564,7 +566,7 @@ begin
   except
       on EListError do
         begin
-         {$ifdef debug}ShowMessage('EListError in UBAGlobals.DiagnosesMatch()');{$endif}
+         {$ifdef debug}ShowMsg('EListError in UBAGlobals.DiagnosesMatch()');{$endif}
          raise;
         end;
   end;
@@ -587,7 +589,7 @@ begin
                        except
                           on EListError do
                              begin
-                             {$ifdef debug}ShowMessage('EListError in UBAGlobals.CountSelectedOrders() - F_ORDERS_SIGN');{$endif}
+                             {$ifdef debug}ShowMsg('EListError in UBAGlobals.CountSelectedOrders() - F_ORDERS_SIGN');{$endif}
                              raise;
                              end;
                        end;
@@ -600,7 +602,7 @@ begin
                        except
                           on EListError do
                              begin
-                             {$ifdef debug}ShowMessage('EListError in UBAGlobals.CountSelectedOrders() - F_REVIEW');{$endif}
+                             {$ifdef debug}ShowMsg('EListError in UBAGlobals.CountSelectedOrders() - F_REVIEW');{$endif}
                              raise;
                              end;
                        end;
@@ -642,7 +644,7 @@ begin
                        except
                           on EListError do
                              begin
-                             {$ifdef debug}ShowMessage('EListError in UBAGlobals.CompareOrderDx() - F_ORDERS_SIGN');{$endif}
+                             {$ifdef debug}ShowMsg('EListError in UBAGlobals.CompareOrderDx() - F_ORDERS_SIGN');{$endif}
                              raise;
                              end;
                        end;
@@ -658,7 +660,7 @@ begin
                        except
                           on EListError do
                              begin
-                             {$ifdef debug}ShowMessage('EListError in UBAGlobals.CompareOrderDx() - F_REVIEW');{$endif}
+                             {$ifdef debug}ShowMsg('EListError in UBAGlobals.CompareOrderDx() - F_REVIEW');{$endif}
                              raise;
                              end;
                        end;
@@ -703,7 +705,7 @@ begin
                        except
                           on EListError do
                              begin
-                             {$ifdef debug}ShowMessage('EListError in UBAGlobals.CompareOrderDx() - F_ORDERS_SIGN');{$endif}
+                             {$ifdef debug}ShowMsg('EListError in UBAGlobals.CompareOrderDx() - F_ORDERS_SIGN');{$endif}
                              raise;
                              end;
                        end;
@@ -735,7 +737,7 @@ begin
                           except
                           on EListError do
                              begin
-                             {$ifdef debug}ShowMessage('EListError in UBAGlobals.CompareOrderDx() - F_REVIEW');{$endif}
+                             {$ifdef debug}ShowMsg('EListError in UBAGlobals.CompareOrderDx() - F_REVIEW');{$endif}
                              raise;
                              end;
                           end;
@@ -857,7 +859,7 @@ begin
            except
               on EListError do
                  begin
-                 {$ifdef debug}ShowMessage('EListError in UBAGlobals.SetBADxListForOrder()');{$endif}
+                 {$ifdef debug}ShowMsg('EListError in UBAGlobals.SetBADxListForOrder()');{$endif}
                  raise;
                  end;
            end;
@@ -889,7 +891,7 @@ begin
      except
         on EListError do
            begin
-           {$ifdef debug}ShowMessage('EListError in UBAGlobals.SecondaryDxFull()');{$endif}
+           {$ifdef debug}ShowMsg('EListError in UBAGlobals.SecondaryDxFull()');{$endif}
            raise;
            end;
      end;
@@ -922,7 +924,7 @@ begin
   except
      on EListError do
         begin
-        {$ifdef debug}ShowMessage('EListError in UBAGlobals.AddSecondaryDx()');{$endif}
+        {$ifdef debug}ShowMsg('EListError in UBAGlobals.AddSecondaryDx()');{$endif}
         raise;
         end;
   end;
@@ -1067,6 +1069,7 @@ begin
       6: PtBID              := Alist[i];
       7: PtHNC              := (AList[i] = '1');
       8: PtMST              := (AList[i] = '1');
+      9: PtSHAD              := (AList[i] = '1');
     end;
 end;
 
@@ -1077,7 +1080,7 @@ end;
 
 procedure TBAPLPt.LoadPatientParams(AList:TstringList);
 begin
-  AList.Assign(rpcInitPt(Patient.DFN));
+  FastAssign(rpcInitPt(Patient.DFN), AList);
   BAPLPt := TBAPLPt.create(Alist);
 end;
 
@@ -1110,7 +1113,7 @@ begin
      except
         on EListError do
            begin
-           {$ifdef debug}ShowMessage('EListError in UBAGlobals.tempDxNodeExists()');{$endif}
+           {$ifdef debug}ShowMsg('EListError in UBAGlobals.tempDxNodeExists()');{$endif}
            raise;
            end;
      end;
@@ -1158,7 +1161,6 @@ Initialization
   BAConsultPLFlags     := TStringList.Create;
   BANurseConsultOrders := TStringList.Create;
   BADeltedOrders       := TStringList.Create;
- // BAConsultOrdersRequireDx := TStringList.Create;
   BAConsultDxList.Clear;
   NonBillableOrderList.Clear;
   OrderListSCEI.Clear;
@@ -1174,8 +1176,7 @@ Initialization
   BAPCEDiagList.Clear;
   BANurseConsultOrders.Clear;
   BADeltedOrders.Clear;
-  //BAConsultOrdersRequireDx.Clear;
- 
+
 end.
 
 

@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORCtrls, OrFn, ComCtrls;
+  StdCtrls, ExtCtrls, ORCtrls, OrFn, ComCtrls, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOptionsPatientSelection = class(TForm)
+  TfrmOptionsPatientSelection = class(TfrmBase508Form)
     pnlBottom: TPanel;
     btnOK: TButton;
     btnCancel: TButton;

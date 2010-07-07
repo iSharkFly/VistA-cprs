@@ -1,13 +1,15 @@
 inherited frmAlertOrders: TfrmAlertOrders
   Left = 374
   Top = 193
-  Height = 278
   Caption = 'Alert when Results Available'
+  ClientHeight = 251
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 320
+  ExplicitHeight = 278
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TLabel [0]
     Left = 8
     Top = 8
     Width = 297
@@ -16,14 +18,14 @@ inherited frmAlertOrders: TfrmAlertOrders
       'The following orders will send alerts when results are available' +
       ' -'
   end
-  object lblAlertRecipient: TLabel
+  object lblAlertRecipient: TLabel [1]
     Left = 8
     Top = 208
     Width = 72
     Height = 13
     Caption = 'Alert Recipient:'
   end
-  object lstOrders: TCaptionListBox
+  object lstOrders: TCaptionListBox [2]
     Left = 8
     Top = 22
     Width = 411
@@ -34,7 +36,7 @@ inherited frmAlertOrders: TfrmAlertOrders
       'The following orders will send alerts when results are available' +
       ' -'
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [3]
     Left = 267
     Top = 222
     Width = 72
@@ -44,7 +46,7 @@ inherited frmAlertOrders: TfrmAlertOrders
     TabOrder = 2
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [4]
     Left = 347
     Top = 222
     Width = 72
@@ -54,7 +56,7 @@ inherited frmAlertOrders: TfrmAlertOrders
     TabOrder = 3
     OnClick = cmdCancelClick
   end
-  object cboAlertRecipient: TORComboBox
+  object cboAlertRecipient: TORComboBox [5]
     Left = 7
     Top = 226
     Width = 226
@@ -78,5 +80,24 @@ inherited frmAlertOrders: TfrmAlertOrders
     TabOrder = 1
     OnExit = cboOnExit
     OnNeedData = cboAlertRecipientNeedData
+    CharsNeedMatch = 1
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lstOrders'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cboAlertRecipient'
+        'Status = stsDefault')
+      (
+        'Component = frmAlertOrders'
+        'Status = stsDefault'))
   end
 end

@@ -2,8 +2,8 @@ inherited frmPCEBaseMain: TfrmPCEBaseMain
   Left = 302
   Top = 166
   Caption = 'frmPCEBaseMain'
-  OnDestroy = FormDestroy
-  OnResize = FormResize
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
   object lblSection: TLabel [0]
@@ -36,26 +36,32 @@ inherited frmPCEBaseMain: TfrmPCEBaseMain
   inherited btnOK: TBitBtn
     Left = 464
     TabOrder = 1
+    ExplicitLeft = 464
   end
   inherited btnCancel: TBitBtn
     Left = 544
     TabOrder = 2
+    ExplicitLeft = 544
   end
   inherited pnlGrid: TPanel
     Width = 475
     TabOrder = 0
+    ExplicitWidth = 475
     inherited lbGrid: TORListBox
       Width = 475
       MultiSelect = True
       OnClick = lbGridSelect
+      OnExit = lbGridExit
       OnChange = lbGridSelect
       CheckEntireLine = True
+      ExplicitWidth = 475
     end
     inherited hcGrid: THeaderControl
       Width = 475
+      ExplicitWidth = 475
     end
   end
-  object edtComment: TCaptionEdit
+  object edtComment: TCaptionEdit [7]
     Left = 6
     Top = 343
     Width = 523
@@ -66,7 +72,7 @@ inherited frmPCEBaseMain: TfrmPCEBaseMain
     OnKeyPress = edtCommentKeyPress
     Caption = 'Comments'
   end
-  object btnRemove: TButton
+  object btnRemove: TButton [8]
     Left = 536
     Top = 343
     Width = 75
@@ -75,7 +81,7 @@ inherited frmPCEBaseMain: TfrmPCEBaseMain
     TabOrder = 4
     OnClick = btnRemoveClick
   end
-  object btnSelectAll: TButton
+  object btnSelectAll: TButton [9]
     Left = 406
     Top = 326
     Width = 75
@@ -85,7 +91,7 @@ inherited frmPCEBaseMain: TfrmPCEBaseMain
     TabStop = False
     OnClick = btnSelectAllClick
   end
-  object pnlMain: TPanel
+  object pnlMain: TPanel [10]
     Left = 6
     Top = 20
     Width = 612
@@ -96,9 +102,7 @@ inherited frmPCEBaseMain: TfrmPCEBaseMain
     object splLeft: TSplitter
       Left = 204
       Top = 0
-      Width = 3
       Height = 204
-      Cursor = crHSplit
       OnMoved = splLeftMoved
     end
     object lbxSection: TORListBox
@@ -114,6 +118,7 @@ inherited frmPCEBaseMain: TfrmPCEBaseMain
       ShowHint = True
       TabOrder = 1
       OnClick = clbListClick
+      OnExit = lbxSectionExit
       OnMouseDown = clbListMouseDown
       Caption = 'Section Name'
       ItemTipColor = clWindow
@@ -146,11 +151,14 @@ inherited frmPCEBaseMain: TfrmPCEBaseMain
         ShowHint = True
         TabOrder = 1
         OnClick = lbSectionClick
+        OnExit = lbSectionExit
         Caption = 'Section'
         ItemTipColor = clWindow
         LongList = False
         Pieces = '3'
         CheckEntireLine = True
+        ExplicitLeft = -3
+        ExplicitTop = -2
       end
       object btnOther: TButton
         Left = 65
@@ -161,7 +169,58 @@ inherited frmPCEBaseMain: TfrmPCEBaseMain
         Caption = 'Other'
         TabOrder = 0
         OnClick = btnOtherClick
+        OnExit = btnOtherExit
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Left = 24
+    Top = 24
+    Data = (
+      (
+        'Component = edtComment'
+        'Label = lblComment'
+        'Status = stsOK')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = btnSelectAll'
+        'Status = stsDefault')
+      (
+        'Component = pnlMain'
+        'Status = stsDefault')
+      (
+        'Component = lbxSection'
+        'Label = lblList'
+        'Status = stsOK')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = lbSection'
+        'Label = lblSection'
+        'Status = stsOK')
+      (
+        'Component = btnOther'
+        'Status = stsDefault')
+      (
+        'Component = pnlGrid'
+        'Status = stsDefault')
+      (
+        'Component = lbGrid'
+        'Status = stsDefault')
+      (
+        'Component = hcGrid'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmPCEBaseMain'
+        'Status = stsDefault'))
   end
 end

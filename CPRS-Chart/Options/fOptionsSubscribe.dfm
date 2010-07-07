@@ -1,4 +1,4 @@
-object frmOptionsSubscribe: TfrmOptionsSubscribe
+inherited frmOptionsSubscribe: TfrmOptionsSubscribe
   Left = 309
   Top = 103
   BorderIcons = [biSystemMenu, biHelp]
@@ -6,18 +6,11 @@ object frmOptionsSubscribe: TfrmOptionsSubscribe
   Caption = 'Subscribe to a Team'
   ClientHeight = 216
   ClientWidth = 302
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   HelpFile = 'CPRSWT.HLP'
-  OldCreateOrder = False
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [0]
     Left = 0
     Top = 184
     Width = 302
@@ -55,5 +48,20 @@ object frmOptionsSubscribe: TfrmOptionsSubscribe
       ModalResult = 2
       TabOrder = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsSubscribe'
+        'Status = stsDefault'))
   end
 end

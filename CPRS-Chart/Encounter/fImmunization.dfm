@@ -2,6 +2,8 @@ inherited frmImmunizations: TfrmImmunizations
   Left = 373
   Top = 169
   Caption = 'Encouner Immunization'
+  ExplicitLeft = 373
+  ExplicitTop = 169
   PixelsPerInch = 96
   TextHeight = 13
   object lblReaction: TLabel [0]
@@ -21,6 +23,7 @@ inherited frmImmunizations: TfrmImmunizations
   inherited lblSection: TLabel
     Width = 100
     Caption = 'Immunization Section'
+    ExplicitWidth = 100
   end
   object lblContra: TLabel [6]
     Left = 509
@@ -74,6 +77,67 @@ inherited frmImmunizations: TfrmImmunizations
   inherited edtComment: TCaptionEdit
     TabOrder = 3
   end
+  object cboImmReaction: TORComboBox [11]
+    Tag = 20
+    Left = 490
+    Top = 288
+    Width = 121
+    Height = 21
+    Style = orcsDropDown
+    AutoSelect = True
+    Caption = 'Reaction'
+    Color = clWindow
+    DropDownCount = 8
+    Enabled = False
+    ItemHeight = 13
+    ItemTipColor = clWindow
+    ItemTipEnable = True
+    ListItemsOnly = False
+    LongList = False
+    LookupPiece = 0
+    MaxLength = 0
+    Pieces = '2'
+    Sorted = False
+    SynonymChars = '<>'
+    TabOrder = 5
+    OnChange = cboImmReactionChange
+    CharsNeedMatch = 1
+  end
+  object cboImmSeries: TORComboBox [12]
+    Tag = 10
+    Left = 490
+    Top = 250
+    Width = 121
+    Height = 21
+    Style = orcsDropDown
+    AutoSelect = True
+    Caption = 'Series'
+    Color = clWindow
+    DropDownCount = 8
+    Enabled = False
+    ItemHeight = 13
+    ItemTipColor = clWindow
+    ItemTipEnable = True
+    ListItemsOnly = False
+    LongList = False
+    LookupPiece = 0
+    MaxLength = 0
+    Pieces = '2'
+    Sorted = False
+    SynonymChars = '<>'
+    TabOrder = 4
+    OnChange = cboImmSeriesChange
+    CharsNeedMatch = 1
+  end
+  object ckbContra: TCheckBox [13]
+    Left = 490
+    Top = 319
+    Width = 13
+    Height = 13
+    Enabled = False
+    TabOrder = 6
+    OnClick = ckbContraClick
+  end
   inherited btnRemove: TButton
     TabOrder = 7
   end
@@ -99,61 +163,63 @@ inherited frmImmunizations: TfrmImmunizations
       end
     end
   end
-  object cboImmReaction: TORComboBox
-    Tag = 20
-    Left = 490
-    Top = 288
-    Width = 121
-    Height = 21
-    Style = orcsDropDown
-    AutoSelect = True
-    Caption = 'Reaction'
-    Color = clWindow
-    DropDownCount = 8
-    Enabled = False
-    ItemHeight = 13
-    ItemTipColor = clWindow
-    ItemTipEnable = True
-    ListItemsOnly = False
-    LongList = False
-    MaxLength = 0
-    Pieces = '2'
-    Sorted = False
-    SynonymChars = '<>'
-    TabOrder = 5
-    OnChange = cboImmReactionChange
-  end
-  object cboImmSeries: TORComboBox
-    Tag = 10
-    Left = 490
-    Top = 250
-    Width = 121
-    Height = 21
-    Style = orcsDropDown
-    AutoSelect = True
-    Caption = 'Series'
-    Color = clWindow
-    DropDownCount = 8
-    Enabled = False
-    ItemHeight = 13
-    ItemTipColor = clWindow
-    ItemTipEnable = True
-    ListItemsOnly = False
-    LongList = False
-    MaxLength = 0
-    Pieces = '2'
-    Sorted = False
-    SynonymChars = '<>'
-    TabOrder = 4
-    OnChange = cboImmSeriesChange
-  end
-  object ckbContra: TCheckBox
-    Left = 490
-    Top = 319
-    Width = 13
-    Height = 13
-    Enabled = False
-    TabOrder = 6
-    OnClick = ckbContraClick
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cboImmReaction'
+        'Label = lblReaction'
+        'Status = stsOK')
+      (
+        'Component = cboImmSeries'
+        'Label = lblSeries'
+        'Status = stsOK')
+      (
+        'Component = ckbContra'
+        'Status = stsDefault')
+      (
+        'Component = edtComment'
+        'Label = lblComment'
+        'Status = stsOK')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = btnSelectAll'
+        'Status = stsDefault')
+      (
+        'Component = pnlMain'
+        'Status = stsDefault')
+      (
+        'Component = lbxSection'
+        'Label = lblList'
+        'Status = stsOK')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = lbSection'
+        'Label = lblSection'
+        'Status = stsOK')
+      (
+        'Component = btnOther'
+        'Status = stsDefault')
+      (
+        'Component = pnlGrid'
+        'Status = stsDefault')
+      (
+        'Component = lbGrid'
+        'Status = stsDefault')
+      (
+        'Component = hcGrid'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmImmunizations'
+        'Status = stsDefault'))
   end
 end

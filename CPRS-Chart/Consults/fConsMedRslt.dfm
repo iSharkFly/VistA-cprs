@@ -1,22 +1,16 @@
-object frmConsMedRslt: TfrmConsMedRslt
+inherited frmConsMedRslt: TfrmConsMedRslt
   Left = 468
   Top = 172
   BorderStyle = bsDialog
   Caption = 'Select Medicine Result'
   ClientHeight = 242
   ClientWidth = 505
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = True
   Position = poScreenCenter
-  OnDestroy = FormDestroy
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 505
@@ -177,6 +171,37 @@ object frmConsMedRslt: TfrmConsMedRslt
       SynonymChars = '<>'
       TabOrder = 3
       OnNeedData = NewPersonNeedData
+      CharsNeedMatch = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = lstMedResults'
+        'Status = stsDefault')
+      (
+        'Component = cmdDetails'
+        'Status = stsDefault')
+      (
+        'Component = ckAlert'
+        'Status = stsDefault')
+      (
+        'Component = calDateofAction'
+        'Status = stsDefault')
+      (
+        'Component = cboPerson'
+        'Status = stsDefault')
+      (
+        'Component = frmConsMedRslt'
+        'Status = stsDefault'))
   end
 end

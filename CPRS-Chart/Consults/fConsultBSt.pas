@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, ORCtrls, StdCtrls, ORFn, uConsults;
+  ExtCtrls, ORCtrls, StdCtrls, ORFn, uConsults, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmConsultsByStatus = class(TForm)
+  TfrmConsultsByStatus = class(TfrmBase508Form)
     pnlBase: TORAutoPanel;
     lblStatus: TLabel;
     radSort: TRadioGroup;
@@ -61,7 +62,7 @@ begin
       ClientHeight := H; pnlBase.Height := H;
       FChanged := False;
       with radSort do {if SortConsultsAscending then ItemIndex := 0 else} ItemIndex := 1;
-      lstStatus.Items.Assign(SubSetOfStatus);
+      FastAssign(SubSetOfStatus, lstStatus.Items);
       CurrentStatus := CurrentContext.Status;
       if CurrentStatus <> '' then with lstStatus do
         begin

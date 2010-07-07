@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, ORCtrls, StdCtrls, ORFn, ComCtrls, uConsults;
+  ExtCtrls, ORCtrls, StdCtrls, ORFn, ComCtrls, uConsults, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmConsultsByService = class(TForm)
+  TfrmConsultsByService = class(TfrmBase508Form)
     pnlBase: TORAutoPanel;
     lblService: TLabel;
     radSort: TRadioGroup;
@@ -70,8 +71,8 @@ begin
       ClientWidth  := W; pnlBase.Width  := W;
       ClientHeight := H; pnlBase.Height := H;
       FChanged := False;
-      //SvcList.Assign(LoadServiceList(CN_SVC_LIST_DISP));                         {RV}
-      SvcList.Assign(LoadServiceListWithSynonyms(CN_SVC_LIST_DISP));             {RV}
+      //FastAssign(LoadServiceList(CN_SVC_LIST_DISP), SvcList);                         {RV}
+      FastAssign(LoadServiceListWithSynonyms(CN_SVC_LIST_DISP), SvcList);             {RV}
       SortByPiece(TStringList(SvcList), U, 2);                                   {RV}
       for i := 0 to SvcList.Count - 1 do
         if cboService.Items.IndexOf(Trim(Piece(SvcList.Strings[i], U, 2))) = -1 then   {RV}

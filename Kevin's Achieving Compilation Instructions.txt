@@ -1,0 +1,54 @@
+Attempts at getting WV_CPRS_V27 (OR_3_243V27) up and compiling in Delphi Dev Studio 2006
+
+June, 2010
+
+Copied source to:
+p:\vista\CPRS-WV_OFFICIAL_RELEASE-27
+
+Menu: Component\Install Packages --> Add ...
+  Browse to Packages folder
+  Don't add the file names that have *60.bpl 
+	Don't add VA10.bpl
+	Don't add Borland.bpl
+  Add:
+	Borland2006.bpl
+	ORCtrlLib2006.bpl	
+	ORDateLib2006.bpl
+	VA508Access2006
+	VA2006.bpl
+	VAShared2006
+	XWB_D10.bpl
+
+Then found:  .\VA\VAShared2006.dpk
+I suspect this is a combination of needed files. It opens, but I can't find how to install it.
+
+So I closed this.
+
+Opened up CPRSChart.dpr
+Attempted compile.
+Got error of missing ORSystem.dcu
+
+Open project options.
+Go to Directories and Conditionals
+  Change the Unit Output Directory to the DCU folder.
+  Change the Search Path so that is searches in:
+    CPRS folder
+    CPRSLib folder
+    WVEHR-Lib folder
+  Change the Packages output folder to 
+
+Compile attempt again.  This time is is missing TRPCB.dcu
+  In my other instances of compiling CPRS, I have always had the BDK32 folder in with the CPRS source. This is the RPC Broker.  It does not appear to be included anywhere in the source tree.
+  A file search shows that it is in the DCU folder.  So back to the Options and include the DCU folder in the search path.
+
+Compile attempt again.  Compiles much further.  Now error of multiple missing *.dfm files.  
+  First missing one is. fDebugInfo.DFM.  A filesystem search doesn't find it.  
+  A search for *.dfm reveals many files, but not the ones I need.
+  Looking closer, the missing .dfm files are all related to the debugger.
+  So I think this is a problem of the compiler wanting to recompile the TRPCB.dcu.
+
+  So I am going to take a chance and copy over the BDK32 directory into the source tree and add it to the search path and see if that works.  I put it at the same level as the CPRS-Lib, VA, DCU etc folders.  I deleted the \BDK32\D7 folder.  Added \BDK32\Source to search path.
+
+Compile attempt again..
+
+Success!!

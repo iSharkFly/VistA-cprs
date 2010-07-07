@@ -1,6 +1,7 @@
 unit ORSystem;
 
 {$O-}
+{$WARN SYMBOL_PLATFORM OFF}
 
 interface
 
@@ -18,18 +19,6 @@ const
   CPRS_USER_LAST = 'Software\Vista\CPRS\LastUpdate';
   CPRS_LAST_DATE = 'Software\Vista\CPRS\DateUpdated';
 
-  { values that can be passed to FileVersionValue }
-  FILE_VER_COMPANYNAME      = '\StringFileInfo\040904E4\CompanyName';
-  FILE_VER_FILEDESCRIPTION  = '\StringFileInfo\040904E4\FileDescription';
-  FILE_VER_FILEVERSION      = '\StringFileInfo\040904E4\FileVersion';
-  FILE_VER_INTERNALNAME     = '\StringFileInfo\040904E4\InternalName';
-  FILE_VER_LEGALCOPYRIGHT   = '\StringFileInfo\040904E4\LegalCopyright';
-  FILE_VER_ORIGINALFILENAME = '\StringFileInfo\040904E4\OriginalFilename';
-  FILE_VER_PRODUCTNAME      = '\StringFileInfo\040904E4\ProductName';
-  FILE_VER_PRODUCTVERSION   = '\StringFileInfo\040904E4\ProductVersion';
-  FILE_VER_COMMENTS         = '\StringFileInfo\040904E4\Comments';
-
-
 function AppOutOfDate(AppName: string): Boolean;
 function ClientVersion(const AFileName: string): string;
 function CompareVersion(const A, B: string): Integer;
@@ -39,7 +28,6 @@ procedure CopyLastWriteTime(const Source, Dest: string);
 procedure Delay(i: Integer);
 //procedure FileCopy(const FromFileName, ToFileName: string);
 //procedure FileCopyWithDate(const FromFileName, ToFileName: string);
-function FileVersionValue(const AFileName, AValueName: string): string;
 function FullToFilePart(const AFileName: string): string;
 function FullToPathPart(const AFileName: string): string;
 function IsWin95Style: Boolean;
@@ -59,6 +47,7 @@ function UserRegReadInt(const AKey, AName: string): Integer;
 procedure UserRegWriteInt(const AKey, AName: string; AValue: Integer);
 procedure RunProgram(const AppName: string);
 function UpdateSelf: Boolean;
+function BorlandDLLVersionOK: boolean;
 
 implementation
 
@@ -109,7 +98,17 @@ begin
   if (Length(x) > 0) and (CompareText(x, FullToPathPart(AppName)) <> 0) then Exit;
   // check for different file date in the gold directory
   GoldName := RegReadStr(CPRS_REG_GOLD);
-  if Length(GoldName) = 0 then Exit;
+  if (Length(GoldName) = 0)  then exit;
+  if not DirectoryExists(GoldName) then
+  begin
+    if Pos('"', Goldname) > 0 then
+    begin
+      Goldname := Copy(GoldName, 2, MaxInt);
+      if Pos('"', Goldname) > 0 then
+        Goldname := Copy(GoldName, 1, Length(GoldName) - 1);
+    end;
+  end;
+  if (not DirectoryExists(GoldName)) then Exit;
   GoldName := GoldName + FullToFilePart(AppName);
   if FileExists(GoldName) then
   begin
@@ -138,30 +137,6 @@ begin
                                                      IntToStr(LOWORD(dwFileVersionMS)) + '.' +
                                                      IntToStr(HIWORD(dwFileVersionLS)) + '.' +
                                                      IntToStr(LOWORD(dwFileVersionLS));
-  end;
-end;
-
-function FileVersionValue(const AFileName, AValueName: string): string;
-type
-  PValBuf = ^TValBuf;
-  TValBuf = array[0..255] of Char;
-var
-  VerSize, ValSize, AHandle: DWORD;
-  VerBuf: Pointer;
-  ValBuf: PValBuf;
-begin
-  Result := '';
-  VerSize:=GetFileVersionInfoSize(PChar(AFileName), AHandle);
-  if VerSize > 0 then
-  begin
-    GetMem(VerBuf, VerSize);
-    try
-      GetFileVersionInfo(PChar(AFileName), AHandle, VerSize, VerBuf);
-      VerQueryValue(VerBuf, PChar(AValueName), Pointer(ValBuf), ValSize);
-      SetString(Result, ValBuf^, ValSize);
-    finally
-      FreeMem(VerBuf);
-    end;
   end;
 end;
 
@@ -549,5 +524,38 @@ begin
   CopyFileWithDate(GoldName, AppName);
 end;
 *)
+
+function BorlandDLLVersionOK: boolean;
+const
+  DLL_CURRENT_VERSION = 10;
+  TC_DLL_ERR   = 'ERROR - BORLNDMM.DLL';
+  TX_NO_RUN    = 'This version of CPRS is unable to run because' + CRLF;
+  TX_NO_DLL    = 'no copy of BORLNDMM.DLL can be found' + CRLF +
+                 'in your workstation''s current PATH.';
+  TX_OLD_DLL1  = 'the copy of BORLNDMM.DLL located at:' + CRLF + CRLF;
+  TX_OLD_DLL2  = CRLF + CRLF + 'is out of date  (Version ';
+  TX_CALL_IRM  = CRLF + CRLF +'Please contact IRM for assistance.';
+var
+  DLLHandle: HMODULE;
+  DLLNamePath: array[0..261] of Char;
+  DLLVersion: string;
+begin
+  Result := TRUE;
+  DLLHandle := GetModuleHandle('BORLNDMM.DLL');
+  if DLLHandle <=0 then
+  begin
+    InfoBox(TX_NO_RUN + TX_NO_DLL + TX_CALL_IRM, TC_DLL_ERR, MB_ICONERROR or MB_OK);
+    Result := FALSE;
+    Exit;
+  end;
+  Windows.GetModuleFileName(DLLHandle, DLLNamePath, 261);
+  DLLVersion := ClientVersion(DLLNamePath);
+  if StrToIntDef(Piece(DLLVersion, '.', 1), 0) < DLL_CURRENT_VERSION then
+  begin
+    InfoBox(TX_NO_RUN + TX_OLD_DLL1 + '   ' + DLLNamePath + TX_OLD_DLL2 + DLLVersion + ')' +
+            TX_CALL_IRM, TC_DLL_ERR, MB_ICONERROR or MB_OK);
+    Result := false;
+  end;
+end;
 
 end.

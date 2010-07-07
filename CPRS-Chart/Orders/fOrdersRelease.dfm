@@ -1,13 +1,16 @@
 inherited frmReleaseOrders: TfrmReleaseOrders
   Left = 318
   Top = 186
-  Height = 370
   Caption = 'Release Orders to Service(s)'
+  ClientHeight = 343
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitLeft = 318
+  ExplicitTop = 186
+  ExplicitHeight = 377
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
+  object Panel1: TPanel [0]
     Left = 0
     Top = 0
     Width = 427
@@ -28,6 +31,7 @@ inherited frmReleaseOrders: TfrmReleaseOrders
       Height = 13
       Align = alTop
       Caption = 'The following orders will be released -'
+      ExplicitWidth = 176
     end
     object lstOrders: TCaptionListBox
       Left = 1
@@ -44,14 +48,12 @@ inherited frmReleaseOrders: TfrmReleaseOrders
       Caption = 'The following orders will be released '
     end
   end
-  object Panel2: TPanel
+  object Panel2: TPanel [1]
     Left = 0
     Top = 296
     Width = 427
     Height = 47
     Align = alBottom
-    BiDiMode = bdRightToLeft
-    ParentBiDiMode = False
     TabOrder = 1
     object grpRelease: TGroupBox
       Left = 8
@@ -107,5 +109,38 @@ inherited frmReleaseOrders: TfrmReleaseOrders
       TabOrder = 2
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = lstOrders'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = grpRelease'
+        'Status = stsDefault')
+      (
+        'Component = radVerbal'
+        'Status = stsDefault')
+      (
+        'Component = radPhone'
+        'Status = stsDefault')
+      (
+        'Component = radPolicy'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmReleaseOrders'
+        'Status = stsDefault'))
   end
 end

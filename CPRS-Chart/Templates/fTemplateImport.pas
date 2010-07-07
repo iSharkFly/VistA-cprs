@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Gauges, StdCtrls, ComCtrls;
+  Gauges, StdCtrls, ComCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmTemplateImport = class(TForm)
+  TfrmTemplateImport = class(TfrmBase508Form)
     animImport: TAnimate;
     btnCancel: TButton;
     lblImporting: TStaticText;

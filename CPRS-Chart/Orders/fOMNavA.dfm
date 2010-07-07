@@ -1,25 +1,23 @@
-object frmOMNavA: TfrmOMNavA
-  Left = 265
-  Top = 445
-  Width = 491
-  Height = 305
+inherited frmOMNavA: TfrmOMNavA
+  Left = 212
+  Top = 354
   BorderIcons = []
-  Caption = 'frmOMNavA'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  Caption = 'Order Menu'
+  ClientHeight = 278
+  ClientWidth = 483
   OldCreateOrder = True
   OnActivate = FormActivate
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
+  ExplicitLeft = 212
+  ExplicitTop = 354
+  ExplicitWidth = 491
+  ExplicitHeight = 312
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlTool: TPanel
+  object pnlTool: TPanel [0]
     Left = 0
     Top = 0
     Width = 483
@@ -29,7 +27,7 @@ object frmOMNavA: TfrmOMNavA
     Caption = 'Menu or Dialog Name'
     Color = clHighlight
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWhite
+    Font.Color = clHighlightText
     Font.Height = -11
     Font.Name = 'MS Sans Serif'
     Font.Style = [fsBold]
@@ -43,16 +41,16 @@ object frmOMNavA: TfrmOMNavA
       Top = 1
       Width = 50
       Height = 17
+      Align = alRight
       Caption = 'Done'
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWhite
+      Font.Color = clBtnText
       Font.Height = -11
       Font.Name = 'MS Sans Serif'
       Font.Style = []
       ParentFont = False
       TabOrder = 0
       OnClick = cmdDoneClick
-      Align = alRight
     end
     object cmdPrev: TBitBtn
       Left = 0
@@ -103,7 +101,7 @@ object frmOMNavA: TfrmOMNavA
       Spacing = 80
     end
   end
-  object grdMenu: TCaptionStringGrid
+  object grdMenu: TCaptionStringGrid [1]
     Left = 0
     Top = 19
     Width = 483
@@ -127,5 +125,35 @@ object frmOMNavA: TfrmOMNavA
     OnMouseMove = grdMenuMouseMove
     OnMouseUp = grdMenuMouseUp
     Caption = 'Menu or Dialog Name'
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Left = 8
+    Top = 40
+    Data = (
+      (
+        'Component = pnlTool'
+        'Status = stsDefault')
+      (
+        'Component = cmdDone'
+        'Status = stsDefault')
+      (
+        'Component = cmdPrev'
+        'Status = stsDefault')
+      (
+        'Component = cmdNext'
+        'Status = stsDefault')
+      (
+        'Component = grdMenu'
+        'Status = stsDefault')
+      (
+        'Component = frmOMNavA'
+        'Status = stsDefault'))
+  end
+  object accEventsGrdMenu: TVA508ComponentAccessibility
+    Component = grdMenu
+    OnCaptionQuery = accEventsGrdMenuCaptionQuery
+    OnValueQuery = accEventsGrdMenuValueQuery
+    Left = 40
+    Top = 40
   end
 end

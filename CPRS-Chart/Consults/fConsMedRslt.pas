@@ -3,7 +3,8 @@ unit fConsMedRslt;
 interface
 
 uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
-  Buttons, ORCtrls, ORfn, ExtCtrls, fAutoSz, ORDtTm, fConsultAlertTo, fRptBox;
+  Buttons, ORCtrls, ORfn, ExtCtrls, fAutoSz, ORDtTm, fConsultAlertTo, fRptBox,
+  VA508AccessibilityManager;
 
 type
   TMedResultRec = record
@@ -81,12 +82,12 @@ begin
 
       if MedResult.Action = 'ATTACH' then
         begin
-          lstMedResults.Items.Assign(GetAssignableMedResults(ConsultIEN));
+          FastAssign(GetAssignableMedResults(ConsultIEN), lstMedResults.Items);
           ckAlert.Visible := True;
         end
       else if MedResult.Action = 'REMOVE' then
         begin
-          lstMedResults.Items.Assign(GetRemovableMedResults(ConsultIEN));
+          FastAssign(GetRemovableMedResults(ConsultIEN), lstMedResults.Items);
           ckAlert.Visible := False;
         end;
       if lstMedResults.Items.Count > 0 then
@@ -133,10 +134,18 @@ const
   TX_RESULTS_CAP = 'Detailed Results Display';
 var
   x: string;
+  //MsgString, HasImages: string;
 begin
   inherited;
   if lstMedResults.ItemIndex = -1 then exit;
   x := Piece(Piece(Piece(lstMedResults.ItemID, ';', 2), '(', 2), ',', 1) + ';' + Piece(lstMedResults.ItemID, ';', 1);
+  // ---------------------------------------------------------------
+  // Don't do this until MED API is changed for new/unassigned results, or false '0' will be broadcast
+(*  MsgString := 'MED^' + x;
+  HasImages := BOOLCHAR[StrToIntDef(Piece(x, U, 5), 0) > 0];
+  SetPiece(HasImages, U, 10, HasImages);
+  NotifyOtherApps(NAE_REPORT, MsgString);*)
+  // ---------------------------------------------------------------
   NotifyOtherApps(NAE_REPORT, 'MED^' + x);
   if(not assigned(FShowDetails)) then
   begin

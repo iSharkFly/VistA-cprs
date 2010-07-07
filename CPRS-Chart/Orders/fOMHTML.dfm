@@ -1,14 +1,16 @@
 inherited frmOMHTML: TfrmOMHTML
   Left = 390
   Top = 242
-  Width = 520
-  Height = 320
   Caption = 'HTML Ordering'
+  ClientHeight = 293
+  ClientWidth = 512
   OnClose = FormClose
   OnCreate = FormCreate
+  ExplicitWidth = 520
+  ExplicitHeight = 320
   PixelsPerInch = 96
   TextHeight = 13
-  object btnOK: TButton
+  object btnOK: TButton [0]
     Left = 352
     Top = 268
     Width = 72
@@ -18,7 +20,7 @@ inherited frmOMHTML: TfrmOMHTML
     TabOrder = 0
     OnClick = btnOKClick
   end
-  object btnCancel: TButton
+  object btnCancel: TButton [1]
     Left = 433
     Top = 268
     Width = 72
@@ -29,7 +31,7 @@ inherited frmOMHTML: TfrmOMHTML
     TabOrder = 1
     OnClick = btnCancelClick
   end
-  object btnBack: TButton
+  object btnBack: TButton [2]
     Left = 6
     Top = 268
     Width = 43
@@ -40,7 +42,7 @@ inherited frmOMHTML: TfrmOMHTML
     TabOrder = 2
     OnClick = btnBackClick
   end
-  object pnlWeb: TPanel
+  object pnlWeb: TPanel [3]
     Left = 6
     Top = 6
     Width = 499
@@ -65,7 +67,7 @@ inherited frmOMHTML: TfrmOMHTML
         00000000000000000100000000000000000000000000000000000000}
     end
   end
-  object btnShow: TButton
+  object btnShow: TButton [4]
     Left = 55
     Top = 268
     Width = 103
@@ -74,5 +76,29 @@ inherited frmOMHTML: TfrmOMHTML
     Caption = 'Show Selections....'
     TabOrder = 4
     OnClick = btnShowClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnBack'
+        'Status = stsDefault')
+      (
+        'Component = pnlWeb'
+        'Status = stsDefault')
+      (
+        'Component = webView'
+        'Status = stsDefault')
+      (
+        'Component = btnShow'
+        'Status = stsDefault')
+      (
+        'Component = frmOMHTML'
+        'Status = stsDefault'))
   end
 end

@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, ORFN,
-  StdCtrls, ExtCtrls, ORCtrls, uCore, ComCtrls, ORDtTm;
+  StdCtrls, ExtCtrls, ORCtrls, uCore, ComCtrls, ORDtTm, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmConsultAction = class(TForm)
+  TfrmConsultAction = class(TfrmBase508Form)
     lblActionBy: TOROffsetLabel;
     calDateofAction: TORDateBox;
     lblDateofAction: TOROffsetLabel;
@@ -159,14 +160,14 @@ begin
  if IsProcedure then
    begin
      OrdItmIEN := GetOrderableIEN(IntToStr(ConsultRec.ORFileNumber));
-     SvcList.Assign(GetProcedureServices(OrdItmIEN));
-     //SvcList.Assign(GetProcedureServices(ProcIEN));   RPC expects pointer to 101.43, NOT 123.3  (RV)
+     FastAssign(GetProcedureServices(OrdItmIEN), SvcList);
+     //FastAssign(GetProcedureServices(ProcIEN), SvcList);   RPC expects pointer to 101.43, NOT 123.3  (RV)
      i := SvcList.IndexOf(IntToStr(ConsultRec.ToService) + U + Trim(ExternalName(ConsultRec.ToService, 123.5)));
      if i > -1 then SvcList.Delete(i);
      treService.Visible := False;
    end
  else
-   SvcList.Assign(LoadServiceListWithSynonyms(CN_SVC_LIST_FWD, ConsultRec.IEN));           {RV}
+   FastAssign(LoadServiceListWithSynonyms(CN_SVC_LIST_FWD, ConsultRec.IEN), SvcList);           {RV}
  if (IsProcedure and (SvcList.Count <= 0)) then
    begin
      InfoBox(TX_FWD_NO_PROC_SVCS_TEXT, TX_NOFORWARD_CAP, MB_OK or MB_ICONWARNING);
@@ -203,9 +204,9 @@ begin
  if cboService.Items.Count = 1 then cboService.ItemIndex := 0;
  FToService := cboService.ItemIEN;
  cboAttentionOf.InitLongList('') ;
- with cboUrgency do        
-  begin        
-    Items.Assign(SubsetofUrgencies(ConsultRec.IEN)) ;
+ with cboUrgency do
+  begin
+    FastAssign(SubsetofUrgencies(ConsultRec.IEN), cboUrgency.Items) ;
     MixedCaseList(Items) ;
     SelectByIEN(ConsultRec.Urgency);
     if ItemIndex = -1 then
@@ -561,7 +562,7 @@ begin
     FToService  := cboService.ItemIEN;
 end;                                                                      
 
-procedure TfrmConsultAction.ShowAutoAlertText;
+(*procedure TfrmConsultAction.ShowAutoAlertText;      ****  SEE BELOW FOR REPLACEMENT - v27.9 Phelps/Vertigan
 const
   TX_ALERT1          = 'An alert will automatically be sent to ';
   TX_ALERT_PROVIDER  = 'the ordering provider';
@@ -587,7 +588,44 @@ begin
        end;
    end;
    lblAutoAlerts.Caption := x;
+end;*)
+
+procedure TfrmConsultAction.ShowAutoAlertText;
+const
+  TX_ALERT1          = 'An alert will automatically be sent to ';
+  TX_ALERT_PROVIDER  = 'the ordering provider';
+  TX_ALERT_SVC_USERS = 'notification recipients for this service.';
+  TX_ALERT_NOBODY    = 'No automatic alerts will be sent.';  // this should be rare to never
+var
+  x: string;
+begin
+  case FUserLevel of
+    UL_NONE, UL_REVIEW:
+      begin
+        if FUserIsRequester then
+          x := TX_ALERT1 + TX_ALERT_SVC_USERS
+        else
+          x := TX_ALERT1 + TX_ALERT_PROVIDER + ' and to ' + TX_ALERT_SVC_USERS;
+      end;
+    UL_UPDATE, UL_ADMIN, UL_UPDATE_AND_ADMIN:
+      begin
+        if FUserIsRequester then
+          //x := TX_ALERT_NOBODY   Replace with following line
+          x := TX_ALERT1 + TX_ALERT_SVC_USERS
+        else
+          x := TX_ALERT1 + TX_ALERT_PROVIDER + '.';
+      end;
+    UL_UNRESTRICTED:
+      begin
+        if FUserIsRequester then
+          x := TX_ALERT1 + TX_ALERT_SVC_USERS
+        else
+          x := TX_ALERT1 + TX_ALERT_PROVIDER + ' and to ' + TX_ALERT_SVC_USERS;
+      end;
+  end;
+  lblAutoAlerts.Caption := x;
 end;
+
 
 initialization
    SvcList := TStringList.Create ;

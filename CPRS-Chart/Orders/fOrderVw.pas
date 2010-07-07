@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ComCtrls, ExtCtrls, ORCtrls, ORFn, rOrders, ORDtTm;
+  fAutoSz, StdCtrls, ComCtrls, ExtCtrls, ORCtrls, ORFn, rOrders, ORDtTm,
+  VA508AccessibilityManager;
 
 type
   TfrmOrderView = class(TfrmAutoSz)
@@ -161,7 +162,8 @@ begin
   begin
     Item[i].Expanded := True;
     Item[i].Selected := True;
-    FDGroupName := Item[i].Text;
+    FFilter := Integer(Item[i].Data);
+    FFilterName := Item[i].Text;
     Break;
   end;
 
@@ -302,10 +304,17 @@ begin
   begin
     FFilter := Integer(Node.Data);
     FFilterName := Node.Text;
+    chkDateRange.Enabled := True;
     if FFilter = 2 then                          // disallow date range for active orders view
     begin
       chkDateRange.Checked := False;
       chkDateRangeClick(Self);
+    end;
+    if FFilter = 5 then                          // disallow date range for expiring orders view
+    begin
+      chkDateRange.Checked := False;
+      chkDateRangeClick(Self);
+      chkDateRange.Enabled := False;
     end;
     if FFilter in [8, 9, 10, 20] then chkDateRange.Checked := True else
     begin

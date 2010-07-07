@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fAutoSz, StdCtrls, ORFn, ComCtrls, uConst, rODMeds, uOrders, fOCAccept,
-  ExtCtrls, uODBase, ORCtrls;
+  ExtCtrls, uODBase, ORCtrls, VA508AccessibilityManager;
 
 type
   TfrmRenewOrders = class(TfrmAutoSz)
@@ -25,9 +25,9 @@ type
     procedure lstOrdersClick(Sender: TObject);
     procedure cmdChangeClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormShow(Sender: TObject);
     procedure hdrOrdersSectionResize(HeaderControl: THeaderControl;
       Section: THeaderSection);
+    procedure FormResize(Sender: TObject);
   private
     OKPressed: Boolean;
     OrderList: TList;
@@ -41,7 +41,8 @@ implementation
 
 {$R *.DFM}
 
-uses rOrders, fDateRange, fRenewOutMed, uCore, rCore, rMisc, UBAGlobals;
+uses rOrders, fDateRange, fRenewOutMed, uCore, rCore, rMisc, UBAGlobals, 
+  VA2006Utils;
 
 const
   TEXT_COLUMN = 0;
@@ -102,7 +103,6 @@ begin
 
   try
     frmRenewOrders.OrderList := SelectedList;
-    ResizeFormToFont(TForm(frmRenewOrders));
     IsInpt := OrderForInpatient;
 
     with frmRenewOrders.OrderList do
@@ -259,29 +259,48 @@ end;
 procedure TfrmRenewOrders.FormCreate(Sender: TObject);
 begin
   inherited;
-  lstOrders.Color := ReadOnlyColor;
+  FixHeaderControlDelphi2006Bug(hdrOrders);
   OKPressed := False;
+  ResizeFormToFont(Self);
+  SetFormPosition(Self);  
+end;
+
+procedure TfrmRenewOrders.FormResize(Sender: TObject);
+var
+i: integer;
+Height: integer;
+begin
+  inherited;
+  if lstorders.Count = 0 then exit;
+  for I := 0 to lstOrders.Count - 1 do
+    begin
+       Height := lstOrders.ItemRect(i).Bottom - lstOrders.ItemRect(i).Top;
+       lstOrdersMeasureItem(lstOrders,i,Height);
+       //ListGridDrawCell(lstOrders, hdrOrders, i, TEXT_COLUMN, x, WORD_WRAPPED);
+    end;
 end;
 
 procedure TfrmRenewOrders.lstOrdersMeasureItem(Control: TWinControl;
   Index: Integer; var Height: Integer);
 var
-  x: string;
+  x, tmp: string;
   DateHeight, TextHeight: Integer;
   AnOrder: TOrder;
   RenewFields: TOrderRenewFields;
 begin
   inherited;
-  AnOrder := TOrder(OrderList.Items[Index]);
-  if AnOrder <> nil then
-  begin
-    RenewFields := TOrderRenewFields(AnOrder.LinkObject);
-    with RenewFields do x := 'Start: ' + StartTime + CRLF + 'Stop: ' + StopTime;
-    TextHeight := MeasureColumnHeight(RenewFields.NewText,Index,TEXT_COLUMN);
-    DateHeight := MeasureColumnHeight(x, Index, DATE_COLUMN);
-    Height := HigherOf(TextHeight, DateHeight);
-    if Height > 255 then Height := 255;  //This is maximum allowed by a windows listbox item.
-  end
+      AnOrder := TOrder(OrderList.Items[Index]);
+      if (AnOrder <> nil) then
+        begin
+          RenewFields := TOrderRenewFields(AnOrder.LinkObject);
+          with RenewFields do x := 'Start: ' + StartTime + CRLF + 'Stop: ' + StopTime;
+          //tmp := RenewFields.NewText;
+          tmp := LstOrders.Items.Strings[index];
+          TextHeight := MeasureColumnHeight(tmp,Index,TEXT_COLUMN);
+          DateHeight := MeasureColumnHeight(x, Index, DATE_COLUMN);
+          Height := HigherOf(TextHeight, DateHeight);
+          if Height > 255 then Height := 255;  //This is maximum allowed by a windows listbox item.
+        end
 end;
 
 procedure TfrmRenewOrders.lstOrdersDrawItem(Control: TWinControl;
@@ -417,12 +436,6 @@ procedure TfrmRenewOrders.FormClose(Sender: TObject;
 begin
   inherited;
   SaveUserBounds(Self);
-end;
-
-procedure TfrmRenewOrders.FormShow(Sender: TObject);
-begin
-  inherited;
-  SetFormPosition(Self);
 end;
 
 procedure TfrmRenewOrders.hdrOrdersSectionResize(HeaderControl: THeaderControl; Section: THeaderSection);

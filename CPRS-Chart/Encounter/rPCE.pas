@@ -41,8 +41,10 @@ type
     MSTDflt:  Boolean;        // default if prompting military sexual trauma
     HNCAllow: Boolean;        // prompt for Head or Neck Cancer
     HNCDflt:  Boolean;        // default if prompting Head or Neck Cancer
-    CVAllow: Boolean;        // prompt for Combat Veteran Related
-    CVDflt:  Boolean;        // default if prompting Comabt Veteran
+    CVAllow:  Boolean;        // prompt for Combat Veteran Related
+    CVDflt:   Boolean;        // default if prompting Comabt Veteran
+    SHDAllow: Boolean;        // prompt for Shipboard Hazard and Defense
+    SHDDflt:  Boolean;        // default if prompting Shipboard Hazard and Defense
   end;
 
   TPCEListCodesProc = procedure(Dest: TStrings; SectionIndex: Integer);
@@ -148,6 +150,7 @@ function PromptForWorkload(ANote, ATitle: Integer; VisitCat: Char; StandAlone: b
 function DefaultProvider(ALocation: integer; AUser: Int64; ADate: TFMDateTime;
                                              ANoteIEN: integer): string;
 function IsUserAProvider(AUser: Int64; ADate: TFMDateTime): boolean;
+function IsUserAUSRProvider(AUser: Int64; ADate: TFMDateTime): boolean;
 function IsCancelOrNoShow(ANote: integer): boolean;
 function IsNonCountClinic(ALocation: integer): boolean;
 
@@ -241,7 +244,7 @@ begin
   LX_CPT: CodeSys := 'CHP';
   end;
   CallV('ORWPCE LEX', [x, CodeSys, ADate]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 function  IsActiveICDCode(ACode: string; ADate: TFMDateTime = 0): boolean;
@@ -404,7 +407,7 @@ begin
     uVTypeLastLoc := Location;
     uVTypeLastDate := EncDt;
   end;
-  Dest.Assign(uVTypeForLoc);
+  FastAssign(uVTypeForLoc, Dest);
 end;
 
 function AutoSelectVisit(Location: integer): boolean;
@@ -1071,6 +1074,8 @@ begin
     HNCDflt  := Piece(Piece(x, ';', 6), U, 2) = '1';
     CVAllow  := Piece(Piece(x, ';', 7), U, 1) = '1';
     CVDflt   := Piece(Piece(x, ';', 7), U, 2) = '1';
+    SHDAllow := Piece(Piece(x, ';', 8), U, 1) = '1';
+    SHDDflt  := Piece(Piece(x, ';', 8), U, 2) = '1';
   end;
 end;
 
@@ -1078,7 +1083,7 @@ procedure ListSCDisabilities(Dest: TStrings);
 { return text listing a patient's rated disabilities and % service connected }
 begin
   CallV('ORWPCE SCDIS', [Patient.DFN]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure LoadPCEDataForNote(Dest: TStrings; ANoteIEN: Integer; VStr: string);
@@ -1087,7 +1092,7 @@ begin
     CallV('ORWPCE PCE4NOTE', [ANoteIEN, Patient.DFN, VStr])
   else
     CallV('ORWPCE PCE4NOTE', [ANoteIEN]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 function GetVisitIEN(NoteIEN: Integer): string;
@@ -1154,7 +1159,7 @@ begin
           break;
         end;
       end;
-      uHasCPT.AddStrings(RPCBrokerV.Results);
+      FastAddStrings(RPCBrokerV.Results, uHasCPT);
     end;
   end;
 end;
@@ -1218,7 +1223,12 @@ begin
     if typ > 0 then
     begin
       if idx = 0 then
-        tCallV(TmpSL,RPC,[nil])
+      begin
+        if (typ = 1) or (typ = 2) then
+          tCallV(TmpSL,RPC,[uEncPCEData.VisitDateTime])
+        else
+          tCallV(TmpSL,RPC,[nil]);
+      end
       else
         tCallV(TmpSL,RPC,[idx]);
       CallV('ORWPCE GET EXCLUDED', [Location, Typ]);
@@ -1243,7 +1253,7 @@ begin
         end;
       end;
     end;
-    Dest.Assign(TmpSL);
+    FastAssign(TmpSL, Dest);
   finally
     TmpSL.Free;
   end;
@@ -1451,6 +1461,11 @@ end;
 function IsUserAProvider(AUser: Int64; ADate: TFMDateTime): boolean;
 begin
   Result := (sCallV('TIU IS USER A PROVIDER?', [AUser, ADate]) = '1');
+end;
+
+function IsUserAUSRProvider(AUser: Int64; ADate: TFMDateTime): boolean;
+begin
+  Result := (sCallV('TIU IS USER A USR PROVIDER', [AUser, ADate]) = '1');
 end;
 
 //function HNCOK: boolean;

@@ -1,6 +1,6 @@
 unit rODBase;
 
-interface
+interface                        
 
 uses SysUtils, Windows, Classes, ORNet, ORFn, uCore, uConst, rOrders;
 
@@ -131,7 +131,7 @@ function ODForVitals: TStrings;
 
 implementation
 
-uses TRPCB, uOrders, uODBase;
+uses TRPCB, uOrders, uODBase, fODBase;
 
 var
   uLastDispenseIEN: Integer;
@@ -181,12 +181,20 @@ begin
         if (Pos('H',upperCase(IVDuration))>0)  then
         begin
           IVDurVal := Copy(IVDuration,1,length(IVDuration)-1);
-          TResponse(ResponseList.Items[j]).IValue := 'for ' + IVDurVal + 'hours';
+          TResponse(ResponseList.Items[j]).IValue := 'for ' + IVDurVal + ' hours';
         end
         else if (Pos('D',upperCase(IVDuration))>0) then
         begin
-          IVDurVal := Copy(IVDuration,1,length(IVDuration)-1);
-          TResponse(ResponseList.Items[j]).IValue := 'for ' + IVDurVal + 'days';
+          if Pos('DOSES', upperCase(IVDuration)) > 0 then
+            begin
+              IVDurVal := Copy(IVDuration, 1, length(IVDuration)-5);
+              TResponse(ResponseList.Items[j]).IValue := 'for a total of ' + IVDurVal + ' doses';
+            end
+          else
+            begin
+              IVDurVal := Copy(IVDuration,1,length(IVDuration)-1);
+              TResponse(ResponseList.Items[j]).IValue := 'for ' + IVDurVal + ' days';
+            end;
         end
         else if ((Pos('ML',upperCase(IVDuration))>0) or (Pos('CC',upperCase(IVDuration))>0)) then
         begin
@@ -244,7 +252,7 @@ end;
 procedure LoadQuickListForOD(Dest: TStrings; DGroup: Integer);
 begin
   CallV('ORWDXQ GETQLST', [DGroup]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure SaveQuickListForOD(Src: TStrings;  DGroup: Integer);
@@ -388,7 +396,7 @@ begin
   i := 0;
   HasObjects := FALSE;
   TempBroker := TStringlist.Create;
-  TempBroker.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, TempBroker);
   try
   with TempBroker do while i < Count do
   begin
@@ -426,8 +434,12 @@ begin
 end;
 
 procedure LoadResponses(Dest: TList; const OrderID: string; var HasObjects: boolean);
+var
+Transfer: boolean;
 begin
-  CallV('ORWDX LOADRSP', [OrderID]);
+  if ((XferOuttoInOnMeds = True) or (XfInToOutNow = True)) and (CharAt(OrderID,1)='C') then Transfer := true
+  else Transfer := false;
+  CallV('ORWDX LOADRSP', [OrderID, Transfer]);
   ExtractToResponses(Dest, HasObjects);
 end;
 
@@ -703,7 +715,7 @@ begin
     with RPCBrokerV do
     begin
       uMedRoutes := TStringList.Create;
-      uMedRoutes.Assign(Results);
+      FastAssign(RPCBrokerV.Results, uMedRoutes);
       for i := 0 to Results.Count - 1 do if Length(Piece(Results[i], U, 3)) > 0 then
       begin
         x := Piece(Results[i], U, 1) + U + Piece(Results[i], U, 3) +
@@ -713,7 +725,7 @@ begin
       SortByPiece(uMedRoutes, U, 2);
     end; {with RPCBrokerV}
   end; {if uMedRoutes}
-  Dest.AddStrings(uMedRoutes);
+  FastAddStrings(uMedRoutes, Dest);
 end;
 
 procedure CheckAuthForMeds(var x: string);
@@ -757,7 +769,7 @@ end;
 procedure LoadFormularyAlt(AList: TStringList; AnIEN: Integer; PSType: Char);
 begin
   CallV('ORWDPS32 FORMALT', [AnIEN, PSType]);
-  AList.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, AList);
 end;
 
 procedure LookupRoute(const AName: string; var ID, Abbreviation: string);
@@ -782,14 +794,14 @@ end;
 function ODForMedIn: TStrings;
 { Returns init values for inpatient meds dialog.  The results must be used immediately. }
 begin
-  CallV('ORWDPS32 DLGSLCT', [PST_UNIT_DOSE]);
+  CallV('ORWDPS32 DLGSLCT', [PST_UNIT_DOSE, patient.dfn, patient.location]);
   Result := RPCBrokerV.Results;
 end;
 
 function ODForIVFluids: TStrings;
 { Returns init values for IV Fluids dialog.  The results must be used immediately. }
 begin
-  CallV('ORWDPS32 DLGSLCT', [PST_IV_FLUIDS]);
+  CallV('ORWDPS32 DLGSLCT', [PST_IV_FLUIDS, patient.dfn, patient.location]);
   Result := RPCBrokerV.Results;
 end;
 
@@ -801,7 +813,7 @@ end;
 function ODForMedOut: TStrings;
 { Returns init values for outpatient meds dialog.  The results must be used immediately. }
 begin
-  CallV('ORWDPS32 DLGSLCT', [PST_OUTPATIENT]);
+  CallV('ORWDPS32 DLGSLCT', [PST_OUTPATIENT, patient.dfn, patient.location]);
   Result := RPCBrokerV.Results;
 end;
 

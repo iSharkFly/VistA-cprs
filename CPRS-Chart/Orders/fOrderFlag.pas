@@ -4,17 +4,17 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ComCtrls, ORFn, rOrders, ORCtrls;
+  fAutoSz, StdCtrls, ComCtrls, ORFn, rOrders, ORCtrls, VA508AccessibilityManager;
 
 type
   TfrmFlagOrder = class(TfrmAutoSz)
-    txtReason: TCaptionEdit;
     Label1: TLabel;
     cmdOK: TButton;
     cmdCancel: TButton;
     memOrder: TMemo;
     lblAlertRecipient: TLabel;
     cboAlertRecipient: TORComboBox;
+    cboFlagReason: TORComboBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdCancelClick(Sender: TObject);
@@ -50,7 +50,7 @@ begin
       ShowModal;
       if OKPressed then
       begin
-        FlagOrder(AnOrder, txtReason.Text, AlertRecip);
+        FlagOrder(AnOrder, cboFlagReason.Text, AlertRecip);
         Result := True;
       end;
     end;
@@ -61,9 +61,18 @@ begin
 end;
 
 procedure TfrmFlagOrder.FormCreate(Sender: TObject);
+var
+  tmpList: TStringList;
 begin
   inherited;
   OKPressed := False;
+  tmpList := TStringList.Create;
+  try
+    GetUserListParam(tmpList, 'OR FLAGGED ORD REASONS');
+    FastAssign(tmpList, cboFlagReason.Items);
+  finally
+    tmpList.Free;
+  end;
   cboAlertRecipient.InitLongList('');
   //cboAlertRecipient.SelectByIEN(User.DUZ);
 end;
@@ -74,7 +83,8 @@ const
   TC_REASON_REQ = 'Reason Required';
 begin
   inherited;
-  if txtReason.Text = '' then
+  if cboFlagReason.Text = '' then
+  //if txtReason.Text = '' then
   begin
     InfoBox(TX_REASON_REQ, TC_REASON_REQ, MB_OK);
     Exit;

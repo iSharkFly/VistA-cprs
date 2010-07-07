@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, StdCtrls, fAutoSZ, ORFn;
+  ExtCtrls, StdCtrls, fAutoSZ, ORFn, VA508AccessibilityManager;
 
 type
   TfrmODChild = class(TfrmAutoSz)
@@ -82,7 +82,7 @@ begin
     ARect := TheRect;
     ARect.Left := ARect.Left + 2;
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     SaveColor := Canvas.Brush.Color;
     Canvas.MoveTo(ARect.Left, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);

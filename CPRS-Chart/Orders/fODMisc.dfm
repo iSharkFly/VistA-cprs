@@ -44,7 +44,7 @@ inherited frmODMisc: TfrmODMisc
   inherited pnlMessage: TPanel
     TabOrder = 7
   end
-  object cboCare: TORComboBox
+  object cboCare: TORComboBox [8]
     Left = 6
     Top = 20
     Width = 292
@@ -58,6 +58,7 @@ inherited frmODMisc: TfrmODMisc
     ItemTipEnable = True
     ListItemsOnly = True
     LongList = True
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = False
@@ -66,8 +67,9 @@ inherited frmODMisc: TfrmODMisc
     OnExit = ControlChange
     OnMouseClick = ControlChange
     OnNeedData = cboCareNeedData
+    CharsNeedMatch = 1
   end
-  object calStart: TORDateBox
+  object calStart: TORDateBox [9]
     Left = 6
     Top = 114
     Width = 140
@@ -79,7 +81,7 @@ inherited frmODMisc: TfrmODMisc
     RequireTime = False
     Caption = 'Start Date/Time'
   end
-  object calStop: TORDateBox
+  object calStop: TORDateBox [10]
     Left = 158
     Top = 114
     Width = 140
@@ -90,7 +92,7 @@ inherited frmODMisc: TfrmODMisc
     RequireTime = False
     Caption = 'Stop Date/Time'
   end
-  object txtComment: TCaptionEdit
+  object txtComment: TCaptionEdit [11]
     Left = 6
     Top = 67
     Width = 508
@@ -98,5 +100,38 @@ inherited frmODMisc: TfrmODMisc
     TabOrder = 1
     OnChange = ControlChange
     Caption = 'Instructions'
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cboCare'
+        'Status = stsDefault')
+      (
+        'Component = calStart'
+        'Status = stsDefault')
+      (
+        'Component = calStop'
+        'Status = stsDefault')
+      (
+        'Component = txtComment'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODMisc'
+        'Status = stsDefault'))
   end
 end

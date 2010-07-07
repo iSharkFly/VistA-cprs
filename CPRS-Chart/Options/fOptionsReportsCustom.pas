@@ -5,10 +5,10 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, Spin, ORCtrls, fOptions, ComCtrls, ORFn, ORNet, Grids, uConst,
-  ORDtTm, rCore;
+  ORDtTm, rCore, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmOptionsReportsCustom = class(TForm)
+  TfrmOptionsReportsCustom = class(TfrmBase508Form)
     Panel1: TPanel;
     Bevel3: TBevel;
     btnApply: TButton;
@@ -46,7 +46,6 @@ type
     procedure FormShow(Sender: TObject);
     procedure grdReportKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
-    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
     //startDate,endDate,
@@ -69,7 +68,7 @@ procedure DialogOptionsHSCustom(topvalue, leftvalue, fontsize: integer; var acti
 
 implementation
 
-uses rOptions, uOptions, fReports, uCore, uAccessibleStringGrid;
+uses rOptions, uOptions, fReports, fLabs, uCore;
 
 {$R *.DFM}
 
@@ -124,7 +123,6 @@ end;
 procedure TfrmOptionsReportsCustom.FormCreate(Sender: TObject);
 begin
   rptList := TStringList.Create;
-  TAccessibleStringGrid.WrapControl(grdReport);
 end;
 
 procedure TfrmOptionsReportsCustom.ShowEditor(ACol, ARow: Integer; AChar: Char);
@@ -354,7 +352,14 @@ begin
    odbStop.Visible := False;
    edtMax.Visible := False;
    frmReports.LoadTreeView;
+   frmLabs.LoadTreeView;
    with frmReports.tvReports do
+     begin
+       if Items.Count > 0 then
+         Selected := Items.GetFirstNode;
+       frmReports.tvReportsClick(Selected);
+     end;
+   with frmLabs.tvReports do
      begin
        if Items.Count > 0 then
          Selected := Items.GetFirstNode;
@@ -653,11 +658,6 @@ begin
     EdtSearch.SetFocus;
     Key := 0;
   end;
-end;
-
-procedure TfrmOptionsReportsCustom.FormDestroy(Sender: TObject);
-begin
-  TAccessibleStringGrid.UnwrapControl(grdReport);
 end;
 
 end.

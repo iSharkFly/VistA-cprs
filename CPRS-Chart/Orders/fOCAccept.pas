@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ComCtrls, ORFn, ExtCtrls;
+  fAutoSz, StdCtrls, ComCtrls, ORFn, ExtCtrls, VA508AccessibilityManager;
 
 type
   TfrmOCAccept = class(TfrmAutoSz)

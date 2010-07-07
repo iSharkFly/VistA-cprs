@@ -1,11 +1,13 @@
 unit fProcedure;
+{Warning: The tab order has been changed in the OnExit event of several controls.
+ To change the tab order of lbSection, lbxSection, lbMods, and btnOther you must do it programatically.}
 
 interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fPCEBase, StdCtrls, ComCtrls, CheckLst, ORCtrls, ExtCtrls, Buttons, uPCE, rPCE, ORFn,
-  fPCELex, fPCEOther, fPCEBaseGrid, fPCEBaseMain;
+  fPCELex, fPCEOther, fPCEBaseGrid, fPCEBaseMain, VA508AccessibilityManager;
 
 type
   TfrmProcedures = class(TfrmPCEBaseMain)
@@ -32,11 +34,15 @@ type
     procedure cboProviderNeedData(Sender: TObject; const StartFrom: String;
       Direction, InsertAt: Integer);
     procedure cboProviderChange(Sender: TObject);
+    procedure lbxSectionExit(Sender: TObject);
+    procedure lbModsExit(Sender: TObject);
+    procedure btnOtherExit(Sender: TObject);
   private
     FCheckingCode: boolean;
     FCheckingMods: boolean;
     FLastCPTCodes: string;
     FModsReadOnly: boolean;
+    FProviderChanging: boolean;
     FModsROChecked: string;
     function MissingProvider: boolean;
   protected
@@ -57,7 +63,7 @@ implementation
 {$R *.DFM}
 
 uses
-  fEncounterFrame, uConst, rCore;
+  fEncounterFrame, uConst, rCore, VA508AccessibilityRouter;
 
 const
   TX_PROC_PROV = 'Each procedure requires selection of a Provider before it can be saved.';
@@ -87,7 +93,12 @@ begin
     for i := 0 to lbGrid.Items.Count-1 do
       if(lbGrid.Selected[i]) then
         TPCEProc(lbGrid.Items.Objects[i]).Provider := cboProvider.ItemIEN;
-    GridChanged;
+    FProviderChanging := TRUE; // CQ 11707
+    try
+      GridChanged;
+    finally
+      FProviderChanging := FALSE;
+    end;
   end;
 end;
 
@@ -101,6 +112,7 @@ begin
   FPCECode := 'CPT';
   FSectionTabCount := 1;
   FormResize(Self);
+  lbMods.HideSelection := TRUE;
 end;
 
 procedure TfrmProcedures.UpdateNewItemStr(var x: string);
@@ -169,11 +181,14 @@ begin
           spnProcQty.Position := 1;
           txtProcQty.Text := '';
         end;
-        if(SameProv) then
-          cboProvider.SetExactByIEN(Prov, ExternalName(Prov, 200))
-        else
-          cboProvider.SetExactByIEN(uProviders.PCEProvider, uProviders.PCEProviderName);
-          //cboProvider.ItemIndex := -1;     v22.8 - RV
+        if not FProviderChanging then // CQ 11707
+        begin
+          if(SameProv) then
+            cboProvider.SetExactByIEN(Prov, ExternalName(Prov, 200))
+          else
+            cboProvider.SetExactByIEN(uProviders.PCEProvider, uProviders.PCEProviderName);
+            //cboProvider.ItemIndex := -1;     v22.8 - RV
+        end;
       end
       else
       begin
@@ -417,6 +432,14 @@ begin
   end;
 end;
 
+procedure TfrmProcedures.lbModsExit(Sender: TObject);
+begin
+  inherited;
+  if TabIsPressed then
+    if btnOther.CanFocus then
+      btnOther.SetFocus;
+end;
+
 procedure TfrmProcedures.lbSectionClick(Sender: TObject);
 begin
   inherited;
@@ -433,11 +456,12 @@ begin
   try
     inherited;
     Sync2Grid;
+    lbxSection.Selected[Index] := True;
     if(lbxSection.ItemIndex >= 0) and (lbxSection.ItemIndex = Index) and
       (lbxSection.Checked[Index]) then
     begin
-      UpdateModifierList(lbxSection.Items, Index);
-      lbxSection.Checked[Index] := TRUE;
+      UpdateModifierList(lbxSection.Items, Index); // CQ#16439
+      lbxSection.Checked[Index] := TRUE;    
       for i := 0 to lbGrid.Items.Count-1 do
       begin
         if(lbGrid.Selected[i]) then
@@ -455,6 +479,7 @@ begin
             {   4.  No default.                                                                                   }
             Modifiers := Piece(lbxSection.Items[lbxSection.ItemIndex], U, 4);
             GridChanged;
+            lbxSection.Selected[Index] := True; // CQ#15493
             exit;
           end;
         end;
@@ -465,11 +490,33 @@ begin
   end;
 end;
 
+procedure TfrmProcedures.lbxSectionExit(Sender: TObject);
+begin
+  if TabIsPressed then begin
+    if lbMods.CanFocus then
+      lbMods.SetFocus;
+  end
+  else if ShiftTabIsPressed then
+    if lbSection.CanFocus then
+      lbSection.SetFocus;
+end;
+
 procedure TfrmProcedures.btnOtherClick(Sender: TObject);
 begin
   inherited;
   Sync2Grid;
   ShowModifiers;
+end;
+
+procedure TfrmProcedures.btnOtherExit(Sender: TObject);
+begin
+  if TabIsPressed then begin
+    if lbGrid.CanFocus then
+      lbGrid.SetFocus;
+  end
+  else if ShiftTabIsPressed then
+    if lbMods.CanFocus then
+      lbMods.SetFocus;    
 end;
 
 procedure TfrmProcedures.btnRemoveClick(Sender: TObject);
@@ -535,5 +582,8 @@ begin
   for i := 0 to lbGrid.Items.Count - 1 do
     TPCEProc(lbGrid.Items.Objects[i]).fIsOldProcedure := True;
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmProcedures);
 
 end.

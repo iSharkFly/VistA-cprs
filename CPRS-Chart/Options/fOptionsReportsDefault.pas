@@ -5,10 +5,10 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, Spin, fOptions, ComCtrls, ORFn, ORNet, ORCtrls,
-  ORDtTm, rCore;
+  ORDtTm, rCore, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmOptionsReportsDefault = class(TForm)
+  TfrmOptionsReportsDefault = class(TfrmBase508Form)
     Label2: TLabel;
     Label3: TLabel;
     Label4: TLabel;

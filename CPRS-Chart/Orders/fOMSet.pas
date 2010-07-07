@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, CheckLst, rOrders, uConst, ORFn, rODMeds, fODBase,uCore,fOrders, fframe;
+  StdCtrls, CheckLst, rOrders, uConst, ORFn, rODMeds, fODBase,uCore,fOrders, fframe, fBase508Form,
+  VA508AccessibilityManager;
 
 type
   TSetItem = class
@@ -16,7 +17,7 @@ type
     RefNum: Integer;
   end;
 
-  TfrmOMSet = class(TForm)
+  TfrmOMSet = class(TfrmBase508Form)
     lstSet: TCheckListBox;
     cmdInterupt: TButton;
     procedure cmdInteruptClick(Sender: TObject);
@@ -148,9 +149,12 @@ begin
               end;
     'D', 'Q': if not ActivateOrderDialog(IntToStr(SetItem.DialogIEN), FDelayEvent, Self, ItemIndex) then
                 begin
-                  if IsCreatedByMenu(SetItem) and (lstSet.ItemIndex < lstSet.Items.Count - 1) then
-                    lstSet.Checked[lstSet.ItemIndex] := True
-                  else SkipToNext;
+                  if Not FClosing then
+                  begin
+                    if IsCreatedByMenu(SetItem) and (lstSet.ItemIndex < lstSet.Items.Count - 1) then
+                      lstSet.Checked[lstSet.ItemIndex] := True
+                    else SkipToNext;
+                  end;
                 end;
     'M':      if ActivateOrderMenu(  IntToStr(SetItem.DialogIEN), FDelayEvent, Self, ItemIndex)
                 then Inc(FActiveMenus)

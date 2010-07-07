@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORCtrls, OrFn, Menus;
+  StdCtrls, ExtCtrls, ORCtrls, OrFn, Menus, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOptionsLists = class(TForm)
+  TfrmOptionsLists = class(TfrmBase508Form)
     pnlBottom: TPanel;
     btnOK: TButton;
     btnCancel: TButton;
@@ -31,6 +32,7 @@ type
     bvlBottom: TBevel;
     mnuPopPatient: TPopupMenu;
     mnuPatientID: TMenuItem;
+    grpVisibility: TRadioGroup;
     procedure FormCreate(Sender: TObject);
     procedure btnNewListClick(Sender: TObject);
     procedure radAddByTypeClick(Sender: TObject);
@@ -54,9 +56,11 @@ type
     procedure lstPersonalPatientsMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure lstAddByKeyPress(Sender: TObject; var Key: Char);
+    procedure grpVisibilityClick(Sender: TObject);
   private
     { Private declarations }
     FLastList: integer;
+    FChanging: boolean;
     procedure AddIfUnique(entry: string; aList: TORListBox);
   public
     { Public declarations }
@@ -69,7 +73,7 @@ procedure DialogOptionsLists(topvalue, leftvalue, fontsize: integer; var actiont
 
 implementation
 
-uses fOptionsNewList, rOptions, uOptions, rCore, fPtSelOptns;
+uses fOptionsNewList, rOptions, uOptions, rCore, fPtSelOptns, VAUtils;
 
 {$R *.DFM}
 
@@ -107,6 +111,8 @@ end;
 procedure TfrmOptionsLists.FormCreate(Sender: TObject);
 begin
   rpcGetPersonalLists(lstPersonalLists.Items);
+  grpVisibility.ItemIndex := 1;
+  grpVisibility.Enabled := FALSE;
   radAddByType.ItemIndex := 0;
   radAddByTypeClick(self);
   FLastList := 0;
@@ -203,8 +209,10 @@ begin
 end;
 
 procedure TfrmOptionsLists.lstPersonalListsChange(Sender: TObject);
+var
+  x: integer;
 begin
-  if btnListSaveChanges.Enabled then
+  if (btnListSaveChanges.Enabled) and (not FChanging) then
   begin
     if InfoBox('Do you want to save changes to '
         + Piece(lstPersonalLists.Items[FLastList], '^', 2) + '?',
@@ -223,9 +231,16 @@ begin
       btnPersonalPatientR.Enabled := false;
       btnPersonalPatientRA.Enabled := false;
       btnListSaveChanges.Enabled := false;
+      grpVisibility.Enabled := False;
       exit;
     end;
     ListPtByTeam(lstPersonalPatients.Items, strtointdef(Piece(Items[ItemIndex], '^', 1), 0));
+    grpVisibility.Enabled := TRUE;
+    FChanging := True;
+    x := StrToIntDef(Piece(Items[ItemIndex], '^', 9), 1);
+    if x = 2 then x := 1;
+    grpVisibility.ItemIndex := x;
+    FChanging := False;
     btnDeleteList.Enabled := true;
   end;
   if lstPersonalPatients.Items.Count = 1 then         // avoid selecting '^No patients found.' msg
@@ -339,8 +354,13 @@ var
   listien: integer;
 begin
   listien := strtointdef(Piece(lstPersonalLists.Items[FLastList], '^', 1), 0);
-  rpcSaveListChanges(lstPersonalPatients.Items, listien);
+  rpcSaveListChanges(lstPersonalPatients.Items, listien, grpVisibility.ItemIndex);
   btnListSaveChanges.Enabled := false;
+  rpcGetPersonalLists(lstPersonalLists.Items);
+  lstPersonalLists.ItemIndex := FLastList;
+  lstPersonalListsChange(Self);
+  if lstPersonalPatients.CanFocus then
+    lstPersonalPatients.SetFocus;
 end;
 
 procedure TfrmOptionsLists.btnPersonalPatientRAClick(Sender: TObject);
@@ -437,12 +457,18 @@ procedure TfrmOptionsLists.FormShow(Sender: TObject);
 begin
   with lstPersonalLists do
     if Items.Count < 1 then
-      showmessage('You have no personal lists. Use "New List..." to create one.')
+      ShowMsg('You have no personal lists. Use "New List..." to create one.')
     else
     begin
       ItemIndex := 0;
       lstPersonalListsChange(self);
     end;
+end;
+
+procedure TfrmOptionsLists.grpVisibilityClick(Sender: TObject);
+begin
+  inherited;
+  if not FChanging then btnListSaveChanges.Enabled := True;
 end;
 
 procedure TfrmOptionsLists.lstAddByNeedData(Sender: TObject;

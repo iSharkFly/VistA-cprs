@@ -4,17 +4,10 @@ inherited frmDiagnoses: TfrmDiagnoses
   Caption = 'Encounter Diagnoses'
   PixelsPerInch = 96
   TextHeight = 13
-  object lblAdd2PL: TLabel [0]
-    Left = 555
-    Top = 255
-    Width = 53
-    Height = 26
-    Caption = 'Add to Problem list'
-    WordWrap = True
-  end
   inherited lblSection: TLabel
     Width = 89
     Caption = 'Diagnoses Section'
+    ExplicitWidth = 89
   end
   inherited btnOK: TBitBtn
     TabOrder = 7
@@ -25,10 +18,12 @@ inherited frmDiagnoses: TfrmDiagnoses
   inherited pnlGrid: TPanel
     Width = 523
     TabOrder = 1
+    ExplicitWidth = 523
     inherited lbGrid: TORListBox
       Tag = 20
       Width = 523
       Pieces = '1,2,3'
+      ExplicitWidth = 523
     end
     inherited hcGrid: THeaderControl
       Width = 523
@@ -51,10 +46,31 @@ inherited frmDiagnoses: TfrmDiagnoses
           Text = 'Selected Diagnoses'
           Width = 110
         end>
+      ExplicitWidth = 523
     end
   end
   inherited edtComment: TCaptionEdit
     TabOrder = 3
+  end
+  object cmdDiagPrimary: TButton [8]
+    Left = 536
+    Top = 306
+    Width = 75
+    Height = 21
+    Caption = 'Primary'
+    Enabled = False
+    TabOrder = 5
+    OnClick = cmdDiagPrimaryClick
+  end
+  object ckbDiagProb: TCheckBox [9]
+    Left = 535
+    Top = 258
+    Width = 76
+    Height = 38
+    Caption = 'Add to Problem list'
+    TabOrder = 4
+    WordWrap = True
+    OnClick = ckbDiagProbClicked
   end
   inherited btnRemove: TButton
     TabOrder = 6
@@ -63,6 +79,7 @@ inherited frmDiagnoses: TfrmDiagnoses
     Left = 454
     TabOrder = 2
     TabStop = True
+    ExplicitLeft = 454
   end
   inherited pnlMain: TPanel
     TabOrder = 0
@@ -71,6 +88,7 @@ inherited frmDiagnoses: TfrmDiagnoses
       Height = 196
       IntegralHeight = True
       Pieces = '2,3,4,5'
+      ExplicitHeight = 196
     end
     inherited pnlLeft: TPanel
       inherited lbSection: TORListBox
@@ -84,23 +102,58 @@ inherited frmDiagnoses: TfrmDiagnoses
       end
     end
   end
-  object cmdDiagPrimary: TButton
-    Left = 536
-    Top = 306
-    Width = 75
-    Height = 21
-    Caption = 'Primary'
-    Enabled = False
-    TabOrder = 5
-    OnClick = cmdDiagPrimaryClick
-  end
-  object ckbDiagProb: TCheckBox
-    Left = 536
-    Top = 262
-    Width = 13
-    Height = 13
-    Caption = 'Add to Problem list'
-    TabOrder = 4
-    OnClick = ckbDiagProbClicked
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cmdDiagPrimary'
+        'Status = stsDefault')
+      (
+        'Component = ckbDiagProb'
+        'Status = stsDefault')
+      (
+        'Component = edtComment'
+        'Label = lblComment'
+        'Status = stsOK')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = btnSelectAll'
+        'Status = stsDefault')
+      (
+        'Component = pnlMain'
+        'Status = stsDefault')
+      (
+        'Component = lbxSection'
+        'Label = lblList'
+        'Status = stsOK')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = lbSection'
+        'Label = lblSection'
+        'Status = stsOK')
+      (
+        'Component = btnOther'
+        'Status = stsDefault')
+      (
+        'Component = pnlGrid'
+        'Status = stsDefault')
+      (
+        'Component = lbGrid'
+        'Status = stsDefault')
+      (
+        'Component = hcGrid'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmDiagnoses'
+        'Status = stsDefault'))
   end
 end

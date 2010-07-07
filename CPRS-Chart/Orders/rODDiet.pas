@@ -116,7 +116,7 @@ end;
 procedure AppendTFProducts(Dest: TStrings);
 begin
   CallV('ORWDFH TFPROD', [nil]);
-  Dest.AddStrings(RPCBrokerV.Results);
+  FastAddStrings(RPCBrokerV.Results, Dest);
 end;
 
 function ExpandedQuantity(Product, Strength: Integer; const Qty: string): string;
@@ -160,13 +160,13 @@ end;
 procedure LoadIsolations(Dest: TStrings);
 begin
   CallV('ORWDFH ISOLIST', [nil]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure LoadDietQuickList(Dest: TStrings; const GroupID: string);
 begin
   CallV('ORWDXQ GETQLST', [GroupID, 'Q']);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 function DietDialogType(GroupIEN: Integer): Char;
@@ -202,7 +202,7 @@ end;
 procedure GetCurrentRecurringOPMeals(Dest: TStrings; MealType: string = '');
 begin
   CallV('ORWDFH CURRENT MEALS', [Patient.DFN, MealType]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
   MixedCaseList(Dest);
 end;
 

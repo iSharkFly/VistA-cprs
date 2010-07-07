@@ -1,28 +1,24 @@
-object frmTemplateEditor: TfrmTemplateEditor
-  Left = 135
-  Top = 239
-  Width = 748
-  Height = 470
+inherited frmTemplateEditor: TfrmTemplateEditor
+  Left = 321
+  Top = 119
   HelpContext = 10000
   ActiveControl = tvPersonal
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Template Editor'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
+  ClientHeight = 450
+  ClientWidth = 740
   Position = poScreenCenter
   Scaled = False
+  OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
+  ExplicitWidth = 748
+  ExplicitHeight = 477
   PixelsPerInch = 96
   TextHeight = 13
-  object splMain: TSplitter
+  object splMain: TSplitter [0]
     Left = 0
     Top = 239
     Width = 740
@@ -34,9 +30,9 @@ object frmTemplateEditor: TfrmTemplateEditor
     MinSize = 40
     OnMoved = splMainMoved
   end
-  object splNotes: TSplitter
+  object splNotes: TSplitter [1]
     Left = 0
-    Top = 371
+    Top = 377
     Width = 740
     Height = 3
     Cursor = crVSplit
@@ -45,15 +41,17 @@ object frmTemplateEditor: TfrmTemplateEditor
     Beveled = True
     Visible = False
     OnMoved = splBoilMoved
+    ExplicitTop = 371
   end
-  object pnlBottom: TORAutoPanel
+  object pnlBottom: TPanel [2]
     Left = 0
-    Top = 416
+    Top = 423
     Width = 740
     Height = 27
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 4
+    ExplicitTop = 416
     DesignSize = (
       740
       27)
@@ -129,11 +127,11 @@ object frmTemplateEditor: TfrmTemplateEditor
       OnClick = cbEditSharedClick
     end
   end
-  object pnlBoilerplate: TPanel
+  object pnlBoilerplate: TPanel [3]
     Left = 0
     Top = 284
     Width = 740
-    Height = 87
+    Height = 93
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 2
@@ -141,27 +139,29 @@ object frmTemplateEditor: TfrmTemplateEditor
     OnResize = pnlBoilerplateResize
     object splBoil: TSplitter
       Left = 0
-      Top = 43
+      Top = 14
       Width = 740
       Height = 3
       Cursor = crVSplit
-      Align = alBottom
+      Align = alTop
       AutoSnap = False
       Beveled = True
       Visible = False
       OnMoved = splBoilMoved
+      ExplicitTop = 43
     end
     object reBoil: TRichEdit
       Left = 0
-      Top = 14
+      Top = 17
       Width = 740
-      Height = 29
+      Height = 30
       Align = alClient
       Font.Charset = ANSI_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
       Font.Name = 'Courier New'
       Font.Style = []
+      Constraints.MinHeight = 30
       ParentFont = False
       PlainText = True
       PopupMenu = popBoilerplate
@@ -174,12 +174,13 @@ object frmTemplateEditor: TfrmTemplateEditor
       OnKeyUp = reBoilKeyUp
       OnResizeRequest = reResizeRequest
       OnSelectionChange = reBoilSelectionChange
+      ExplicitTop = 14
     end
     object pnlGroupBP: TPanel
       Left = 0
-      Top = 46
+      Top = 47
       Width = 740
-      Height = 41
+      Height = 46
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 2
@@ -191,6 +192,7 @@ object frmTemplateEditor: TfrmTemplateEditor
         Height = 13
         Align = alTop
         Caption = 'Group Boilerplate'
+        ExplicitWidth = 81
       end
       object lblGroupRow: TLabel
         Left = 264
@@ -210,7 +212,7 @@ object frmTemplateEditor: TfrmTemplateEditor
         Left = 0
         Top = 16
         Width = 740
-        Height = 25
+        Height = 30
         Align = alClient
         Color = clCream
         Font.Charset = ANSI_CHARSET
@@ -218,6 +220,7 @@ object frmTemplateEditor: TfrmTemplateEditor
         Font.Height = -11
         Font.Name = 'Courier New'
         Font.Style = []
+        Constraints.MinHeight = 30
         ParentFont = False
         PlainText = True
         PopupMenu = popGroup
@@ -280,7 +283,7 @@ object frmTemplateEditor: TfrmTemplateEditor
       end
     end
   end
-  object pnlTop: TPanel
+  object pnlTop: TPanel [4]
     Left = 0
     Top = 0
     Width = 740
@@ -292,9 +295,7 @@ object frmTemplateEditor: TfrmTemplateEditor
     object splMiddle: TSplitter
       Left = 297
       Top = 24
-      Width = 3
       Height = 215
-      Cursor = crHSplit
       Align = alRight
       AutoSnap = False
       Beveled = True
@@ -318,9 +319,7 @@ object frmTemplateEditor: TfrmTemplateEditor
       object splProperties: TSplitter
         Left = 216
         Top = 0
-        Width = 3
         Height = 215
-        Cursor = crHSplit
         Align = alRight
         AutoSnap = False
         Beveled = True
@@ -427,6 +426,7 @@ object frmTemplateEditor: TfrmTemplateEditor
           Caption = '&Personal Templates'
           FocusControl = tvPersonal
           PopupMenu = popTemplates
+          ExplicitWidth = 93
         end
         object tvPersonal: TORTreeView
           Tag = 1
@@ -715,8 +715,8 @@ object frmTemplateEditor: TfrmTemplateEditor
             ParentShowHint = False
             ShowHint = True
             TabOrder = 5
-            OnClick = cbExcludeClick
             WordWrap = True
+            OnClick = cbExcludeClick
             AutoSize = True
           end
           object cbActive: TCheckBox
@@ -759,13 +759,10 @@ object frmTemplateEditor: TfrmTemplateEditor
               'Indicates the number of blank lines to insert, in the group boil' +
               'erplate, between each item'#39's boilerplate.'
             Associate = edtGap
-            Min = 0
             Max = 3
             ParentShowHint = False
-            Position = 0
             ShowHint = True
             TabOrder = 8
-            Wrap = False
           end
           object edtName: TCaptionEdit
             Left = 38
@@ -870,8 +867,8 @@ object frmTemplateEditor: TfrmTemplateEditor
             ParentShowHint = False
             ShowHint = True
             TabOrder = 4
-            OnClick = cbHideItemsClick
             WordWrap = True
+            OnClick = cbHideItemsClick
             AutoSize = True
           end
           object cbxType: TCaptionComboBox
@@ -912,6 +909,7 @@ object frmTemplateEditor: TfrmTemplateEditor
             SynonymChars = '<>'
             TabOrder = 2
             OnChange = cbxRemDlgsChange
+            CharsNeedMatch = 1
           end
           object cbLock: TORCheckBox
             Left = 168
@@ -942,6 +940,7 @@ object frmTemplateEditor: TfrmTemplateEditor
         Caption = '&Shared Templates'
         FocusControl = tvShared
         PopupMenu = popTemplates
+        ExplicitWidth = 86
       end
       object tvShared: TORTreeView
         Left = 0
@@ -1187,16 +1186,17 @@ object frmTemplateEditor: TfrmTemplateEditor
         TabOrder = 1
         OnChange = cboOwnerChange
         OnNeedData = cboOwnerNeedData
+        CharsNeedMatch = 1
       end
       object btnNew: TORAlignButton
         Left = 558
         Top = 0
         Width = 182
         Height = 22
+        Align = alRight
         Caption = '&New Template'
         TabOrder = 2
         OnClick = btnNewClick
-        Align = alRight
       end
       object pnlMenu: TPanel
         Left = 0
@@ -1211,14 +1211,13 @@ object frmTemplateEditor: TfrmTemplateEditor
         object mbMain: TMenuBar
           Left = 1
           Top = 1
-          Width = 69
+          Width = 107
           Height = 20
           Align = alLeft
           AutoSize = True
           ButtonHeight = 21
           ButtonWidth = 43
           Caption = 'mbMain'
-          Flat = True
           Menu = mnuMain
           ShowCaptions = True
           TabOrder = 0
@@ -1227,11 +1226,11 @@ object frmTemplateEditor: TfrmTemplateEditor
       end
     end
   end
-  object pnlNotes: TPanel
+  object pnlNotes: TPanel [5]
     Left = 0
-    Top = 374
+    Top = 380
     Width = 740
-    Height = 42
+    Height = 43
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 3
@@ -1243,18 +1242,20 @@ object frmTemplateEditor: TfrmTemplateEditor
       Height = 13
       Align = alTop
       Caption = 'Template Notes:'
+      ExplicitWidth = 78
     end
     object reNotes: TRichEdit
       Left = 0
       Top = 13
       Width = 740
-      Height = 29
+      Height = 30
       Align = alClient
       Font.Charset = ANSI_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
       Font.Name = 'Courier New'
       Font.Style = []
+      Constraints.MinHeight = 30
       ParentFont = False
       PlainText = True
       PopupMenu = popNotes
@@ -1268,7 +1269,7 @@ object frmTemplateEditor: TfrmTemplateEditor
       OnResizeRequest = reResizeRequest
     end
   end
-  object pnlCOM: TPanel
+  object pnlCOM: TPanel [6]
     Left = 0
     Top = 263
     Width = 740
@@ -1285,6 +1286,7 @@ object frmTemplateEditor: TfrmTemplateEditor
       Align = alLeft
       Caption = '  Passed Value: '
       Layout = tlCenter
+      ExplicitHeight = 13
     end
     object lblCOMObj: TLabel
       Left = 0
@@ -1294,15 +1296,16 @@ object frmTemplateEditor: TfrmTemplateEditor
       Align = alLeft
       Caption = ' COM Object: '
       Layout = tlCenter
+      ExplicitHeight = 13
     end
     object edtCOMParam: TCaptionEdit
       Left = 360
       Top = 0
       Width = 380
       Height = 21
+      Align = alClient
       TabOrder = 0
       OnChange = edtCOMParamChange
-      Align = alClient
       Caption = 'Passed Value'
     end
     object cbxCOMObj: TORComboBox
@@ -1328,9 +1331,10 @@ object frmTemplateEditor: TfrmTemplateEditor
       SynonymChars = '<>'
       TabOrder = 1
       OnChange = cbxCOMObjChange
+      CharsNeedMatch = 1
     end
   end
-  object pnlLink: TPanel
+  object pnlLink: TPanel [7]
     Left = 0
     Top = 242
     Width = 740
@@ -1347,6 +1351,7 @@ object frmTemplateEditor: TfrmTemplateEditor
       Align = alLeft
       Caption = ' Associated Consult Service: '
       Layout = tlCenter
+      ExplicitHeight = 13
     end
     object cbxLink: TORComboBox
       Left = 138
@@ -1366,7 +1371,7 @@ object frmTemplateEditor: TfrmTemplateEditor
       LongList = True
       LookupPiece = 0
       MaxLength = 0
-      Pieces = '2,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1'
+      Pieces = '2'
       HideSynonyms = True
       Sorted = False
       SynonymChars = '<>'
@@ -1375,8 +1380,254 @@ object frmTemplateEditor: TfrmTemplateEditor
       TabStop = True
       OnChange = cbxLinkChange
       OnNeedData = cbxLinkNeedData
-      OnSynonymCheck = cbxLinkSynonymCheck
+      CharsNeedMatch = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnApply'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = cbEditShared'
+        'Status = stsDefault')
+      (
+        'Component = cbNotes'
+        'Status = stsDefault')
+      (
+        'Component = cbEditUser'
+        'Status = stsDefault')
+      (
+        'Component = pnlBoilerplate'
+        'Status = stsDefault')
+      (
+        'Component = reBoil'
+        'Label = lblBoilerplate'
+        'Status = stsOK')
+      (
+        'Component = pnlGroupBP'
+        'Status = stsDefault')
+      (
+        'Component = reGroupBP'
+        'Label = lblGroupBP'
+        'Status = stsOK')
+      (
+        'Component = pnlGroupBPGap'
+        'Status = stsDefault')
+      (
+        'Component = pnlBP'
+        'Status = stsDefault')
+      (
+        'Component = cbLongLines'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = pnlRightTop'
+        'Status = stsDefault')
+      (
+        'Component = pnlCopyBtns'
+        'Status = stsDefault')
+      (
+        'Component = sbCopyRight'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = sbCopyLeft'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = pnlPersonal'
+        'Status = stsDefault')
+      (
+        'Component = tvPersonal'
+        'Status = stsDefault')
+      (
+        'Component = pnlPersonalBottom'
+        'Status = stsDefault')
+      (
+        'Component = sbPerUp'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = sbPerDown'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = sbPerDelete'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = cbPerHide'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = pnlPersonalGap'
+        'Status = stsDefault')
+      (
+        'Component = pnlPerSearch'
+        'Status = stsDefault')
+      (
+        'Component = btnPerFind'
+        'Text = Find Personal Template'
+        'Status = stsOK')
+      (
+        'Component = edtPerSearch'
+        'Status = stsDefault')
+      (
+        'Component = cbPerMatchCase'
+        'Status = stsDefault')
+      (
+        'Component = cbPerWholeWords'
+        'Status = stsDefault')
+      (
+        'Component = pnlProperties'
+        'Status = stsDefault')
+      (
+        'Component = gbProperties'
+        'Status = stsDefault')
+      (
+        'Component = cbExclude'
+        'Status = stsDefault')
+      (
+        'Component = cbActive'
+        'Status = stsDefault')
+      (
+        'Component = edtGap'
+        'Status = stsDefault')
+      (
+        'Component = udGap'
+        'Status = stsDefault')
+      (
+        'Component = edtName'
+        'Status = stsDefault')
+      (
+        'Component = gbDialogProps'
+        'Status = stsDefault')
+      (
+        'Component = cbDisplayOnly'
+        'Status = stsDefault')
+      (
+        'Component = cbOneItemOnly'
+        'Status = stsDefault')
+      (
+        'Component = cbFirstLine'
+        'Status = stsDefault')
+      (
+        'Component = cbHideDlgItems'
+        'Status = stsDefault')
+      (
+        'Component = cbIndent'
+        'Status = stsDefault')
+      (
+        'Component = cbHideItems'
+        'Status = stsDefault')
+      (
+        'Component = cbxType'
+        'Status = stsDefault')
+      (
+        'Component = cbxRemDlgs'
+        'Status = stsDefault')
+      (
+        'Component = cbLock'
+        'Status = stsDefault')
+      (
+        'Component = pnlShared'
+        'Status = stsDefault')
+      (
+        'Component = tvShared'
+        'Status = stsDefault')
+      (
+        'Component = pnlSharedBottom'
+        'Status = stsDefault')
+      (
+        'Component = sbShUp'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = sbShDown'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = sbShDelete'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = cbShHide'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = pnlSharedGap'
+        'Status = stsDefault')
+      (
+        'Component = pnlShSearch'
+        'Status = stsDefault')
+      (
+        'Component = btnShFind'
+        'Text = Find Shared Template'
+        'Status = stsOK')
+      (
+        'Component = edtShSearch'
+        'Status = stsDefault')
+      (
+        'Component = cbShMatchCase'
+        'Status = stsDefault')
+      (
+        'Component = cbShWholeWords'
+        'Status = stsDefault')
+      (
+        'Component = pnlMenuBar'
+        'Status = stsDefault')
+      (
+        'Component = cboOwner'
+        'Status = stsDefault')
+      (
+        'Component = btnNew'
+        'Status = stsDefault')
+      (
+        'Component = pnlMenu'
+        'Status = stsDefault')
+      (
+        'Component = mbMain'
+        'Status = stsDefault')
+      (
+        'Component = pnlNotes'
+        'Status = stsDefault')
+      (
+        'Component = reNotes'
+        'Label = lblNotes'
+        'Status = stsOK')
+      (
+        'Component = pnlCOM'
+        'Status = stsDefault')
+      (
+        'Component = edtCOMParam'
+        'Label = lblCOMParam'
+        'Status = stsOK')
+      (
+        'Component = cbxCOMObj'
+        'Property = Caption'
+        'Status = stsOK')
+      (
+        'Component = pnlLink'
+        'Status = stsDefault')
+      (
+        'Component = cbxLink'
+        'Label = lblLink'
+        'Status = stsOK')
+      (
+        'Component = frmTemplateEditor'
+        'Status = stsDefault'))
   end
   object popTemplates: TPopupMenu
     OnPopup = popTemplatesPopup
@@ -1748,5 +1999,18 @@ object frmTemplateEditor: TfrmTemplateEditor
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 56
     Top = 136
+  end
+  object imgLblTemplates: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvPersonal
+      end
+      item
+        Component = tvShared
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblHealthFactorLabels
+    Left = 104
+    Top = 144
   end
 end

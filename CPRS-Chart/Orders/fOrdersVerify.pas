@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORFn, ORCtrls, ExtCtrls;
+  fAutoSz, StdCtrls, ORFn, ORCtrls, ExtCtrls, VA508AccessibilityManager;
 
 type
   TfrmVerifyOrders = class(TfrmAutoSz)
@@ -126,7 +126,6 @@ begin
     Canvas.FillRect(ARect);
     x := FilteredString(Items[Index]);
     AHeight := WrappedTextHeightByFont(Canvas, Font, x, ARect);
-    //if AHeight > 255 then AHeight := 255;
     if AHeight <  13 then AHeight := 15;
   end;
 end;
@@ -144,7 +143,7 @@ begin
     ARect := Rect;
     ARect.Left := ARect.Left + 2;
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     SaveColor := Canvas.Brush.Color;
     Canvas.MoveTo(ARect.Left, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);

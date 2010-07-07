@@ -3,10 +3,10 @@ unit fODRadApproval;
 interface
 
 uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
-  Buttons, ORCtrls, ORfn, ExtCtrls;
+  Buttons, ORCtrls, ORfn, ExtCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmODRadApproval = class(TForm)
+  TfrmODRadApproval = class(TfrmBase508Form)
     cmdOK: TButton;
     cmdCancel: TButton;
     cboRadiologist: TORComboBox;
@@ -48,7 +48,7 @@ begin
       ClientWidth  := W; pnlBase.Width  := W;
       ClientHeight := H; pnlBase.Height := H;
       FChanged := False;
-      cboRadiologist.Items.Assign(SubsetOfRadiologists);
+      FastAssign(SubsetOfRadiologists, cboRadiologist.Items);
       ShowModal;
       Radiologist := FRadiologist ;
     end; {with frmODRadApproval}

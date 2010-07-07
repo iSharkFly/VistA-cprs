@@ -1,11 +1,13 @@
 unit fPCEBaseMain;
+{Warning: The tab order has been changed in the OnExit event of several controls.
+ To change the tab order of lbSection, lbxSection, and btnOther you must do it programatically.}
 
 interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fPCEBaseGrid, ComCtrls, StdCtrls, ORCtrls, ExtCtrls, Buttons, rPCE, uPCE,
-  CheckLst, ORFn;
+  CheckLst, ORFn, VA508AccessibilityManager;
 
 type
   TCopyItemsMethod = procedure(Dest: TStrings) of object;
@@ -40,10 +42,16 @@ type
     procedure lbxSectionClickCheck(Sender: TObject; Index: Integer);
     procedure splLeftMoved(Sender: TObject);
     procedure edtCommentKeyPress(Sender: TObject; var Key: Char);
+    procedure lbSectionExit(Sender: TObject);
+    procedure btnOtherExit(Sender: TObject);
+    procedure lbxSectionExit(Sender: TObject);
+    procedure lbGridExit(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     FCommentItem: integer;
     FCommentChanged: boolean;
     FUpdateCount: integer;
+    FSectionPopulated: boolean;
     //FUpdatingGrid: boolean;  moved to 'protected' so frmDiagnoses can see it  (RV)
   protected
     FUpdatingGrid: boolean;
@@ -76,9 +84,17 @@ const
 
 implementation
 
-uses fPCELex, fPCEOther, fEncounterFrame, fHFSearch;
+uses fPCELex, fPCEOther, fEncounterFrame, fHFSearch, VA508AccessibilityRouter,
+  ORCtrlsVA508Compatibility, fBase508Form;
 
 {$R *.DFM}
+
+type
+  TLBSectionManager = class(TORListBox508Manager)
+  public
+    function GetItemInstructions(Component: TWinControl): string; override;
+    function GetState(Component: TWinControl): string; override;    
+  end;
 
 procedure TfrmPCEBaseMain.lbSectionClick(Sender: TObject);
 begin
@@ -86,6 +102,15 @@ begin
   ClearGrid;
   FPCEListCodesProc(lbxSection.Items, lbSection.ItemIEN);
   CheckOffEntries;
+  FSectionPopulated := TRUE;
+end;
+
+procedure TfrmPCEBaseMain.lbSectionExit(Sender: TObject);
+begin
+  inherited;
+  if TabIsPressed then
+    if lbxSection.CanFocus then
+      lbxSection.SetFocus;
 end;
 
 procedure TfrmPCEBaseMain.UpdateNewItemStr(var x: string);
@@ -101,14 +126,15 @@ begin
   BeginUpdate;
   try
     SaveGridSelected;
-    tmpList.Assign(lbGrid.Items);
+    FastAssign(lbGrid.Items, tmpList);
     for i := 0 to lbGrid.Items.Count-1 do
     begin
       //lbGrid.Items[i] := TPCEItem(lbGrid.Items.Objects[i]).ItemStr;   v22.5 - RV
       tmpList[i] := TPCEItem(lbGrid.Items.Objects[i]).ItemStr;
       tmpList.Objects[i] := lbGrid.Items.Objects[i];
     end;
-    lbGrid.Items.Assign(tmpList);
+  //FastAssign(tmpList,lbGrid.Items); //cq: 13228  Causin a/v errors.
+    lbGrid.Items.Assign(tmpList);    //cq: 13228
     RestoreGridSelected;
     SyncGridData;
   finally
@@ -152,6 +178,18 @@ begin
     SyncGridData;
   end;
   UpdateControls;
+end;
+
+procedure TfrmPCEBaseMain.btnOtherExit(Sender: TObject);
+begin
+  inherited;
+  if TabIsPressed then begin
+    if lbGrid.CanFocus then
+      lbGrid.SetFocus
+  end
+  else if ShiftTabIsPressed then
+    if lbxSection.CanFocus then
+      lbxSection.SetFocus;
 end;
 
 procedure TfrmPCEBaseMain.edtCommentExit(Sender: TObject);
@@ -239,11 +277,26 @@ begin
 //    ClearGrid;
 end;
 
+procedure TfrmPCEBaseMain.lbGridExit(Sender: TObject);
+begin
+  inherited;
+  if ShiftTabIsPressed then
+    if btnOther.CanFocus then
+      btnOther.SetFocus;
+end;
+
 procedure TfrmPCEBaseMain.lbGridSelect(Sender: TObject);
 begin
   inherited;
 //  clbList.ItemIndex := -1;
   UpdateControls;
+end;
+
+procedure TfrmPCEBaseMain.FormCreate(Sender: TObject);
+begin
+  inherited FormCreate(Sender);
+  lbxSection.HideSelection := TRUE;
+  amgrMain.ComponentManager[lbSection] := TLBSectionManager.Create;
 end;
 
 procedure TfrmPCEBaseMain.FormDestroy(Sender: TObject);
@@ -412,6 +465,18 @@ begin
   UpdateControls;
 end;
 
+procedure TfrmPCEBaseMain.lbxSectionExit(Sender: TObject);
+begin
+  inherited;
+  if TabIsPressed then begin
+    if btnOther.CanFocus then
+      btnOther.SetFocus
+  end
+  else if ShiftTabIsPressed then
+    if lbSection.CanFocus then
+      lbSection.SetFocus;
+end;
+
 procedure TfrmPCEBaseMain.UpdateTabPos;
 begin
   lbxSection.TabPositions := SectionString;
@@ -501,5 +566,38 @@ begin
      ((edtComment.Text = '') or (edtComment.SelStart = 0)) then
     Key := #0;
 end;
+
+{ TLBSectionManager }
+
+function TLBSectionManager.GetItemInstructions(Component: TWinControl): string;
+var
+  lb : TORListBox;
+  idx: integer;
+begin
+  lb := TORListBox(Component);
+  idx := lb.ItemIndex;
+  if (idx >= 0) and lb.Selected[idx] then
+    Result := 'Press space bar to populate ' +
+        TfrmPCEBaseMain(Component.Owner).FTabName + ' section'
+  else
+    result := inherited GetItemInstructions(Component);
+end;
+
+function TLBSectionManager.GetState(Component: TWinControl): string;
+var
+  frm: TfrmPCEBaseMain;
+begin
+  Result := '';
+  frm := TfrmPCEBaseMain(Component.Owner);
+  if frm.FSectionPopulated then
+  begin
+    frm.FSectionPopulated := FALSE;
+    Result := frm.FTabName + ' section populated with ' +
+        inttostr(frm.lbxSection.Count) + ' items';
+  end;
+end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmPCEBaseMain);
 
 end.

@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ORFn, uCore, StdCtrls, CheckLst, ComCtrls,ExtCtrls,uConst, ORCtrls;
+  ORFn, uCore, StdCtrls, CheckLst, ComCtrls,ExtCtrls,uConst, ORCtrls, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmInvalidActionList = class(TForm)
+  TfrmInvalidActionList = class(TfrmBase508Form)
     pnlTop: TPanel;
     lstActDeniedOrders: TCaptionListBox;
     Label1: TLabel;
@@ -41,6 +42,9 @@ type
   procedure DisplayOrdersForAction(TheInvalidList: TStringList; TheValidList: TStringList; TheAction: String);
 
 implementation
+
+uses
+  VA2006Utils;
 
 {$R *.DFM}
 
@@ -96,7 +100,7 @@ begin
   begin
     ARect := TheRect;
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     Canvas.MoveTo(ARect.Left, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);
     RightSide := -2;
@@ -167,6 +171,7 @@ end;
 
 procedure TfrmInvalidActionList.FormCreate(Sender: TObject);
 begin
+  FixHeaderControlDelphi2006Bug(hdrAction);
   TheInvaList := TStringList.Create;
 end;
 
@@ -233,7 +238,7 @@ begin
   begin
     ARect := TheRect;
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     SaveColor := Canvas.Brush.Color;    
     Canvas.MoveTo(ARect.Left, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);

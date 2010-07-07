@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fODBase, ORCtrls, StdCtrls, ORFn, ExtCtrls, uConst, ComCtrls, uCore,
-  Menus;
+  Menus, VA508AccessibilityManager;
 
 type
   TfrmODMedIn = class(TfrmODBase)

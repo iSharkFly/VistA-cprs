@@ -7,7 +7,8 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fODBase, StdCtrls, ORCtrls, ExtCtrls, ComCtrls, ORfn, uConst, Buttons,
-  Menus, UBAGlobals, rOrders, fBALocalDiagnoses, UBAConst, UBACore, ORNet ;
+  Menus, UBAGlobals, rOrders, fBALocalDiagnoses, UBAConst, UBACore, ORNet,
+  VA508AccessibilityManager ;
 
 type
   TfrmODCslt = class(TfrmODBase)
@@ -17,10 +18,10 @@ type
     txtProvDiag: TCaptionEdit;
     txtAttn: TORComboBox;
     lblService: TLabel;
-    lblUrgency: TStaticText;
-    lblPlace: TStaticText;
-    lblAttn: TStaticText;
-    lblProvDiag: TStaticText;
+    lblUrgency: TLabel;
+    lblPlace: TLabel;
+    lblAttn: TLabel;
+    lblProvDiag: TLabel;
     treService: TORTreeView;
     cboCategory: TORComboBox;
     pnlServiceTreeButton: TKeyClickPanel;
@@ -85,6 +86,8 @@ type
     procedure btnDiagnosisClick(Sender: TObject);
     procedure cmdQuitClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormResize(Sender: TObject);
+    procedure treServiceEnter(Sender: TObject);
 
   private
     FcboServiceKeyDownStopClick : boolean;
@@ -102,6 +105,7 @@ type
     procedure SetUpQuickOrderDX;
     procedure SaveConsultDxForNurse(pDiagnosis: string);  // save the dx entered by nurese if Master BA switch is ON
     procedure SetUpCopyConsultDiagnoses(pOrderID:string);
+    procedure AdjustMemReasonSize;
   protected
     procedure InitDialog; override;
     procedure Validate(var AnErrMsg: string); override;
@@ -124,7 +128,7 @@ implementation
 
 uses
     rODBase, rConsults, uCore, uConsults, rCore, fConsults, fPCELex, rPCE, fPreReq,
-    ORClasses, clipbrd, uTemplates, fFrame, uODBase;
+    ORClasses, clipbrd, uTemplates, fFrame, uODBase, uVA508CPRSCompatibility;
 
 var
   SvcList, QuickList, Defaults: TStrings ;
@@ -151,6 +155,10 @@ const
   TX_INACTIVE_CODE1  = 'The provisional diagnosis code is not active as of today''s date.' + #13#10;
   TX_INACTIVE_CODE_REQD     = 'Another code must be selected before the order can be saved.';
   TX_INACTIVE_CODE_OPTIONAL = 'If another code is not selected, no code will be saved.';
+
+  TX_SVC_HRCHY = 'services/specialties hierarchy';
+  TX_VIEW_SVC_HRCHY = 'View services/specialties hierarchically';
+  TX_CLOSE_SVC_HRCHY = 'Close services/specialties hierarchy tree view';
 
 procedure TfrmODCslt.FormCreate(Sender: TObject);
 begin
@@ -179,7 +187,7 @@ begin
   StatusText('Loading Dialog Definition');
   Responses.Dialog := 'GMRCOR CONSULT';   // loads formatting info
   StatusText('Loading Default Values');
-  Defaults.Assign(ODForConsults);  // ODForConsults returns TStrings with defaults
+  FastAssign(ODForConsults, Defaults);  // ODForConsults returns TStrings with defaults
   CtrlInits.LoadDefaults(Defaults);
   txtAttn.InitLongList('') ;
   PreserveControl(txtAttn);
@@ -228,8 +236,8 @@ begin
   cboService.Height := 25 + (7 * cboService.ItemHeight);
   btnServiceTree.Enabled := True;
   pnlServiceTreeButton.Enabled := True;
-  ActiveControl := cboService;
   SetProvDiagPromptingMode;
+  ActiveControl := cboService; // set after call to SetProvDiagPromptingMode
   Changing := False;
   StatusText('');
 end;
@@ -239,6 +247,9 @@ const
   TX_INACTIVE_SVC = 'This consult service is currently inactive and not receiving requests.' + CRLF +
                     'Please contact your Clinical Coordinator/IRM staff to fix this order.';
   TX_INACTIVE_SVC_CAP = 'Inactive Service';
+  TX_NO_SVC = 'The order or quick order you have selected does not specify a consult service.' + CRLF +
+              'Please contact your Clinical Coordinator/IRM staff to fix this order.';
+  TC_NO_SVC = 'No service specified';
 var
  i:integer;
  AList: TStringList;
@@ -253,7 +264,15 @@ begin
     begin
       Changing := True;
       tmpResp := TResponse(FindResponseByName('ORDERABLE',1));
-      SvcIEN := GetServiceIEN(tmpResp.IValue);
+      if tmpResp <> nil then
+        SvcIEN := GetServiceIEN(tmpResp.IValue)
+      else
+        begin
+          InfoBox(TX_NO_SVC, TC_NO_SVC, MB_ICONERROR or MB_OK);
+          AbortOrder := True;
+          Close;
+          Exit;
+        end;
       if SvcIEN = '-1' then
         begin
           InfoBox(TX_INACTIVE_SVC, TX_INACTIVE_SVC_CAP, MB_OK);
@@ -283,16 +302,30 @@ begin
         end;
       SetProvDiagPromptingMode;
       GetProvDxandValidateCode(Responses);
+      SetTemplateDialogCanceled(FALSE);
       SetControl(memReason,     'COMMENT',   1);
+      if WasTemplateDialogCanceled then
+      begin
+        AbortOrder := True;
+        Close;
+        Exit;
+      end;
+      SetTemplateDialogCanceled(FALSE);
       SetupReasonForRequest(OrderAction);
+      if WasTemplateDialogCanceled then
+      begin
+        AbortOrder := True;
+        Close;
+        Exit;
+      end;
       Changing := False;
       ControlChange(Self);
     end
     else
     begin
       if QuickList.Count > 0 then BuildQuickTree(QuickList, '0', nil) ;
-      SvcList.Assign(LoadServiceListWithSynonyms(CN_SVC_LIST_ORD));           {RV}
-      AList.Assign(SvcList);
+      FastAssign(LoadServiceListWithSynonyms(CN_SVC_LIST_ORD), SvcList);           {RV}
+      FastAssign(SvcList, AList);
       SortByPiece(AList, U, 2);
       BuildServiceTree(treService, SvcList, '0', nil) ;
       with treService do
@@ -307,7 +340,7 @@ begin
         end ;
       if QuickList.Count > 0 then with cboService do
         begin
-          Items.Assign(QuickList);
+          FastAssign(QuickList, cboService.Items);
           Items.Add(LLS_LINE);
           Items.Add(LLS_SPACE);
         end;
@@ -337,7 +370,7 @@ begin
               Close;
               Exit;
             end;
-          memReason.Lines.Assign(DefaultReasonForRequest(cboService.ItemID, True));
+          QuickCopy(DefaultReasonForRequest(cboService.ItemID, True), memReason);
         end;
       PreserveControl(treService);
       PreserveControl(cboService);
@@ -554,9 +587,16 @@ begin
       SetControl(cboUrgency,    'URGENCY',     1);
       SetControl(cboPlace,      'PLACE',     1);
       SetControl(txtAttn,       'PROVIDER',  1);
+      SetTemplateDialogCanceled(FALSE);
       SetControl(memReason,     'COMMENT',   1);
+      if WasTemplateDialogCanceled and OrderContainsObjects then
+      begin
+        AbortOrder := TRUE;
+        Close;
+        Exit;
+      end;
       if ((cboService.ItemIEN > 0) and (Length(memReason.Text) = 0)) then
-        memReason.Lines.Assign(DefaultReasonForRequest(cboService.ItemID, True));
+        QuickCopy(DefaultReasonForRequest(cboService.ItemID, True), memReason);
       SetupReasonForRequest(ORDER_QUICK);
       GetProvDxandValidateCode(Responses);
       Changing := False;
@@ -570,7 +610,7 @@ begin
               Close;
               Exit;
             end;
-          memReason.Lines.Assign(DefaultReasonForRequest(cboService.ItemID, True));
+          QuickCopy(DefaultReasonForRequest(cboService.ItemID, True), memReason);
           SetupReasonForRequest(ORDER_NEW);
         end;
     end;
@@ -619,9 +659,16 @@ begin
   memOrder.Text := Responses.OrderText;
 end;
 
+procedure TfrmODCslt.treServiceEnter(Sender: TObject);
+begin
+  inherited;
+  cmdQuit.Cancel := FALSE;
+end;
+
 procedure TfrmODCslt.treServiceExit(Sender: TObject);
 begin
   inherited;
+  cmdQuit.Cancel := TRUE;
   with cboService do
   begin
     if ItemIEN > 0 then
@@ -687,9 +734,11 @@ begin
   inherited;
   AStringList := TStringList.Create;
   try
-    AStringList.Assign(memReason.Lines);
+    //QuickCopy(memReason, AStringList);
+    AStringList.Text := memReason.Text;
     LimitStringLength(AStringList, 74);
-    memReason.Lines.Assign(AstringList);
+    //QuickCopy(AstringList, memReason);
+    memReason.Text := AStringList.Text;
     ControlChange(Self);
   finally
     AStringList.Free;
@@ -761,9 +810,16 @@ begin
               SetControl(cboUrgency,    'URGENCY',     1);
               SetControl(cboPlace,      'PLACE',     1);
               SetControl(txtAttn,       'PROVIDER',  1);
+              SetTemplateDialogCanceled(FALSE);
               SetControl(memReason,     'COMMENT',   1);
+              if WasTemplateDialogCanceled and OrderContainsObjects then
+              begin
+                AbortOrder := TRUE;
+                Close;
+                Exit;
+              end;
 //              if ((cboService.ItemIEN > 0) and (Length(memReason.Text) = 0)) then
-//                memReason.Lines.Assign(DefaultReasonForRequest(cboService.ItemID, True));
+//                QuickCopy(DefaultReasonForRequest(cboService.ItemID, True), memReason);
               SetupReasonForRequest(ORDER_QUICK);
               GetProvDxandValidateCode(Responses);
               Changing := False;
@@ -778,7 +834,7 @@ begin
                       Close;
                       Exit;
                     end;
-                  memReason.Lines.Assign(DefaultReasonForRequest(cboService.ItemID, True));
+                  QuickCopy(DefaultReasonForRequest(cboService.ItemID, True), memReason);
                   SetupReasonForRequest(ORDER_NEW);
                   Changing := False;
                 end;
@@ -823,6 +879,10 @@ begin
   treService.Visible := not treService.Visible;
   if treService.Visible then
   begin
+  // for some reason screen reader is reading caption when tree view is not visible
+    treService.Caption := TX_SVC_HRCHY;
+    pnlServiceTreeButton.Caption := TX_CLOSE_SVC_HRCHY;
+    btnServiceTree.Hint := TX_CLOSE_SVC_HRCHY;
     treService.SetFocus;
     with treService do for i := 0 to Items.Count-1 do
     begin
@@ -833,6 +893,13 @@ begin
           break;
         end;
     end;
+  end
+  else
+  begin
+    treService.Caption := '';
+    pnlServiceTreeButton.Caption := TX_VIEW_SVC_HRCHY;
+    btnServiceTree.Hint := TX_VIEW_SVC_HRCHY;
+    pnlServiceTreeButton.SetFocus;
   end;
   Changing := False;
 end;
@@ -862,7 +929,6 @@ begin
          cmdLexSearch.Enabled   := False;
       txtProvDiag.Enabled    := False;
       txtProvDiag.Font.Color := clGrayText;
-      lblProvDiag.Enabled    := False;
       txtProvDiag.ReadOnly   := True;
       txtProvDiag.Color      := clBtnFace;
     end
@@ -939,7 +1005,6 @@ begin
   txtProvDiag.ReadOnly   := True;
   txtProvDiag.Color      := clBtnFace;
   txtProvDiag.Font.Color := clBtnText;
-  lblProvDiag.Enabled    := False;
   txtProvDiag.Hint       := '';
   if cboService.ItemIEN = 0 then Exit;
   GetProvDxMode(ProvDx, cboService.ItemID + CSLT_PTR);
@@ -961,7 +1026,6 @@ begin
       txtProvDiag.ReadOnly   := True;
       txtProvDiag.Color      := clBtnFace;
       txtProvDiag.Font.Color := clBtnText;
-      lblProvDiag.Enabled    := False;
     end
   else
     case ProvDx.PromptMode[1] of
@@ -971,7 +1035,6 @@ begin
               txtProvDiag.ReadOnly   := False;
               txtProvDiag.Color      := clWindow;
               txtProvDiag.Font.Color := clWindowText;
-              lblProvDiag.Enabled    := True;
             end;
       'L':  begin
               if BILLING_AWARE then
@@ -988,7 +1051,6 @@ begin
               txtProvDiag.ReadOnly   := True;
               txtProvDiag.Color      := clInfoBk;
               txtProvDiag.Font.Color := clInfoText;
-              lblProvDiag.Enabled    := True;
            end;
     end;
 end;
@@ -1036,7 +1098,7 @@ var
 
 begin
   if ((OrderAction = ORDER_QUICK) and (cboService.ItemID <> '') and (Length(memReason.Text) = 0)) then
-    memReason.Lines.Assign(DefaultReasonForRequest(cboService.ItemID, True));
+    QuickCopy(DefaultReasonForRequest(cboService.ItemID, True), memReason);
   EditReason := GMRCREAF;
   if EditReason = '' then EditReason := ReasonForRequestEditable(cboService.ItemID + CSLT_PTR);
   case EditReason[1] of
@@ -1064,7 +1126,7 @@ begin
     with cboService do
       if ItemIEN > 0 then
         begin
-          Alist.Assign(GetServicePrerequisites(ItemID + CSLT_PTR));
+          FastAssign(GetServicePrerequisites(ItemID + CSLT_PTR), Alist);
           if AList.Count > 0 then
             begin
               if not DisplayPrerequisites(AList, TC_PREREQUISITES + DisplayText[ItemIndex]) then
@@ -1153,14 +1215,22 @@ begin
   TmpSL := TStringList.Create;
   try
     Result := GetDefaultReasonForRequest(Service + CSLT_PTR, Resolve);
-    TmpSL.Assign(Result);
+    FastAssign(Result, TmpSL);
     x := TmpSL.Text;
     ExpandOrderObjects(x, HasObjects);
     TmpSL.Text := x;
     Responses.OrderContainsObjects := HasObjects;
     ExecuteTemplateOrBoilerPlate(TmpSL, cboService.ItemIEN , ltConsult, nil, 'Reason for Request: ' + cboService.DisplayText[cboService.ItemIndex], DocInfo);
-    if TmpSL.Text <> x then Responses.OrderContainsObjects := False;
-    Result.Assign(TmpSL);
+    AbortOrder := WasTemplateDialogCanceled;
+    Responses.OrderContainsObjects := HasObjects or TemplateBPHasObjects;
+    if AbortOrder then
+    begin
+      Result.Text := '';
+      Close;
+      Exit;
+    end
+    else
+      FastAssignWith508Msg(TmpSL, Result);
   finally
     TmpSL.Free;
   end;
@@ -1189,6 +1259,11 @@ begin
       FKeyBoarding := False;
       treServiceChange(Sender, treService.Selected);
     end;
+  VK_ESCAPE:
+    begin
+      key := 0;
+      btnServiceTreeClick(Self);
+    end    
   else
     FKeyBoarding := True;
   end;
@@ -1403,6 +1478,20 @@ procedure TfrmODCslt.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   inherited;
   frmFrame.pnlVisit.Enabled := true;
+end;
+
+procedure TfrmODCslt.FormResize(Sender: TObject);
+begin
+  inherited;
+  AdjustMemReasonSize();
+end;
+
+procedure TfrmODCslt.AdjustMemReasonSize;
+const
+  PIXEL_SPACE = 3;
+begin
+  pnlReason.Top := cboService.Top + cboService.Height + PIXEL_SPACE;
+  pnlReason.Height := memOrder.Top - pnlReason.Top - PIXEL_SPACE;
 end;
 
 end.

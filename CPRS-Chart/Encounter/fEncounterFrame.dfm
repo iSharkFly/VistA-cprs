@@ -1,17 +1,10 @@
-object frmEncounterFrame: TfrmEncounterFrame
+inherited frmEncounterFrame: TfrmEncounterFrame
   Left = 290
   Top = 108
-  Width = 640
-  Height = 451
   Caption = 'Encounter Frame'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 424
+  ClientWidth = 632
   FormStyle = fsMDIForm
-  KeyPreview = True
   OldCreateOrder = True
   Position = poScreenCenter
   OnCanResize = FormCanResize
@@ -19,30 +12,33 @@ object frmEncounterFrame: TfrmEncounterFrame
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  OnKeyDown = FormKeyDown
   OnResize = FormResize
+  OnShow = FormShow
+  ExplicitLeft = 290
+  ExplicitTop = 108
+  ExplicitWidth = 640
+  ExplicitHeight = 458
   PixelsPerInch = 96
   TextHeight = 13
-  object Bevel1: TBevel
+  object Bevel1: TBevel [0]
     Left = 0
     Top = 0
     Width = 632
     Height = 2
     Align = alTop
   end
-  object StatusBar1: TStatusBar
+  object StatusBar1: TStatusBar [1]
     Left = 0
-    Top = 417
+    Top = 424
     Width = 632
     Height = 0
     Panels = <>
-    SimplePanel = False
   end
-  object pnlPage: TPanel
+  object pnlPage: TPanel [2]
     Left = 0
     Top = 24
     Width = 632
-    Height = 393
+    Height = 400
     Align = alClient
     BevelOuter = bvNone
     Font.Charset = DEFAULT_CHARSET
@@ -53,7 +49,7 @@ object frmEncounterFrame: TfrmEncounterFrame
     ParentFont = False
     TabOrder = 1
   end
-  object TabControl: TTabControl
+  object TabControl: TTabControl [3]
     Left = 0
     Top = 2
     Width = 632
@@ -62,6 +58,21 @@ object frmEncounterFrame: TfrmEncounterFrame
     TabOrder = 2
     OnChange = TabControlChange
     OnChanging = TabControlChanging
-    OnExit = TabControlExit
+    OnEnter = TabControlEnter
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = StatusBar1'
+        'Status = stsDefault')
+      (
+        'Component = pnlPage'
+        'Status = stsDefault')
+      (
+        'Component = TabControl'
+        'Status = stsDefault')
+      (
+        'Component = frmEncounterFrame'
+        'Status = stsDefault'))
   end
 end

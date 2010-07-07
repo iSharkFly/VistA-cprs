@@ -1,6 +1,6 @@
 object ORfrmDtTm: TORfrmDtTm
-  Left = 550
-  Top = 474
+  Left = 586
+  Top = 483
   BorderIcons = []
   BorderStyle = bsDialog
   Caption = 'Select Date/Time'

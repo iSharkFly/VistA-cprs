@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORFn, ORCtrls, ExtCtrls, UBACore, UBAGlobals;
+  fAutoSz, StdCtrls, ORFn, ORCtrls, ExtCtrls, UBACore, UBAGlobals,
+  VA508AccessibilityManager;
 
 type
   TfrmReleaseOrders = class(TfrmAutoSz)
@@ -41,7 +42,7 @@ implementation
 {$R *.DFM}
 
 uses Hash, rCore, rOrders, uConst, fSignItem, fOrdersPrint, uCore, uOrders, fRptBox,
-  fFrame, fClinicWardMeds;
+  fFrame, fClinicWardMeds, rODLab;
 
 const
   TX_SAVERR1 = 'The error, ';
@@ -59,6 +60,7 @@ var
   SignList: TStringList;
   OrderText: string;
   AnOrder: TOrder;
+  AList: TStringList;
 
   function FindOrderText(const AnID: string): string;
   var
@@ -130,12 +132,27 @@ begin
           if Pos('E', Piece(SignList[i], U, 2)) > 0 then
           begin
             OrderText := FindOrderText(Piece(SignList[i], U, 1));
-            InfoBox(TX_SAVERR1 + Piece(SignList[i], U, 4) + TX_SAVERR2 + OrderText, TC_SAVERR, MB_OK);
+                if Piece(SignList[i],U,4) = 'Invalid Pharmacy order number' then
+                InfoBox(TX_SAVERR1 + Piece(SignList[i], U, 4) + TX_SAVERR2 + OrderText + CRLF + CRLF +
+                        'The changes to this order have not been saved.  You must contact Pharmacy to complete any action on this order.',
+                        TC_SAVERR, MB_OK)
+                else
+                InfoBox(TX_SAVERR1 + Piece(SignList[i], U, 4) + TX_SAVERR2 + OrderText,
+                        TC_SAVERR, MB_OK);
           end;
           if Pos('R', Piece(SignList[i], U, 2)) > 0 then
             NotifyOtherApps(NAE_ORDER, 'RL' + U + Piece(SignList[i], U, 1));
         end;
         StatusText('');
+          //  CQ 10226, PSI-05-048 - advise of auto-change from LC to WC on lab orders
+        AList := TStringList.Create;
+        try
+          CheckForChangeFromLCtoWCOnRelease(AList, Encounter.Location, SignList);
+          if AList.Text <> '' then
+            ReportBox(AList, 'Changed Orders', TRUE);
+        finally
+          AList.Free;
+        end;
         PrintOrdersOnSignRelease(SignList, frmReleaseOrders.FNature, PrintLoc);
 //        SetupOrdersPrint(SignList, DeviceInfo, frmReleaseOrders.FNature, False, PrintIt); //*KCM*
 //        if PrintIt then PrintOrdersOnReview(SignList, DeviceInfo);                       //*KCM*
@@ -243,7 +260,7 @@ begin
     ARect := Rect;
     ARect.Left := ARect.Left + 2;
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     SaveColor := Canvas.Brush.Color;
     Canvas.MoveTo(ARect.Left, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);
@@ -270,7 +287,6 @@ begin
     Canvas.FillRect(ARect);
     x := FilteredString(Items[Index]);
     AHeight := WrappedTextHeightByFont(Canvas, Font, x, ARect);
-    //if AHeight > 255 then AHeight := 255;
     if AHeight <  13 then AHeight := 15;
   end;
 end;

@@ -1,4 +1,4 @@
-object frmOptionsTeams: TfrmOptionsTeams
+inherited frmOptionsTeams: TfrmOptionsTeams
   Left = 730
   Top = 96
   HelpContext = 9090
@@ -7,47 +7,40 @@ object frmOptionsTeams: TfrmOptionsTeams
   Caption = 'Team Information'
   ClientHeight = 369
   ClientWidth = 384
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   HelpFile = 'CPRSWT.HLP'
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object lblTeams: TLabel
+  object lblTeams: TLabel [0]
     Left = 10
     Top = 70
     Width = 115
     Height = 13
     Caption = 'You are on these teams:'
   end
-  object lblPatients: TLabel
+  object lblPatients: TLabel [1]
     Left = 200
     Top = 70
     Width = 130
     Height = 13
     Caption = 'Patients on selected teams:'
   end
-  object lblTeamMembers: TLabel
+  object lblTeamMembers: TLabel [2]
     Left = 200
     Top = 214
     Width = 75
     Height = 13
     Caption = 'Team members:'
   end
-  object lblSubscribe: TLabel
+  object lblSubscribe: TLabel [3]
     Left = 8
     Top = 270
     Width = 97
     Height = 13
     Caption = 'Subscribe to a team:'
   end
-  object lblInfo: TMemo
+  object lblInfo: TMemo [4]
     Left = 8
     Top = 8
     Width = 369
@@ -63,7 +56,7 @@ object frmOptionsTeams: TfrmOptionsTeams
     ReadOnly = True
     TabOrder = 8
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [5]
     Left = 0
     Top = 336
     Width = 384
@@ -92,7 +85,7 @@ object frmOptionsTeams: TfrmOptionsTeams
       TabOrder = 0
     end
   end
-  object lstPatients: TORListBox
+  object lstPatients: TORListBox [6]
     Left = 200
     Top = 86
     Width = 175
@@ -110,7 +103,7 @@ object frmOptionsTeams: TfrmOptionsTeams
     LongList = False
     Pieces = '2'
   end
-  object lstTeams: TORListBox
+  object lstTeams: TORListBox [7]
     Left = 10
     Top = 86
     Width = 175
@@ -128,7 +121,7 @@ object frmOptionsTeams: TfrmOptionsTeams
     LongList = False
     Pieces = '2'
   end
-  object lstUsers: TORListBox
+  object lstUsers: TORListBox [8]
     Left = 200
     Top = 230
     Width = 175
@@ -144,7 +137,7 @@ object frmOptionsTeams: TfrmOptionsTeams
     LongList = False
     Pieces = '2'
   end
-  object btnRemove: TButton
+  object btnRemove: TButton [9]
     Left = 10
     Top = 241
     Width = 175
@@ -161,7 +154,7 @@ object frmOptionsTeams: TfrmOptionsTeams
     TabOrder = 3
     OnClick = btnRemoveClick
   end
-  object chkPersonal: TCheckBox
+  object chkPersonal: TCheckBox [10]
     Left = 10
     Top = 40
     Width = 175
@@ -171,7 +164,7 @@ object frmOptionsTeams: TfrmOptionsTeams
     TabOrder = 0
     OnClick = chkPersonalClick
   end
-  object chkRestrict: TCheckBox
+  object chkRestrict: TCheckBox [11]
     Left = 200
     Top = 40
     Width = 185
@@ -183,7 +176,7 @@ object frmOptionsTeams: TfrmOptionsTeams
     Visible = False
     OnClick = chkRestrictClick
   end
-  object cboSubscribe: TORComboBox
+  object cboSubscribe: TORComboBox [12]
     Left = 12
     Top = 287
     Width = 175
@@ -209,6 +202,42 @@ object frmOptionsTeams: TfrmOptionsTeams
     OnKeyDown = cboSubscribeKeyDown
     OnMouseClick = cboSubscribeMouseClick
     CharsNeedMatch = 1
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblInfo'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnClose'
+        'Status = stsDefault')
+      (
+        'Component = lstPatients'
+        'Status = stsDefault')
+      (
+        'Component = lstTeams'
+        'Status = stsDefault')
+      (
+        'Component = lstUsers'
+        'Status = stsDefault')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = chkPersonal'
+        'Status = stsDefault')
+      (
+        'Component = chkRestrict'
+        'Status = stsDefault')
+      (
+        'Component = cboSubscribe'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsTeams'
+        'Status = stsDefault'))
   end
   object mnuPopPatient: TPopupMenu
     Top = 336

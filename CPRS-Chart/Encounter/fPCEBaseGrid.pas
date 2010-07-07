@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fPCEBase, ComCtrls, StdCtrls, ORCtrls, ExtCtrls, Buttons, ORFn;
+  fPCEBase, ComCtrls, StdCtrls, ORCtrls, ExtCtrls, Buttons, ORFn,
+  VA508AccessibilityManager;
 
 type
   TfrmPCEBaseGrid = class(TfrmPCEBase)
@@ -37,6 +38,9 @@ var
 
 implementation
 
+uses
+  VA2006Utils, VA508AccessibilityRouter;
+
 {$R *.DFM}
 
 const
@@ -45,8 +49,7 @@ const
 procedure TfrmPCEBaseGrid.FormCreate(Sender: TObject);
 begin
   inherited;
-  lbGrid.Color := ReadOnlyColor;
-  lbGrid.ItemTipColor := ReadOnlyColor;
+  FixHeaderControlDelphi2006Bug(hcGrid);
   FSectionGap := 15;
   SyncGridHeader(TRUE);
 end;
@@ -221,5 +224,8 @@ begin
   for i := 0 to lbGrid.Items.Count-1 do
     FSel := FSel + BOOLCHAR[lbGrid.Selected[i]];
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmPCEBaseGrid);
 
 end.

@@ -3,10 +3,10 @@ unit fCsltNote;
 interface
 
 uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
-  Buttons, ORCtrls, ORfn, ExtCtrls;
+  Buttons, ORCtrls, ORfn, ExtCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmCsltNote = class(TForm)
+  TfrmCsltNote = class(TfrmBase508Form)
     cmdOK: TButton;
     cmdCancel: TButton;
     cboCsltNote: TORComboBox;

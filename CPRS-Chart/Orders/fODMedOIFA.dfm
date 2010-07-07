@@ -1,15 +1,9 @@
-object frmODMedOIFA: TfrmODMedOIFA
+inherited frmODMedOIFA: TfrmODMedOIFA
   Left = 0
   Top = 0
-  Width = 313
-  Height = 205
   Caption = 'Formulary Alternatives'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 178
+  ClientWidth = 305
   FormStyle = fsStayOnTop
   OldCreateOrder = True
   Position = poMainFormCenter
@@ -18,15 +12,16 @@ object frmODMedOIFA: TfrmODMedOIFA
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TLabel [0]
     Left = 0
     Top = 0
     Width = 305
     Height = 13
     Align = alTop
     Caption = 'The selected drug is not in the formulary.  Alternatives are:'
+    ExplicitWidth = 273
   end
-  object Label2: TStaticText
+  object Label2: TStaticText [1]
     Left = 0
     Top = 134
     Width = 305
@@ -34,8 +29,9 @@ object frmODMedOIFA: TfrmODMedOIFA
     Align = alBottom
     Caption = 'Do you wish to use the selected alternative instead?'
     TabOrder = 1
+    ExplicitWidth = 250
   end
-  object lstFormAlt: TORListBox
+  object lstFormAlt: TORListBox [2]
     Left = 0
     Top = 13
     Width = 305
@@ -51,7 +47,7 @@ object frmODMedOIFA: TfrmODMedOIFA
     LongList = False
     Pieces = '2'
   end
-  object btnPanel: TPanel
+  object btnPanel: TPanel [3]
     Left = 0
     Top = 151
     Width = 305
@@ -80,5 +76,26 @@ object frmODMedOIFA: TfrmODMedOIFA
       TabOrder = 1
       OnClick = cmdNoClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Label2'
+        'Status = stsDefault')
+      (
+        'Component = lstFormAlt'
+        'Status = stsDefault')
+      (
+        'Component = btnPanel'
+        'Status = stsDefault')
+      (
+        'Component = cmdYes'
+        'Status = stsDefault')
+      (
+        'Component = cmdNo'
+        'Status = stsDefault')
+      (
+        'Component = frmODMedOIFA'
+        'Status = stsDefault'))
   end
 end

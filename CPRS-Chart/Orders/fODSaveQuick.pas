@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, Buttons, ExtCtrls, StdCtrls, ORCtrls;
+  fAutoSz, Buttons, ExtCtrls, StdCtrls, ORCtrls, VA508AccessibilityManager;
 
 type
   TfrmODQuick = class(TfrmAutoSz)

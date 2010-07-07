@@ -1,24 +1,19 @@
-object frmTemplateObjects: TfrmTemplateObjects
+inherited frmTemplateObjects: TfrmTemplateObjects
   Left = 215
   Top = 343
-  Width = 247
-  Height = 300
   ActiveControl = cboObjects
   Caption = 'Insert Patient Data (Object)'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 273
+  ClientWidth = 239
   FormStyle = fsStayOnTop
-  OldCreateOrder = False
   Position = poOwnerFormCenter
   OnClose = FormClose
   OnShow = FormShow
+  ExplicitWidth = 247
+  ExplicitHeight = 300
   PixelsPerInch = 96
   TextHeight = 13
-  object cboObjects: TORComboBox
+  object cboObjects: TORComboBox [0]
     Left = 0
     Top = 0
     Width = 239
@@ -41,8 +36,9 @@ object frmTemplateObjects: TfrmTemplateObjects
     SynonymChars = '<>'
     TabOrder = 0
     OnDblClick = cboObjectsDblClick
+    CharsNeedMatch = 1
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 246
     Width = 239
@@ -89,5 +85,26 @@ object frmTemplateObjects: TfrmTemplateObjects
       TabOrder = 2
       OnClick = btnRefreshClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cboObjects'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnInsert'
+        'Status = stsDefault')
+      (
+        'Component = btnRefresh'
+        'Status = stsDefault')
+      (
+        'Component = frmTemplateObjects'
+        'Status = stsDefault'))
   end
 end

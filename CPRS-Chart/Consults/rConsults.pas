@@ -284,7 +284,7 @@ begin
            x := MakeConsultListItem(Results[i]);
            Results[i] := x;
          end;
-       Dest.Assign(Results);
+       FastAssign(Results, Dest);
      end
     else
      begin
@@ -298,14 +298,14 @@ procedure LoadConsultDetail(Dest: TStrings; IEN: integer) ;
 { returns the detail of a consult }
 begin
   CallV('ORQQCN DETAIL', [IEN]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure DisplayResults(Dest: TStrings; IEN: integer) ;
 { returns the results for a consult }
 begin
   CallV('ORQQCN MED RESULTS', [IEN]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure GetConsultRec(IEN: integer);
@@ -326,7 +326,7 @@ begin
   ConsultRec.IEN := IEN ;
   alist := TStringList.Create ;
  try
-  alist.Assign(RPCBrokerV.Results) ;
+  FastAssign(RPCBrokerV.Results, aList);
   x := alist[0] ;
   if Piece(x,u,1) <> '-1' then
     with ConsultRec do
@@ -458,56 +458,56 @@ end ;
 procedure ReceiveConsult(Dest: TStrings; IEN: integer; ReceivedBy: int64; RcptDate: TFMDateTime; Comments: TStrings);
 begin
   CallV('ORQQCN RECEIVE', [IEN, ReceivedBy, RcptDate, Comments]);
-  Dest.Assign(RPCBrokerV.Results);   {1^Error message' or '0'}
+  FastAssign(RPCBrokerV.Results, Dest);   {1^Error message' or '0'}
 end;
 
 procedure ScheduleConsult(Dest: TStrings; IEN: integer; ScheduledBy: Int64; SchdDate: TFMDateTime; Alert: integer;
      AlertTo: string; Comments: TStrings);
 begin
   CallV('ORQQCN2 SCHEDULE CONSULT', [IEN, ScheduledBy, SchdDate, Alert, AlertTo, Comments]);
-  Dest.Assign(RPCBrokerV.Results);   {1^Error message' or '0'}
+  FastAssign(RPCBrokerV.Results, Dest);   {1^Error message' or '0'}
 end;
 
 procedure DenyConsult(Dest: TStrings; IEN: integer; DeniedBy: int64;
             DenialDate: TFMDateTime; Comments: TStrings);
 begin
   CallV('ORQQCN DISCONTINUE', [IEN, DeniedBy, DenialDate,'DY',Comments]);
-  Dest.Assign(RPCBrokerV.Results);   {1^Error message' or '0'}
+  FastAssign(RPCBrokerV.Results, Dest);   {1^Error message' or '0'}
 end;
 
 procedure DiscontinueConsult(Dest: TStrings; IEN: integer; DiscontinuedBy: int64;
             DiscontinueDate: TFMDateTime; Comments: TStrings);
 begin
   CallV('ORQQCN DISCONTINUE', [IEN, DiscontinuedBy, DiscontinueDate,'DC',Comments]);
-  Dest.Assign(RPCBrokerV.Results);   {1^Error message' or '0'}
+  FastAssign(RPCBrokerV.Results, Dest);   {1^Error message' or '0'}
 end;
 
 procedure ForwardConsult(Dest: TStrings; IEN, ToService: integer; Forwarder, AttentionOf: int64; Urgency: integer;
      ActionDate: TFMDateTime; Comments: TStrings);
 begin
-     CallV('ORQQCN FORWARD', [IEN, ToService, Forwarder, AttentionOf, Urgency, ActionDate, Comments]);
-     Dest.Assign(RPCBrokerV.Results);   {1^Error message' or '0'}
+  CallV('ORQQCN FORWARD', [IEN, ToService, Forwarder, AttentionOf, Urgency, ActionDate, Comments]);
+  FastAssign(RPCBrokerV.Results, Dest);   {1^Error message' or '0'}
 end ;
 
 procedure AddComment(Dest: TStrings; IEN: integer; Comments: TStrings; ActionDate: TFMDateTime; Alert: integer;
 AlertTo: string) ;
 begin
-     CallV('ORQQCN ADDCMT', [IEN, Comments, Alert, AlertTo, ActionDate]);
-     Dest.Assign(RPCBrokerV.Results);   {1^Error message' or '0'}
+  CallV('ORQQCN ADDCMT', [IEN, Comments, Alert, AlertTo, ActionDate]);
+  FastAssign(RPCBrokerV.Results, Dest);   {1^Error message' or '0'}
 end ;
 
 procedure AdminComplete(Dest: TStrings; IEN: integer; SigFindingsFlag: string; Comments: TStrings;
           RespProv: Int64; ActionDate: TFMDateTime; Alert: integer; AlertTo: string) ;
 begin
-     CallV('ORQQCN ADMIN COMPLETE', [IEN, SigFindingsFlag, Comments, RespProv, Alert, AlertTo, ActionDate]);
-     Dest.Assign(RPCBrokerV.Results);   {1^Error message' or '0'}
+  CallV('ORQQCN ADMIN COMPLETE', [IEN, SigFindingsFlag, Comments, RespProv, Alert, AlertTo, ActionDate]);
+  FastAssign(RPCBrokerV.Results, Dest);   {1^Error message' or '0'}
 end ;
 
 procedure SigFindings(Dest: TStrings; IEN: integer; SigFindingsFlag: string; Comments: TStrings; ActionDate: TFMDateTime; Alert: integer;
 AlertTo: string) ;
 begin
-     CallV('ORQQCN SIGFIND', [IEN, SigFindingsFlag, Comments, Alert, AlertTo, ActionDate]);
-     Dest.Assign(RPCBrokerV.Results);   {1^Error message' or '0'}
+  CallV('ORQQCN SIGFIND', [IEN, SigFindingsFlag, Comments, Alert, AlertTo, ActionDate]);
+  FastAssign(RPCBrokerV.Results, Dest);   {1^Error message' or '0'}
 end ;
 
 //==================  Ordering functions   ===================================
@@ -830,6 +830,7 @@ begin
       ClinProcSummCode := StrToIntDef(Piece(x, U, 3), 0);
       ClinProcDateTime := StrToFMDateTime(Piece(x, U, 4));
       Title := StrToIntDef(Piece(x, U, 5), 0);
+      DateTime := StrToFloatDef(Piece(x, U, 6), 0);
     end;
   Result := AnEditRec;
 end;

@@ -1,17 +1,19 @@
 inherited frmBAOptionsDiagnoses: TfrmBAOptionsDiagnoses
   Left = 231
   Top = 183
-  Width = 747
-  Height = 557
   Caption = 'Personal Diagnoses List'
+  ClientHeight = 530
+  ClientWidth = 739
   Constraints.MinHeight = 100
   Constraints.MinWidth = 200
   OnActivate = FormActivate
   OnCreate = FormCreate
   OnShow = FormShow
+  ExplicitWidth = 747
+  ExplicitHeight = 557
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
+  object Panel1: TPanel [0]
     Left = 0
     Top = 0
     Width = 739
@@ -33,28 +35,24 @@ inherited frmBAOptionsDiagnoses: TfrmBAOptionsDiagnoses
         Top = 26
         Width = -3
         Height = 463
-        Cursor = crHSplit
       end
       object Splitter2: TSplitter
         Left = 169
         Top = 26
         Width = 7
         Height = 463
-        Cursor = crHSplit
       end
       object Splitter3: TSplitter
         Left = 457
         Top = 26
         Width = 1
         Height = 463
-        Cursor = crHSplit
       end
       object Splitter5: TSplitter
         Left = 455
         Top = 26
         Width = 2
         Height = 463
-        Cursor = crHSplit
       end
       object pnlBottom: TPanel
         Left = 1
@@ -141,7 +139,6 @@ inherited frmBAOptionsDiagnoses: TfrmBAOptionsDiagnoses
           Top = 0
           Width = 168
           Height = 17
-          DragReorder = False
           Sections = <
             item
               Alignment = taCenter
@@ -189,7 +186,6 @@ inherited frmBAOptionsDiagnoses: TfrmBAOptionsDiagnoses
           Top = 0
           Width = 201
           Height = 17
-          DragReorder = False
           Sections = <
             item
               Alignment = taCenter
@@ -232,7 +228,6 @@ inherited frmBAOptionsDiagnoses: TfrmBAOptionsDiagnoses
           Top = 0
           Width = 257
           Height = 17
-          DragReorder = False
           Sections = <
             item
               Alignment = taCenter
@@ -308,5 +303,71 @@ inherited frmBAOptionsDiagnoses: TfrmBAOptionsDiagnoses
         end
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOther'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = Button1'
+        'Status = stsDefault')
+      (
+        'Component = Panel3'
+        'Status = stsDefault')
+      (
+        'Component = lbSections'
+        'Status = stsDefault')
+      (
+        'Component = hdrCntlDxSections'
+        'Status = stsDefault')
+      (
+        'Component = Panel4'
+        'Status = stsDefault')
+      (
+        'Component = lbDiagnosis'
+        'Status = stsDefault')
+      (
+        'Component = hdrCntlDxAdd'
+        'Status = stsDefault')
+      (
+        'Component = Panel5'
+        'Status = stsDefault')
+      (
+        'Component = lbPersonalDx'
+        'Status = stsDefault')
+      (
+        'Component = hdrCntlDx'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = StaticText3'
+        'Status = stsDefault')
+      (
+        'Component = Panel7'
+        'Status = stsDefault')
+      (
+        'Component = btnAdd'
+        'Status = stsDefault')
+      (
+        'Component = btnDelete'
+        'Status = stsDefault')
+      (
+        'Component = frmBAOptionsDiagnoses'
+        'Status = stsDefault'))
   end
 end

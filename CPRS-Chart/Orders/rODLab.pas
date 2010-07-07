@@ -22,19 +22,40 @@ function  GetOneSpecimen(LRFSPEC: integer): string;
 procedure GetLabTimesForDate(Dest: TStrings; LabDate: TFMDateTime; Location: integer);
 function  GetLastCollectionTime: string;
 procedure GetPatientBBInfo(Dest: TStrings; PatientID: string; Loc: integer);
+procedure ListForQuickOrders(var AListIEN, ACount: Integer; const DGrpNm: string);
+procedure SubsetOfQuickOrders(Dest: TStringList; AListIEN, First, Last: Integer);
 procedure GetPatientBloodResults(Dest: TStrings; PatientID: string; ATests: TStringList);
 procedure GetPatientBloodResultsRaw(Dest: TStrings; PatientID: string; ATests: TStringList);
 function  StatAllowed(PatientID: string): boolean;
 procedure GetBloodComponents(Dest: TStrings);
+function  NursAdminSuppress: boolean;
+function  GetSubtype(TestName: string): string;
+function  TNSDaysBack: integer;
+procedure CheckForChangeFromLCtoWCOnAccept(Dest: TStrings; ALocation: integer; AStartDate, ACollType, ASchedule, ADuration: string);
+procedure CheckForChangeFromLCtoWCOnRelease(Dest: TStrings; ALocation: integer; OrderList: TStringList);
+function  GetLCtoWCInstructions(Alocation: integer): string;
+procedure FormatLCtoWCDisplayTextOnAccept(InputList, OutputList: TStrings);
+procedure FormatLCtoWCDisplayTextOnRelease(InputList, OutputList: TStrings);
+
+const
+  TX0 = 'The following Lab orders will be changed to Ward Collect:';
+  TX2 = 'Order Date' + #9 +#9 + 'Reason Changed to Ward Collect';
+  TX5 = 'Please contact the ward staff to insure the specimen is collected.';
+  TX6 = 'You can print this screen for reference.';
+  TX_BLANK = '';
 
 implementation
 
 uses  rODBase;
-(*    fODBase, rODBase, fODLab;*)
 
 procedure GetBloodComponents(Dest: TStrings);
 begin
   tCallV(Dest, 'ORWDXVB COMPORD', []);
+end;
+
+function NursAdminSuppress: boolean;
+begin
+  Result := (StrToInt(sCallV('ORWDXVB NURSADMN',[nil])) < 1);
 end;
 
 function  StatAllowed(PatientID: string): boolean;
@@ -55,6 +76,32 @@ end;
 procedure GetPatientBBInfo(Dest: TStrings; PatientID: string; Loc: integer);
 begin
   tCallV(Dest, 'ORWDXVB GETALL', [PatientID, Loc]);
+end;
+
+function GetSubtype(TestName: string): string;
+begin
+  Result := sCallV('ORWDXVB SUBCHK', [TestName]);
+end;
+
+function TNSDaysBack: integer;
+begin
+  Result := StrToIntDef(sCallV('ORWDXVB VBTNS', [nil]),3);
+end;
+
+procedure ListForQuickOrders(var AListIEN, ACount: Integer; const DGrpNm: string);
+begin
+  CallV('ORWUL QV4DG', [DGrpNm]);
+  AListIEN := StrToIntDef(Piece(RPCBrokerV.Results[0], U, 1), 0);
+  ACount   := StrToIntDef(Piece(RPCBrokerV.Results[0], U, 2), 0);
+end;
+
+procedure SubsetOfQuickOrders(Dest: TStringList; AListIEN, First, Last: Integer);
+var
+  i: Integer;
+begin
+ CallV('ORWUL QVSUB', [AListIEN,'','']);
+ for i := 0 to RPCBrokerV.Results.Count -1 do
+   Dest.Add(RPCBrokerV.Results[i]);
 end;
 
 function ODForLab(Location, Division: integer): TStrings;
@@ -157,4 +204,119 @@ begin
     end;
 end;
 
+procedure CheckForChangeFromLCtoWCOnAccept(Dest: TStrings; ALocation: integer; AStartDate, ACollType, ASchedule, ADuration: string);
+var
+  AList: TStringList;
+begin
+  AList := TStringList.Create;
+  try
+    CallV('ORCDLR2 CHECK ONE LC TO WC', [ALocation, '', AStartDate, ACollType, ASchedule, ADuration]);
+    FastAssign(RPCBrokerV.Results, AList);
+    FormatLCtoWCDisplayTextOnAccept(AList, Dest);
+  finally
+    AList.Free;
+  end;
+end;
+
+procedure CheckForChangeFromLCtoWCOnRelease(Dest: TStrings; ALocation: integer; OrderList: TStringList);
+var
+  AList: TStringList;
+begin
+  AList := TStringList.Create;
+  try
+    CallV('ORCDLR2 CHECK ALL LC TO WC', [ALocation, OrderList]);
+    FastAssign(RPCBrokerV.Results, AList);
+    FormatLCtoWCDisplayTextOnRelease(AList, Dest);
+  finally
+    AList.Free;
+  end;
+end;
+
+procedure FormatLCtoWCDisplayTextOnAccept(InputList, OutputList: TStrings);
+var
+  i: integer;
+  x: string;
+begin
+  OutputList.Clear;
+  for i := InputList.Count - 1 downto 0 do
+    if Piece(InputList[i], U, 2) = '1' then InputList.Delete(i);
+  if InputList.Count > 0 then
+  begin
+    SetListFMDateTime('mmm dd, yyyy@hh:nn', TStringList(InputList), U, 1);
+    with OutputList do
+    begin
+      Add(TX0);
+      Add(TX_BLANK);
+      Add('Patient :' + #9 + Patient.Name);
+      Add('SSN     :' + #9 + Patient.SSN);
+      Add('Location:' + #9 + Encounter.LocationName + CRLF);
+      for i := 0 to InputList.Count - 1 do
+        Add(Piece(InputList[i], U, 1) + #9 + Piece(InputList[i], U, 3));
+      Add(TX_BLANK);
+      x := GetLCtoWCInstructions(Encounter.Location);
+      if x = '' then x := TX5;
+      Add(x);
+      Add(TX6);
+    end;
+  end;
+end;
+
+procedure FormatLCtoWCDisplayTextOnRelease(InputList, OutputList: TStrings);
+var
+  i, j, k, Changed: integer;
+  AList: TStringlist;
+  x: string;
+begin
+  OutputList.Clear;
+  Changed := StrToIntDef(ExtractDefault(InputList, 'COUNT'), 0);
+  if Changed > 0 then
+  begin
+    AList := TStringList.Create;
+    try
+      with OutputList do
+      begin
+        Add(TX0);
+        Add(TX_BLANK);
+        Add('Patient :' + #9 + Patient.Name);
+        Add('SSN     :' + #9 + Patient.SSN);
+        Add('Location:' + #9 + Encounter.LocationName);
+        for i := 1 to Changed do
+        begin
+          Add(TX_BLANK);
+          AList.Clear;
+          ExtractText(AList, InputList, 'ORDER_' + IntToStr(i));
+          Add('Order   :' + #9 + AList[0]);
+          k := Length(OutputList[Count-1]);
+          if AList.Count > 1 then
+            for j := 1 to AList.Count - 1 do
+            begin
+              Add(StringOfChar(' ', 9) + #9 + AList[j]);
+              k := HigherOf(k, Length(OutputList[Count - 1]));
+            end;
+          Add(StringOfChar('-', k + 4));
+          AList.Clear;
+          ExtractItems(AList, InputList, 'ORDER_' + IntToStr(i));
+          SetListFMDateTime('mmm dd, yyyy@hh:nn', AList, U, 1);
+          for j := 0 to AList.Count - 1 do
+            OutputList.Add(Piece(AList[j], U, 1) + #9 + Piece(AList[j], U, 3));
+        end;
+        Add(TX_BLANK);
+        x := GetLCtoWCInstructions(Encounter.Location);
+        if x = '' then x := TX5;
+        Add(x);
+        Add(TX6);
+      end;
+    finally
+      AList.Free;
+    end;
+  end;
+end;
+
+function GetLCtoWCInstructions(Alocation: integer): string;
+begin
+  Result := sCallV('ORWDLR33 LC TO WC', [Encounter.Location]);
+end;
+
 end.
+
+

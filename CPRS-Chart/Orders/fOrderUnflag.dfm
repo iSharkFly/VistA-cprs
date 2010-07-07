@@ -1,20 +1,22 @@
 inherited frmUnflagOrder: TfrmUnflagOrder
   Left = 365
   Top = 389
-  Height = 230
   Caption = 'Unflag Order'
+  ClientHeight = 203
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 320
+  ExplicitHeight = 230
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TLabel [0]
     Left = 8
     Top = 123
     Width = 90
     Height = 13
     Caption = 'Comment (optional)'
   end
-  object txtComment: TCaptionEdit
+  object txtComment: TCaptionEdit [1]
     Left = 8
     Top = 137
     Width = 411
@@ -23,7 +25,7 @@ inherited frmUnflagOrder: TfrmUnflagOrder
     TabOrder = 0
     Caption = 'Comment (optional)'
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [2]
     Left = 267
     Top = 174
     Width = 72
@@ -33,7 +35,7 @@ inherited frmUnflagOrder: TfrmUnflagOrder
     TabOrder = 1
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [3]
     Left = 347
     Top = 174
     Width = 72
@@ -43,7 +45,7 @@ inherited frmUnflagOrder: TfrmUnflagOrder
     TabOrder = 2
     OnClick = cmdCancelClick
   end
-  object memReason: TMemo
+  object memReason: TMemo [4]
     Left = 8
     Top = 80
     Width = 411
@@ -53,7 +55,7 @@ inherited frmUnflagOrder: TfrmUnflagOrder
     TabOrder = 4
     WantReturns = False
   end
-  object memOrder: TMemo
+  object memOrder: TMemo [5]
     Left = 8
     Top = 8
     Width = 411
@@ -62,5 +64,26 @@ inherited frmUnflagOrder: TfrmUnflagOrder
     ReadOnly = True
     TabOrder = 3
     WantReturns = False
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = txtComment'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = memReason'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = frmUnflagOrder'
+        'Status = stsDefault'))
   end
 end

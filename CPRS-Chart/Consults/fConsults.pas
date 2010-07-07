@@ -1,12 +1,17 @@
 unit fConsults;
-
+{Notes of Intent:
+  Tab Order:
+    The tab order has been custom coded to place the pnlRight in the Tab order
+    right after the tvConsults.  
+}
 
 interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, ORDtTm,
   fHSplit, stdCtrls, ExtCtrls, Menus, ComCtrls, ORCtrls, ORFn, uConsults, rOrders, uPCE,
-  ORClasses, uConst, fDrawers, rTIU, uTIU, uDocTree, RichEdit, fPrintList;
+  ORClasses, uConst, fDrawers, rTIU, uTIU, uDocTree, RichEdit, fPrintList,
+  VA508AccessibilityManager, fBase508Form, VA508ImageListLabeler;
 
 type
   TfrmConsults = class(TfrmHSplit)
@@ -171,6 +176,9 @@ type
     mnuViewReminders: TMenuItem;
     mnuViewRemoteData: TMenuItem;
     mnuViewPostings: TMenuItem;
+    imgLblNotes: TVA508ImageListLabeler;
+    imgLblImages: TVA508ImageListLabeler;
+    imgLblConsults: TVA508ImageListLabeler;
     procedure mnuChartTabClick(Sender: TObject);
     procedure lstConsultsClick(Sender: TObject);
     procedure pnlRightResize(Sender: TObject);
@@ -267,18 +275,17 @@ type
     procedure sptHorzCanResize(Sender: TObject; var NewSize: Integer; var Accept: Boolean);
     procedure popNoteMemoPreviewClick(Sender: TObject);
     procedure popNoteMemoInsTemplateClick(Sender: TObject);
-    procedure tvConsultsAddition(Sender: TObject; Node: TTreeNode);
-    procedure tvConsultsDeletion(Sender: TObject; Node: TTreeNode);
     procedure tvConsultsExit(Sender: TObject);
-    procedure pnlResultsExit(Sender: TObject);
-    procedure pnlActionExit(Sender: TObject);
     procedure FormHide(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure FormMouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
     procedure ViewInfo(Sender: TObject);
     procedure mnuViewInformationClick(Sender: TObject);
+    procedure pnlLeftExit(Sender: TObject);
+    procedure pnlRightExit(Sender: TObject);
+    procedure cmdEditResubmitExit(Sender: TObject);
+    procedure cmdNewConsultExit(Sender: TObject);
   private
+    FocusToRightPanel : Boolean;
     FEditingIndex: Integer;      // TIU index of document being currently edited
     FChanged: Boolean;
     FActionType: integer ;
@@ -299,14 +306,9 @@ type
     FcmdChangeOKPressed: boolean;
     FNotifPending: boolean;
     FOldFramePnlPatientExit: TNotifyEvent;
-    FOldDrawerPnlTemplatesButtonExit: TNotifyEvent;
-    FOldDrawerPnlEncounterButtonExit: TNotifyEvent;
-    FOldDrawerEdtSearchExit: TNotifyEvent;
-    FMousing: TDateTime;
+    //FMousing: TDateTime;
+    procedure DoLeftPanelCustomShiftTab;
     procedure frmFramePnlPatientExit(Sender: TObject);
-    procedure frmDrawerPnlTemplatesButtonExit(Sender: TObject);
-    procedure frmDrawerPnlEncounterButtonExit(Sender: TObject);
-    procedure frmDrawerEdtSearchExit(Sender: TObject);
     procedure DoAutoSave(Suppress: integer = 1);
     function GetTitleText(AnIndex: Integer): string;
     //function MakeTitleText(IsAddendum: Boolean = False): string;
@@ -394,7 +396,7 @@ uses fVisit, rCore, uCore, rConsults, fConsultBS, fConsultBD, fSignItem,
      fTemplateEditor, fNotePrt, fNotes, fNoteProps, fNotesBP, fReminderTree,
      fReminderDialog, uReminders, fConsMedRslt, fTemplateFieldEditor,
      dShared, rTemplates, fIconLegend, fNoteIDParents, fNoteCPFields,
-     uTemplates,  uAccessibleTreeView, uAccessibleTreeNode, fTemplateDialog, DateUtils;
+     uTemplates, fTemplateDialog, DateUtils, uVA508CPRSCompatibility, VA508AccessibilityRouter;
 
 const
   CT_ORDERS =   4;                               // ID for orders tab used by frmFrame
@@ -905,7 +907,7 @@ begin
     begin
       DocInfo := MakeXMLParamTIU(IntToStr(CreatedNote.IEN), FEditNote);
       ExecuteTemplateOrBoilerPlate(TmpBoilerPlate, FEditNote.Title, ltTitle, Self, 'Title: ' + FEditNote.TitleName, DocInfo);
-      memResults.Lines.Assign(TmpBoilerPlate);
+      QuickCopyWith508Msg(TmpBoilerPlate, memResults);
       TmpBoilerPlate.Free;
     end;
     if EnableAutosave then // Don't enable autosave until after dialog fields have been resolved
@@ -1106,7 +1108,7 @@ begin
     begin
       DocInfo := MakeXMLParamTIU(IntToStr(lstNotes.ItemIEN), FEditNote);
       ExecuteTemplateOrBoilerPlate(TmpBoilerPlate, FEditNote.Title, ltTitle, Self, 'Title: ' + FEditNote.TitleName, DocInfo);
-      memResults.Lines.Assign(TmpBoilerPlate);
+      QuickCopyWith508Msg(TmpBoilerPlate, memResults);
       TmpBoilerPlate.Free;
     end;
     if EnableAutosave then // Don't enable autosave until after dialog fields have been resolved
@@ -1220,6 +1222,15 @@ end;
 
 
 { Form events -----------------------------------------------------------------}
+
+procedure TfrmConsults.pnlRightExit(Sender: TObject);
+begin
+  inherited;
+  if TabIsPressed then
+    FindNextControl(tvConsults, True, True, False).SetFocus
+  else if ShiftTabIsPressed then
+    FindNextControl(pnlLeft, True, True, False).SetFocus;
+end;
 
 procedure TfrmConsults.pnlRightResize(Sender: TObject);
 { TRichEdit doesn't repaint appropriately unless its parent panel is refreshed }
@@ -1380,6 +1391,13 @@ procedure TfrmConsults.cmdNewConsultClick(Sender: TObject);
 begin
   inherited;
   mnuActNewConsultRequestClick(Self);
+end;
+
+procedure TfrmConsults.cmdNewConsultExit(Sender: TObject);
+begin
+  inherited;
+  if Not cmdEditResubmit.Visible then
+    DoLeftPanelCustomShiftTab;
 end;
 
 procedure TfrmConsults.cmdNewProcClick(Sender: TObject);
@@ -2337,7 +2355,7 @@ begin
          mnuActDisplaySF513.Enabled   :=  True;
          mnuActPrintSF513.Enabled     :=  True;
          mnuActConsultResults.Enabled :=  (lstConsults.ItemIEN > 0) and
-                                          (((UserLevel = UL_UPDATE) or (UserLevel = UL_UPDATE_AND_ADMIN)) and
+                                          (((UserLevel = UL_UPDATE) or (UserLevel = UL_UPDATE_AND_ADMIN) or (UserLevel = UL_UNRESTRICTED)) and
                                           ((status<>ST_DISCONTINUED) and
                                            (status<>ST_CANCELLED)))
                                           or
@@ -2364,7 +2382,8 @@ var
 begin
   mnuActComplete.Enabled           :=   mnuActConsultResults.Enabled and
                                         ((MenuAccessRec.UserLevel = UL_UPDATE) or
-                                        (MenuAccessRec.UserLevel = UL_UPDATE_AND_ADMIN))
+                                        (MenuAccessRec.UserLevel = UL_UPDATE_AND_ADMIN) or
+                                        (MenuAccessRec.UserLevel = UL_UNRESTRICTED))
                                         and
                                        ((ConsultRec.ORStatus=ST_PENDING) or
                                        (ConsultRec.ORStatus=ST_ACTIVE) or
@@ -2373,7 +2392,8 @@ begin
                                        (ConsultRec.ORStatus=ST_COMPLETE))   ;
   mnuActMakeAddendum.Enabled       :=  mnuActConsultResults.Enabled and
                                         ((MenuAccessRec.UserLevel = UL_UPDATE) or
-                                        (MenuAccessRec.UserLevel = UL_UPDATE_AND_ADMIN))
+                                        (MenuAccessRec.UserLevel = UL_UPDATE_AND_ADMIN) or
+                                        (MenuAccessRec.UserLevel = UL_UNRESTRICTED))
                                         and
                                         (ConsultRec.ORStatus=ST_COMPLETE) and
                                        ((lstNotes.ItemIndex > -1) and
@@ -2630,16 +2650,20 @@ begin
        memConsult.TabStop := True;
        if Copy(Piece(lstNotes.ItemID, ';', 2), 1, 4)= 'MCAR' then
          begin
-           memConsult.Lines.Assign(GetDetailedMedicineResults(lstNotes.ItemID));
+           QuickCopy(GetDetailedMedicineResults(lstNotes.ItemID), memConsult);
            x := Piece(Piece(Piece(lstNotes.ItemID, ';', 2), '(', 2), ',', 1) + ';' + Piece(lstNotes.ItemID, ';', 1);
-           NotifyOtherApps(NAE_REPORT, 'MED^' + x);
+           x := 'MED^' + x;
+           SetPiece(x, U, 10, Piece(lstNotes.Items[lstNotes.ItemIndex], U, 11));
+           NotifyOtherApps(NAE_REPORT, x);
          end
        else
          begin
            LoadDocumentText(memConsult.Lines,ItemIEN) ;
            mnuActChange.Enabled     := False;
            mnuActLoadBoiler.Enabled := False;
-           NotifyOtherApps(NAE_REPORT, 'TIU^' + lstNotes.ItemID);
+           x := 'TIU^' + lstNotes.ItemID;
+           SetPiece(x, U, 10, Piece(lstNotes.Items[lstNotes.ItemIndex], U, 11));
+           NotifyOtherApps(NAE_REPORT, x);
          end;
        memConsult.SelStart := 0;
      end;
@@ -2813,27 +2837,21 @@ begin
      end;
 end;
 
+{for printing multiple notes}
 procedure TfrmConsults.RequestMultiplePrint(AForm: TfrmPrintList);
 var
   NoteIEN: int64;
   i: integer;
 begin
-  inherited;
   with AForm.lbIDParents do
+  for i := 0 to Items.Count - 1 do
+  if Selected[i] then
   begin
-    for i := 0 to Items.Count - 1 do
-     begin
-       if Selected[i] then
-        begin
-         NoteIEN := StrToInt64def(Piece(TStringList(Items.Objects[i])[0],U,1),0);
-         if NoteIEN > 0 then PrintSF513(NoteIEN, DisplayText[i]) else
-          begin
-           if NoteIEN = 0 then InfoBox(TX_NOCONSULT, TX_NOCSLT_CAP, MB_OK);
-           if NoteIEN < 0 then InfoBox(TX_NOPRT_NEW, TX_NOPRT_NEW_CAP, MB_OK);
-          end;
-        end; {if selected}
-     end; {for}
-  end; {with}
+    NoteIEN := StrToInt64def(Piece(Items[i], U, 1), 0);
+    if NoteIEN > 0 then PrintSF513(NoteIEN, DisplayText[i])
+    else if NoteIEN = 0 then InfoBox(TX_NOCONSULT, TX_NOCSLT_CAP, MB_OK)
+    else InfoBox(TX_NOPRT_NEW, TX_NOPRT_NEW_CAP, MB_OK);
+  end;
 end;
 
 procedure TfrmConsults.mnuActDisplayResultsClick(Sender: TObject);
@@ -2851,6 +2869,8 @@ begin
   DisplayResults(memConsult.Lines, lstConsults.ItemIEN) ;
   memConsult.SelStart := 0;
   SetResultMenus;
+  if memConsult.CanFocus then
+    memConsult.SetFocus;
 end;
 
 procedure TfrmConsults.mnuActDisplaySF513Click(Sender: TObject);
@@ -2882,16 +2902,25 @@ begin
   inherited;
   LimitEditWidth(memResults, MAX_ENTRY_WIDTH - 1);
   memResults.Constraints.MinWidth := TextWidthByFont(memResults.Font.Handle, StringOfChar('X', MAX_ENTRY_WIDTH)) + (LEFT_MARGIN * 2) + ScrollBarWidth;
-  pnlLeft.Width := self.ClientWidth - pnlResults.Width - sptHorz.Width;
+  //CQ13181	508 Consults--Splitter bar doesn't retain size
+ //CQ13181  pnlLeft.Width := self.ClientWidth - pnlResults.Width - sptHorz.Width;
 end;
 
 procedure TfrmConsults.NotifyOrder(OrderAction: Integer; AnOrder: TOrder);
+var
+  SavedCsltID: string;
 begin
   if ViewContext = 0 then exit;     // form has not yet been displayed, so nothing to update
   if EditingIndex <> -1 then exit;  // do not rebuild list until after save
+  with tvConsults do if Selected <> nil then SavedCsltID := lstConsults.ItemID;
   case OrderAction of
   ORDER_NEW:  UpdateList ;
   ORDER_SIGN: UpdateList{ sent by fReview, fOrderSign when orders signed, AnOrder=nil}
+  end;
+  if SavedCsltID <> '' then with tvConsults do
+  begin
+    Selected := FindPieceNode(SavedCsltID, U, Items.GetFirstNode);
+    tvConsultsChange(Self, Selected);
   end;
 end;
 
@@ -2924,10 +2953,8 @@ end;
 procedure TfrmConsults.FormCreate(Sender: TObject);
 begin
   inherited;
+  FocusToRightPanel := False;
   PageID := CT_CONSULTS;
-  memConsult.Color := ReadOnlyColor;
-  memPCEShow.Color := ReadOnlyColor;
-  lblNewTitle.Color := ReadOnlyColor;
   EditingIndex := -1;
   FLastNoteID := '';
   FEditNote.LastCosigner := 0;
@@ -2939,9 +2966,6 @@ begin
   frmDrawers.RichEditControl := memResults;
   frmDrawers.Splitter := splDrawers;
   frmDrawers.DefTempPiece := 2;
-  tvCsltNotes.Images := dmodShared.imgNotes;
-  tvCsltNotes.StateImages := dmodShared.imgImages;
-  tvConsults.Images := dmodShared.imgConsults;
   FImageFlag := TBitmap.Create;
   FDocList := TStringList.Create;
   with FCurrentNoteContext do
@@ -2951,7 +2975,6 @@ begin
       Status := IntToStr(NC_ALL);
     end;
   FCsltList := TStringList.Create;
-  TAccessibleTreeView.WrapControl(tvConsults);
 end;
 
 procedure TfrmConsults.mnuActDisplayDetailsClick(Sender: TObject);
@@ -2967,6 +2990,8 @@ begin
   end;
   tvConsultsChange(Self, tvConsults.Selected);
   //lstConsultsClick(Self);
+  if memConsult.CanFocus then
+    memConsult.SetFocus;
 end;
 
 procedure TfrmConsults.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -3254,6 +3279,12 @@ begin
   mnuActEditResubmitClick(Self);
 end;
 
+procedure TfrmConsults.cmdEditResubmitExit(Sender: TObject);
+begin
+  inherited;
+  DoLeftPanelCustomShiftTab;
+end;
+
 procedure TfrmConsults.mnuViewSaveAsDefaultClick(Sender: TObject);
 begin
   inherited;
@@ -3290,6 +3321,19 @@ procedure TfrmConsults.mnuNewTemplateClick(Sender: TObject);
 begin
   inherited;
   EditTemplates(Self, True);
+end;
+
+procedure TfrmConsults.pnlLeftExit(Sender: TObject);
+begin
+  inherited;
+  if (Not FocusToRightPanel) then
+    if ShiftTabIsPressed then
+      frmFrame.tabPage.SetFocus
+    else if TabIsPressed then
+      frmFrame.pnlPatient.SetFocus;
+
+  if FocusToRightPanel then
+    FocusToRightPanel := False;
 end;
 
 procedure TfrmConsults.pnlLeftResize(Sender: TObject);
@@ -3386,7 +3430,6 @@ end;
 *)
 procedure TfrmConsults.FormDestroy(Sender: TObject);
 begin
-  TAccessibleTreeView.UnwrapControl(tvConsults);
   FDocList.Free;
   FCsltList.Free;
   FImageFlag.Free;
@@ -3577,7 +3620,7 @@ begin
       //if (IsConsultTitle(Title) and (Consult = 0)) then Result := True;
     if (DocType = TYP_ADDENDUM) then
     begin
-      if AskCosignerForDocument(Addend, Author) and (Cosigner <= 0) then Result := True;
+      if AskCosignerForDocument(Addend, Author, DateTime) and (Cosigner <= 0) then Result := True;
     end else
     begin
       if Title > 0 then CurTitle := Title else CurTitle := DocType;
@@ -3694,6 +3737,7 @@ procedure TfrmConsults.DoAutoSave(Suppress: integer = 1);
 var
   ErrMsg: string;
 begin
+  if fFrame.frmFrame.DLLActive = True then Exit;  
   if (EditingIndex > -1) and FChanged then
   begin
     StatusText('Autosaving note...');
@@ -3710,6 +3754,14 @@ begin
   if ErrMsg <> '' then
     InfoBox(TX_SAVE_ERROR1 + ErrMsg + TX_SAVE_ERROR2, TC_SAVE_ERROR, MB_OK or MB_ICONWARNING);
   //Assert(ErrMsg = '', 'AutoSave: ' + ErrMsg);
+end;
+
+procedure TfrmConsults.DoLeftPanelCustomShiftTab;
+begin
+  if ShiftTabIsPressed then begin
+    FocusToRightPanel := True;
+    FindNextControl(frmFrame.pnlPatient, False, True, False).SetFocus;
+  end;
 end;
 
 procedure TfrmConsults.cmdChangeClick(Sender: TObject);
@@ -3827,7 +3879,7 @@ var
   procedure AssignBoilerText;
   begin
     ExecuteTemplateOrBoilerPlate(BoilerText, FEditNote.Title, ltTitle, Self, 'Title: ' + FEditNote.TitleName, DocInfo);
-    memResults.Lines.Assign(BoilerText);
+    QuickCopyWith508Msg(BoilerText, memResults);
     FChanged := False;
   end;
 
@@ -3848,7 +3900,7 @@ begin
         0:  { do nothing } ;                         // ignore
         1: begin
              ExecuteTemplateOrBoilerPlate(BoilerText, FEditNote.Title, ltTitle, Self, 'Title: ' + FEditNote.TitleName, DocInfo);
-             memResults.Lines.AddStrings(BoilerText);  // append
+             QuickCopyWith508Msg(BoilerText, memResults);  // append
            end;
         2: AssignBoilerText;                         // replace
         end;
@@ -4282,7 +4334,7 @@ begin
         GetConsultsList(tmpList, StrToFMDateTime(BeginDate), StrToFMDateTime(EndDate), Service, Status, Ascending);
         CreateListItemsforConsultTree(FCsltList, tmpList, ViewContext, GroupBy, Ascending);
         UpdateConsultsTreeView(FCsltList, tvConsults);
-        lstConsults.Items.Assign(tmpList);
+        FastAssign(tmpList, lstConsults.Items);
       end;
     with tvConsults do
       begin
@@ -4308,7 +4360,7 @@ begin
     begin
       uChanging := True;
       Items.BeginUpdate;
-      lstConsults.Items.AddStrings(DocList);
+      FastAddStrings(DocList, lstConsults.Items);
       BuildConsultsTree(Tree, DocList, '0', nil, FCurrentContext);
       Items.EndUpdate;
       uChanging := False;
@@ -4538,7 +4590,7 @@ begin
   if NoteIEN <= 0 then exit;
   Signers := TStringList.Create;
   try
-    Signers.Assign(GetCurrentSigners(NoteIEN));
+    FastAssign(GetCurrentSigners(NoteIEN), Signers);
     for i := 0 to Signers.Count - 1 do
       if Piece(Signers[i], U, 1) = IntToStr(User.DUZ) then
         begin
@@ -4593,20 +4645,6 @@ begin
   frmDrawers.mnuInsertTemplateClick(Sender);
 end;
 
-procedure TfrmConsults.tvConsultsAddition(Sender: TObject;
-  Node: TTreeNode);
-begin
-  inherited;
-  TAccessibleTreeNode.WrapControl(Node as TORTreeNode);
-end;
-
-procedure TfrmConsults.tvConsultsDeletion(Sender: TObject;
-  Node: TTreeNode);
-begin
-  inherited;
-  TAccessibleTreeNode.UnwrapControl(Node as TORTreeNode);
-end;
-
 procedure TfrmConsults.lstConsultsToPrint;      
 var
   AParentID: string;
@@ -4629,119 +4667,25 @@ begin
   with tvConsults do Selected := FindPieceNode(AParentID, 1, U, Items.GetFirstNode);
 end;
 
-
-{Tab Order tricks.  Need to change
-  tvConsult
-
-  tvCsltNotes
-  cmdEditResubmit
-  cmdNewConsult
-  cmdNewProc
-  frmDrawers.pnlTemplateButton
-  frmDrawers.pnlEncounterButton
-  cmdPCE
-
-  cmdChange
-  txtSubject
-  memResults
-
-to
-  tvConsult
-
-  cmdChange
-  txtSubject
-  memResults
-
-  tvCsltNotes
-  cmdEditResubmit
-  cmdNewConsult
-  cmdNewProc
-  frmDrawers.pnlTemplateButton
-  frmDrawers.pnlEncounterButton
-  cmdPCE
-}
-
 procedure TfrmConsults.tvConsultsExit(Sender: TObject);
 begin
   inherited;
-  if IncSecond(FMousing,1) < Now then
-  begin
-    if (Screen.ActiveControl = tvCsltNotes) or
-        (Screen.ActiveControl = cmdEditResubmit) or
-        (Screen.ActiveControl = cmdNewConsult) or
-        (Screen.ActiveControl = cmdNewProc) or
-        (Screen.ActiveControl = frmDrawers.pnlTemplatesButton) or
-        (Screen.ActiveControl = frmDrawers.pnlEncounterButton) or
-        (Screen.ActiveControl = cmdPCE) then
-      FindNextControl( cmdPCE, True, True, False).SetFocus;
-  end;
-  FMousing := 0;
-end;
-
-procedure TfrmConsults.pnlResultsExit(Sender: TObject);
-begin
-  inherited;
-  if IncSecond(FMousing,1) < Now then
-  begin
-    if (Screen.ActiveControl = frmFrame.pnlPatient) then
-      FindNextControl( tvConsults, True, True, False).SetFocus
-    else
-    if (Screen.ActiveControl = tvCsltNotes) or
-        (Screen.ActiveControl = cmdEditResubmit) or
-        (Screen.ActiveControl = cmdNewConsult) or
-        (Screen.ActiveControl = cmdNewProc) or
-        (Screen.ActiveControl = frmDrawers.pnlTemplatesButton) or
-        (Screen.ActiveControl = frmDrawers.pnlEncounterButton) or
-        (Screen.ActiveControl = cmdPCE) then
-      FindNextControl( tvCsltNotes, False, True, False).SetFocus;
-  end;
-  FMousing := 0;
-end;
-
-procedure TfrmConsults.pnlActionExit(Sender: TObject);
-begin
-  inherited;
-  if IncSecond(FMousing,1) < Now then
-  begin
-    if (Screen.ActiveControl = memConsult) or
-        (Screen.ActiveControl = cmdChange) or
-        (Screen.ActiveControl = txtSubject) or
-        (Screen.ActiveControl = memResults) then
-      begin
-        //frmFrame.pnlPatient.SetFocus  //COMMENTED OUT FOR CQ6498
-        if memResults.CanFocus then
-          memResults.SetFocus //ADDED THIS LINE FOR CQ6498
-        else
-          memConsult.SetFocus;
-      end
-    else
-    if (Screen.ActiveControl = tvConsults) then
-      FindNextControl( frmFrame.pnlPatient, False, True, False).SetFocus;
-  end;
-  FMousing := 0;
+  FocusToRightPanel := True;
+  if TabIsPressed then
+    FindNextControl(pnlLeft, False, True, False).SetFocus;
 end;
 
 procedure TfrmConsults.frmFramePnlPatientExit(Sender: TObject);
 begin
   FOldFramePnlPatientExit(Sender);
-  if IncSecond(FMousing,1) < Now then
-  begin
-    if (Screen.ActiveControl = memConsult) or
-        (Screen.ActiveControl = cmdChange) or
-        (Screen.ActiveControl = txtSubject) or
-        (Screen.ActiveControl = memResults) then
-      FindNextControl( memConsult, False, True, False).SetFocus;
-  end;
-  FMousing := 0;
+  if ShiftTabIsPressed then
+    FindNextControl( pnlRight, False, True, False).SetFocus;
 end;
 
 procedure TfrmConsults.FormHide(Sender: TObject);
 begin
   inherited;
   frmFrame.pnlPatient.OnExit := FOldFramePnlPatientExit;
-  frmDrawers.pnlTemplatesButton.OnExit := FOldDrawerPnlTemplatesButtonExit;
-  frmDrawers.pnlEncounterButton.OnExit := FOldDrawerPnlEncounterButtonExit;
-  frmDrawers.edtSearch.OnExit := FOldDrawerEdtSearchExit;
 end;
 
 procedure TfrmConsults.FormShow(Sender: TObject);
@@ -4751,12 +4695,6 @@ begin
   inherited;
   FOldFramePnlPatientExit := frmFrame.pnlPatient.OnExit;
   frmFrame.pnlPatient.OnExit := frmFramePnlPatientExit;
-  FOldDrawerPnlTemplatesButtonExit := frmDrawers.pnlTemplatesButton.OnExit;
-  frmDrawers.pnlTemplatesButton.OnExit := frmDrawerPnlTemplatesButtonExit;
-  FOldDrawerPnlEncounterButtonExit := frmDrawers.pnlEncounterButton.OnExit;
-  frmDrawers.pnlEncounterButton.OnExit := frmDrawerPnlEncounterButtonExit;
-  FOldDrawerEdtSearchExit := frmDrawers.edtSearch.OnExit;
-  frmDrawers.edtSearch.OnExit := frmDrawerEdtSearchExit;
   {Below is a fix for ClearQuest Defect HDS0000948, Kind of Kloogy I looked
   and looked for side effects and a better solution and this was the best!}
   if (EditingIndex = -1) or (lstNotes.ItemIndex <> EditingIndex) then
@@ -4772,31 +4710,6 @@ begin
     end;
   end
   {End of ClearQuest Defect HDS0000948 Fixes}
-end;
-
-procedure TfrmConsults.frmDrawerEdtSearchExit(Sender: TObject);
-begin
-  FOldDrawerEdtSearchExit(Sender);
-  pnlActionExit(Sender);
-end;
-
-procedure TfrmConsults.frmDrawerPnlTemplatesButtonExit(Sender: TObject);
-begin
-  FOldDrawerPnlTemplatesButtonExit(Sender);
-  pnlActionExit(Sender);
-end;
-
-procedure TfrmConsults.frmDrawerPnlEncounterButtonExit(Sender: TObject);
-begin
-  FOldDrawerPnlEncounterButtonExit(Sender);
-  pnlActionExit(Sender);
-end;
-
-procedure TfrmConsults.FormMouseMove(Sender: TObject; Shift: TShiftState;
-  X, Y: Integer);
-begin
-  inherited;
-  FMousing := Now;
 end;
 
 procedure TfrmConsults.ViewInfo(Sender: TObject);
@@ -4820,6 +4733,7 @@ begin
 end;
 
 initialization
+  SpecifyFormIsNotADialog(TfrmConsults);
   uPCEEdit := TPCEData.Create;
   uPCEShow := TPCEData.Create;
 

@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ComCtrls, ExtCtrls, Menus, ORFn;
+  StdCtrls, ComCtrls, ExtCtrls, Menus, ORFn, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmTemplateView = class(TForm)
+  TfrmTemplateView = class(TfrmBase508Form)
     pnlBottom: TPanel;
     reMain: TRichEdit;
     btnClose: TButton;
@@ -25,8 +26,8 @@ type
     procedure Copy1Click(Sender: TObject);
     procedure SelectAll1Click(Sender: TObject);
     procedure btnPrintClick(Sender: TObject);
+    procedure AlignButtons();
     procedure FormCreate(Sender: TObject);
-    procedure FormShow(Sender: TObject);
   private
   end;
 
@@ -51,7 +52,8 @@ var
 begin
   if(not assigned(frmTemplateView)) then
     frmTemplateView := TfrmTemplateView.Create(Application);
-  ResizeAnchoredFormToFont(frmTemplateView);
+  //Quick fix to work around glich in resize algorithm
+  frmTemplateView.AlignButtons();
   frmTemplateView.reMain.Lines.Clear;
   frmTemplateView.Caption := 'Template: ' + Title;
   frmTemplateView.reMain.Lines.Text := Text;
@@ -79,6 +81,13 @@ procedure TfrmTemplateView.FormClose(Sender: TObject;
 begin
   SaveUserBounds(frmTemplateView);
   Action := caFree;
+end;
+
+procedure TfrmTemplateView.FormCreate(Sender: TObject);
+begin
+  inherited;
+  ResizeAnchoredFormToFont(Self);
+  SetFormPosition(Self);
 end;
 
 procedure TfrmTemplateView.cbStayOnTopClick(Sender: TObject);
@@ -117,14 +126,12 @@ begin
   PrintStrings(Self, reMain.Lines, Caption, 'End of template');
 end;
 
-procedure TfrmTemplateView.FormCreate(Sender: TObject);
+procedure TfrmTemplateView.AlignButtons;
+Const
+  BtnSpace = 8;
 begin
-  reMain.Color := ReadOnlyColor;
-end;
-
-procedure TfrmTemplateView.FormShow(Sender: TObject);
-begin
-  SetFormPosition(frmTemplateView);
+  btnClose.Left := frmTemplateView.Width - btnClose.Width - BtnSpace;
+  btnPrint.Left := btnClose.Left - BtnSpace - btnPrint.Width;
 end;
 
 end.

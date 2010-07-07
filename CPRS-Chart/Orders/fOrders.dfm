@@ -1,28 +1,36 @@
 inherited frmOrders: TfrmOrders
   Left = 451
-  Top = 250
-  Width = 774
-  Height = 579
+  Top = 177
   HelpContext = 4000
   Caption = 'Orders Page'
+  ClientHeight = 571
+  ClientWidth = 766
   HelpFile = 'overvw'
   Menu = mnuOrders
   OnDestroy = FormDestroy
   OnShow = FormShow
+  ExplicitWidth = 774
+  ExplicitHeight = 617
   PixelsPerInch = 96
   TextHeight = 13
   inherited shpPageBottom: TShape
-    Top = 528
+    Top = 566
     Width = 766
+    ExplicitTop = 528
+    ExplicitWidth = 766
   end
   inherited sptHorz: TSplitter
     Left = 117
-    Height = 528
+    Height = 566
     OnMoved = sptHorzMoved
+    ExplicitLeft = 117
+    ExplicitHeight = 528
   end
   inherited pnlLeft: TPanel
     Width = 117
-    Height = 528
+    Height = 566
+    ExplicitWidth = 117
+    ExplicitHeight = 566
     object OROffsetLabel1: TOROffsetLabel
       Left = 0
       Top = 0
@@ -76,7 +84,7 @@ inherited frmOrders: TfrmOrders
       Left = 0
       Top = 116
       Width = 117
-      Height = 412
+      Height = 450
       Align = alClient
       ItemHeight = 13
       ParentShowHint = False
@@ -93,21 +101,24 @@ inherited frmOrders: TfrmOrders
       Top = 79
       Width = 117
       Height = 18
+      Align = alTop
       Caption = 'Write Delayed Orders'
       TabOrder = 1
       OnClick = btnDelayedOrderClick
-      Align = alTop
       Alignment = taLeftJustify
     end
   end
   inherited pnlRight: TPanel
     Left = 121
     Width = 645
-    Height = 528
+    Height = 566
     ParentColor = True
     ParentCtl3D = False
     ParentFont = False
     OnResize = pnlRightResize
+    ExplicitLeft = 121
+    ExplicitWidth = 645
+    ExplicitHeight = 566
     object lblOrders: TOROffsetLabel
       Left = 0
       Top = 0
@@ -146,7 +157,6 @@ inherited frmOrders: TfrmOrders
       Top = 19
       Width = 645
       Height = 17
-      DragReorder = False
       Sections = <
         item
           ImageIndex = -1
@@ -215,7 +225,7 @@ inherited frmOrders: TfrmOrders
       Left = 0
       Top = 36
       Width = 645
-      Height = 492
+      Height = 530
       Style = lbOwnerDrawVariable
       Align = alClient
       Color = clCream
@@ -228,9 +238,35 @@ inherited frmOrders: TfrmOrders
       OnDblClick = lstOrdersDblClick
       OnDrawItem = lstOrdersDrawItem
       OnMeasureItem = lstOrdersMeasureItem
-      RightClickSelect = True
       Caption = 'Active Orders'
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lstSheets'
+        'Status = stsDefault')
+      (
+        'Component = lstWrite'
+        'Status = stsDefault')
+      (
+        'Component = btnDelayedOrder'
+        'Status = stsDefault')
+      (
+        'Component = hdrOrders'
+        'Status = stsDefault')
+      (
+        'Component = lstOrders'
+        'Status = stsDefault')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = pnlRight'
+        'Status = stsDefault')
+      (
+        'Component = frmOrders'
+        'Status = stsDefault'))
   end
   object mnuOrders: TMainMenu
     Left = 136

@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ORfn, ExtCtrls, rOrders, fFrame;
+  StdCtrls, ORCtrls, ORfn, ExtCtrls, rOrders, fFrame, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOrdersPrint = class(TForm)
+  TfrmOrdersPrint = class(TfrmBase508Form)
     ckChartCopy: TCheckBox;
     ckLabels: TCheckBox;
     ckRequisitions: TCheckBox;
@@ -58,7 +59,8 @@ var
 const
   NO_WIN_PRINT = False;
 
-procedure SetupOrdersPrint(OrderList: TStringList; var DeviceInfo: string; Nature: Char; SelectAll: Boolean; var PrintIt: Boolean);
+procedure SetupOrdersPrint(OrderList: TStringList; var DeviceInfo: string; Nature: Char; SelectAll: Boolean; var PrintIt: Boolean;
+                           PrintTitle: string = ''; PrintLoc: Integer = 0);
 
 implementation
 
@@ -67,12 +69,14 @@ implementation
 uses
   fDeviceSelect, uCore, ORNet, fOrders;
 
-procedure SetupOrdersPrint(OrderList: TStringList; var DeviceInfo: string; Nature: Char; SelectAll: Boolean; var PrintIt: Boolean);
+procedure SetupOrdersPrint(OrderList: TStringList; var DeviceInfo: string; Nature: Char; SelectAll: Boolean; var PrintIt: Boolean;
+                           PrintTitle: string = ''; PrintLoc: Integer = 0);
 {displays device and copy selection form for printing orders, and returns a record of the selections}
 var
   frmOrdersPrint: TfrmOrdersPrint;
 begin
   frmOrdersPrint := TfrmOrdersPrint.Create(Application);
+  if PrintTitle <> '' then frmOrdersPrint.Caption := 'Print Orders for ' + PrintTitle;
   try
     frmFrame.CCOWBusy := True;
     ResizeFormToFont(TForm(frmOrdersPrint));
@@ -86,7 +90,7 @@ begin
           cmdCancel.Caption := 'Cancel Print';
           lblPart2.Text := 'Greyed out items are not available.';
         end;
-      OrderPrintDeviceInfo(OrderList, PrintParams, Nature);
+      OrderPrintDeviceInfo(OrderList, PrintParams, Nature, PrintLoc);
       SetupControls(PrintParams);
       if (PrintParams.AnyPrompts) {or FSelectAll} then ShowModal;
       DeviceInfo := FDevices;

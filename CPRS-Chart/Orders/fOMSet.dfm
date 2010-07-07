@@ -1,28 +1,23 @@
-object frmOMSet: TfrmOMSet
+inherited frmOMSet: TfrmOMSet
   Left = 209
   Top = 191
-  Width = 113
-  Height = 229
   BorderIcons = []
   Caption = 'Selected Orders'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 202
+  ClientWidth = 105
   FormStyle = fsStayOnTop
-  OldCreateOrder = False
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  ExplicitWidth = 113
+  ExplicitHeight = 229
   DesignSize = (
     105
     202)
   PixelsPerInch = 96
   TextHeight = 13
-  object lstSet: TCheckListBox
+  object lstSet: TCheckListBox [0]
     Left = 0
     Top = 0
     Width = 104
@@ -33,7 +28,7 @@ object frmOMSet: TfrmOMSet
     ItemHeight = 13
     TabOrder = 0
   end
-  object cmdInterupt: TButton
+  object cmdInterupt: TButton [1]
     Left = 4
     Top = 172
     Width = 96
@@ -42,5 +37,17 @@ object frmOMSet: TfrmOMSet
     Caption = 'Stop Order Set'
     TabOrder = 1
     OnClick = cmdInteruptClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lstSet'
+        'Status = stsDefault')
+      (
+        'Component = cmdInterupt'
+        'Status = stsDefault')
+      (
+        'Component = frmOMSet'
+        'Status = stsDefault'))
   end
 end

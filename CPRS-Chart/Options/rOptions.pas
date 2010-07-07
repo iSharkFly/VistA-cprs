@@ -9,7 +9,8 @@ function rpcGetOrderChecks: TStrings;
 function rpcGetNotificationDefaults: String;
 function rpcGetSurrogateInfo: String;
 procedure rpcCheckSurrogate(surrogate: Int64; var ok: boolean; var msg: string);
-procedure rpcSetSurrogateInfo(aString: String);
+//procedure rpcSetSurrogateInfo(aString: String);
+procedure rpcSetSurrogateInfo(aString: String; var ok: boolean; var msg: string);
 procedure rpcClearNotifications;
 procedure rpcSetNotifications(aList: TStringList);
 procedure rpcSetOrderChecks(aList: TStringList);
@@ -53,8 +54,8 @@ procedure rpcGetAllTeams(Dest: TStrings);
 procedure rpcGetTeams(Dest: TStrings);
 procedure rpcGetATeams(Dest: TStrings);
 procedure rpcDeleteList(aString: String);
-function rpcNewList(aString: String): String;
-procedure rpcSaveListChanges(aList: TStrings; aListIEN: integer);
+function rpcNewList(aString: String; Visibility: integer): String;
+procedure rpcSaveListChanges(aList: TStrings; aListIEN, aListVisibility: integer);
 procedure rpcListUsersByTeam(Dest: TStrings; teamid: integer);
 procedure rpcRemoveList(aListIEN: integer);
 procedure rpcAddList(aListIEN: integer);
@@ -112,9 +113,18 @@ begin
   msg := Piece(value, '^', 2);
 end;
 
-procedure rpcSetSurrogateInfo(aString: String);
+(*procedure rpcSetSurrogateInfo(aString: String);
 begin
   CallV('ORWTPP SAVESURR', [aString]);
+end;*)
+
+procedure rpcSetSurrogateInfo(aString: String; var ok: boolean; var msg: string);
+var
+  value: string;
+begin
+  value := sCallV('ORWTPP SAVESURR', [aString]);
+  ok := Piece(value, '^', 1) = '1';
+  msg := Piece(value, '^', 2);
 end;
 
 
@@ -317,7 +327,7 @@ procedure rpcGetReminders(Dest: TStrings);
 begin
   CallV('ORWTPP GETREM', [nil]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure rpcSetReminders(aList: TStringList);
@@ -405,28 +415,28 @@ procedure rpcGetPersonalLists(Dest: TStrings);
 begin
   CallV('ORWTPP PLISTS', [nil]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure rpcGetAllTeams(Dest: TStrings);
 begin
   CallV('ORWTPP PLTEAMS', [nil]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure rpcGetTeams(Dest: TStrings);
 begin
   CallV('ORWTPP TEAMS', [nil]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure rpcGetATeams(Dest: TStrings);
 begin
   CallV('ORWTPT ATEAMS', [nil]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure rpcDeleteList(aString: String);
@@ -434,22 +444,22 @@ begin
   CallV('ORWTPP DELLIST', [aString]);
 end;
 
-function rpcNewList(aString: String): String;
+function rpcNewList(aString: String; Visibility: integer): String;
 begin
-  result := sCallV('ORWTPP NEWLIST', [aString]);
+  result := sCallV('ORWTPP NEWLIST', [aString, Visibility]);
   result := MixedCase(result);
 end;
 
-procedure rpcSaveListChanges(aList: TStrings; aListIEN: integer);
+procedure rpcSaveListChanges(aList: TStrings; aListIEN, aListVisibility: integer);
 begin
-  CallV('ORWTPP SAVELIST', [aList, aListIEN]);
+  CallV('ORWTPP SAVELIST', [aList, aListIEN, aListVisibility]);
 end;
 
 procedure rpcListUsersByTeam(Dest: TStrings; teamid: integer);
 begin
   CallV('ORWTPT GETTEAM', [teamid]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure rpcRemoveList(aListIEN: integer);

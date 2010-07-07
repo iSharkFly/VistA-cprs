@@ -1,32 +1,42 @@
 inherited frmConsults: TfrmConsults
-  Left = 247
-  Top = 174
-  Width = 723
-  Height = 467
+  Left = 402
+  Top = 80
   HelpContext = 6000
   Caption = 'Consults Page'
+  ClientHeight = 421
+  ClientWidth = 715
   Menu = mnuConsults
   OnDestroy = FormDestroy
   OnHide = FormHide
-  OnMouseMove = FormMouseMove
   OnShow = FormShow
+  ExplicitWidth = 723
+  ExplicitHeight = 467
   PixelsPerInch = 96
   TextHeight = 13
   inherited shpPageBottom: TShape
     Top = 416
     Width = 715
+    ExplicitTop = 416
+    ExplicitWidth = 715
   end
   inherited sptHorz: TSplitter
     Left = 83
     Width = 2
     Height = 416
     OnCanResize = sptHorzCanResize
+    ExplicitLeft = 83
+    ExplicitWidth = 2
+    ExplicitHeight = 416
   end
   inherited pnlRight: TPanel [2]
     Left = 85
     Width = 630
     Height = 416
+    OnExit = pnlRightExit
     OnResize = pnlRightResize
+    ExplicitLeft = 85
+    ExplicitWidth = 630
+    ExplicitHeight = 416
     object sptVert: TSplitter
       Left = 0
       Top = 350
@@ -43,7 +53,6 @@ inherited frmConsults: TfrmConsults
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
-      OnExit = pnlResultsExit
       object lblTitle: TOROffsetLabel
         Left = 0
         Top = 0
@@ -90,7 +99,6 @@ inherited frmConsults: TfrmConsults
         TabOrder = 0
         WantReturns = False
         WordWrap = False
-        OnMouseMove = FormMouseMove
       end
     end
     object memPCEShow: TRichEdit
@@ -111,7 +119,6 @@ inherited frmConsults: TfrmConsults
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
-      OnExit = pnlResultsExit
       OnResize = pnlResultsResize
       object memResults: TRichEdit
         Left = 0
@@ -131,7 +138,6 @@ inherited frmConsults: TfrmConsults
         WantTabs = True
         OnChange = memResultChange
         OnKeyDown = memResultsKeyDown
-        OnMouseMove = FormMouseMove
       end
       object pnlFields: TPanel
         Left = 0
@@ -239,7 +245,6 @@ inherited frmConsults: TfrmConsults
           Caption = 'Change...'
           TabOrder = 0
           OnClick = cmdChangeClick
-          OnMouseMove = FormMouseMove
         end
         object txtSubject: TCaptionEdit
           Left = 48
@@ -253,7 +258,6 @@ inherited frmConsults: TfrmConsults
           ShowHint = True
           TabOrder = 1
           Text = 'txtSubject'
-          OnMouseMove = FormMouseMove
           Caption = 'Subject'
         end
       end
@@ -262,7 +266,10 @@ inherited frmConsults: TfrmConsults
   inherited pnlLeft: TPanel [3]
     Width = 83
     Height = 416
+    OnExit = pnlLeftExit
     OnResize = pnlLeftResize
+    ExplicitWidth = 83
+    ExplicitHeight = 416
     object splConsults: TSplitter
       Left = 0
       Top = 161
@@ -279,7 +286,6 @@ inherited frmConsults: TfrmConsults
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
-      OnExit = pnlActionExit
       object splDrawers: TSplitter
         Left = 0
         Top = 228
@@ -293,30 +299,31 @@ inherited frmConsults: TfrmConsults
         Top = 21
         Width = 83
         Height = 21
+        Align = alTop
         Caption = 'New Consult'
         Constraints.MinHeight = 21
-        TabOrder = 2
+        Default = True
+        TabOrder = 1
         OnClick = cmdNewConsultClick
-        OnMouseMove = FormMouseMove
-        Align = alTop
+        OnExit = cmdNewConsultExit
       end
       object cmdNewProc: TORAlignButton
         Left = 0
         Top = 42
         Width = 83
         Height = 21
+        Align = alTop
         Caption = 'New Procedure'
         Constraints.MinHeight = 21
-        TabOrder = 3
+        TabOrder = 2
         OnClick = cmdNewProcClick
-        OnMouseMove = FormMouseMove
-        Align = alTop
       end
       object cmdEditResubmit: TORAlignButton
         Left = 0
         Top = 0
         Width = 83
         Height = 21
+        Align = alTop
         Caption = 'Edit/Resubmit'
         Constraints.MinHeight = 21
         Font.Charset = DEFAULT_CHARSET
@@ -325,11 +332,10 @@ inherited frmConsults: TfrmConsults
         Font.Name = 'MS Sans Serif'
         Font.Style = []
         ParentFont = False
-        TabOrder = 1
+        TabOrder = 0
         Visible = False
         OnClick = cmdEditResubmitClick
-        OnMouseMove = FormMouseMove
-        Align = alTop
+        OnExit = cmdEditResubmitExit
       end
       object lstNotes: TORListBox
         Left = 0
@@ -344,7 +350,6 @@ inherited frmConsults: TfrmConsults
         TabOrder = 4
         Visible = False
         OnClick = lstNotesClick
-        OnMouseMove = FormMouseMove
         ItemTipColor = clWindow
         LongList = False
         Pieces = '2,3'
@@ -358,17 +363,18 @@ inherited frmConsults: TfrmConsults
         Align = alClient
         Constraints.MinWidth = 30
         HideSelection = False
+        Images = dmodShared.imgNotes
         Indent = 19
         PopupMenu = popNoteList
         ReadOnly = True
-        TabOrder = 0
+        StateImages = dmodShared.imgImages
+        TabOrder = 3
         OnChange = tvCsltNotesChange
         OnClick = tvCsltNotesClick
         OnCollapsed = tvCsltNotesCollapsed
         OnDragDrop = tvCsltNotesDragDrop
         OnDragOver = tvCsltNotesDragOver
         OnExpanded = tvCsltNotesExpanded
-        OnMouseMove = FormMouseMove
         OnStartDrag = tvCsltNotesStartDrag
         Caption = 'Consult Notes'
         NodePiece = 0
@@ -379,14 +385,12 @@ inherited frmConsults: TfrmConsults
       Top = 395
       Width = 83
       Height = 21
+      Align = alBottom
       Caption = 'Encounter'
       Enabled = False
       TabOrder = 2
       Visible = False
       OnClick = cmdPCEClick
-      OnExit = pnlActionExit
-      OnMouseMove = FormMouseMove
-      Align = alBottom
     end
     object pnlConsultList: TPanel
       Left = 0
@@ -435,23 +439,105 @@ inherited frmConsults: TfrmConsults
         Height = 142
         Align = alClient
         HideSelection = False
-        Indent = 15
+        Images = dmodShared.imgConsults
+        Indent = 19
         PopupMenu = popNoteList
         ReadOnly = True
         TabOrder = 0
-        OnAddition = tvConsultsAddition
         OnClick = tvConsultsClick
         OnCollapsed = tvConsultsCollapsed
-        OnDeletion = tvConsultsDeletion
         OnExit = tvConsultsExit
         OnExpanded = tvConsultsExpanded
         OnKeyUp = tvConsultsKeyUp
-        OnMouseMove = FormMouseMove
         Caption = 'Consults'
         NodePiece = 0
         ShortNodeCaptions = True
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlRead'
+        'Status = stsDefault')
+      (
+        'Component = memConsult'
+        'Status = stsDefault')
+      (
+        'Component = memPCEShow'
+        'Status = stsDefault')
+      (
+        'Component = pnlResults'
+        'Status = stsDefault')
+      (
+        'Component = memResults'
+        'Status = stsDefault')
+      (
+        'Component = pnlFields'
+        'Status = stsDefault')
+      (
+        'Component = lblRefDate'
+        'Status = stsDefault')
+      (
+        'Component = lblAuthor'
+        'Status = stsDefault')
+      (
+        'Component = lblVisit'
+        'Status = stsDefault')
+      (
+        'Component = lblCosigner'
+        'Status = stsDefault')
+      (
+        'Component = lblSubject'
+        'Status = stsDefault')
+      (
+        'Component = lblNewTitle'
+        'Status = stsDefault')
+      (
+        'Component = cmdChange'
+        'Status = stsDefault')
+      (
+        'Component = txtSubject'
+        'Status = stsDefault')
+      (
+        'Component = pnlAction'
+        'Status = stsDefault')
+      (
+        'Component = cmdNewConsult'
+        'Status = stsDefault')
+      (
+        'Component = cmdNewProc'
+        'Status = stsDefault')
+      (
+        'Component = cmdEditResubmit'
+        'Status = stsDefault')
+      (
+        'Component = lstNotes'
+        'Status = stsDefault')
+      (
+        'Component = tvCsltNotes'
+        'Status = stsDefault')
+      (
+        'Component = cmdPCE'
+        'Status = stsDefault')
+      (
+        'Component = pnlConsultList'
+        'Status = stsDefault')
+      (
+        'Component = lstConsults'
+        'Status = stsDefault')
+      (
+        'Component = tvConsults'
+        'Status = stsDefault')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = pnlRight'
+        'Status = stsDefault')
+      (
+        'Component = frmConsults'
+        'Status = stsDefault'))
   end
   object popNoteMemo: TPopupMenu
     OnPopup = popNoteMemoPopup
@@ -1042,5 +1128,35 @@ inherited frmConsults: TfrmConsults
     OnReplace = dlgReplaceTextReplace
     Left = 665
     Top = 303
+  end
+  object imgLblNotes: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvCsltNotes
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblNotes
+    Left = 16
+    Top = 48
+  end
+  object imgLblImages: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvCsltNotes
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblImages
+    Left = 8
+    Top = 88
+  end
+  object imgLblConsults: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvConsults
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblConsults
+    Left = 56
+    Top = 96
   end
 end

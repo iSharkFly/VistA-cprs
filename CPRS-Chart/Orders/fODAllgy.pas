@@ -5,7 +5,7 @@ interface
 uses
   SysUtils, WinTypes, WinProcs, Messages, Classes, Graphics, Controls,
   Forms, Dialogs, StdCtrls, ORCtrls, ORfn, fODBase, ExtCtrls, ComCtrls, uConst,
-  Menus, ORDtTm, Buttons;
+  Menus, ORDtTm, Buttons, VA508AccessibilityManager;
 
 type
   TfrmODAllergy = class(TfrmODBase)
@@ -320,9 +320,9 @@ begin
   inherited;
   AStringList := TStringList.Create;
   try
-    AStringList.Assign(memComments.Lines);
+    FastAssign(memComments.Lines, AStringList);
     LimitStringLength(AStringList, 74);
-    memComments.Lines.Assign(AstringList);
+    QuickCopy(AstringList, memComments);
     ControlChange(Self);
   finally
     AStringList.Free;

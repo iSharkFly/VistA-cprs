@@ -1,55 +1,54 @@
-object frmEditCslt: TfrmEditCslt
+inherited frmEditCslt: TfrmEditCslt
   Tag = 110
   Left = 409
   Top = 225
-  Width = 569
-  Height = 367
+  Width = 599
+  Height = 375
   HorzScrollBar.Range = 561
   VertScrollBar.Range = 340
-  AutoScroll = False
   Caption = 'Edit/Resubmit a Cancelled Consult'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  Constraints.MinHeight = 371
+  Constraints.MinWidth = 573
   OldCreateOrder = True
   Position = poScreenCenter
+  ExplicitLeft = 409
+  ExplicitTop = 225
+  ExplicitWidth = 599
+  ExplicitHeight = 375
   DesignSize = (
-    561
-    340)
+    591
+    341)
   PixelsPerInch = 96
   TextHeight = 13
-  object lblService: TLabel
+  object lblService: TLabel [0]
     Left = 4
     Top = 4
     Width = 134
     Height = 13
     Caption = 'Consult to Service/Specialty'
   end
-  object lblReason: TLabel
+  object lblReason: TLabel [1]
     Left = 4
     Top = 166
     Width = 90
     Height = 13
     Caption = 'Reason for Consult'
   end
-  object lblComment: TLabel
+  object lblComment: TLabel [2]
     Left = 4
     Top = 105
     Width = 77
     Height = 13
     Caption = 'New Comments:'
   end
-  object lblComments: TLabel
+  object lblComments: TLabel [3]
     Left = 4
     Top = 51
     Width = 89
     Height = 13
     Caption = 'Display Comments:'
   end
-  object lblUrgency: TStaticText
+  object lblUrgency: TStaticText [4]
     Left = 196
     Top = 4
     Width = 44
@@ -57,7 +56,7 @@ object frmEditCslt: TfrmEditCslt
     Caption = 'Urgency'
     TabOrder = 16
   end
-  object lblPlace: TStaticText
+  object lblPlace: TStaticText [5]
     Left = 376
     Top = 41
     Width = 104
@@ -65,7 +64,7 @@ object frmEditCslt: TfrmEditCslt
     Caption = 'Place of Consultation'
     TabOrder = 17
   end
-  object lblAttn: TStaticText
+  object lblAttn: TStaticText [6]
     Left = 376
     Top = 4
     Width = 46
@@ -73,7 +72,7 @@ object frmEditCslt: TfrmEditCslt
     Caption = 'Attention'
     TabOrder = 18
   end
-  object lblProvDiag: TStaticText
+  object lblProvDiag: TStaticText [7]
     Left = 195
     Top = 82
     Width = 104
@@ -81,7 +80,7 @@ object frmEditCslt: TfrmEditCslt
     Caption = 'Provisional Diagnosis'
     TabOrder = 19
   end
-  object lblInpOutp: TStaticText
+  object lblInpOutp: TStaticText [8]
     Left = 197
     Top = 47
     Width = 127
@@ -89,11 +88,11 @@ object frmEditCslt: TfrmEditCslt
     Caption = 'Patient will be seen as an:'
     TabOrder = 20
   end
-  object memReason: TRichEdit
+  object memReason: TRichEdit [9]
     Left = 4
     Top = 179
-    Width = 552
-    Height = 129
+    Width = 589
+    Height = 137
     Anchors = [akLeft, akTop, akRight, akBottom]
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -110,11 +109,12 @@ object frmEditCslt: TfrmEditCslt
     OnKeyDown = memCommentKeyDown
     OnKeyPress = memCommentKeyPress
     OnKeyUp = memCommentKeyUp
+    ExplicitHeight = 136
   end
-  object pnlMessage: TPanel
-    Left = 21
-    Top = 292
-    Width = 381
+  object pnlMessage: TPanel [10]
+    Left = 16
+    Top = 294
+    Width = 418
     Height = 44
     Anchors = [akLeft, akRight, akBottom]
     BevelInner = bvRaised
@@ -145,7 +145,7 @@ object frmEditCslt: TfrmEditCslt
       WantReturns = False
     end
   end
-  object cboService: TORComboBox
+  object cboService: TORComboBox [11]
     Left = 4
     Top = 19
     Width = 180
@@ -175,7 +175,7 @@ object frmEditCslt: TfrmEditCslt
     TabOrder = 0
     CharsNeedMatch = 1
   end
-  object cboUrgency: TORComboBox
+  object cboUrgency: TORComboBox [12]
     Left = 196
     Top = 19
     Width = 170
@@ -199,7 +199,7 @@ object frmEditCslt: TfrmEditCslt
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object radInpatient: TRadioButton
+  object radInpatient: TRadioButton [13]
     Left = 197
     Top = 61
     Width = 61
@@ -208,7 +208,7 @@ object frmEditCslt: TfrmEditCslt
     TabOrder = 5
     OnClick = radInpatientClick
   end
-  object radOutpatient: TRadioButton
+  object radOutpatient: TRadioButton [14]
     Left = 269
     Top = 61
     Width = 73
@@ -217,10 +217,10 @@ object frmEditCslt: TfrmEditCslt
     TabOrder = 6
     OnClick = radOutpatientClick
   end
-  object cboPlace: TORComboBox
+  object cboPlace: TORComboBox [15]
     Left = 376
     Top = 54
-    Width = 179
+    Width = 216
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     Style = orcsDropDown
@@ -242,10 +242,10 @@ object frmEditCslt: TfrmEditCslt
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object txtProvDiag: TCaptionEdit
+  object txtProvDiag: TCaptionEdit [16]
     Left = 195
     Top = 95
-    Width = 309
+    Width = 346
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     MaxLength = 180
@@ -256,10 +256,10 @@ object frmEditCslt: TfrmEditCslt
     OnChange = ControlChange
     Caption = 'Provisional Diagnosis'
   end
-  object txtAttn: TORComboBox
+  object txtAttn: TORComboBox [17]
     Left = 376
     Top = 19
-    Width = 181
+    Width = 218
     Height = 21
     Anchors = [akLeft, akTop, akRight]
     Style = orcsDropDown
@@ -282,7 +282,7 @@ object frmEditCslt: TfrmEditCslt
     OnNeedData = txtAttnNeedData
     CharsNeedMatch = 1
   end
-  object cboCategory: TORComboBox
+  object cboCategory: TORComboBox [18]
     Left = 561
     Top = 103
     Width = 10
@@ -304,9 +304,9 @@ object frmEditCslt: TfrmEditCslt
     Visible = False
     CharsNeedMatch = 1
   end
-  object cmdAccept: TButton
-    Left = 407
-    Top = 313
+  object cmdAccept: TButton [19]
+    Left = 437
+    Top = 319
     Width = 72
     Height = 21
     Anchors = [akRight, akBottom]
@@ -314,9 +314,9 @@ object frmEditCslt: TfrmEditCslt
     TabOrder = 12
     OnClick = cmdAcceptClick
   end
-  object cmdQuit: TButton
-    Left = 484
-    Top = 313
+  object cmdQuit: TButton [20]
+    Left = 514
+    Top = 319
     Width = 72
     Height = 21
     Anchors = [akRight, akBottom]
@@ -325,10 +325,10 @@ object frmEditCslt: TfrmEditCslt
     TabOrder = 13
     OnClick = cmdQuitClick
   end
-  object memComment: TRichEdit
+  object memComment: TRichEdit [21]
     Left = 4
     Top = 121
-    Width = 550
+    Width = 587
     Height = 41
     Anchors = [akLeft, akTop, akRight]
     PopupMenu = popReason
@@ -339,7 +339,7 @@ object frmEditCslt: TfrmEditCslt
     OnKeyPress = memCommentKeyPress
     OnKeyUp = memCommentKeyUp
   end
-  object btnCmtCancel: TButton
+  object btnCmtCancel: TButton [22]
     Left = 110
     Top = 49
     Width = 75
@@ -348,7 +348,7 @@ object frmEditCslt: TfrmEditCslt
     TabOrder = 3
     OnClick = btnCmtCancelClick
   end
-  object btnCmtOther: TButton
+  object btnCmtOther: TButton [23]
     Left = 110
     Top = 75
     Width = 75
@@ -357,8 +357,8 @@ object frmEditCslt: TfrmEditCslt
     TabOrder = 4
     OnClick = btnCmtOtherClick
   end
-  object cmdLexSearch: TButton
-    Left = 508
+  object cmdLexSearch: TButton [24]
+    Left = 545
     Top = 95
     Width = 46
     Height = 21
@@ -366,6 +366,78 @@ object frmEditCslt: TfrmEditCslt
     Caption = 'Lexicon'
     TabOrder = 9
     OnClick = cmdLexSearchClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblUrgency'
+        'Status = stsDefault')
+      (
+        'Component = lblPlace'
+        'Status = stsDefault')
+      (
+        'Component = lblAttn'
+        'Status = stsDefault')
+      (
+        'Component = lblProvDiag'
+        'Status = stsDefault')
+      (
+        'Component = lblInpOutp'
+        'Status = stsDefault')
+      (
+        'Component = memReason'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = cboService'
+        'Status = stsDefault')
+      (
+        'Component = cboUrgency'
+        'Status = stsDefault')
+      (
+        'Component = radInpatient'
+        'Status = stsDefault')
+      (
+        'Component = radOutpatient'
+        'Status = stsDefault')
+      (
+        'Component = cboPlace'
+        'Status = stsDefault')
+      (
+        'Component = txtProvDiag'
+        'Status = stsDefault')
+      (
+        'Component = txtAttn'
+        'Status = stsDefault')
+      (
+        'Component = cboCategory'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = memComment'
+        'Status = stsDefault')
+      (
+        'Component = btnCmtCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnCmtOther'
+        'Status = stsDefault')
+      (
+        'Component = cmdLexSearch'
+        'Status = stsDefault')
+      (
+        'Component = frmEditCslt'
+        'Status = stsDefault'))
   end
   object mnuPopProvDx: TPopupMenu
     Left = 353

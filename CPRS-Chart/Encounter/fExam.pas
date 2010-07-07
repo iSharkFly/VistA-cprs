@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fPCEBase, StdCtrls, ORCtrls, CheckLst, ExtCtrls, Buttons, uPCE, rPCE, ORFn,
-  fPCELex, fPCEOther, ComCtrls, fPCEBaseMain;
+  fPCELex, fPCEOther, ComCtrls, fPCEBaseMain, VA508AccessibilityManager;
 
 type
   TfrmExams = class(TfrmPCEBaseMain)
@@ -28,7 +28,7 @@ implementation
 {$R *.DFM}
 
 uses
-  fEncounterFrame;
+  fEncounterFrame, VA508AccessibilityRouter;
 
 procedure TfrmExams.cboExamResultsChange(Sender: TObject);
 var
@@ -112,6 +112,9 @@ begin
     end;
   end;
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmExams);
 
 end.
 

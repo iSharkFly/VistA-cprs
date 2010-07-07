@@ -3,10 +3,10 @@ unit fODRadConShRes;
 interface
 
 uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
-  Buttons, ORCtrls, ORfn, ExtCtrls;
+  Buttons, ORCtrls, ORfn, ExtCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmODRadConShRes = class(TForm)
+  TfrmODRadConShRes = class(TfrmBase508Form)
     cmdOK: TButton;
     cmdCancel: TButton;
     cboSource: TORComboBox;
@@ -53,7 +53,7 @@ begin
       FChanged := False;
       if SrcType in ['C','S'] then with cboSource do
          begin
-           Items.Assign(SubsetOfRadSources(SrcType));
+           FastAssign(SubsetOfRadSources(SrcType), cboSource.Items);
            if Items.Count > 0 then
             begin
              txtResearch.Enabled := False;

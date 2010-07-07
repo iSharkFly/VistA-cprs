@@ -3,10 +3,10 @@ unit fODRadImType;
 interface
 
 uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
-  Buttons, ORCtrls, ORfn, ExtCtrls;
+  Buttons, ORCtrls, ORfn, ExtCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmODRadImType = class(TForm)
+  TfrmODRadImType = class(TfrmBase508Form)
     cmdOK: TButton;
     cmdCancel: TButton;
     cboImType: TORComboBox;
@@ -49,7 +49,7 @@ begin
       ClientWidth  := W; pnlBase.Width  := W;
       ClientHeight := H; pnlBase.Height := H;
       FChanged := False;
-      cboImType.Items.Assign(SubsetOfImagingTypes);
+      FastAssign(SubsetOfImagingTypes, cboImType.Items);
       if cboImType.Items.Count > 1 then
          ShowModal
       else

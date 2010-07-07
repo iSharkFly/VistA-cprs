@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs
   ,ORFn, uCore, rOrders, fOrders, StdCtrls, ORCtrls, ExtCtrls, Grids,fAutoSz,
-  Spin, ComCtrls;
+  Spin, ComCtrls, VA508AccessibilityManager;
 
 type
   TfrmOrdersEvntRelease = class(TfrmAutoSz)
@@ -44,7 +44,6 @@ type
     procedure edtNumberClick(Sender: TObject);
     procedure updown1Click(Sender: TObject; Button: TUDBtnType);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
     FEvtList: TStringList;
@@ -64,7 +63,7 @@ type
 
 implementation
 
-uses rMisc, Accessibility_TLB, uAccessibleStringGrid;
+uses rMisc, VAUtils;
 
 {$R *.DFM}
 
@@ -147,7 +146,6 @@ begin
   grdEvtList.Cells[0,0] := 'Event Name';
   grdEvtList.Cells[1,0] := 'Date/Time Occured';
   SetPtEvtList(TStrings(fevtList),Patient.DFN, ATotal);
-  TAccessibleStringGrid.WrapControl(grdEvtList);
 end;
 
 procedure TfrmOrdersEvntRelease.btnCancelClick(Sender: TObject);
@@ -199,7 +197,7 @@ var
 begin
   if grdEvtList.Row < 1 then
   begin
-    ShowMessage('You need to select an event first.');
+    ShowMsg('You need to select an event first.');
     FOkPressed := False;
     Exit;
   end
@@ -360,12 +358,6 @@ begin
   inherited;
   SaveUserBounds(Self);
   Action := caFree;
-end;
-
-procedure TfrmOrdersEvntRelease.FormDestroy(Sender: TObject);
-begin
-  TAccessibleStringGrid.UnwrapControl(grdEvtList);
-  inherited;
 end;
 
 end.

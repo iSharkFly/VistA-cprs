@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, Buttons, ExtCtrls, StdCtrls, ORCtrls, ORFn, fODBase, uOrders;
+  fAutoSz, Buttons, ExtCtrls, StdCtrls, ORCtrls, ORFn, fODBase, uOrders,
+  VA508AccessibilityManager;
 
 type
   TfrmSaveQuickOrder = class(TfrmAutoSz)
@@ -57,6 +58,10 @@ const
   TC_NO_DEL_NEW  = 'Remove Quick Order';
   TX_NO_TEXT     = 'No fields have been entered - cannot save as quick order.';
   TC_NO_TEXT     = 'Save as Quick Order';
+  TX_DUP_NAME = 'There is already a quick order with that name.' + CRLF +
+                'Please either delete the original or enter a different name.';
+  TC_DUP_NAME = 'Unable to save quick order';
+  TC_DUP_RENAME = 'Unable to rename quick order';
 
 function EditCommonList(ADisplayGroup: Integer): Boolean;
 var
@@ -83,6 +88,7 @@ begin
         LoadQuickListForOD(Items, ADisplayGroup);
         ItemIndex := 0;
       end;
+      ActiveControl := lstQuickList;
       ShowModal;
       if OKPressed then
       begin
@@ -127,6 +133,11 @@ begin
         DGroupName := NameOfDGroup(InptDisp)
       else
         DGroupName := NameOfDGroup(ResponseSet.DisplayGroup);
+      if DGroupName = 'Inpt. Meds' then
+        begin
+          ResponseSet.DisplayGroup := InptDisp;
+          DGroupName := NameOfDGroup(InptDisp);
+        end;
       Caption := 'Add Quick Order (' + DGroupName + ')';
       lblQuickList.Caption := 'Common List for ' + DGroupName;
       lstQuickList.Caption := lblQuickList.Caption;
@@ -144,6 +155,7 @@ begin
           else Items.Insert(0, '-1^<New Quick Order>');
         ItemIndex := 0;
       end;
+      ActiveControl := txtDisplayName;
       ShowModal;
       if OKPressed then
       begin
@@ -212,15 +224,23 @@ end;
 procedure TfrmSaveQuickOrder.cmdRenameClick(Sender: TObject);
 var
   AName: string;
+  i: integer;
 begin
   inherited;
   with lstQuickList do
   begin
     if ItemIndex < 0 then Exit;
     AName := Piece(Items[ItemIndex], U, 2);
-    if ExecuteRename(AName, TX_QO_RENAME)
-      then Items[ItemIndex] := Piece(Items[ItemIndex], U, 1) + U + AName;
+    if ExecuteRename(AName, TX_QO_RENAME) then
+    begin
+      i := Items.IndexOf(AName);
+      if (i > -1) and (i <> ItemIndex) then
+        InfoBox(TX_DUP_NAME, TC_DUP_RENAME, MB_ICONERROR or MB_OK)
+      else
+        Items[ItemIndex] := Piece(Items[ItemIndex], U, 1) + U + AName;
+    end;
   end;
+
 end;
 
 procedure TfrmSaveQuickOrder.cmdDeleteClick(Sender: TObject);
@@ -246,12 +266,24 @@ begin
 end;
 
 procedure TfrmSaveQuickOrder.cmdOKClick(Sender: TObject);
+var
+  i: integer;
 begin
   inherited;
-  if txtDisplayName.Enabled and (txtDisplayName.Text = '') then
+  if txtDisplayName.Enabled then
   begin
-    InfoBox(TX_DNAME_REQ, TC_DNAME_REQ, MB_OK);
-    Exit;
+    if (txtDisplayName.Text = '') then
+    begin
+      InfoBox(TX_DNAME_REQ, TC_DNAME_REQ, MB_OK);
+      Exit;
+    end;
+    for i := 0 to lstQuickList.Count - 1 do
+      if (UpperCase(lstQuickList.DisplayText[i]) = UpperCase(txtDisplayName.Text)) and (i > 0) then
+      begin
+        InfoBox(TX_DUP_NAME, TC_DUP_NAME, MB_ICONERROR or MB_OK);
+        lstQuickList.ItemIndex := i;
+        Exit;
+      end;
   end;
   OKPressed := True;
   Close;

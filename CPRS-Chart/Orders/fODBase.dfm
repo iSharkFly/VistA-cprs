@@ -8,18 +8,18 @@ inherited frmODBase: TfrmODBase
   HorzScrollBar.Visible = True
   VertScrollBar.Range = 225
   VertScrollBar.Visible = True
-  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = ''
   FormStyle = fsStayOnTop
-  KeyPreview = True
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnKeyPress = FormKeyPress
+  ExplicitWidth = 528
+  ExplicitHeight = 275
   PixelsPerInch = 96
   TextHeight = 13
-  object memOrder: TCaptionMemo
+  object memOrder: TCaptionMemo [0]
     Left = 6
     Top = 194
     Width = 430
@@ -33,7 +33,7 @@ inherited frmODBase: TfrmODBase
     TabOrder = 0
     Caption = 'Order'
   end
-  object cmdAccept: TButton
+  object cmdAccept: TButton [1]
     Left = 442
     Top = 194
     Width = 72
@@ -42,7 +42,7 @@ inherited frmODBase: TfrmODBase
     TabOrder = 1
     OnClick = cmdAcceptClick
   end
-  object cmdQuit: TButton
+  object cmdQuit: TButton [2]
     Left = 442
     Top = 221
     Width = 39
@@ -52,7 +52,7 @@ inherited frmODBase: TfrmODBase
     TabOrder = 2
     OnClick = cmdQuitClick
   end
-  object pnlMessage: TPanel
+  object pnlMessage: TPanel [3]
     Left = 24
     Top = 176
     Width = 381
@@ -90,5 +90,26 @@ inherited frmODBase: TfrmODBase
       OnMouseDown = pnlMessageMouseDown
       OnMouseMove = pnlMessageMouseMove
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODBase'
+        'Status = stsDefault'))
   end
 end

@@ -1,26 +1,28 @@
 inherited frmODQuick: TfrmODQuick
   Left = 371
   Top = 203
-  Width = 304
-  Height = 290
   Caption = 'frmODQuick'
+  ClientHeight = 263
+  ClientWidth = 296
+  ExplicitWidth = 304
+  ExplicitHeight = 290
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TLabel [0]
     Left = 8
     Top = 8
     Width = 261
     Height = 13
     Caption = 'Enter the name that should be used for this quick order.'
   end
-  object Label2: TLabel
+  object Label2: TLabel [1]
     Left = 8
     Top = 61
     Width = 136
     Height = 13
     Caption = 'Meds, Inpatient Common List'
   end
-  object SpeedButton1: TSpeedButton
+  object SpeedButton1: TSpeedButton [2]
     Left = 263
     Top = 108
     Width = 25
@@ -35,7 +37,7 @@ inherited frmODQuick: TfrmODQuick
       3333333CCCCCCCCC33333333CCCCCCC3333333333CCCCC333333333333CCC333
       33333333333C3333333333333333333333333333333333333333}
   end
-  object SpeedButton2: TSpeedButton
+  object SpeedButton2: TSpeedButton [3]
     Left = 263
     Top = 144
     Width = 25
@@ -50,19 +52,19 @@ inherited frmODQuick: TfrmODQuick
       333333333CCCCC33333333333CCCCC33333333333CCCCC33333333333CCCCC33
       333333333CCCCC33333333333333333333333333333333333333}
   end
-  object Bevel1: TBevel
+  object Bevel1: TBevel [4]
     Left = 8
     Top = 224
     Width = 280
     Height = 2
   end
-  object Bevel2: TBevel
+  object Bevel2: TBevel [5]
     Left = 8
     Top = 51
     Width = 280
     Height = 2
   end
-  object Edit1: TCaptionEdit
+  object Edit1: TCaptionEdit [6]
     Left = 8
     Top = 22
     Width = 280
@@ -70,7 +72,7 @@ inherited frmODQuick: TfrmODQuick
     TabOrder = 0
     Caption = 'Enter the name that should be used for this quick order.'
   end
-  object ORListBox1: TORListBox
+  object ORListBox1: TORListBox [7]
     Left = 8
     Top = 75
     Width = 245
@@ -82,7 +84,7 @@ inherited frmODQuick: TfrmODQuick
     ItemTipColor = clWindow
     LongList = False
   end
-  object Button1: TButton
+  object Button1: TButton [8]
     Left = 136
     Top = 234
     Width = 72
@@ -90,7 +92,7 @@ inherited frmODQuick: TfrmODQuick
     Caption = 'OK'
     TabOrder = 2
   end
-  object Button2: TButton
+  object Button2: TButton [9]
     Left = 216
     Top = 234
     Width = 72
@@ -98,12 +100,33 @@ inherited frmODQuick: TfrmODQuick
     Caption = 'Cancel'
     TabOrder = 3
   end
-  object BitBtn1: TBitBtn
+  object BitBtn1: TBitBtn [10]
     Left = 263
     Top = 191
     Width = 25
     Height = 25
     TabOrder = 4
     Kind = bkAbort
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Edit1'
+        'Status = stsDefault')
+      (
+        'Component = ORListBox1'
+        'Status = stsDefault')
+      (
+        'Component = Button1'
+        'Status = stsDefault')
+      (
+        'Component = Button2'
+        'Status = stsDefault')
+      (
+        'Component = BitBtn1'
+        'Status = stsDefault')
+      (
+        'Component = frmODQuick'
+        'Status = stsDefault'))
   end
 end

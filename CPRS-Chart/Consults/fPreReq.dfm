@@ -1,24 +1,21 @@
-object frmPrerequisites: TfrmPrerequisites
+inherited frmPrerequisites: TfrmPrerequisites
   Left = 337
   Top = 219
-  Width = 377
-  Height = 348
   BorderIcons = [biSystemMenu]
   Caption = 'frmPrerequisites'
-  Color = clBtnFace
+  ClientHeight = 319
+  ClientWidth = 367
   Font.Charset = ANSI_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
+  OnActivate = OnActivate
   OnClose = FormClose
   OnCreate = FormCreate
-  OnShow = FormShow
+  ExplicitWidth = 375
+  ExplicitHeight = 346
   PixelsPerInch = 96
   TextHeight = 13
-  object lblFontTest: TLabel
+  object lblFontTest: TLabel [0]
     Left = 148
     Top = 208
     Width = 77
@@ -31,11 +28,11 @@ object frmPrerequisites: TfrmPrerequisites
     Font.Style = []
     ParentFont = False
   end
-  object memReport: TRichEdit
+  object memReport: TRichEdit [1]
     Left = 0
     Top = 33
-    Width = 369
-    Height = 288
+    Width = 367
+    Height = 286
     Align = alClient
     Color = clCream
     Font.Charset = ANSI_CHARSET
@@ -52,19 +49,19 @@ object frmPrerequisites: TfrmPrerequisites
     WantReturns = False
     WordWrap = False
   end
-  object pnlButton: TPanel
+  object pnlButton: TPanel [2]
     Left = 0
     Top = 0
-    Width = 369
+    Width = 367
     Height = 33
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 2
     DesignSize = (
-      369
+      367
       33)
     object cmdContinue: TButton
-      Left = 209
+      Left = 207
       Top = 6
       Width = 75
       Height = 21
@@ -74,7 +71,7 @@ object frmPrerequisites: TfrmPrerequisites
       OnClick = cmdContinueClick
     end
     object cmdCancel: TButton
-      Left = 292
+      Left = 290
       Top = 6
       Width = 75
       Height = 21
@@ -85,7 +82,7 @@ object frmPrerequisites: TfrmPrerequisites
       OnClick = cmdCancelClick
     end
   end
-  object cmdPrint: TButton
+  object cmdPrint: TButton [3]
     Left = 2
     Top = 6
     Width = 75
@@ -93,6 +90,27 @@ object frmPrerequisites: TfrmPrerequisites
     Caption = 'Print'
     TabOrder = 1
     OnClick = cmdPrintClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memReport'
+        'Status = stsDefault')
+      (
+        'Component = pnlButton'
+        'Status = stsDefault')
+      (
+        'Component = cmdContinue'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cmdPrint'
+        'Status = stsDefault')
+      (
+        'Component = frmPrerequisites'
+        'Status = stsDefault'))
   end
   object dlgPrintReport: TPrintDialog
     Left = 113

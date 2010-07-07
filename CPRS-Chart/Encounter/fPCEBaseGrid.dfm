@@ -1,16 +1,17 @@
 inherited frmPCEBaseGrid: TfrmPCEBaseGrid
-  Left = 200
-  Top = 303
+  Left = 128
+  Top = 192
   Caption = 'frmPCEBaseGrid'
+  ExplicitLeft = 128
+  ExplicitTop = 192
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlGrid: TPanel
+  object pnlGrid: TPanel [2]
     Left = 6
     Top = 238
     Width = 451
     Height = 87
     BevelOuter = bvNone
-    Caption = 'pnlGrid'
     TabOrder = 2
     OnResize = pnlGridResize
     object lbGrid: TORListBox
@@ -33,7 +34,6 @@ inherited frmPCEBaseGrid: TfrmPCEBaseGrid
       Top = 0
       Width = 451
       Height = 17
-      DragReorder = False
       Sections = <
         item
           ImageIndex = -1
@@ -45,5 +45,26 @@ inherited frmPCEBaseGrid: TfrmPCEBaseGrid
         end>
       OnSectionResize = hcGridSectionResize
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlGrid'
+        'Status = stsDefault')
+      (
+        'Component = lbGrid'
+        'Status = stsDefault')
+      (
+        'Component = hcGrid'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmPCEBaseGrid'
+        'Status = stsDefault'))
   end
 end

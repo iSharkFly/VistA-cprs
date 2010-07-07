@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ExtCtrls, ORFn;
+  StdCtrls, ORCtrls, ExtCtrls, ORFn, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmTemplateAutoGen = class(TForm)
+  TfrmTemplateAutoGen = class(TfrmBase508Form)
     rgSource: TKeyClickRadioGroup;
     cbxObjects: TORComboBox;
     btnOK: TButton;
@@ -120,7 +120,7 @@ begin
               cbxObjects.Items.Add(dmodShared.TIUObjects[i]);
           end;
       if DoIt then
-        cbxObjects.Items.Assign(dmodShared.TIUObjects);
+        FastAssign(dmodShared.TIUObjects, cbxObjects.Items);
       FObjectsDone := TRUE;
     end;
     cbxObjects.SetFocus;

@@ -1,28 +1,23 @@
-object frmConsultAlertsTo: TfrmConsultAlertsTo
+inherited frmConsultAlertsTo: TfrmConsultAlertsTo
   Left = 297
   Top = 206
   BorderStyle = bsDialog
   Caption = 'Send Alert'
   ClientHeight = 262
-  ClientWidth = 358
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientWidth = 371
   OldCreateOrder = True
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
-    Width = 358
+    Width = 371
     Height = 262
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitWidth = 358
     object SrcLabel: TLabel
       Left = 12
       Top = 14
@@ -31,7 +26,7 @@ object frmConsultAlertsTo: TfrmConsultAlertsTo
       Caption = 'Select or enter name'
     end
     object DstLabel: TLabel
-      Left = 196
+      Left = 217
       Top = 14
       Width = 132
       Height = 13
@@ -44,7 +39,7 @@ object frmConsultAlertsTo: TfrmConsultAlertsTo
       Height = 25
       Caption = 'OK'
       ModalResult = 1
-      TabOrder = 2
+      TabOrder = 4
       OnClick = cmdOKClick
     end
     object cmdCancel: TButton
@@ -55,7 +50,7 @@ object frmConsultAlertsTo: TfrmConsultAlertsTo
       Cancel = True
       Caption = 'Cancel'
       ModalResult = 2
-      TabOrder = 3
+      TabOrder = 5
       OnClick = cmdCancelClick
     end
     object cboSrcList: TORComboBox
@@ -82,9 +77,10 @@ object frmConsultAlertsTo: TfrmConsultAlertsTo
       OnKeyDown = cboSrcListKeyDown
       OnMouseClick = cboSrcListMouseClick
       OnNeedData = cboSrcListNeedData
+      CharsNeedMatch = 1
     end
     object DstList: TORListBox
-      Left = 196
+      Left = 217
       Top = 30
       Width = 144
       Height = 185
@@ -92,12 +88,57 @@ object frmConsultAlertsTo: TfrmConsultAlertsTo
       MultiSelect = True
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 1
+      TabOrder = 2
       OnClick = DstListClick
       Caption = 'Currently selected recipients'
       ItemTipColor = clWindow
       LongList = False
       Pieces = '2'
     end
+    object btnAdd: TButton
+      Left = 160
+      Top = 109
+      Width = 51
+      Height = 25
+      Caption = 'Add'
+      TabOrder = 1
+      OnClick = cboSrcListMouseClick
+    end
+    object btnRemove: TButton
+      Left = 160
+      Top = 140
+      Width = 51
+      Height = 25
+      Caption = 'Remove'
+      TabOrder = 3
+      OnClick = DstListClick
+    end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cboSrcList'
+        'Status = stsDefault')
+      (
+        'Component = DstList'
+        'Status = stsDefault')
+      (
+        'Component = btnAdd'
+        'Status = stsDefault')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = frmConsultAlertsTo'
+        'Status = stsDefault'))
   end
 end

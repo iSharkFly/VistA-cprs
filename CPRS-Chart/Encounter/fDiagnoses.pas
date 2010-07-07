@@ -5,13 +5,12 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fPCEBase, StdCtrls, CheckLst, ORCtrls, ORNet, ExtCtrls, Buttons, uPCE, rPCE, ORFn,
-  ComCtrls, fPCEBaseMain, UBAGlobals, UBAConst, UCore;
+  ComCtrls, fPCEBaseMain, UBAGlobals, UBAConst, UCore, VA508AccessibilityManager;
 
 type
   TfrmDiagnoses = class(TfrmPCEBaseMain)
     cmdDiagPrimary: TButton;
     ckbDiagProb: TCheckBox;
-    lblAdd2PL: TLabel;
     procedure cmdDiagPrimaryClick(Sender: TObject);
     procedure ckbDiagProbClicked(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -48,7 +47,7 @@ implementation
 {$R *.DFM}
 
 uses
-  fEncounterFrame, uConst, UBACore;
+  fEncounterFrame, uConst, UBACore, VA508AccessibilityRouter;
 
 procedure TfrmDiagnoses.EnsurePrimaryDiag;
 var
@@ -152,7 +151,6 @@ begin
           if (lbGrid.Selected[k]) and (TPCEDiag(lbGrid.Items.Objects[k]).Category = PL_ITEMS) then
             PLItemCount := PLItemCount + 1;
       OK := OK and (PLItemCount < lbGrid.SelCount);
-      lblAdd2PL.Enabled := OK;
       ckbDiagProb.Enabled := OK;
       if(OK) then
       begin
@@ -181,6 +179,7 @@ end;
 procedure TfrmDiagnoses.FormResize(Sender: TObject);
 begin
   inherited;
+  if lbxSection.width = 0 then Exit;
   FSectionTabs[0] := -(lbxSection.width - LBCheckWidthSpace - (8*MainFontWidth) - ScrollBarWidth);
   FSectionTabs[1] := -FSectionTabs[0]+2;
   FSectionTabs[2] := -FSectionTabs[0]+4;
@@ -255,5 +254,8 @@ begin
   (Control as TListBox).Canvas.TextOut(Rect.Left+2, Rect.Top+1, (Control as
               TListBox).Items[Index]); {display the text }
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmDiagnoses);
 
 end.

@@ -4,6 +4,8 @@ inherited frmGAF: TfrmGAF
   ActiveControl = edtScore
   Caption = 'frmGAF'
   OnActivate = FormActivate
+  ExplicitLeft = 8
+  ExplicitTop = 8
   PixelsPerInch = 96
   TextHeight = 13
   object lblScore: TLabel [0]
@@ -33,6 +35,7 @@ inherited frmGAF: TfrmGAF
     Width = 624
     Height = 13
     Align = alTop
+    ExplicitWidth = 3
   end
   object Spacer2: TLabel [4]
     Left = 0
@@ -40,6 +43,7 @@ inherited frmGAF: TfrmGAF
     Width = 624
     Height = 13
     Align = alTop
+    ExplicitWidth = 3
   end
   object lblGAF: TStaticText [5]
     Left = 0
@@ -87,12 +91,16 @@ inherited frmGAF: TfrmGAF
     Width = 624
     Align = alTop
     TabOrder = 0
+    ExplicitLeft = 0
+    ExplicitTop = 35
+    ExplicitWidth = 624
     inherited lbGrid: TORListBox
       Width = 624
       TabStop = False
       MultiSelect = True
       Caption = 'Most recent Global Assessment of Functioning (GAF) scores'
       Pieces = '1,2,3,4'
+      ExplicitWidth = 624
     end
     inherited hcGrid: THeaderControl
       Width = 624
@@ -121,9 +129,10 @@ inherited frmGAF: TfrmGAF
           Text = 'Comment'
           Width = 60
         end>
+      ExplicitWidth = 624
     end
   end
-  object edtScore: TCaptionEdit
+  object edtScore: TCaptionEdit [10]
     Left = 226
     Top = 171
     Width = 33
@@ -133,18 +142,15 @@ inherited frmGAF: TfrmGAF
     OnChange = edtScoreChange
     Caption = 'Score'
   end
-  object udScore: TUpDown
+  object udScore: TUpDown [11]
     Left = 259
     Top = 171
     Width = 15
     Height = 21
     Associate = edtScore
-    Min = 0
-    Position = 0
     TabOrder = 2
-    Wrap = False
   end
-  object dteGAF: TORDateBox
+  object dteGAF: TORDateBox [12]
     Left = 226
     Top = 202
     Width = 121
@@ -155,7 +161,7 @@ inherited frmGAF: TfrmGAF
     RequireTime = False
     Caption = 'Date Determined:'
   end
-  object cboGAFProvider: TORComboBox
+  object cboGAFProvider: TORComboBox [13]
     Left = 226
     Top = 233
     Width = 212
@@ -178,8 +184,9 @@ inherited frmGAF: TfrmGAF
     TabOrder = 4
     OnExit = cboGAFProviderExit
     OnNeedData = cboGAFProviderNeedData
+    CharsNeedMatch = 1
   end
-  object btnURL: TButton
+  object btnURL: TButton [14]
     Left = 3
     Top = 376
     Width = 134
@@ -190,5 +197,47 @@ inherited frmGAF: TfrmGAF
     ShowHint = True
     TabOrder = 5
     OnClick = btnURLClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblGAF'
+        'Status = stsDefault')
+      (
+        'Component = lblEntry'
+        'Status = stsDefault')
+      (
+        'Component = edtScore'
+        'Status = stsDefault')
+      (
+        'Component = udScore'
+        'Status = stsDefault')
+      (
+        'Component = dteGAF'
+        'Status = stsDefault')
+      (
+        'Component = cboGAFProvider'
+        'Status = stsDefault')
+      (
+        'Component = btnURL'
+        'Status = stsDefault')
+      (
+        'Component = pnlGrid'
+        'Status = stsDefault')
+      (
+        'Component = lbGrid'
+        'Status = stsDefault')
+      (
+        'Component = hcGrid'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmGAF'
+        'Status = stsDefault'))
   end
 end

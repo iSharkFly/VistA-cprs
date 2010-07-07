@@ -1,41 +1,35 @@
-object frmTemplateFieldEditor: TfrmTemplateFieldEditor
+inherited frmTemplateFieldEditor: TfrmTemplateFieldEditor
   Left = 294
   Top = 211
-  Width = 640
-  Height = 447
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Template Field Editor'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
+  ClientHeight = 420
+  ClientWidth = 788
   Position = poScreenCenter
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
+  ExplicitWidth = 796
+  ExplicitHeight = 454
   PixelsPerInch = 96
   TextHeight = 13
-  object splLeft: TSplitter
-    Left = 273
+  object splLeft: TSplitter [0]
+    Left = 429
     Top = 25
-    Width = 3
     Height = 366
-    Cursor = crHSplit
     Beveled = True
+    ExplicitLeft = 273
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 391
-    Width = 632
+    Width = 788
     Height = 29
     Align = alBottom
     TabOrder = 2
     DesignSize = (
-      632
+      788
       29)
     object lblReq: TStaticText
       Left = 132
@@ -46,7 +40,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
       TabOrder = 5
     end
     object btnOK: TButton
-      Left = 392
+      Left = 548
       Top = 4
       Width = 75
       Height = 21
@@ -57,7 +51,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
       OnClick = btnOKClick
     end
     object btnCancel: TButton
-      Left = 472
+      Left = 628
       Top = 4
       Width = 75
       Height = 21
@@ -69,7 +63,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
       OnClick = btnCancelClick
     end
     object btnApply: TButton
-      Left = 552
+      Left = 708
       Top = 4
       Width = 75
       Height = 21
@@ -79,7 +73,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
       OnClick = btnApplyClick
     end
     object btnPreview: TButton
-      Left = 279
+      Left = 435
       Top = 4
       Width = 75
       Height = 21
@@ -101,10 +95,10 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
       OnClick = cbHideClick
     end
   end
-  object pnlObjs: TPanel
+  object pnlObjs: TPanel [2]
     Left = 0
     Top = 25
-    Width = 273
+    Width = 429
     Height = 366
     Align = alLeft
     Caption = 'pnlObjs'
@@ -113,15 +107,16 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
     object lblObjs: TLabel
       Left = 1
       Top = 1
-      Width = 271
+      Width = 427
       Height = 13
       Align = alTop
       Caption = 'Template Fields'
+      ExplicitWidth = 74
     end
     object cbxObjs: TORComboBox
       Left = 1
       Top = 14
-      Width = 271
+      Width = 427
       Height = 351
       Style = orcsSimple
       Align = alClient
@@ -140,16 +135,17 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
       HideSynonyms = True
       Sorted = False
       SynonymChars = '<Inactive>'
-      TabPositions = '34,45,55,65,75'
+      TabPositions = '50,60,70,80,90'
       TabOrder = 0
       OnChange = cbxObjsChange
       OnKeyDown = cbxObjsKeyDown
       OnNeedData = cbxObjsNeedData
       OnSynonymCheck = cbxObjsSynonymCheck
+      CharsNeedMatch = 1
     end
   end
-  object pnlRight: TPanel
-    Left = 276
+  object pnlRight: TPanel [3]
+    Left = 432
     Top = 25
     Width = 356
     Height = 366
@@ -181,6 +177,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
         Height = 13
         Align = alTop
         Caption = 'Notes:'
+        ExplicitWidth = 31
       end
       object reNotes: TRichEdit
         Left = 1
@@ -369,6 +366,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
         SynonymChars = '<>'
         TabOrder = 1
         OnChange = cbxTypeChange
+        CharsNeedMatch = 1
       end
       object edtTextLen: TCaptionEdit
         Left = 309
@@ -388,11 +386,8 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
         Height = 21
         Anchors = [akTop, akRight]
         Associate = edtTextLen
-        Min = 0
         Max = 240
-        Position = 0
         TabOrder = 5
-        Wrap = False
       end
       object pnlSwap: TPanel
         Left = 50
@@ -407,6 +402,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
           Top = 0
           Width = 300
           Height = 22
+          Align = alTop
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -419,7 +415,6 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
           OnChange = edtDefaultChange
           OnEnter = edtpopControlEnter
           OnExit = ControlExit
-          Align = alTop
           Caption = 'Default Value'
         end
         object pnlNum: TPanel
@@ -459,10 +454,8 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
             Associate = edtDefNum
             Min = -9999
             Max = 9999
-            Position = 0
             TabOrder = 1
             Thousands = False
-            Wrap = False
           end
           object edtDefNum: TCaptionEdit
             Left = 0
@@ -482,10 +475,8 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
             Associate = edtMinVal
             Min = -9999
             Max = 9999
-            Position = 0
             TabOrder = 3
             Thousands = False
-            Wrap = False
           end
           object edtMinVal: TCaptionEdit
             Left = 76
@@ -507,7 +498,6 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
             Max = 999
             Position = 1
             TabOrder = 7
-            Wrap = False
           end
           object edtInc: TCaptionEdit
             Left = 259
@@ -537,10 +527,8 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
             Associate = edtMaxVal
             Min = -9999
             Max = 9999
-            Position = 0
             TabOrder = 5
             Thousands = False
-            Wrap = False
           end
         end
         object edtURL: TCaptionEdit
@@ -548,6 +536,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
           Top = 66
           Width = 300
           Height = 22
+          Align = alTop
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -559,7 +548,6 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
           TabOrder = 3
           OnChange = edtURLChange
           OnEnter = edtpopControlEnter
-          Align = alTop
           Caption = 'URL'
         end
         object reItems: TRichEdit
@@ -614,6 +602,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
           TabOrder = 1
           TabStop = True
           OnChange = cbxDefaultChange
+          CharsNeedMatch = 1
         end
         object pnlDate: TPanel
           Left = 0
@@ -677,6 +666,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
             SynonymChars = '<>'
             TabOrder = 1
             OnChange = cbxDateTypeChange
+            CharsNeedMatch = 1
           end
         end
       end
@@ -702,7 +692,6 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
         Max = 70
         Position = 1
         TabOrder = 3
-        Wrap = False
       end
       object gbIndent: TGroupBox
         Left = 232
@@ -742,12 +731,9 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
           Width = 15
           Height = 21
           Associate = edtIndent
-          Min = 0
           Max = 30
-          Position = 0
           TabOrder = 1
           Thousands = False
-          Wrap = False
         end
         object udPad: TUpDown
           Left = 93
@@ -755,12 +741,9 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
           Width = 15
           Height = 21
           Associate = edtPad
-          Min = 0
           Max = 30
-          Position = 0
           TabOrder = 2
           Thousands = False
-          Wrap = False
         end
         object edtPad: TCaptionEdit
           Left = 72
@@ -822,34 +805,33 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
       end
     end
   end
-  object pnlTop: TPanel
+  object pnlTop: TPanel [4]
     Left = 0
     Top = 0
-    Width = 632
+    Width = 788
     Height = 25
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 3
     DesignSize = (
-      632
+      788
       25)
     object MenuBar1: TMenuBar
       Left = 0
       Top = 0
-      Width = 23
+      Width = 41
       Height = 25
       Align = alLeft
       AutoSize = True
       ButtonHeight = 21
       ButtonWidth = 43
       Caption = 'MenuBar1'
-      Flat = True
       Menu = mnuMain
       ShowCaptions = True
       TabOrder = 0
     end
     object btnNew: TButton
-      Left = 557
+      Left = 711
       Top = 2
       Width = 75
       Height = 21
@@ -859,7 +841,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
       OnClick = mnuNewClick
     end
     object btnCopy: TButton
-      Left = 478
+      Left = 632
       Top = 2
       Width = 75
       Height = 21
@@ -870,7 +852,7 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
       OnClick = mnuCopyClick
     end
     object btnDelete: TButton
-      Left = 399
+      Left = 553
       Top = 2
       Width = 75
       Height = 21
@@ -880,6 +862,168 @@ object frmTemplateFieldEditor: TfrmTemplateFieldEditor
       TabOrder = 1
       OnClick = mnuDeleteClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = lblReq'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnApply'
+        'Status = stsDefault')
+      (
+        'Component = btnPreview'
+        'Status = stsDefault')
+      (
+        'Component = cbHide'
+        'Status = stsDefault')
+      (
+        'Component = pnlObjs'
+        'Status = stsDefault')
+      (
+        'Component = cbxObjs'
+        'Status = stsDefault')
+      (
+        'Component = pnlRight'
+        'Status = stsDefault')
+      (
+        'Component = pnlPreview'
+        'Status = stsDefault')
+      (
+        'Component = reNotes'
+        'Status = stsDefault')
+      (
+        'Component = pnlObjInfo'
+        'Status = stsDefault')
+      (
+        'Component = edtName'
+        'Status = stsDefault')
+      (
+        'Component = edtLMText'
+        'Status = stsDefault')
+      (
+        'Component = cbxType'
+        'Status = stsDefault')
+      (
+        'Component = edtTextLen'
+        'Status = stsDefault')
+      (
+        'Component = udTextLen'
+        'Status = stsDefault')
+      (
+        'Component = pnlSwap'
+        'Status = stsDefault')
+      (
+        'Component = edtDefault'
+        'Status = stsDefault')
+      (
+        'Component = pnlNum'
+        'Status = stsDefault')
+      (
+        'Component = udDefNum'
+        'Status = stsDefault')
+      (
+        'Component = edtDefNum'
+        'Status = stsDefault')
+      (
+        'Component = udMinVal'
+        'Status = stsDefault')
+      (
+        'Component = edtMinVal'
+        'Status = stsDefault')
+      (
+        'Component = udInc'
+        'Status = stsDefault')
+      (
+        'Component = edtInc'
+        'Status = stsDefault')
+      (
+        'Component = edtMaxVal'
+        'Status = stsDefault')
+      (
+        'Component = udMaxVal'
+        'Status = stsDefault')
+      (
+        'Component = edtURL'
+        'Status = stsDefault')
+      (
+        'Component = reItems'
+        'Status = stsDefault')
+      (
+        'Component = cbxDefault'
+        'Status = stsDefault')
+      (
+        'Component = pnlDate'
+        'Status = stsDefault')
+      (
+        'Component = edtDateDef'
+        'Status = stsDefault')
+      (
+        'Component = cbxDateType'
+        'Status = stsDefault')
+      (
+        'Component = edtLen'
+        'Status = stsDefault')
+      (
+        'Component = udLen'
+        'Status = stsDefault')
+      (
+        'Component = gbIndent'
+        'Status = stsDefault')
+      (
+        'Component = edtIndent'
+        'Status = stsDefault')
+      (
+        'Component = udIndent'
+        'Status = stsDefault')
+      (
+        'Component = udPad'
+        'Status = stsDefault')
+      (
+        'Component = edtPad'
+        'Status = stsDefault')
+      (
+        'Component = gbMisc'
+        'Status = stsDefault')
+      (
+        'Component = cbActive'
+        'Status = stsDefault')
+      (
+        'Component = cbRequired'
+        'Status = stsDefault')
+      (
+        'Component = cbSepLines'
+        'Status = stsDefault')
+      (
+        'Component = cbExclude'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = MenuBar1'
+        'Status = stsDefault')
+      (
+        'Component = btnNew'
+        'Status = stsDefault')
+      (
+        'Component = btnCopy'
+        'Status = stsDefault')
+      (
+        'Component = btnDelete'
+        'Status = stsDefault')
+      (
+        'Component = frmTemplateFieldEditor'
+        'Status = stsDefault'))
   end
   object mnuMain: TMainMenu
     Left = 8

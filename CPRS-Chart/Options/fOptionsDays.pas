@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, fOptions, ComCtrls, OrFn, ORCtrls;
+  StdCtrls, ExtCtrls, fOptions, ComCtrls, OrFn, ORCtrls, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOptionsDays = class(TForm)
+  TfrmOptionsDays = class(TfrmBase508Form)
     pnlBottom: TPanel;
     btnOK: TButton;
     btnCancel: TButton;
@@ -231,7 +232,7 @@ end;
 procedure TfrmOptionsDays.spnLabInpatientClick(Sender: TObject;
   Button: TUDBtnType);
 begin
-  txtLabInpatient.SetFocus;
+ // txtLabInpatient.SetFocus; cq:13554
   txtLabInpatient.Tag := strtointdef(txtLabInpatient.Text, 0);
   btnLabDefaults.Tag := 0;
   AdjustLabLabel;
@@ -240,7 +241,7 @@ end;
 procedure TfrmOptionsDays.spnLabOutpatientClick(Sender: TObject;
   Button: TUDBtnType);
 begin
-  txtLabOutpatient.SetFocus;
+  //txtLabOutpatient.SetFocus;  cq:13554
   txtLabOutpatient.Tag := strtointdef(txtLabOutpatient.Text, 0);
   btnLabDefaults.Tag := 0;
   AdjustLabLabel;

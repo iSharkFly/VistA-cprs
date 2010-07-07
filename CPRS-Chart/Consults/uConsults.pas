@@ -37,6 +37,8 @@ type
     ProvDiagnosis: string ;                 {  30}       { * }
     ProvDxCode: string;                     {  30.1}
     RequestProcessingActivity: TStringList; {  40}
+    //EarliestDate: TFMDateTime;
+    //LatestDate: TFMDateTime;
   end ;
 
   TEditResubmitRec = record
@@ -50,6 +52,8 @@ type
     ConsultProcName: string;
     Urgency: integer;
     UrgencyName: string;
+    //EarliestDate: TFMDateTime;
+    //LatestDate: TFMDateTime;
     Place: string;
     PlaceName: string;
     Attention: int64;
@@ -133,6 +137,7 @@ const
    UL_UPDATE            = 2;
    UL_ADMIN             = 3;
    UL_UPDATE_AND_ADMIN  = 4;
+   UL_UNRESTRICTED      = 5;
 
    {Clinical Procedure statuses}
    CP_NOT_CLINPROC      = 0;
@@ -296,7 +301,7 @@ begin
   AList := TStringList.Create;
   SrcList := TStringList.Create;
   try
-    SrcList.Assign(Source);
+    FastAssign(Source, SrcList);
     with SrcList do
       begin
         if (Count = 1) and (Piece(Strings[0], U, 1) = '-1') then

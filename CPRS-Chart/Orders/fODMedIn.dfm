@@ -73,6 +73,7 @@ inherited frmODMedIn: TfrmODMedIn
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = False
+    LookupPiece = 0
     MaxLength = 0
     ParentShowHint = False
     Pieces = '2,4,3'
@@ -84,6 +85,7 @@ inherited frmODMedIn: TfrmODMedIn
     OnChange = ControlChange
     OnExit = cboDispenseExit
     OnMouseClick = cboDispenseMouseClick
+    CharsNeedMatch = 1
   end
   object cboMedication: TORComboBox [9]
     Left = 6
@@ -99,6 +101,7 @@ inherited frmODMedIn: TfrmODMedIn
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = True
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = False
@@ -108,17 +111,15 @@ inherited frmODMedIn: TfrmODMedIn
     OnExit = cboMedicationSelect
     OnMouseClick = cboMedicationSelect
     OnNeedData = cboMedicationNeedData
+    CharsNeedMatch = 1
   end
-  inherited memOrder: TMemo
+  inherited memOrder: TCaptionMemo
     TabOrder = 10
   end
   inherited cmdAccept: TButton
     TabOrder = 8
   end
-  inherited cmdQuit: TButton
-    TabOrder = 9
-  end
-  object cboRoute: TORComboBox [13]
+  object cboRoute: TORComboBox [12]
     Left = 364
     Top = 18
     Width = 72
@@ -132,14 +133,16 @@ inherited frmODMedIn: TfrmODMedIn
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = False
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = False
     SynonymChars = '<>'
     TabOrder = 4
     OnChange = ControlChange
+    CharsNeedMatch = 1
   end
-  object cboSchedule: TORComboBox [14]
+  object cboSchedule: TORComboBox [13]
     Left = 442
     Top = 18
     Width = 72
@@ -153,13 +156,15 @@ inherited frmODMedIn: TfrmODMedIn
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = False
+    LookupPiece = 0
     MaxLength = 0
     Sorted = False
     SynonymChars = '<>'
     TabOrder = 5
     OnChange = ControlChange
+    CharsNeedMatch = 1
   end
-  object memComments: TMemo [15]
+  object memComments: TMemo [14]
     Left = 223
     Top = 128
     Width = 212
@@ -168,7 +173,7 @@ inherited frmODMedIn: TfrmODMedIn
     TabOrder = 6
     OnChange = ControlChange
   end
-  object cboPriority: TORComboBox [16]
+  object cboPriority: TORComboBox [15]
     Left = 442
     Top = 128
     Width = 72
@@ -182,14 +187,16 @@ inherited frmODMedIn: TfrmODMedIn
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = False
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = False
     SynonymChars = '<>'
     TabOrder = 7
     OnChange = ControlChange
+    CharsNeedMatch = 1
   end
-  object txtDosage: TCaptionEdit [17]
+  object txtDosage: TCaptionEdit [16]
     Left = 224
     Top = 18
     Width = 134
@@ -199,10 +206,13 @@ inherited frmODMedIn: TfrmODMedIn
     OnChange = ControlChange
     Caption = 'Dosage'
   end
+  inherited cmdQuit: TButton
+    TabOrder = 9
+  end
   inherited pnlMessage: TPanel
     TabOrder = 11
   end
-  object cboMedAlt: TORComboBox
+  object cboMedAlt: TORComboBox [19]
     Left = 6
     Top = 18
     Width = 202
@@ -216,6 +226,7 @@ inherited frmODMedIn: TfrmODMedIn
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = True
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = False
@@ -226,5 +237,51 @@ inherited frmODMedIn: TfrmODMedIn
     OnExit = cboMedicationSelect
     OnMouseClick = cboMedicationSelect
     OnNeedData = cboMedicationNeedData
+    CharsNeedMatch = 1
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cboDispense'
+        'Status = stsDefault')
+      (
+        'Component = cboMedication'
+        'Status = stsDefault')
+      (
+        'Component = cboRoute'
+        'Status = stsDefault')
+      (
+        'Component = cboSchedule'
+        'Status = stsDefault')
+      (
+        'Component = memComments'
+        'Status = stsDefault')
+      (
+        'Component = cboPriority'
+        'Status = stsDefault')
+      (
+        'Component = txtDosage'
+        'Status = stsDefault')
+      (
+        'Component = cboMedAlt'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODMedIn'
+        'Status = stsDefault'))
   end
 end

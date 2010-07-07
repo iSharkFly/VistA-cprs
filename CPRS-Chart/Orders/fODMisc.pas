@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fODBase, StdCtrls, ORCtrls, ORDtTm, ComCtrls, ExtCtrls, ORFn, uConst;
+  fODBase, StdCtrls, ORCtrls, ORDtTm, ComCtrls, ExtCtrls, ORFn, uConst,
+  VA508AccessibilityManager;
 
 type
   TfrmODMisc = class(TfrmODBase)

@@ -1,4 +1,4 @@
-object frmOptionsPrimaryList: TfrmOptionsPrimaryList
+inherited frmOptionsPrimaryList: TfrmOptionsPrimaryList
   Left = 714
   Top = 143
   BorderIcons = [biSystemMenu, biHelp]
@@ -6,17 +6,10 @@ object frmOptionsPrimaryList: TfrmOptionsPrimaryList
   Caption = 'Primary List'
   ClientHeight = 225
   ClientWidth = 175
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   HelpFile = 'CPRSWT.HLP'
-  OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
-  object lblPrimaryList: TLabel
+  object lblPrimaryList: TLabel [0]
     Left = 10
     Top = 8
     Width = 145
@@ -25,7 +18,7 @@ object frmOptionsPrimaryList: TfrmOptionsPrimaryList
     Caption = 'Select the list you wish to be your primary personal list.'
     WordWrap = True
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 191
     Width = 175
@@ -55,7 +48,7 @@ object frmOptionsPrimaryList: TfrmOptionsPrimaryList
       TabOrder = 1
     end
   end
-  object cboPrimary: TORComboBox
+  object cboPrimary: TORComboBox [2]
     Left = 10
     Top = 64
     Width = 153
@@ -70,10 +63,30 @@ object frmOptionsPrimaryList: TfrmOptionsPrimaryList
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = False
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = True
     SynonymChars = '<>'
     TabOrder = 0
+    CharsNeedMatch = 1
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = cboPrimary'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsPrimaryList'
+        'Status = stsDefault'))
   end
 end

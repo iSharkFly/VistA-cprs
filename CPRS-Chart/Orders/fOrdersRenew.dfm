@@ -4,7 +4,6 @@ inherited frmRenewOrders: TfrmRenewOrders
   HorzScrollBar.Tracking = True
   HorzScrollBar.Visible = True
   VertScrollBar.Tracking = True
-  AutoScroll = False
   Caption = 'Renew Orders'
   ClientHeight = 416
   ClientWidth = 592
@@ -12,15 +11,15 @@ inherited frmRenewOrders: TfrmRenewOrders
   Scaled = False
   OnClose = FormClose
   OnCreate = FormCreate
-  OnShow = FormShow
+  ExplicitWidth = 600
+  ExplicitHeight = 443
   PixelsPerInch = 96
   TextHeight = 13
-  object hdrOrders: THeaderControl
+  object hdrOrders: THeaderControl [0]
     Left = 0
     Top = 0
     Width = 592
     Height = 17
-    DragReorder = False
     Constraints.MinHeight = 17
     Sections = <
       item
@@ -37,7 +36,7 @@ inherited frmRenewOrders: TfrmRenewOrders
       end>
     OnSectionResize = hdrOrdersSectionResize
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 393
     Width = 592
@@ -85,7 +84,7 @@ inherited frmRenewOrders: TfrmRenewOrders
       OnClick = cmdChangeClick
     end
   end
-  object lstOrders: TCaptionListBox
+  object lstOrders: TCaptionListBox [2]
     Left = 0
     Top = 17
     Width = 592
@@ -111,5 +110,29 @@ inherited frmRenewOrders: TfrmRenewOrders
     OnDrawItem = lstOrdersDrawItem
     OnMeasureItem = lstOrdersMeasureItem
     HintOnItem = True
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = hdrOrders'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdChange'
+        'Status = stsDefault')
+      (
+        'Component = lstOrders'
+        'Status = stsDefault')
+      (
+        'Component = frmRenewOrders'
+        'Status = stsDefault'))
   end
 end

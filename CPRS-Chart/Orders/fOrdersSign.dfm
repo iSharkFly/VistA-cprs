@@ -1,38 +1,34 @@
-object frmSignOrders: TfrmSignOrders
-  Left = 400
-  Top = 159
-  Width = 585
-  Height = 511
+inherited frmSignOrders: TfrmSignOrders
+  Left = 337
+  Top = 142
   Caption = 'Sign Orders'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
+  ClientHeight = 487
+  ClientWidth = 833
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  OnKeyDown = FormKeyDown
   OnMouseDown = clstOrdersMouseDown
   OnMouseMove = FormMouseMove
+  OnResize = FormResize
   OnShow = FormShow
+  ExplicitWidth = 841
+  ExplicitHeight = 514
   DesignSize = (
-    577
-    484)
+    833
+    487)
   PixelsPerInch = 96
   TextHeight = 13
-  object lblESCode: TLabel
+  object lblESCode: TLabel [0]
     Left = 8
-    Top = 441
+    Top = 449
     Width = 123
     Height = 13
     Anchors = [akLeft, akBottom]
     Caption = 'Electronic Signature Code'
+    ExplicitTop = 446
   end
-  object laDiagnosis: TLabel
+  object laDiagnosis: TLabel [1]
     Left = 184
     Top = 185
     Width = 46
@@ -40,18 +36,18 @@ object frmSignOrders: TfrmSignOrders
     Caption = 'Diagnosis'
     Visible = False
   end
-  object Label2: TStaticText
+  object lblOrderList: TStaticText [2]
     Left = 8
-    Top = 147
-    Width = 171
+    Top = 163
+    Width = 205
     Height = 17
-    Caption = 'The following orders will be signed -'
+    Caption = 'Signature will be Applied to Checked Items'
     TabOrder = 3
     TabStop = True
   end
-  object cmdOK: TButton
-    Left = 417
-    Top = 455
+  object cmdOK: TButton [3]
+    Left = 673
+    Top = 458
     Width = 72
     Height = 21
     Anchors = [akRight, akBottom]
@@ -60,9 +56,9 @@ object frmSignOrders: TfrmSignOrders
     TabOrder = 1
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
-    Left = 497
-    Top = 455
+  object cmdCancel: TButton [4]
+    Left = 753
+    Top = 458
     Width = 72
     Height = 21
     Anchors = [akRight, akBottom]
@@ -71,9 +67,9 @@ object frmSignOrders: TfrmSignOrders
     TabOrder = 2
     OnClick = cmdCancelClick
   end
-  object txtESCode: TCaptionEdit
+  object txtESCode: TCaptionEdit [5]
     Left = 8
-    Top = 455
+    Top = 463
     Width = 137
     Height = 21
     Anchors = [akLeft, akBottom]
@@ -81,109 +77,11 @@ object frmSignOrders: TfrmSignOrders
     TabOrder = 0
     Caption = 'Electronic Signature Code'
   end
-  inline fraCoPay: TfraCoPayDesc
-    Left = 0
-    Top = 0
-    Width = 577
-    Height = 132
-    Align = alTop
-    ParentShowHint = False
-    ShowHint = True
-    TabOrder = 5
-    Visible = False
-    inherited pnlRight: TPanel
-      Left = 328
-      inherited lblCaption: TStaticText
-        Caption = 'Patient Orders Related To:'
-      end
-      inherited pnlMain: TPanel
-        inherited Panel7: TPanel
-          inherited lblHNC2: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-          inherited lblHNC: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-        end
-        inherited Panel8: TPanel
-          inherited Label12: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-          inherited Label11: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-        end
-        inherited Panel9: TPanel
-          inherited Label14: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-          inherited Label13: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-        end
-        inherited Panel10: TPanel
-          inherited Label16: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-          inherited Label15: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-        end
-        inherited Panel11: TPanel
-          inherited Label18: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-          inherited Label17: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-        end
-        inherited Panel12: TPanel
-          inherited Label24: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-          inherited Label23: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-        end
-        inherited Panel1: TPanel
-          inherited StaticText4: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-          inherited StaticText1: TORStaticText
-            OnEnter = fraCoPayLabel23Enter
-            OnExit = fraCoPayLabel23Exit
-          end
-        end
-      end
-    end
-    inherited pnlSC: TPanel
-      Width = 328
-      inherited lblSCDisplay: TLabel
-        Width = 328
-      end
-      inherited memSCDisplay: TCaptionMemo
-        Width = 328
-      end
-    end
-  end
-  object clstOrders: TCaptionCheckListBox
+  object clstOrders: TCaptionCheckListBox [6]
     Left = 8
-    Top = 162
-    Width = 564
-    Height = 277
+    Top = 181
+    Width = 820
+    Height = 262
     OnClickCheck = clstOrdersClickCheck
     Anchors = [akLeft, akTop, akRight, akBottom]
     ItemHeight = 16
@@ -200,14 +98,14 @@ object frmSignOrders: TfrmSignOrders
     OnMouseMove = clstOrdersMouseMove
     Caption = 'The following orders will be signed -'
   end
-  object gbdxLookup: TGroupBox
+  object gbdxLookup: TGroupBox [7]
     Left = 7
-    Top = 139
+    Top = 157
     Width = 99
     Height = 43
     Caption = 'Lookup Diagnosis'
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clBlack
+    Font.Color = clWindowText
     Font.Height = -11
     Font.Name = 'MS Sans Serif'
     Font.Style = []
@@ -225,6 +123,221 @@ object frmSignOrders: TfrmSignOrders
       TabOrder = 0
       OnClick = buOrdersDiagnosisClick
     end
+  end
+  inline fraCoPay: TfraCoPayDesc [8]
+    Left = 0
+    Top = 0
+    Width = 833
+    Height = 157
+    Align = alTop
+    AutoSize = True
+    ParentShowHint = False
+    ShowHint = True
+    TabOrder = 5
+    TabStop = True
+    Visible = False
+    ExplicitWidth = 833
+    inherited pnlRight: TPanel
+      Left = 545
+      ExplicitLeft = 545
+      inherited pnlMain: TPanel
+        inherited pnlHNC: TPanel
+          inherited lblHNC2: TVA508StaticText
+            Width = 129
+            ExplicitWidth = 129
+          end
+          inherited lblHNC: TVA508StaticText
+            Width = 31
+            ExplicitWidth = 31
+          end
+        end
+        inherited pnlMST: TPanel
+          inherited lblMST2: TVA508StaticText
+            Width = 25
+            ExplicitWidth = 25
+          end
+          inherited lblMST: TVA508StaticText
+            Width = 31
+            ExplicitWidth = 31
+          end
+        end
+        inherited pnlSWAC: TPanel
+          inherited lblSWAC2: TVA508StaticText
+            Width = 127
+            ExplicitWidth = 127
+          end
+          inherited lblSWAC: TVA508StaticText
+            Width = 40
+            ExplicitWidth = 40
+          end
+        end
+        inherited pnlIR: TPanel
+          inherited lblIR2: TVA508StaticText
+            Width = 133
+            ExplicitWidth = 133
+          end
+          inherited lblIR: TVA508StaticText
+            Width = 19
+            ExplicitWidth = 19
+          end
+        end
+        inherited pnlAO: TPanel
+          inherited lblAO2: TVA508StaticText
+            Width = 115
+            ExplicitWidth = 115
+          end
+          inherited lblAO: TVA508StaticText
+            Width = 23
+            ExplicitWidth = 23
+          end
+        end
+        inherited pnlCV: TPanel
+          inherited lblCV2: TVA508StaticText
+            Width = 142
+            ExplicitWidth = 142
+          end
+        end
+        inherited pnlSHD: TPanel
+          inherited lblSHAD: TVA508StaticText
+            Width = 33
+            ExplicitWidth = 33
+          end
+          inherited lblSHAD2: TVA508StaticText
+            Width = 159
+            ExplicitWidth = 159
+          end
+        end
+      end
+    end
+    inherited pnlSCandRD: TPanel
+      Width = 545
+      ExplicitWidth = 545
+      inherited lblSCDisplay: TLabel
+        Width = 545
+        ExplicitWidth = 311
+      end
+      inherited memSCDisplay: TCaptionMemo
+        Width = 545
+        ExplicitWidth = 545
+      end
+    end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblOrderList'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = txtESCode'
+        'Status = stsDefault')
+      (
+        'Component = clstOrders'
+        'Status = stsDefault')
+      (
+        'Component = gbdxLookup'
+        'Status = stsDefault')
+      (
+        'Component = buOrdersDiagnosis'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlRight'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblCaption'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlMain'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlHNC'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblHNC2'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblHNC'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlMST'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblMST2'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblMST'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlSWAC'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblSWAC2'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblSWAC'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlIR'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblIR2'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblIR'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlAO'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblAO2'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblAO'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlSC'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblSC2'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblSC'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlCV'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblCV2'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblCV'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlSHD'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblSHAD'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.lblSHAD2'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.pnlSCandRD'
+        'Status = stsDefault')
+      (
+        'Component = fraCoPay.memSCDisplay'
+        'Status = stsDefault')
+      (
+        'Component = frmSignOrders'
+        'Status = stsDefault'))
   end
   object poBACopyPaste: TPopupMenu
     Left = 344

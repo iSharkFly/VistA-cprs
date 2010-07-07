@@ -1,22 +1,17 @@
-object frmODActive: TfrmODActive
+inherited frmODActive: TfrmODActive
   Left = 267
   Top = 216
-  Width = 547
-  Height = 350
   Caption = 'Copy active orders for selected event'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 316
+  ClientWidth = 539
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
-  object lblCaption: TLabel
+  object lblCaption: TLabel [0]
     Left = 0
     Top = 0
     Width = 539
@@ -27,18 +22,19 @@ object frmODActive: TfrmODActive
     Layout = tlCenter
     WordWrap = True
   end
-  object pnlClient: TPanel
+  object pnlClient: TPanel [1]
     Left = 0
     Top = 29
     Width = 539
-    Height = 293
+    Height = 287
     Align = alClient
     BevelOuter = bvNone
     Locked = True
     TabOrder = 0
+    ExplicitHeight = 294
     DesignSize = (
       539
-      293)
+      287)
     object btnOK: TButton
       Left = 386
       Top = 270
@@ -80,7 +76,6 @@ object frmODActive: TfrmODActive
       Top = 0
       Width = 539
       Height = 21
-      DragReorder = False
       Sections = <
         item
           ImageIndex = -1
@@ -108,5 +103,26 @@ object frmODActive: TfrmODActive
         end>
       OnSectionResize = hdControlSectionResize
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlClient'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = lstActiveOrders'
+        'Status = stsDefault')
+      (
+        'Component = hdControl'
+        'Status = stsDefault')
+      (
+        'Component = frmODActive'
+        'Status = stsDefault'))
   end
 end

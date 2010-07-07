@@ -1,20 +1,22 @@
 inherited frmODDietLT: TfrmODDietLT
   Left = 398
   Top = 254
-  Width = 304
-  Height = 188
   Caption = 'Late Tray?'
+  ClientHeight = 161
+  ClientWidth = 296
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 304
+  ExplicitHeight = 188
   PixelsPerInch = 96
   TextHeight = 13
-  object Bevel1: TBevel
+  object Bevel1: TBevel [0]
     Left = 0
     Top = 66
     Width = 296
     Height = 2
   end
-  object lblMealCutoff: TStaticText
+  object lblMealCutoff: TStaticText [1]
     Left = 8
     Top = 16
     Width = 186
@@ -22,7 +24,7 @@ inherited frmODDietLT: TfrmODDietLT
     Caption = 'You have missed the breakfast cut-off.'
     TabOrder = 4
   end
-  object Label2: TStaticText
+  object Label2: TStaticText [2]
     Left = 8
     Top = 34
     Width = 156
@@ -30,7 +32,7 @@ inherited frmODDietLT: TfrmODDietLT
     Caption = 'Do you wish to order a late tray?'
     TabOrder = 5
   end
-  object GroupBox1: TGroupBox
+  object GroupBox1: TGroupBox [3]
     Left = 109
     Top = 76
     Width = 77
@@ -59,7 +61,7 @@ inherited frmODDietLT: TfrmODDietLT
       TabOrder = 2
     end
   end
-  object cmdYes: TButton
+  object cmdYes: TButton [4]
     Left = 216
     Top = 8
     Width = 72
@@ -69,7 +71,7 @@ inherited frmODDietLT: TfrmODDietLT
     TabOrder = 1
     OnClick = cmdYesClick
   end
-  object cmdNo: TButton
+  object cmdNo: TButton [5]
     Left = 216
     Top = 37
     Width = 72
@@ -79,12 +81,45 @@ inherited frmODDietLT: TfrmODDietLT
     TabOrder = 2
     OnClick = cmdNoClick
   end
-  object chkBagged: TCheckBox
+  object chkBagged: TCheckBox [6]
     Left = 8
     Top = 76
     Width = 85
     Height = 17
     Caption = 'Bagged Meal'
     TabOrder = 3
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblMealCutoff'
+        'Status = stsDefault')
+      (
+        'Component = Label2'
+        'Status = stsDefault')
+      (
+        'Component = GroupBox1'
+        'Status = stsDefault')
+      (
+        'Component = radLT1'
+        'Status = stsDefault')
+      (
+        'Component = radLT2'
+        'Status = stsDefault')
+      (
+        'Component = radLT3'
+        'Status = stsDefault')
+      (
+        'Component = cmdYes'
+        'Status = stsDefault')
+      (
+        'Component = cmdNo'
+        'Status = stsDefault')
+      (
+        'Component = chkBagged'
+        'Status = stsDefault')
+      (
+        'Component = frmODDietLT'
+        'Status = stsDefault'))
   end
 end

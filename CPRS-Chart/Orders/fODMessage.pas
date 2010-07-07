@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, StdCtrls, ComCtrls;
+  ExtCtrls, StdCtrls, ComCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmODMessage = class(TForm)
+  TfrmODMessage = class(TfrmBase508Form)
     memMessage: TRichEdit;
     imgMessage: TImage;
     procedure FormDestroy(Sender: TObject);

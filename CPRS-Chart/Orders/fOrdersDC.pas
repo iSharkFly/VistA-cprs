@@ -3,11 +3,11 @@ unit fOrdersDC;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORFn, ORCtrls, ExtCtrls;
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, fBase508Form,
+  fAutoSz, StdCtrls, ORFn, ORCtrls, ExtCtrls, ORNet, VA508AccessibilityManager;
 
 type
-  TfrmDCOrders = class(TfrmAutoSz)
+  TfrmDCOrders = class(TfrmBase508Form)
     Label1: TLabel;
     Panel1: TPanel;
     lstOrders: TCaptionListBox;
@@ -23,10 +23,14 @@ type
       Rect: TRect; State: TOwnerDrawState);
     procedure lstOrdersMeasureItem(Control: TWinControl; Index: Integer;
       var AHeight: Integer);
+    procedure FormDestroy(Sender: TObject);
+    procedure unMarkedOrignalOrderDC(OrderArr: TStringList);
   private
     OKPressed: Boolean;
     DCReason: Integer;
-    function MeasureColumnHeight(TheOrderText: string; Index: Integer):integer;    
+    function MeasureColumnHeight(TheOrderText: string; Index: Integer):integer;
+  public
+    OrderIDArr: TStringList;
   end;
 
 function ExecuteDCOrders(SelectedList: TList; var DelEvt: boolean): Boolean;
@@ -45,15 +49,17 @@ const
 var
   frmDCOrders: TfrmDCOrders;
   AnOrder: TOrder;
-  i,CanSign, DCType: Integer;
-  NeedReason,NeedRefresh,OnCurrent: Boolean;
+  i, j, CanSign, DCType: Integer;
+  NeedReason,NeedRefresh,OnCurrent, DCNewOrder: Boolean;
   OriginalID,APtEvtID,APtEvtName,AnEvtInfo,tmpPtEvt:  string;
   PtEvtList: TStringList;
+  DCChangeItem: TChangeItem;
 begin
   Result := False;
   DelEvt := False;
   OnCurrent := False;
   NeedRefresh := False;
+  DCNewOrder := false;
   PtEvtList := TStringList.Create;
   if SelectedList.Count = 0 then Exit;
   frmDCOrders := TfrmDCOrders.Create(Application);
@@ -64,7 +70,10 @@ begin
     begin
       AnOrder    := TOrder(Items[i]);
       frmDCOrders.lstOrders.Items.Add(AnOrder.Text);
+      frmDCOrders.OrderIDArr.Add(AnOrder.ID);
       if not ((AnOrder.Status = 11) and (AnOrder.Signature = 2)) then NeedReason := True;
+      if (NeedReason = True) and (AnOrder.Status = 10) and (AnOrder.Signature = 2) then  NeedReason := False;
+      
     end;
     if NeedReason then
     begin
@@ -86,10 +95,24 @@ begin
         AnOrder := TOrder(Items[i]);
         OriginalID := AnOrder.ID;
         PtEvtList.Add(AnOrder.EventPtr + '^' + AnOrder.EventName);
-        DCOrder(AnOrder, frmDCOrders.DCReason, DCType);
+        if Changes.Orders.Count = 0 then DCNewOrder := false
+        else
+          begin
+            for j := 0 to Changes.Orders.Count - 1 do
+              begin
+                DCChangeItem := TChangeItem(Changes.Orders.Items[j]);
+                if DCChangeItem.ID = AnOrder.ID then
+                  begin
+                    if (Pos('DC', AnOrder.ActionOn) = 0) then
+                       DCNewOrder := True
+                    else DCNewOrder := False;
+                  end;
+              end;
+          end;
+        DCOrder(AnOrder, frmDCOrders.DCReason, DCNewOrder, DCType);
         case DCType of
         DCT_NEWORDER:  begin
-                         Changes.Add(CH_ORD, AnOrder.ID, AnOrder.Text, '', CanSign, AnOrder.ParentID);
+                         Changes.Add(CH_ORD, AnOrder.ID, AnOrder.Text, '', CanSign, AnOrder.ParentID, user.DUZ, AnOrder.DGroupName, True);
                          AnOrder.ActionOn := OriginalID + '=DC';
                        end;
         DCT_DELETION:  begin
@@ -149,6 +172,7 @@ var
 begin
   inherited;
   OKPressed := False;
+  OrderIDArr := TStringList.Create;
   ListDCReasons(lstReason.Items, DefaultIEN);
   lstReason.SelectByIEN(DefaultIEN);
   { the following commented out so that providers can enter DC reasons }
@@ -178,6 +202,7 @@ end;
 procedure TfrmDCOrders.cmdCancelClick(Sender: TObject);
 begin
   inherited;
+  unMarkedOrignalOrderDC(Self.OrderIDArr);
   Close;
 end;
 
@@ -193,7 +218,7 @@ begin
   with lstOrders do
   begin
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     Canvas.MoveTo(0, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);
     if Index < Items.Count then
@@ -227,6 +252,17 @@ begin
   ARect.Bottom := 0;
   ARect.Right := lstOrders.Width - 6;
   Result := WrappedTextHeightByFont(lstOrders.Canvas,lstOrders.Font,TheOrderText,ARect);
+end;
+
+procedure TfrmDCOrders.FormDestroy(Sender: TObject);
+begin
+  inherited;
+  if self.OrderIDArr <> nil then self.OrderIDArr.Free;
+end;
+
+procedure TfrmDCOrders.unMarkedOrignalOrderDC(OrderArr: TStringList);
+begin
+ CallV('ORWDX1 UNDCORIG', [OrderArr]);
 end;
 
 end.

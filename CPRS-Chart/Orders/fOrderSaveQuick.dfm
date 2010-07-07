@@ -1,14 +1,18 @@
 inherited frmSaveQuickOrder: TfrmSaveQuickOrder
   Left = 308
   Top = 171
-  Width = 363
-  Height = 362
   Caption = 'Add to Common List (Meds, Inpatient)'
+  ClientHeight = 335
+  ClientWidth = 355
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitLeft = 308
+  ExplicitTop = 171
+  ExplicitWidth = 363
+  ExplicitHeight = 362
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
+  object Panel1: TPanel [0]
     Left = 0
     Top = 0
     Width = 355
@@ -48,7 +52,7 @@ inherited frmSaveQuickOrder: TfrmSaveQuickOrder
       Caption = 'Enter the name that should be used for this quick order.'
     end
   end
-  object Panel2: TPanel
+  object Panel2: TPanel [1]
     Left = 0
     Top = 113
     Width = 355
@@ -161,7 +165,7 @@ inherited frmSaveQuickOrder: TfrmSaveQuickOrder
       OnClick = cmdDeleteClick
     end
   end
-  object Panel3: TPanel
+  object Panel3: TPanel [2]
     Left = 0
     Top = 294
     Width = 355
@@ -187,5 +191,47 @@ inherited frmSaveQuickOrder: TfrmSaveQuickOrder
       TabOrder = 1
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = txtDisplayName'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = lstQuickList'
+        'Status = stsDefault')
+      (
+        'Component = pnlUpButton'
+        'Status = stsDefault')
+      (
+        'Component = pnlDownButton'
+        'Status = stsDefault')
+      (
+        'Component = cmdRename'
+        'Status = stsDefault')
+      (
+        'Component = cmdDelete'
+        'Status = stsDefault')
+      (
+        'Component = Panel3'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmSaveQuickOrder'
+        'Status = stsDefault'))
   end
 end

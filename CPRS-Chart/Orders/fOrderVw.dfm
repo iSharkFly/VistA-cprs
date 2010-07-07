@@ -1,14 +1,18 @@
 inherited frmOrderView: TfrmOrderView
   Left = 340
   Top = 165
-  Width = 429
-  Height = 440
   Caption = 'Custom Order View'
+  ClientHeight = 413
+  ClientWidth = 421
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitLeft = 340
+  ExplicitTop = 165
+  ExplicitWidth = 429
+  ExplicitHeight = 440
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlView: TPanel
+  object pnlView: TPanel [0]
     Left = 0
     Top = 0
     Width = 421
@@ -31,22 +35,22 @@ inherited frmOrderView: TfrmOrderView
       Alignment = taCenter
       Caption = 'All Services, Active Orders'
       Layout = tlCenter
+      ExplicitWidth = 153
+      ExplicitHeight = 13
     end
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [1]
     Left = 0
     Top = 21
     Width = 421
-    Height = 277
+    Height = 278
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
     object Splitter1: TSplitter
       Left = 211
       Top = 0
-      Width = 3
-      Height = 277
-      Cursor = crHSplit
+      Height = 278
       MinSize = 1
       OnMoved = Splitter1Moved
     end
@@ -54,7 +58,7 @@ inherited frmOrderView: TfrmOrderView
       Left = 0
       Top = 0
       Width = 211
-      Height = 277
+      Height = 278
       Align = alLeft
       Constraints.MinWidth = 15
       TabOrder = 0
@@ -67,13 +71,15 @@ inherited frmOrderView: TfrmOrderView
         Alignment = taCenter
         Caption = 'Order Status'
         Layout = tlCenter
+        ExplicitWidth = 59
       end
       object trFilters: TCaptionTreeView
         Left = 1
         Top = 14
         Width = 209
-        Height = 262
+        Height = 263
         Align = alClient
+        HideSelection = False
         Indent = 19
         TabOrder = 0
         OnClick = trFiltersClick
@@ -84,7 +90,7 @@ inherited frmOrderView: TfrmOrderView
       Left = 214
       Top = 0
       Width = 207
-      Height = 277
+      Height = 278
       Align = alClient
       Constraints.MinWidth = 15
       TabOrder = 1
@@ -97,13 +103,15 @@ inherited frmOrderView: TfrmOrderView
         Alignment = taCenter
         Caption = 'Service/Section'
         Layout = tlCenter
+        ExplicitWidth = 77
       end
       object treService: TCaptionTreeView
         Left = 1
         Top = 14
         Width = 205
-        Height = 262
+        Height = 263
         Align = alClient
+        HideSelection = False
         Indent = 19
         TabOrder = 0
         OnClick = treServiceClick
@@ -111,9 +119,9 @@ inherited frmOrderView: TfrmOrderView
       end
     end
   end
-  object Panel4: TPanel
+  object Panel4: TPanel [2]
     Left = 0
-    Top = 298
+    Top = 299
     Width = 421
     Height = 114
     Align = alBottom
@@ -222,5 +230,56 @@ inherited frmOrderView: TfrmOrderView
       TabOrder = 5
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlView'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = trFilters'
+        'Status = stsDefault')
+      (
+        'Component = Panel3'
+        'Status = stsDefault')
+      (
+        'Component = treService'
+        'Status = stsDefault')
+      (
+        'Component = Panel4'
+        'Status = stsDefault')
+      (
+        'Component = chkDateRange'
+        'Status = stsDefault')
+      (
+        'Component = GroupBox1'
+        'Status = stsDefault')
+      (
+        'Component = calFrom'
+        'Status = stsDefault')
+      (
+        'Component = calThru'
+        'Status = stsDefault')
+      (
+        'Component = chkInvChrono'
+        'Status = stsDefault')
+      (
+        'Component = chkByService'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmOrderView'
+        'Status = stsDefault'))
   end
 end

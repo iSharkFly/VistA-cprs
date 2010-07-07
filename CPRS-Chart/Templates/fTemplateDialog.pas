@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORCtrls, ORFn, AppEvnts, uTemplates;
+  StdCtrls, ExtCtrls, ORCtrls, ORFn, AppEvnts, uTemplates, fBase508Form, uConst,
+  VA508AccessibilityManager;
 
 type
-  TfrmTemplateDialog = class(TForm)
+  TfrmTemplateDialog = class(TfrmBase508Form)
     sbMain: TScrollBox;
     pnlBottom: TScrollBox;
     btnCancel: TButton;
@@ -25,7 +26,9 @@ type
     procedure btnOKClick(Sender: TObject);
     procedure btnPreviewClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormShow(Sender: TObject);
   private
+    FFirstBuild: boolean;
     SL: TStrings;
     BuildIdx: TStringList;
     Entries: TStringList;
@@ -56,6 +59,8 @@ type
     function IsAncestor( OldID: string; NewID: string): boolean;
     procedure ParentCBEnter(Sender: TObject);
     procedure ParentCBExit(Sender: TObject);
+    procedure UMScreenReaderInit(var Message: TMessage); message UM_MISC;
+    procedure InitScreenReaderSetup;
   public
     property Silent: boolean read FSilent write FSilent ;
   published
@@ -71,7 +76,8 @@ var
 
 implementation
 
-uses dShared, uConst, uTemplateFields, fRptBox, uInit, rMisc;
+uses dShared, uTemplateFields, fRptBox, uInit, rMisc, uDlgComponents,
+  VA508AccessibilityRouter, VAUtils;
 
 {$R *.DFM}
 
@@ -186,6 +192,7 @@ var
 begin
   Result := FALSE;
   CancelDlg := FALSE;
+  SetTemplateDialogCanceled(FALSE);
   frmTemplateDialog := TfrmTemplateDialog.Create(Application);
   try
     DlgIDCounts := TStringList.Create;
@@ -271,9 +278,14 @@ begin
     DlgIDCounts.Free;
   end;
 
-  if not Result then
+  if Result then
+    SetTemplateDialogCanceled(TRUE)
+  else
+  begin
+    SetTemplateDialogCanceled(FALSE);
     CheckBoilerplate4Fields(SL, CaptionText, PreviewMode);
-
+  end;
+  
 end;
 
 procedure CheckBoilerplate4Fields(SL: TStrings; const CaptionText: string = ''; PreviewMode: boolean = FALSE);
@@ -288,6 +300,7 @@ begin
     else
       SL.Clear;
   end;
+  StripScreenReaderCodes(SL);
 end;
 
 procedure CheckBoilerplate4Fields(var AText: string; const CaptionText: string = ''; PreviewMode: boolean = FALSE);
@@ -379,6 +392,27 @@ begin
   end;
 end;
 
+procedure TfrmTemplateDialog.InitScreenReaderSetup;
+var
+  ctrl: TWinControl;
+  list: TList;
+begin
+  if ScreenReaderSystemActive then
+  begin
+    list := TList.Create;
+    try
+      sbMain.GetTabOrderList(list);
+      if list.Count > 0 then
+      begin
+        ctrl := TWinControl(list[0]);
+        PostMessage(Handle, UM_MISC, WParam(ctrl), 0);
+      end;
+    finally
+      list.free;
+    end;
+  end;
+end;
+
 function TfrmTemplateDialog.IsAncestor( OldID: string; NewID: string): boolean;
 begin
   if (OldID = '') or (NewID = '') then
@@ -397,7 +431,8 @@ var
   pnl: TPanel;
   KillCtrl, doHint, dsp, noTextParent: boolean;
   Entry: TTemplateDialogEntry;
-  StringIn, StringOut: string;
+//  StringIn, StringOut: string;
+  cb: TCPRSDialogParentCheckBox;
 
   procedure NextTabCtrl(ACtrl: TControl);
   begin
@@ -510,7 +545,12 @@ begin
     else
       Entry := TTemplateDialogEntry(Entries.Objects[idx]);
 
-    pnl := Entry.GetPanel(FMaxPnlWidth, sbMain);
+    if(dsp or OneOnly) then
+      cb := nil
+    else
+      cb := TCPRSDialogParentCheckBox.Create(Self);
+
+    pnl := Entry.GetPanel(FMaxPnlWidth, sbMain, cb);
     pnl.Show;
     if(doHint and (not pnl.ShowHint)) then
     begin
@@ -520,11 +560,11 @@ begin
       pnl.hint := Entry.GetText;
       Entry.OnChange := FieldChanged;
     end;
-    if(dsp or OneOnly) then
+    if not assigned(cb) then
       ctrl := pnl
     else
     begin
-      ctrl := TORCheckBox.Create(Self);
+      ctrl := cb;
       ctrl.Parent := sbMain;
 
       TORCheckbox(ctrl).OnEnter := frmTemplateDialog.ParentCBEnter;
@@ -538,13 +578,15 @@ begin
     {Remove next line when focus fixed}
       TORCheckBox(ctrl).AutoSize := false;
       TORCheckBox(ctrl).Associate := pnl;
+      pnl.Tag := Integer(ctrl);
       tmpID := copy(ID, 1, (pos('.', ID) - 1)); {copy the ID without the decimal place}
-      if Templates.IndexOf(tmpID) > -1 then
-        StringIn := 'Sub-Template: ' + TTemplate(Templates.Objects[Templates.IndexOf(tmpID)]).PrintName
-      else
-        StringIn := 'Sub-Template:';
-      StringOut := StringReplace(StringIn, '&', '&&', [rfReplaceAll]);
-      TORCheckBox(ctrl).Caption := StringOut;
+//      if Templates.IndexOf(tmpID) > -1 then
+//        StringIn := 'Sub-Template: ' + TTemplate(Templates.Objects[Templates.IndexOf(tmpID)]).PrintName
+//      else
+//        StringIn := 'Sub-Template:';
+//      StringOut := StringReplace(StringIn, '&', '&&', [rfReplaceAll]);
+//      TORCheckBox(ctrl).Caption := StringOut;
+      UpdateColorsFor508Compliance(ctrl);
 
     end;
     ctrl.Tag := CBIdx;
@@ -614,6 +656,11 @@ begin
     Y := Gap - sbMain.VertScrollBar.Position;
     for i := 1 to Count do
       BuildCB(i, Y, FirstTime);
+    if ScreenReaderSystemActive then
+    begin
+      amgrMain.RefreshComponents;
+      Application.ProcessMessages;
+    end;
   finally
     FBuilding := FALSE;
   end;
@@ -625,11 +672,23 @@ begin
   begin
     RepaintBuild := FALSE;
     BuildAllControls;
+    InitScreenReaderSetup;
+  end;
+end;
+
+procedure TfrmTemplateDialog.FormShow(Sender: TObject);
+begin
+  inherited;
+  if FFirstBuild then
+  begin
+    FFirstBuild := FALSE;
+    InitScreenReaderSetup;
   end;
 end;
 
 procedure TfrmTemplateDialog.FormCreate(Sender: TObject);
 begin
+  FFirstBuild := TRUE;
   BuildIdx := TStringList.Create;
   Entries := TStringList.Create;
   NoTextID := TStringList.Create;
@@ -699,7 +758,7 @@ begin
       end;
       if not CanClose then
       begin
-        ShowMessage(MissingFieldsTxt);
+        ShowMsg(MissingFieldsTxt);
         break;
       end;
     end;
@@ -718,8 +777,9 @@ var
 begin
   TmpSL := TStringList.Create;
   try
-    TmpSL.Assign(SL);
+    FastAssign(SL, TmpSL);
     GetText(TmpSL, FALSE);  {FALSE = Do not include embedded fields}
+    StripScreenReaderCodes(TmpSL);
     ReportBox(TmpSL, 'Dialog Preview', FALSE);
   finally
     TmpSL.Free;
@@ -752,6 +812,23 @@ begin
   minWidth := btnCancel.Left + btnCancel.Width + RIGHT_MARGIN;
   if minWidth > Self.Width then
     Self.Width := minWidth;
+end;
+
+procedure TfrmTemplateDialog.UMScreenReaderInit(var Message: TMessage);
+var
+  ctrl: TWinControl;
+  item: TVA508AccessibilityItem;
+begin
+  ctrl := TWinControl(Message.WParam);
+  // Refresh the accessibility manager entry -
+  // fixes bug where first focusable check boxes weren't working correctly  
+  if ctrl is TCPRSDialogParentCheckBox then
+  begin
+    item := amgrMain.AccessData.FindItem(ctrl, FALSE);
+    if assigned(item) then
+      item.free;
+    amgrMain.AccessData.EnsureItemExists(ctrl);
+  end;
 end;
 
 end.

@@ -1,14 +1,18 @@
 inherited frmDCOrders: TfrmDCOrders
   Left = 316
   Top = 226
-  Width = 433
-  Height = 316
   Caption = 'Discontinue / Cancel Orders'
+  ClientHeight = 289
+  ClientWidth = 425
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitLeft = 316
+  ExplicitTop = 226
+  ExplicitWidth = 433
+  ExplicitHeight = 323
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TLabel [0]
     Left = 0
     Top = 0
     Width = 425
@@ -16,8 +20,9 @@ inherited frmDCOrders: TfrmDCOrders
     Align = alTop
     Caption = 'The following orders will be discontinued -'
     WordWrap = True
+    ExplicitWidth = 196
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [1]
     Left = 0
     Top = 13
     Width = 425
@@ -38,12 +43,13 @@ inherited frmDCOrders: TfrmDCOrders
       Caption = 'The following orders will be discontinued '
     end
   end
-  object Panel2: TPanel
+  object Panel2: TPanel [2]
     Left = 0
     Top = 201
     Width = 425
     Height = 88
     Align = alBottom
+    Constraints.MinHeight = 88
     TabOrder = 1
     DesignSize = (
       425
@@ -55,6 +61,7 @@ inherited frmDCOrders: TfrmDCOrders
       Height = 13
       Align = alTop
       Caption = 'Reason for Discontinue (select one)'
+      ExplicitWidth = 169
     end
     object lstReason: TORListBox
       Left = 3
@@ -64,7 +71,6 @@ inherited frmDCOrders: TfrmDCOrders
       ItemHeight = 13
       ParentShowHint = False
       ShowHint = True
-      Sorted = True
       TabOrder = 0
       Caption = 'Reason for Discontinue (select one)'
       ItemTipColor = clWindow
@@ -76,7 +82,7 @@ inherited frmDCOrders: TfrmDCOrders
       Top = 54
       Width = 72
       Height = 21
-      Anchors = [akLeft, akBottom]
+      Anchors = [akRight, akBottom]
       Caption = 'OK'
       Default = True
       TabOrder = 2
@@ -93,5 +99,29 @@ inherited frmDCOrders: TfrmDCOrders
       TabOrder = 3
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = lstOrders'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = lstReason'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmDCOrders'
+        'Status = stsDefault'))
   end
 end

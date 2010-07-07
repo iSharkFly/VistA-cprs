@@ -4,11 +4,9 @@ inherited frmODAllergy: TfrmODAllergy
   Top = 106
   Height = 339
   HorzScrollBar.Range = 520
-  HorzScrollBar.Visible = True
   VertScrollBar.Range = 312
-  VertScrollBar.Visible = True
-  AutoScroll = False
   Caption = 'Enter Allergy Information'
+  ExplicitHeight = 339
   PixelsPerInch = 96
   TextHeight = 13
   object btnAgent: TSpeedButton [0]
@@ -141,27 +139,36 @@ inherited frmODAllergy: TfrmODAllergy
     Left = 5
     Top = 256
     TabOrder = 16
+    ExplicitLeft = 5
+    ExplicitTop = 256
   end
   inherited cmdAccept: TButton
     Left = 441
     Top = 256
     Caption = 'Accept'
     TabOrder = 13
+    ExplicitLeft = 441
+    ExplicitTop = 256
   end
   inherited cmdQuit: TButton
     Left = 441
     Top = 283
     TabOrder = 14
+    ExplicitLeft = 441
+    ExplicitTop = 283
   end
   inherited pnlMessage: TPanel
     Left = 20
     Top = 253
     TabOrder = 15
+    ExplicitLeft = 20
+    ExplicitTop = 253
     inherited memMessage: TRichEdit
       Left = 41
+      ExplicitLeft = 41
     end
   end
-  object cboReactionType: TORComboBox
+  object cboReactionType: TORComboBox [15]
     Left = 7
     Top = 96
     Width = 190
@@ -185,7 +192,7 @@ inherited frmODAllergy: TfrmODAllergy
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object grpObsHist: TRadioGroup
+  object grpObsHist: TRadioGroup [16]
     Left = 364
     Top = 11
     Width = 147
@@ -199,7 +206,7 @@ inherited frmODAllergy: TfrmODAllergy
     TabOrder = 9
     OnClick = grpObsHistClick
   end
-  object memComments: TRichEdit
+  object memComments: TRichEdit [17]
     Left = 282
     Top = 142
     Width = 229
@@ -209,7 +216,7 @@ inherited frmODAllergy: TfrmODAllergy
     OnExit = memCommentsExit
     OnKeyUp = memCommentsKeyUp
   end
-  object lstSelectedSymptoms: TORListBox
+  object lstSelectedSymptoms: TORListBox [18]
     Left = 147
     Top = 143
     Width = 122
@@ -225,7 +232,7 @@ inherited frmODAllergy: TfrmODAllergy
     Pieces = '2,4'
     OnChange = ControlChange
   end
-  object ckNoKnownAllergies: TCheckBox
+  object ckNoKnownAllergies: TCheckBox [19]
     Left = 8
     Top = 18
     Width = 119
@@ -234,7 +241,7 @@ inherited frmODAllergy: TfrmODAllergy
     TabOrder = 0
     OnClick = ckNoKnownAllergiesClick
   end
-  object cboOriginator: TORComboBox
+  object cboOriginator: TORComboBox [20]
     Left = 210
     Top = 22
     Width = 139
@@ -262,7 +269,7 @@ inherited frmODAllergy: TfrmODAllergy
     OnNeedData = cboOriginatorNeedData
     CharsNeedMatch = 1
   end
-  object cboSymptoms: TORComboBox
+  object cboSymptoms: TORComboBox [21]
     Left = 7
     Top = 143
     Width = 135
@@ -288,7 +295,7 @@ inherited frmODAllergy: TfrmODAllergy
     OnNeedData = cboSymptomsNeedData
     CharsNeedMatch = 1
   end
-  object btnCurrent: TButton
+  object btnCurrent: TButton [22]
     Left = 137
     Top = 14
     Width = 56
@@ -297,7 +304,7 @@ inherited frmODAllergy: TfrmODAllergy
     TabOrder = 1
     OnClick = btnCurrentClick
   end
-  object calObservedDate: TORDateBox
+  object calObservedDate: TORDateBox [23]
     Left = 365
     Top = 62
     Width = 145
@@ -308,7 +315,7 @@ inherited frmODAllergy: TfrmODAllergy
     RequireTime = False
     Caption = 'Reaction Date/Time'
   end
-  object cboSeverity: TORComboBox
+  object cboSeverity: TORComboBox [24]
     Left = 365
     Top = 97
     Width = 144
@@ -332,7 +339,7 @@ inherited frmODAllergy: TfrmODAllergy
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object btnRemove: TButton
+  object btnRemove: TButton [25]
     Left = 210
     Top = 224
     Width = 57
@@ -341,7 +348,7 @@ inherited frmODAllergy: TfrmODAllergy
     TabOrder = 7
     OnClick = btnRemoveClick
   end
-  object btnDateTime: TButton
+  object btnDateTime: TButton [26]
     Left = 147
     Top = 224
     Width = 62
@@ -350,8 +357,68 @@ inherited frmODAllergy: TfrmODAllergy
     TabOrder = 6
     OnClick = btnDateTimeClick
   end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lstAllergy'
+        'Status = stsDefault')
+      (
+        'Component = cboReactionType'
+        'Status = stsDefault')
+      (
+        'Component = grpObsHist'
+        'Status = stsDefault')
+      (
+        'Component = memComments'
+        'Status = stsDefault')
+      (
+        'Component = lstSelectedSymptoms'
+        'Status = stsDefault')
+      (
+        'Component = ckNoKnownAllergies'
+        'Status = stsDefault')
+      (
+        'Component = cboOriginator'
+        'Status = stsDefault')
+      (
+        'Component = cboSymptoms'
+        'Status = stsDefault')
+      (
+        'Component = btnCurrent'
+        'Status = stsDefault')
+      (
+        'Component = calObservedDate'
+        'Status = stsDefault')
+      (
+        'Component = cboSeverity'
+        'Status = stsDefault')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = btnDateTime'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODAllergy'
+        'Status = stsDefault'))
+  end
   object dlgReactionDateTime: TORDateTimeDlg
-    FMDateTime = 2981202
+    FMDateTime = 2981202.000000000000000000
     DateOnly = False
     RequireTime = False
     Left = 242

@@ -1,4 +1,4 @@
-object frmOptionsReminders: TfrmOptionsReminders
+inherited frmOptionsReminders: TfrmOptionsReminders
   Left = 693
   Top = 17
   HelpContext = 9020
@@ -7,33 +7,26 @@ object frmOptionsReminders: TfrmOptionsReminders
   Caption = 'Clinical Reminders on Cover Sheet'
   ClientHeight = 323
   ClientWidth = 407
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   HelpFile = 'CPRSWT.HLP'
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object lblDisplayed: TLabel
+  object lblDisplayed: TLabel [0]
     Left = 209
     Top = 8
     Width = 129
     Height = 13
     Caption = 'Reminders being displayed:'
   end
-  object lblNotDisplayed: TLabel
+  object lblNotDisplayed: TLabel [1]
     Left = 8
     Top = 8
     Width = 147
     Height = 13
     Caption = 'Reminders not being displayed:'
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [2]
     Left = 0
     Top = 290
     Width = 407
@@ -73,7 +66,7 @@ object frmOptionsReminders: TfrmOptionsReminders
       TabOrder = 1
     end
   end
-  object lstDisplayed: TORListBox
+  object lstDisplayed: TORListBox [3]
     Left = 209
     Top = 25
     Width = 160
@@ -92,7 +85,7 @@ object frmOptionsReminders: TfrmOptionsReminders
     Pieces = '3'
     OnChange = lstDisplayedChange
   end
-  object lstNotDisplayed: TORListBox
+  object lstNotDisplayed: TORListBox [4]
     Left = 8
     Top = 25
     Width = 160
@@ -112,7 +105,7 @@ object frmOptionsReminders: TfrmOptionsReminders
     Pieces = '3'
     OnChange = lstNotDisplayedChange
   end
-  object btnUp: TButton
+  object btnUp: TButton [5]
     Left = 378
     Top = 94
     Width = 22
@@ -122,7 +115,7 @@ object frmOptionsReminders: TfrmOptionsReminders
     TabOrder = 4
     OnClick = btnUpClick
   end
-  object btnDown: TButton
+  object btnDown: TButton [6]
     Left = 378
     Top = 142
     Width = 22
@@ -132,7 +125,7 @@ object frmOptionsReminders: TfrmOptionsReminders
     TabOrder = 6
     OnClick = btnDownClick
   end
-  object btnDelete: TButton
+  object btnDelete: TButton [7]
     Left = 178
     Top = 181
     Width = 22
@@ -148,7 +141,7 @@ object frmOptionsReminders: TfrmOptionsReminders
     TabOrder = 2
     OnClick = btnDeleteClick
   end
-  object btnAdd: TButton
+  object btnAdd: TButton [8]
     Left = 178
     Top = 70
     Width = 22
@@ -164,7 +157,7 @@ object frmOptionsReminders: TfrmOptionsReminders
     TabOrder = 1
     OnClick = btnAddClick
   end
-  object radSort: TRadioGroup
+  object radSort: TRadioGroup [9]
     Left = 209
     Top = 246
     Width = 192
@@ -183,5 +176,41 @@ object frmOptionsReminders: TfrmOptionsReminders
     ParentFont = False
     TabOrder = 5
     OnClick = radSortClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = lstDisplayed'
+        'Status = stsDefault')
+      (
+        'Component = lstNotDisplayed'
+        'Status = stsDefault')
+      (
+        'Component = btnUp'
+        'Status = stsDefault')
+      (
+        'Component = btnDown'
+        'Status = stsDefault')
+      (
+        'Component = btnDelete'
+        'Status = stsDefault')
+      (
+        'Component = btnAdd'
+        'Status = stsDefault')
+      (
+        'Component = radSort'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsReminders'
+        'Status = stsDefault'))
   end
 end

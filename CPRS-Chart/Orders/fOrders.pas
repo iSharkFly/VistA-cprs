@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, fHSplit, StdCtrls,
   ExtCtrls, Menus, ORCtrls, ComCtrls, ORFn, rOrders, fODBase, uConst, uCore, uOrders,UBACore,
-  UBAGlobals;
+  UBAGlobals, VA508AccessibilityManager, fBase508Form;
 
 type
   TfrmOrders = class(TfrmHSplit)
@@ -164,6 +164,7 @@ type
     procedure sptHorzMoved(Sender: TObject);
   private
     { Private declarations }
+    OrderListClickProcessing : Boolean;
     FDfltSort: Integer;
     FCurrentView: TOrderView;
     FCompress: boolean;
@@ -183,6 +184,7 @@ type
     FRightAfterWriteOrderBox : boolean;
     FDontCheck: boolean;
     FParentComplexOrderID: string;
+    FHighContrast2Mode: boolean;
     function CanChangeOrderView: Boolean;
     function GetEvtIFN(AnIndex: integer): string;
     function DisplayDefaultDlgList(ADest: TORListBox; ADlgList: TStringList): boolean;
@@ -204,7 +206,7 @@ type
     //procedure SetEvtIFN(var AnEvtIFN: integer);
     procedure UseDefaultSort;
     procedure SynchListToOrders;
-//    procedure ActivateDeactiveRenew;
+    procedure ActivateDeactiveRenew;
     procedure ValidateSelected(const AnAction, WarningMsg, WarningTitle: string);
     procedure ViewAlertedOrders(OrderIEN: string; Status: integer; DispGrp: string;
           BySvc, InvDate: boolean; Title: string);
@@ -213,9 +215,10 @@ type
     function GetOrderText(AnOrder: TOrder; Index: integer; Column: integer): string;
     function MeasureColumnHeight(AnOrder: TOrder; Index: Integer; Column: integer):integer;
     function GetPlainText(AnOrder: TOrder; index: integer):string;
-    function PatientStatusChanged: boolean;    
+    //function PatientStatusChanged: boolean;
     procedure UMEventOccur(var Message: TMessage); message UM_EVENTOCCUR;
     function CheckOrderStatus: boolean;
+    procedure RightClickMessageHandler(var Msg: TMessage; var Handled: Boolean);
   public
     procedure setSectionWidths; //CQ6170
     function getTotalSectionsWidth : integer; //CQ6170
@@ -266,7 +269,8 @@ uses fFrame, fEncnt, fOrderVw, fRptBox, fLkUpLocation, fOrdersDC, fOrdersCV, fOr
      fOrdersComplete, fOrdersVerify, fOrderComment, fOrderSaveQuick, fOrdersRenew,fODReleaseEvent,
      fOMNavA, rCore, fOCSession, fOrdersPrint, fOrdersTS, fEffectDate, fODActive, fODChild,
      fOrdersCopy, fOMVerify, fODAuto, rODBase, uODBase, rMeds,fODValidateAction, fMeds, uInit, fBALocalDiagnoses,
-     fODConsult, fClinicWardMeds, fActivateDeactivate;
+     fODConsult, fClinicWardMeds, fActivateDeactivate, VA2006Utils, rodMeds,
+     VA508AccessibilityRouter, VAUtils;
 
 {$R *.DFM}
 
@@ -466,6 +470,8 @@ var
   j: integer;
   AChildList: TStringlist;
   CplxOrderID: string;
+  DCNewOrder: boolean;
+  DCChangeItem: TChangeItem;
 
   procedure RemoveFromOrderList(ChildOrderID: string);
   var
@@ -511,7 +517,21 @@ begin
                 if (Encounter.Provider = User.DUZ) and User.CanSignOrders
                   then CanSign := CH_SIGN_YES
                   else CanSign := CH_SIGN_NA;
-                DCOrder(OrderForList, GetReqReason, ReturnedType);
+                DCNEwOrder := false;
+                if Changes.Orders.Count > 0 then
+                  begin
+                    for j := 0 to Changes.Orders.Count - 1 do
+                      begin
+                        DCChangeItem := TChangeItem(Changes.Orders.Items[j]);
+                        if DCChangeItem.ID = OrderForList.ID then
+                          begin
+                            if (Pos('DC', OrderForList.ActionOn) = 0) then
+                            DCNewOrder := True;
+                            //else DCNewOrder := False;
+                          end;
+                      end;
+                  end;
+                DCOrder(OrderForList, GetReqReason, DCNewOrder, ReturnedType);
                 Changes.Add(CH_ORD, OrderForList.ID, OrderForList.Text, '', CanSign);
                 FCompress := True;
                 SynchListToOrders;
@@ -586,8 +606,9 @@ end;
 procedure TfrmOrders.FormCreate(Sender: TObject);
 begin
   inherited;
+  OrderListClickProcessing := false;
+  FixHeaderControlDelphi2006Bug(hdrOrders);
   PageID             := CT_ORDERS;
-  lstOrders.Color    := ReadOnlyColor;
   uOrderList         := TList.Create;
   uEvtDCList         := TList.Create;
   uEvtRLList         := TList.Create;
@@ -607,11 +628,15 @@ begin
   FEvtColWidth := 0;
   FDontCheck := False;
   FParentComplexOrderID := '';
+  // 508 black color scheme that causes problems 
+  FHighContrast2Mode := BlackColorScheme and (ColorToRGB(clInfoBk) <> ColorToRGB(clBlack));
+  AddMessageHandler(lstOrders, RightClickMessageHandler);
 end;
 
 procedure TfrmOrders.FormDestroy(Sender: TObject);
 begin
   inherited;
+  RemoveMessageHandler(lstOrders, RightClickMessageHandler);
   ClearOrders(uOrderList);
   uEvtDCList.Clear;
   uEvtRLList.Clear;
@@ -683,6 +708,7 @@ begin
     RedrawSuspend(Handle);
     SaveTop := TopIndex;
     Clear;
+    repaint;
     for i := 0 to uOrderList.Count - 1 do
     begin
       AnOrder := TOrder(uOrderList.Items[i]);
@@ -880,48 +906,55 @@ var
 begin
   inherited;
   if not CanChangeOrderView then Exit;
-  AnOrderView := TOrderView.Create;
-  AnOrderView.Filter    := STS_ACTIVE;
-  AnOrderView.DGroup    := DGroupAll;
-  AnOrderView.ViewName  := 'All Services, Active';
-  AnOrderView.InvChrono := True;
-  AnOrderView.ByService := True;
-  AnOrderView.CtxtTime  := 0;
-  AnOrderView.TextView  := 0;
-  AnOrderView.EventDelay.EventType := 'C';
-  AnOrderView.EventDelay.Specialty := 0;
-  AnOrderView.EventDelay.Effective := 0;
-  AnOrderView.EventDelay.EventIFN  := 0;
-  AnOrderView.EventDelay.EventName := 'All Services, Active';
-  SelectOrderView(AnOrderView);
-  with AnOrderView do if Changed then
-  begin
-    FCurrentView := AnOrderView;
-    if FCurrentView.Filter in [15,16,17,24] then
+  AnOrderView := TOrderView.Create;              //       - this starts fresh instead, since CPRS v22
+  try
+    AnOrderView.Assign(FCurrentView);              // RV - v27.1 - preload form with current view params
+  (*  AnOrderView.Filter    := STS_ACTIVE;                    - CQ #11261
+    AnOrderView.DGroup    := DGroupAll;
+    AnOrderView.ViewName  := 'All Services, Active';
+    AnOrderView.InvChrono := True;
+    AnOrderView.ByService := True;
+    AnOrderView.CtxtTime  := 0;
+    AnOrderView.TextView  := 0;
+    AnOrderView.EventDelay.EventType := 'C';
+    AnOrderView.EventDelay.Specialty := 0;
+    AnOrderView.EventDelay.Effective := 0;
+    AnOrderView.EventDelay.EventIFN  := 0;
+    AnOrderView.EventDelay.EventName := 'All Services, Active';*)
+    SelectOrderView(AnOrderView);
+    with AnOrderView do if Changed then
     begin
-      FCompress      := False;
-      mnuActRel.Visible   := True;
-      popOrderRel.Visible := True;
-    end else
-    begin
-      mnuActRel.Visible   := False;
-      popOrderRel.Visible := False;
-    end;
+      FCurrentView.Assign(AnOrderView);
+      if FCurrentView.Filter in [15,16,17,24] then
+      begin
+        FCompress      := False;
+        mnuActRel.Visible   := True;
+        popOrderRel.Visible := True;
+      end else
+      begin
+        mnuActRel.Visible   := False;
+        popOrderRel.Visible := False;
+      end;
 
-    lstSheets.ItemIndex := -1;
-    lblWrite.Caption := 'Write Orders';
-    lstWrite.Clear;
-    lstWrite.Caption := lblWrite.Caption;
-    LoadWriteOrders(lstWrite.Items);
-    RefreshOrderList(FROM_SERVER);
+      //lstSheets.ItemIndex := -1;
+      lstSheets.Items[0] := 'C;0^' + FCurrentView.ViewName;   // v27.5 - RV
 
-    if ByService then
-    begin
-      if InvChrono then FDfltSort := OVS_CATINV  else FDfltSort := OVS_CATFWD;
-    end else
-    begin
-      if InvChrono then FDfltSort := OVS_INVERSE else FDfltSort := OVS_FORWARD;
+      lblWrite.Caption := 'Write Orders';
+      lstWrite.Clear;
+      lstWrite.Caption := lblWrite.Caption;
+      LoadWriteOrders(lstWrite.Items);
+      RefreshOrderList(FROM_SERVER);
+
+      if ByService then
+      begin
+        if InvChrono then FDfltSort := OVS_CATINV  else FDfltSort := OVS_CATFWD;
+      end else
+      begin
+        if InvChrono then FDfltSort := OVS_INVERSE else FDfltSort := OVS_FORWARD;
+      end;
     end;
+  finally
+    AnOrderView.free;
   end;
 end;
 
@@ -983,19 +1016,19 @@ begin
       BigOrderID := TOrder(Items.Objects[i]).ID;
       AnOrderID := Piece(BigOrderID, ';', 1);
       if StrToIntDef(AnOrderID,0) = 0 then
-        ShowMessage('Detail view is not available for selected order.')
+        ShowMsg('Detail view is not available for selected order.')
       else
         begin
-          tmpList.Assign(DetailOrder(BigOrderID));
+          FastAssign(DetailOrder(BigOrderID), tmpList);
           if ((TOrder(Items.Objects[i]).DGroupName = 'Inpt. Meds') or
               (TOrder(Items.Objects[i]).DGroupName = 'Out. Meds') or
-              (TOrder(Items.Objects[i]).DGroupName = 'Clin. Orders') or
+              (TOrder(Items.Objects[i]).DGroupName = 'Clinic Orders') or
               (TOrder(Items.Objects[i]).DGroupName = 'Infusion')) then
             begin
               tmpList.Add('');
               tmpList.Add(StringOfChar('=', 74));
               tmpList.Add('');
-              tmpList.AddStrings(MedAdminHistory(AnOrderID));
+              FastAddStrings(MedAdminHistory(AnOrderID), tmpList);
             end;
 
           if CheckOrderGroup(AnOrderID)=1 then  // if it's UD group
@@ -1242,6 +1275,13 @@ begin
   tmplst.Free;
 end;
 
+procedure TfrmOrders.RightClickMessageHandler(var Msg: TMessage;
+  var Handled: Boolean);
+begin
+  if Msg.Msg = WM_RBUTTONUP then
+    lstOrders.RightClickSelect := (lstOrders.SelCount < 1);
+end;
+
 function TfrmOrders.GetPlainText(AnOrder: TOrder; index: integer):string;
 var
   i: integer;
@@ -1253,7 +1293,7 @@ begin
     FirstColumnDisplayed := 0
   else
     FirstColumnDisplayed := 1;
-  for i:= FirstColumnDisplayed to 8 do begin
+  for i:= FirstColumnDisplayed to 9 do begin
     x := GetOrderText(AnOrder, index, i);
     if x <> '' then
       result := result + hdrOrders.Sections[i].Text + ': ' + x + CRLF;
@@ -1296,7 +1336,7 @@ begin
     NewHeight := HigherOf(NewHeight, MeasureColumnHeight(AnOrder, Index, 2));
     {measure height of start/stop times}
     NewHeight := HigherOf(NewHeight, MeasureColumnHeight(AnOrder, Index, 3));
-    if NewHeight > 255 then NewHeight := 255;
+    if NewHeight > 255 then NewHeight := 255;  // This is maximum allowed by a Windows
     if NewHeight <  13 then NewHeight := 13;
   end;
   AHeight := NewHeight;
@@ -1315,6 +1355,9 @@ begin
 end;
 
 function TfrmOrders.GetOrderText(AnOrder: TOrder; Index: integer; Column: integer): string;
+var
+  AReason:  TStringlist;
+  i: integer;
 begin
   if AnOrder <> nil then with AnOrder do
   begin
@@ -1333,7 +1376,22 @@ begin
       begin
         result := Text;
         if Flagged then
-          result := result + ' *Flagged*';
+        begin
+          if Notifications.Active then
+          begin
+            AReason := TStringList.Create;
+            try
+              result := result + crlf;
+              LoadFlagReason(AReason, ID);
+              for i := 0 to AReason.Count - 1 do
+                result :=  result + AReason[i] + CRLF;
+            finally
+              AReason.Free;
+            end;
+          end
+          else
+            result := result + '  *Flagged*';
+        end;
       end;
       3: result := GetStartStopText( StartTime, StopTime);
       4:
@@ -1374,7 +1432,7 @@ begin
       Canvas.Font.Color := clHighlightText
     end;
     Canvas.FillRect(ARect);
-    Canvas.Pen.Color := clSilver;
+    Canvas.Pen.Color := Get508CompliantColor(clSilver);
     Canvas.MoveTo(ARect.Left, ARect.Bottom - 1);
     Canvas.LineTo(ARect.Right, ARect.Bottom - 1);
     RightSide := -2;
@@ -1404,9 +1462,9 @@ begin
         SaveColor := Canvas.Brush.Color;
         if i = FirstColumnDisplayed then
         begin
-          if Flagged and (ColorToRGB(clWindowText) = ColorToRGB(clBlack)) then
+          if Flagged then
           begin
-            Canvas.Brush.Color := clRed;
+            Canvas.Brush.Color := Get508CompliantColor(clRed);
             Canvas.FillRect(ARect);
           end;
         end;
@@ -1416,8 +1474,10 @@ begin
           if Changes.Exist(CH_ORD, AnOrder.ID) then Canvas.Font.Style := [fsBold];
           if not (odSelected in State) and (AnOrder.Signature = OSS_UNSIGNED) then
           begin
-            if ColorToRGB(clWindowText) = ColorToRGB(clBlack) then
-              Canvas.Font.Color := clBlue;
+            if FHighContrast2Mode then
+              Canvas.Font.Color := clBlue
+            else
+              Canvas.Font.Color := Get508CompliantColor(clBlue);
           end;
         end;
         if (i = 2) or (i = 3) or (i = 0) then
@@ -1434,9 +1494,7 @@ procedure TfrmOrders.hdrOrdersSectionResize(HeaderControl: THeaderControl; Secti
 begin
   inherited;
   FEvtColWidth := hdrOrders.Sections[0].Width;
-  RedrawSuspend(Self.Handle);
   RedrawOrderList;
-  RedrawActivate(Self.Handle);
   lstOrders.Invalidate;
   pnlRight.Refresh;
   pnlLeft.Refresh;
@@ -1456,7 +1514,9 @@ var
   Activated: Boolean;
   NextIndex: Integer;
 begin
-  if PatientStatusChanged then exit;
+  if OrderListClickProcessing then Exit;
+  OrderListClickProcessing := true;   //Make sure this gets set to false prior to exiting.
+  //if PatientStatusChanged then exit;
   if BILLING_AWARE then //CQ5114
      fODConsult.displayDXCode := ''; //CQ5114
 
@@ -1465,17 +1525,22 @@ begin
   if not ActiveOrdering then SetConfirmEventDelay;
   NextIndex := lstWrite.ItemIndex;
   if (FCurrentView.EventDelay.PtEventIFN>0) and (PtEvtCompleted(FCurrentView.EventDelay.PtEventIFN, FCurrentView.EventDelay.EventName)) then
+  begin
+    OrderListClickProcessing := false;
     Exit;
+  end;
   if not ReadyForNewOrder(FCurrentView.EventDelay) then
   begin
     lstWrite.ItemIndex := RefNumFor(Self);
+    OrderListClickProcessing := false;
     Exit;
   end;
-  
+
   // don't write delayed orders for non-VA meds:
   if (FCurrentView.EventDelay.EventIFN>0) and (Piece(lstWrite.ItemID,';',2) = '145') then
     begin
       InfoBox('Delayed orders cannot be written for Non-VA Medications.', 'Meds, Non-VA', MB_OK);
+      OrderListClickProcessing := false;
       Exit;
     end;
 
@@ -1487,10 +1552,13 @@ begin
       if not ObtainEffectiveDate(Effective) then
       begin
         lstWrite.ItemIndex := -1;
+        OrderListClickProcessing := false;
         Exit;
       end;
-  if frmFrame.CCOWDrivedChange then
+  if frmFrame.CCOWDrivedChange then begin
+    OrderListClickProcessing := false;
     Exit;
+  end;
   PositionTopOrder(StrToIntDef(Piece(lstWrite.ItemID, ';', 3), 0));  // position Display Group
   case CharAt(Piece(lstWrite.ItemID, ';', 4), 1) of
   'A':      Activated := ActivateAction(     Piece(lstWrite.ItemID, ';', 1), Self,
@@ -1516,6 +1584,7 @@ begin
     lstSheets.ItemIndex := 0;
     lstSheetsClick(Self);
   end;
+  OrderListClickProcessing := false;
   if (FCurrentView <> nil) and (FCurrentView.EventDelay.PtEventIFN>0) and
     (PtEvtCompleted(FCurrentView.EventDelay.PtEventIFN, FCurrentView.EventDelay.EventName)) then
     Exit;
@@ -1559,6 +1628,11 @@ begin
     with lstOrders do for i := 0 to Items.Count - 1 do if Selected[i] then
     begin
       AnOrder := TOrder(Items.Objects[i]);
+      if (AnAction = 'RN') and (PassDrugTest(StrtoINT(Piece(AnOrder.ID, ';',1)), 'E', True, True)=True) then
+        begin
+          ShowMsg('Cannot renew Clozapine orders.');
+          Selected[i] := false;
+        end;
       if (AnAction = 'RN') and (AnOrder.Status=6) and (AnOrder.DGroupName = 'Inpt. Meds') and (Patient.inpatient) and (IsClinicLoc(Encounter.Location)) then
          begin
            Selected[i] := False;
@@ -1569,9 +1643,9 @@ begin
         if not IsValidSchedule(AnOrder.ID) then
         begin
           if (AnAction = 'RN') then
-            ShowMessage('The order contains invalid schedule and can not be renewed.')
+            ShowMsg('The order contains invalid schedule and can not be renewed.')
           else if (AnAction = 'EV') then
-            ShowMessage('The order contains invalid schedule and can not be changed to event delayed order.');
+            ShowMsg('The order contains invalid schedule and can not be changed to event delayed order.');
 
           Selected[i] := False;
           Continue;
@@ -1719,7 +1793,7 @@ begin
   try
     //if CheckOrderStatus = True then Exit;
     ValidateSelected(OA_DC, TX_NO_DC, TC_NO_DC); // validate DC action on each order
-    //ActivateDeactiveRenew;   AGP 26.53 TURN OFF UNTIL FINAL DECISION CAN BE MADE
+    ActivateDeactiveRenew;   //AGP 26.53 TURN OFF UNTIL FINAL DECISION CAN BE MADE
     MakeSelectedList(SelectedList);                     // build list of orders that remain
     // updating the Changes object happens in ExecuteDCOrders, based on individual order
     if ExecuteDCOrders(SelectedList,DelEvt) then SynchListToOrders;
@@ -1747,7 +1821,7 @@ begin
   if not AuthorizedUser then Exit;
   if not CanManualRelease then
   begin
-    ShowMessage('You are not authorized to manual release delayed orders.');
+    ShowMsg('You are not authorized to manual release delayed orders.');
     Exit;
   end;
   if Encounter.Location = 0 then                         // location required for ORCSEND
@@ -2084,6 +2158,7 @@ begin
    finally
     ChangeIFNList.Free;
   end;
+  if frmFrame.TimedOut then Exit;
   RedrawOrderList;
 end;
 
@@ -2280,7 +2355,7 @@ begin
   if not AuthorizedUser then Exit;
   if (User.OrderRole <> 2) and (User.OrderRole <> 3) then
   begin
-    ShowMessage('Sorry, You don''t have the permission to release selected orders manually');
+    ShowMsg('Sorry, You don''t have the permission to release selected orders manually');
     Exit;
   end;
   if not (FCurrentView.EventDelay.EventIFN>0) then
@@ -2994,6 +3069,7 @@ begin
     end;
     if i > 0 then
       IsDefaultDlg := False;
+
     ADest.ItemIndex := -1;
     for j := 0 to ADest.Items.Count - 1 do
     begin
@@ -3106,28 +3182,28 @@ end;
 procedure TfrmOrders.popOrderPopup(Sender: TObject);
 begin
   inherited;
-  if PatientStatusChanged then exit;
+  //if PatientStatusChanged then exit;
   //frmFrame.UpdatePtInfoOnRefresh;
 end;
 
 procedure TfrmOrders.mnuViewClick(Sender: TObject);
 begin
   inherited;
-  if PatientStatusChanged then exit;
+  //if PatientStatusChanged then exit;
   //frmFrame.UpdatePtInfoOnRefresh;
 end;
 
 procedure TfrmOrders.mnuActClick(Sender: TObject);
 begin
   inherited;
-  if PatientStatusChanged then exit;
+  //if PatientStatusChanged then exit;
   //frmFrame.UpdatePtInfoOnRefresh;
 end;
 
 procedure TfrmOrders.mnuOptClick(Sender: TObject);
 begin
   inherited;
-  if PatientStatusChanged then exit;  
+  //if PatientStatusChanged then exit;  
   //frmFrame.UpdatePtInfoOnRefresh;
 end;
 
@@ -3272,7 +3348,7 @@ begin
   setSectionWidths; //CQ6170
 end;
 
-function TfrmOrders.PatientStatusChanged: boolean;
+{function TfrmOrders.PatientStatusChanged: boolean;
 const
 
   msgTxt1 = 'Patient status was changed from ';
@@ -3301,28 +3377,31 @@ begin
     frmFrame.mnuFileRefreshClick(Application);
     Result := True;
   end;
-end;
+end;}
 
 function TfrmOrders.CheckOrderStatus: boolean;
 var
 i: integer;
 AnOrder: TOrder;
+OrderArray: TStringList;
 begin
     Result := False;
+    OrderArray := TStringList.Create;
     with lstOrders do for i := 0 to Items.Count - 1 do if Selected[i] then
     begin
       AnOrder := TOrder(Items.Objects[i]);
-      if AnORder.Status <> GetOrderStatus(AnOrder.ID) then
-         begin
-           MessageDlg('The Order status has changed.' + #13#10#13 + 'CPRS needs to refresh patient information to display the correct order status', mtWarning, [mbOK], 0);
-           frmFrame.mnuFileRefreshClick(Application);
-           Result := True;
-           EXIT;
-         end;
+      OrderArray.Add(AnOrder.ID + U + InttoStr(AnOrder.Status));
     end;
+    if (OrderArray <> nil) and (not DoesOrderStatusMatch(OrderArray)) then
+      begin
+        MessageDlg('The Order status has changed.' + #13#10#13 + 'CPRS needs to refresh patient information to display the correct order status', mtWarning, [mbOK], 0);
+        frmFrame.mnuFileRefreshClick(Application);
+        Result := True;
+      end;
+    ORderArray.Free;
 end;
 
-(*procedure TfrmOrders.ActivateDeactiveRenew;
+procedure TfrmOrders.ActivateDeactiveRenew;
 var
   i: Integer;
   AnOrder: TOrder;
@@ -3335,7 +3414,7 @@ begin
       if AnOrder.Status = 5 then tmpArr.Add(AnOrder.ID);
     end;
     if tmpArr <> nil then frmActivateDeactive.fActivateDeactive(tmpArr);
-end;  *)
+end;
 
 procedure TfrmOrders.ViewInfo(Sender: TObject);
 begin
@@ -3393,6 +3472,9 @@ begin
   inherited;
   mnuOptimizeFieldsClick(self);
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmOrders);
 
 end.
 

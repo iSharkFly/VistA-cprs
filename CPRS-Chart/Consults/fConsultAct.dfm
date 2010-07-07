@@ -1,23 +1,17 @@
-object frmConsultAction: TfrmConsultAction
+inherited frmConsultAction: TfrmConsultAction
   Left = 277
   Top = 217
-  Width = 600
-  Height = 406
   BorderIcons = []
   Caption = 'frmConsultAction'
-  Color = clBtnFace
+  ClientHeight = 379
+  ClientWidth = 592
   Constraints.MinHeight = 406
   Constraints.MinWidth = 600
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TPanel
+  object pnlBase: TPanel [0]
     Left = 0
     Top = 0
     Width = 592
@@ -358,5 +352,71 @@ object frmConsultAction: TfrmConsultAction
         end
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = pnlForward'
+        'Status = stsDefault')
+      (
+        'Component = Label1'
+        'Status = stsDefault')
+      (
+        'Component = cboAttentionOf'
+        'Status = stsDefault')
+      (
+        'Component = cboUrgency'
+        'Status = stsDefault')
+      (
+        'Component = treService'
+        'Status = stsDefault')
+      (
+        'Component = cboService'
+        'Status = stsDefault')
+      (
+        'Component = pnlOther'
+        'Status = stsDefault')
+      (
+        'Component = pnlSigFind'
+        'Status = stsDefault')
+      (
+        'Component = grpSigFindings'
+        'Status = stsDefault')
+      (
+        'Component = pnlComments'
+        'Status = stsDefault')
+      (
+        'Component = memComments'
+        'Status = stsDefault')
+      (
+        'Component = pnlAlert'
+        'Status = stsDefault')
+      (
+        'Component = lblAutoAlerts'
+        'Status = stsDefault')
+      (
+        'Component = ckAlert'
+        'Status = stsDefault')
+      (
+        'Component = pnlAllActions'
+        'Status = stsDefault')
+      (
+        'Component = calDateofAction'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cboPerson'
+        'Status = stsDefault')
+      (
+        'Component = frmConsultAction'
+        'Status = stsDefault'))
   end
 end

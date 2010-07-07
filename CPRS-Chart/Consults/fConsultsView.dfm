@@ -1,21 +1,15 @@
-object frmConsultsView: TfrmConsultsView
+inherited frmConsultsView: TfrmConsultsView
   Left = 320
   Top = 172
-  Width = 414
-  Height = 400
   BorderIcons = []
   Caption = 'List Selected Consults'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 373
+  ClientWidth = 406
   OldCreateOrder = True
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 406
@@ -153,6 +147,7 @@ object frmConsultsView: TfrmConsultsView
       ItemTipEnable = True
       ListItemsOnly = True
       LongList = False
+      LookupPiece = 0
       MaxLength = 0
       Pieces = '2'
       Sorted = True
@@ -160,6 +155,7 @@ object frmConsultsView: TfrmConsultsView
       TabOrder = 0
       OnKeyPause = cboServiceSelect
       OnMouseClick = cboServiceSelect
+      CharsNeedMatch = 1
     end
     object cboGroupBy: TORComboBox
       Left = 239
@@ -181,12 +177,50 @@ object frmConsultsView: TfrmConsultsView
       ItemTipEnable = True
       ListItemsOnly = False
       LongList = False
+      LookupPiece = 0
       MaxLength = 0
       Pieces = '2'
       Sorted = False
       SynonymChars = '<>'
       TabOrder = 5
+      CharsNeedMatch = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = calBeginDate'
+        'Status = stsDefault')
+      (
+        'Component = calEndDate'
+        'Status = stsDefault')
+      (
+        'Component = lstStatus'
+        'Status = stsDefault')
+      (
+        'Component = radSort'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = treService'
+        'Status = stsDefault')
+      (
+        'Component = cboService'
+        'Status = stsDefault')
+      (
+        'Component = cboGroupBy'
+        'Status = stsDefault')
+      (
+        'Component = frmConsultsView'
+        'Status = stsDefault'))
   end
   object popStatus: TPopupMenu
     Left = 284

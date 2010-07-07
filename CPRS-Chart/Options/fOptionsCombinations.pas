@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, StdCtrls, ORCtrls, OrFn, ComCtrls;
+  ExtCtrls, StdCtrls, ORCtrls, OrFn, ComCtrls, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOptionsCombinations = class(TForm)
+  TfrmOptionsCombinations = class(TfrmBase508Form)
     radAddByType: TRadioGroup;
     lblInfo: TMemo;
     lblAddby: TLabel;

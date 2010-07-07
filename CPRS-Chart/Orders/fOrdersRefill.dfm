@@ -1,22 +1,15 @@
-object frmRefillOrders: TfrmRefillOrders
+inherited frmRefillOrders: TfrmRefillOrders
   Left = 181
   Top = 267
-  Width = 435
-  Height = 311
   Caption = 'Refill Orders'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = True
+  ClientHeight = 284
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
+  ExplicitHeight = 311
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [0]
     Left = 0
     Top = 200
     Width = 427
@@ -79,7 +72,7 @@ object frmRefillOrders: TfrmRefillOrders
       end
     end
   end
-  object pnlClient: TPanel
+  object pnlClient: TPanel [1]
     Left = 0
     Top = 0
     Width = 427
@@ -90,8 +83,8 @@ object frmRefillOrders: TfrmRefillOrders
     object lblOrders: TLabel
       Left = 0
       Top = 0
-      Width = 427
-      Height = 17
+      Width = 181
+      Height = 13
       Align = alTop
       Caption = 'Request refills for the following orders -'
     end
@@ -105,5 +98,38 @@ object frmRefillOrders: TfrmRefillOrders
       TabOrder = 0
       Caption = 'Request refills for the following orders '
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = grbPickUp'
+        'Status = stsDefault')
+      (
+        'Component = radWindow'
+        'Status = stsDefault')
+      (
+        'Component = radMail'
+        'Status = stsDefault')
+      (
+        'Component = radClinic'
+        'Status = stsDefault')
+      (
+        'Component = pnlClient'
+        'Status = stsDefault')
+      (
+        'Component = lstOrders'
+        'Status = stsDefault')
+      (
+        'Component = frmRefillOrders'
+        'Status = stsDefault'))
   end
 end

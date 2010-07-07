@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORFn, ComCtrls, ExtCtrls;
+  StdCtrls, ORFn, ComCtrls, ExtCtrls, fBase508Form, VA508AccessibilityManager,
+  uReports;
 
 type
-  TfrmPrerequisites = class(TForm)
+  TfrmPrerequisites = class(TfrmBase508Form)
     lblFontTest: TLabel;
     memReport: TRichEdit;
     pnlButton: TPanel;
@@ -19,9 +20,9 @@ type
     procedure cmdContinueClick(Sender: TObject);
     procedure cmdCancelClick(Sender: TObject);
     procedure cmdPrintClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormShow(Sender: TObject);
+    procedure OnActivate(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     procedure AlignButtons();
   end;
@@ -34,7 +35,7 @@ var
 implementation
 
 uses
-  uCore, rCore, rReports, Printers,rMisc;
+  uCore, rCore, rReports, Printers, rMisc;
 
 {$R *.DFM}
 
@@ -65,8 +66,7 @@ begin
       Rect := BoundsRect;
       ForceInsideWorkArea(Rect);
       BoundsRect := Rect;
-      memReport.Lines.Assign(ReportText);
-      ResizeAnchoredFormToFont(result);
+      QuickCopy(ReportText, memReport);
       //Quick fix to work around glich in resize algorithim
       AlignButtons();
       for i := 1 to Length(ReportTitle) do if ReportTitle[i] = #9 then ReportTitle[i] := ' ';
@@ -126,19 +126,13 @@ begin
     begin
       AHeader := TStringList.Create;
       CreatePatientHeader(AHeader, Self.Caption);
-      memPrintReport := TRichEdit.Create(Self);
+      memPrintReport := CreateReportTextComponent(Self);
       try
         MaxLines := 60 - AHeader.Count;
         LastLine := 0;
         ThisPage := 0;
         with memPrintReport do
           begin
-            Visible := False;
-            Parent := Self;
-            Font.Name := 'Courier New';
-            Font.Size := MainFontSize;
-            Width := Printer.Canvas.TextWidth(StringOfChar('-', 74));
-            //Width := 600;
             repeat
               with Lines do
                 begin
@@ -173,17 +167,11 @@ begin
   memReport.Invalidate;
 end;
 
-procedure TfrmPrerequisites.FormCreate(Sender: TObject);
-begin
-  memreport.Color := ReadOnlyColor;
-
-end;
-
 procedure TfrmPrerequisites.AlignButtons;
 Const
   BtnSpace = 8;
 begin
-  cmdCancel.Left := self.Width - cmdCancel.Width - BtnSpace;
+  cmdCancel.Left := self.Width - cmdCancel.Width - (BtnSpace * 3) - 3;
   cmdContinue.Left := cmdCancel.Left - BtnSpace - cmdContinue.Width;
 end;
 
@@ -193,9 +181,15 @@ begin
   SaveUserBounds(Self); //Save Position & Size of Form
 end;
 
-procedure TfrmPrerequisites.FormShow(Sender: TObject);
+procedure TfrmPrerequisites.FormCreate(Sender: TObject);
 begin
+  inherited;
+  ResizeAnchoredFormToFont(Self);
   SetFormPosition(Self); //Get Saved Position & Size of Form
 end;
 
+procedure TfrmPrerequisites.OnActivate(Sender: TObject);
+begin
+  if Self.VertScrollBar.IsScrollBarVisible then Self.VertScrollBar.Position := 0;
+end;
 end.

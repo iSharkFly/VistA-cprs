@@ -31,8 +31,6 @@ function ConvertHeight2Inches(Ht: string): string;
 function FormatVitalForNote(VitalStr: string):String;
 function ConvertVitalData(const Value: string; VitalType: TVitalType; UnitType: string = ''): string;
 procedure VitalsFrameCreated(Frame: TFrame);
-procedure SetVitalsMetric(const Value: boolean);
-procedure SetVitCVPmmHg(const Value: boolean);
 function ValidVitalsDate(var ADate: TFMDateTime; SkipFirst: boolean = FALSE; Show: boolean = true): boolean;
 function IsNumericWeight(const x: string): Boolean;
 procedure CloseVitalsDLL;
@@ -79,7 +77,6 @@ const
   VitalPatientStr  = 'VST^PT^';
   VitalLocationStr = 'VST^HL^';
 
-  SHARE_DIR = '\VISTA\Common Files\';
   GMV_CONTEXT = 'OR CPRS GUI CHART';
   GMV_APP_SIGNATURE = 'CPRS';
   GMV_DEFAULT_TEMPLATE = '';
@@ -125,8 +122,8 @@ type
   TGMV_VitalsExit = Procedure;
 
 var
-  VitalsDLLHandle : THandle;
-  DLLForceClose : Boolean = False;
+  VitalsDLLHandle : THandle = 0;
+//  DLLForceClose : Boolean = False;  // jm - removed as part of timeout fix
 
 
 const
@@ -176,7 +173,7 @@ const
 implementation
 
 uses
-  uCore, rCore, rVitals, Contnrs, mVitBase, mVitMetric, fVitalsDate;
+  uCore, rCore, rVitals, Contnrs, fVitalsDate, VAUtils;
   
 var
   uVitalFrames: TComponentList = nil;
@@ -190,7 +187,9 @@ begin
     @VitalsExit := GetProcAddress(VitalsDLLHandle,PChar('GMV_VitalsExit'));
     if assigned(VitalsExit) then
       VitalsExit();
-    DLLForceClose := True;
+    FreeLibrary(VitalsDLLHandle);
+    VitalsDLLHandle := 0;
+//    DLLForceClose := True;   // jm - removed as part of timeout fix
   end;
 end;
 
@@ -378,7 +377,7 @@ begin
          Result := True;
   end;
   if(Result) then
-    ShowMessage(VitalErrorText(VType));
+    ShowMsg(VitalErrorText(VType));
 end;
 
 function VitalControlTag(VType: TVitalType; UnitControl: boolean = FALSE): integer;
@@ -573,40 +572,6 @@ begin
     uVitalFrames := TComponentList.Create(FALSE);
   uVitalFrames.Add(Frame);
 end;
-
-procedure SetVitalsMetric(const Value: boolean);
-var
-  i: integer;
-
-begin
-  if(uVitalsMetric <> Value) then
-  begin
-    uVitalsMetric := Value;
-    for i := 0 to uVitalFrames.Count-1 do
-    begin
-      if uVitalFrames[i] is TfraVitBase then
-        TfraVitBase(uVitalFrames[i]).VitalsMetricChanged
-      else
-      if uVitalFrames[i] is TfraVitMetric then
-        TfraVitMetric(uVitalFrames[i]).VitalsMetricChanged
-    end;   
-  end;
-end;
-
-procedure SetVitCVPmmHg(const Value: boolean);
-var
-  i: integer;
-
-begin
-  if(uVitCVPmmHg <> Value) then
-  begin
-    uVitCVPmmHg := Value;
-    for i := 0 to uVitalFrames.Count-1 do
-      if uVitalFrames[i] is TfraVitBase then
-        TfraVitBase(uVitalFrames[i]).VitalsCVPUnitsChanged;
-  end;
-end;
-
 
 function ValidVitalsDate(var ADate: TFMDateTime; SkipFirst: boolean = FALSE; Show: boolean = true): boolean;   //AGP Change 26.1
 var

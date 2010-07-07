@@ -9,6 +9,10 @@ inherited frmODProc: TfrmODProc
   Caption = 'Order a Procedure'
   Constraints.MinHeight = 393
   Constraints.MinWidth = 543
+  ExplicitLeft = 208
+  ExplicitTop = 188
+  ExplicitWidth = 543
+  ExplicitHeight = 393
   PixelsPerInch = 96
   TextHeight = 13
   object lblProc: TLabel [0]
@@ -118,6 +122,10 @@ inherited frmODProc: TfrmODProc
         '--------------'
       'An order message may be displayed here.')
     TabOrder = 1
+    ExplicitLeft = 0
+    ExplicitTop = 321
+    ExplicitWidth = 380
+    ExplicitHeight = 41
   end
   object cboUrgency: TORComboBox [9]
     Left = 249
@@ -270,30 +278,7 @@ inherited frmODProc: TfrmODProc
     OnChange = cboServiceChange
     CharsNeedMatch = 1
   end
-  inherited cmdAccept: TButton
-    Left = 387
-    Top = 339
-    Anchors = [akRight, akBottom]
-    TabOrder = 10
-  end
-  inherited cmdQuit: TButton
-    Left = 469
-    Top = 339
-    Width = 64
-    Anchors = [akRight, akBottom]
-    TabOrder = 11
-  end
-  inherited pnlMessage: TPanel
-    Left = 50
-    Top = 320
-    Width = 316
-    Anchors = [akLeft, akRight, akBottom]
-    TabOrder = 12
-    inherited memMessage: TRichEdit
-      Width = 254
-    end
-  end
-  object cmdLexSearch: TButton
+  object cmdLexSearch: TButton [15]
     Left = 486
     Top = 93
     Width = 49
@@ -303,7 +288,7 @@ inherited frmODProc: TfrmODProc
     TabOrder = 8
     OnClick = cmdLexSearchClick
   end
-  object gbInptOpt: TGroupBox
+  object gbInptOpt: TGroupBox [16]
     Left = 249
     Top = 36
     Width = 140
@@ -330,7 +315,7 @@ inherited frmODProc: TfrmODProc
       OnClick = radOutpatientClick
     end
   end
-  object txtProvDiag: TCaptionEdit
+  object txtProvDiag: TCaptionEdit [17]
     Left = 249
     Top = 93
     Width = 234
@@ -343,6 +328,110 @@ inherited frmODProc: TfrmODProc
     TabOrder = 7
     OnChange = txtProvDiagChange
     Caption = 'Provisional Diagnosis'
+  end
+  inherited cmdAccept: TButton
+    Left = 387
+    Top = 339
+    Anchors = [akRight, akBottom]
+    TabOrder = 10
+    ExplicitLeft = 387
+    ExplicitTop = 339
+  end
+  inherited cmdQuit: TButton
+    Left = 469
+    Top = 339
+    Width = 64
+    Anchors = [akRight, akBottom]
+    TabOrder = 11
+    ExplicitLeft = 469
+    ExplicitTop = 339
+    ExplicitWidth = 64
+  end
+  inherited pnlMessage: TPanel
+    Left = 50
+    Top = 320
+    Width = 316
+    Anchors = [akLeft, akRight, akBottom]
+    TabOrder = 12
+    ExplicitLeft = 50
+    ExplicitTop = 320
+    ExplicitWidth = 316
+    inherited memMessage: TRichEdit
+      Width = 254
+      ExplicitWidth = 254
+    end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblUrgency'
+        'Status = stsDefault')
+      (
+        'Component = lblPlace'
+        'Status = stsDefault')
+      (
+        'Component = lblAttn'
+        'Status = stsDefault')
+      (
+        'Component = lblProvDiag'
+        'Status = stsDefault')
+      (
+        'Component = pnlReason'
+        'Status = stsDefault')
+      (
+        'Component = memReason'
+        'Status = stsDefault')
+      (
+        'Component = cboUrgency'
+        'Status = stsDefault')
+      (
+        'Component = cboPlace'
+        'Status = stsDefault')
+      (
+        'Component = txtAttn'
+        'Status = stsDefault')
+      (
+        'Component = cboProc'
+        'Status = stsDefault')
+      (
+        'Component = cboCategory'
+        'Status = stsDefault')
+      (
+        'Component = cboService'
+        'Status = stsDefault')
+      (
+        'Component = cmdLexSearch'
+        'Status = stsDefault')
+      (
+        'Component = gbInptOpt'
+        'Status = stsDefault')
+      (
+        'Component = radInpatient'
+        'Status = stsDefault')
+      (
+        'Component = radOutpatient'
+        'Status = stsDefault')
+      (
+        'Component = txtProvDiag'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODProc'
+        'Status = stsDefault'))
   end
   object mnuPopProvDx: TPopupMenu
     Left = 353

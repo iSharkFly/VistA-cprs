@@ -48,7 +48,7 @@ var
 begin
   IDString := patientid;  //*DFN*
   CallV('ORQQVI VITALS', [IDString]);
-  Dest.assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 function VerifyVital(typ,rte,unt: String):boolean;
@@ -85,7 +85,7 @@ begin
   IDString := patientid;  //*DFN*
   NoteIENStr := IntToStr(NoteIen);
   CallV('ORQQVI NOTEVIT', [IDString, NoteIENStr]);
-  Dest.assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 Procedure GetVitalsFromEncDateTime(Dest: TStrings; const PatientID: string; DateTime: TFMDateTime);  //*DFN*
@@ -95,7 +95,7 @@ begin
   IDString := patientid;  //*DFN*
   EncDate := FloatToStr(DateTime);
   CallV('ORQQVI VITALS', [IDString, EncDate]);
-  Dest.assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure LoadUserVitalPreferences;
@@ -138,7 +138,7 @@ begin
     CallV('ORQQVI3 GETVLIST', [Loc]);
     if(RPCBrokerV.Results.Count > 0) then
       RPCBrokerV.Results.Delete(0);
-    uVitalList.assign(RPCBrokerV.Results);
+    FastAssign(RPCBrokerV.Results, uVitalList);
   end;
   Result := uVitalList;
 end;

@@ -5,10 +5,10 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ORCtrls, StdCtrls, ExtCtrls, Menus, ComCtrls, uTemplateFields, ORFn,
-  ToolWin, MenuBar, ORClasses, ORDtTm;
+  ToolWin, MenuBar, ORClasses, ORDtTm, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmTemplateFieldEditor = class(TForm)
+  TfrmTemplateFieldEditor = class(TfrmBase508Form)
     pnlBottom: TPanel;
     btnOK: TButton;
     btnCancel: TButton;
@@ -183,7 +183,7 @@ function EditDialogFields: boolean;
 implementation
 
 uses rTemplates, fTemplateDialog, Clipbrd, uSpell, uConst,
-     fTemplateFields;
+     fTemplateFields, VAUtils;
 
 {$R *.DFM}
 
@@ -469,7 +469,7 @@ begin
   ChangeSizes := FALSE;
   FUpdating := TRUE;
   try
-    cbxDefault.Items.Assign(reItems.Lines);
+    QuickCopy(reItems, cbxDefault);
     idx := -1;
     if(assigned(FFld)) and reItems.Visible and cbxDefault.Visible then
     begin
@@ -508,14 +508,14 @@ var
 begin
   tmp := TORStringList.Create;
   try
-    tmp.Assign(SubSetOfTemplateFields(StartFrom, Direction));
+    FastAssign(SubSetOfTemplateFields(StartFrom, Direction), tmp);
     for i := 0 to FDeleted.Count-1 do
     begin
       idx := tmp.IndexOfPiece(Piece(FDeleted[i],U,1), U, 1);
       if(idx >= 0) then
         tmp.delete(idx);
     end;
-    ConvertCodes2Text(tmp, TRUE);
+    ConvertCodes2Text(tmp, FALSE);
     cbxObjs.ForDataUse(tmp);
   finally
     tmp.Free;
@@ -814,7 +814,7 @@ begin
   begin
     if FDeleted.IndexOfPiece(FFld.FldName, U, 2) >= 0 then
     begin
-      ShowMessage('Template field can not be named the same as a deleted' + CRLF +
+      ShowMsg('Template field can not be named the same as a deleted' + CRLF +
                   'field until OK or Apply has been pressed.');
       bad := TRUE;
     end

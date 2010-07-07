@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORCtrls, ORFn, ComCtrls;
+  StdCtrls, ExtCtrls, ORCtrls, ORFn, ComCtrls, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmOptionsNotes = class(TForm)
+  TfrmOptionsNotes = class(TfrmBase508Form)
     lblAutoSave1: TLabel;
     lblCosigner: TLabel;
     txtAutoSave: TCaptionEdit;

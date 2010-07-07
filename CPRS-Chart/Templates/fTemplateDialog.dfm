@@ -1,26 +1,22 @@
-object frmTemplateDialog: TfrmTemplateDialog
+inherited frmTemplateDialog: TfrmTemplateDialog
   Left = 268
   Top = 155
-  Width = 640
-  Height = 440
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Text Dialog'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
+  ClientHeight = 413
+  ClientWidth = 632
   Position = poScreenCenter
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnPaint = FormPaint
+  OnShow = FormShow
+  ExplicitWidth = 640
+  ExplicitHeight = 440
   PixelsPerInch = 96
   TextHeight = 13
-  object sbMain: TScrollBox
+  object sbMain: TScrollBox [0]
     Left = 0
     Top = 0
     Width = 632
@@ -35,7 +31,7 @@ object frmTemplateDialog: TfrmTemplateDialog
     ParentFont = False
     TabOrder = 0
   end
-  object pnlBottom: TScrollBox
+  object pnlBottom: TScrollBox [1]
     Left = 0
     Top = 375
     Width = 632
@@ -98,5 +94,35 @@ object frmTemplateDialog: TfrmTemplateDialog
       TabOrder = 2
       OnClick = btnPreviewClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = sbMain'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = lblFootnote'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnAll'
+        'Status = stsDefault')
+      (
+        'Component = btnNone'
+        'Status = stsDefault')
+      (
+        'Component = btnPreview'
+        'Status = stsDefault')
+      (
+        'Component = frmTemplateDialog'
+        'Status = stsDefault'))
   end
 end

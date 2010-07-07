@@ -1,21 +1,15 @@
-object frmODLabOthSpec: TfrmODLabOthSpec
+inherited frmODLabOthSpec: TfrmODLabOthSpec
   Left = 240
   Top = 136
-  Width = 317
-  Height = 359
   BorderIcons = []
   Caption = 'Select Specimen'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 332
+  ClientWidth = 309
   OldCreateOrder = True
   Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 309
@@ -37,6 +31,7 @@ object frmODLabOthSpec: TfrmODLabOthSpec
       ItemTipEnable = True
       ListItemsOnly = True
       LongList = True
+      LookupPiece = 0
       MaxLength = 0
       Pieces = '2'
       Sorted = False
@@ -44,6 +39,7 @@ object frmODLabOthSpec: TfrmODLabOthSpec
       TabOrder = 0
       OnDblClick = cboOtherSpecDblClick
       OnNeedData = cboOtherSpecNeedData
+      CharsNeedMatch = 1
     end
     object cmdOK: TButton
       Left = 76
@@ -65,5 +61,23 @@ object frmODLabOthSpec: TfrmODLabOthSpec
       TabOrder = 2
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = cboOtherSpec'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmODLabOthSpec'
+        'Status = stsDefault'))
   end
 end

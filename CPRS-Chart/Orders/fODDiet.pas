@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fODBase, ComCtrls, ExtCtrls, StdCtrls, Grids, ORCtrls, ORDtTm, ORFn, uConst;
+  fODBase, ComCtrls, ExtCtrls, StdCtrls, Grids, ORCtrls, ORDtTm, ORFn, uConst,
+  VA508AccessibilityManager;
 
 type
   TfrmODDiet = class(TfrmODBase)
@@ -160,6 +161,7 @@ type
     FChangeStop: Boolean;
     FIsolationID: string;
     FTabChanging: Boolean;
+    FGiveMultiTabMessage: boolean;
     procedure DietCheckForNPO;
     procedure DietCheckForTF;
     function GetMealTime: string;
@@ -191,7 +193,8 @@ type
     function  GetOPMealWindow: string;
     procedure OPDietCheckForNPO;
     procedure OPDietCheckForTF;
-    function PatientHasRecurringMeals(var MealList: TStringList; MealType: string = ''): boolean;
+    function  PatientHasRecurringMeals(var MealList: TStringList; MealType: string = ''): boolean;
+    //procedure CheckForAutoDCOrders(EvtID: integer; CurrentText: string; var CancelText: string; Sender: TObject);
   protected
     procedure InitDialog; override;
     procedure Validate(var AnErrMsg: string); override;
@@ -209,7 +212,8 @@ implementation
 
 {$R *.DFM}
 
-uses uCore, rODBase, rODDiet, rCore, rOrders, fODDietLT, uAccessibleStringGrid, DateUtils;
+uses uCore, rODBase, rODDiet, rCore, rOrders, fODDietLT, DateUtils,
+  fOrders, uODBase, VA508AccessibilityRouter;
 
 const
   TX_DIET_REG = 'A regular diet may not be combined with other diets.';
@@ -313,6 +317,7 @@ var
   ALocation: string;   //ptr to #44 hospital location
 begin
   inherited;
+  FGiveMultiTabMessage := ScreenReaderSystemActive;
   AbortOrder := False;
   uRecurringMealList := TStringList.Create;
   if OrderForInpatient then
@@ -365,12 +370,10 @@ begin
           chkBagged.Visible := uDietParams.Bagged;
         end;
     end;
-  TAccessibleStringGrid.WrapControl(grdSelected);
 end;
 
 procedure TfrmODDiet.FormDestroy(Sender: TObject);
 begin
-  TAccessibleStringGrid.UnwrapControl(grdSelected);
   TFClearGrid;
   uRecurringMealList.Free;
   inherited;
@@ -666,17 +669,98 @@ begin
   FTabChanging := False;
 end;
 
-procedure TfrmODDiet.nbkDietChange(Sender: TObject);
-var
-  x, CxMsg: string ;
-  i: integer;
-  AStringList: TStringList;
+(*procedure TfrmODDiet.CheckForAutoDCOrders(EvtID: integer; CurrentText: string; var CancelText: string; Sender: TObject);
 const
-//  TX_CX_CUR = 'A new diet order will CANCEL and REPLACE this current diet:' + CRLF + CRLF;
   TX_CX_CUR = 'A new diet order will CANCEL and REPLACE this current diet now unless' + CRLF +
               'you specify a start date for when the new diet should replace the current' + CRLF +
               'diet:' + CRLF + CRLF;
   TX_CX_FUT = 'A new diet order with no expiration date will CANCEL and REPLACE these diets:' + CRLF + CRLF;
+  TX_CX_DELAYED1 =  'There are other delayed diet orders for this release event:';
+  TX_CX_DELAYED2 =  'This new diet order may cancel and replace those other diets' + CRLF +
+                    'IMMEDIATELY ON RELEASE, unless you either:' + CRLF + CRLF +
+
+                    '1. Specify an expiration date/time for this order that will' + CRLF +
+                    '   be prior to the start date/time of those other orders; or' + CRLF + CRLF +
+
+                    '2. Specify a later start date/time for this order for when you' + CRLF +
+                    '   would like it to cancel and replace those other orders.';
+
+var
+  i: integer;
+  AStringList: TStringList;
+  AList: TList;
+  x, PtEvtIFN, PtEvtName: string;
+  //AResponse: TResponse;
+begin
+  if Self.EvtID = 0 then   // check current and future released diets
+  begin
+    x := CurrentText;
+    if Piece(x, #13, 1) <> 'Current Diet:  ' then
+    begin
+      AStringList := TStringList.Create;
+      try
+        AStringList.Text := x;
+        CancelText := TX_CX_CUR + #9 + Piece(AStringList[0], ':', 1) + ':' + CRLF + CRLF
+                 + #9 + Copy(AStringList[0], 16, 99) + CRLF;
+        if AStringList.Count > 1 then
+        begin
+          CancelText := CancelText + CRLF + CRLF +
+                   TX_CX_FUT + #9 + Piece(AStringList[1], ':', 1) + ':' + CRLF + CRLF
+                   + #9 + Copy(AStringList[1], 22, 99) + CRLF;
+          if AStringList.Count > 2 then
+          for i := 2 to AStringList.Count - 1 do
+            CancelText := CancelText + #9 + TrimLeft(AStringList[i]) + CRLF;
+        end;
+      finally
+        AStringList.Free;
+      end;
+    end;
+  end 
+  else if Sender is TButton then     // delayed orders code here - on accept only
+  begin
+    //AResponse := Responses.FindResponseByName('STOP', 1);
+    //if (AResponse <> nil) and (AResponse.EValue <> '') then exit;
+    AList := TList.Create;
+    try
+      PtEvtIFN := IntToStr(frmOrders.TheCurrentView.EventDelay.PtEventIFN);
+      PtEvtName := frmOrders.TheCurrentView.EventDelay.EventName;
+      LoadOrdersAbbr(AList, frmOrders.TheCurrentView, PtEvtIFN);
+      for i := AList.Count - 1 downto 0 do
+      begin
+        if TOrder(Alist.Items[i]).DGroup <> Self.DisplayGroup then
+        begin
+          TOrder(AList.Items[i]).Free;
+          AList.Delete(i);
+        end;
+      end;
+      if AList.Count > 0 then
+      begin
+        x := '';
+        RetrieveOrderFields(AList, 0, 0);
+        CancelText := TX_CX_DELAYED1 + CRLF + CRLF + 'Release event: ' + PtEvtName; 
+        for i := 0 to AList.Count - 1 do
+          with TOrder(AList.Items[i]) do
+          begin
+            x := x + #9 + Text + CRLF;
+(*            if StartTime <> '' then
+              x := #9 + x + 'Start:   ' + StartTime + CRLF
+            else
+              x := #9 + x + 'Ordered: ' + FormatFMDateTime('mmm dd,yyyy@hh:nn', OrderTime) + CRLF;*)
+(*          end;
+        CancelText := CancelText + CRLF + CRLF + x;
+        CancelText := CancelText + CRLF + CRLF + TX_CX_DELAYED2;
+      end;
+    finally
+      with AList do for i := 0 to Count - 1 do TOrder(Items[i]).Free;
+      AList.Free;
+    end;
+  end;
+end;*)
+
+procedure TfrmODDiet.nbkDietChange(Sender: TObject);
+var
+  x: string ;
+  CxMsg: string;
 begin
   inherited;
   // much of the logic here can be eliminated if ClearDialogControls starts clearing containers
@@ -692,26 +776,7 @@ begin
   begin
     AllowQuickOrder := True;
     x := CurrentDietText;
-    if Piece(x, #13, 1) <> 'Current Diet:  ' then
-    begin
-      AStringList := TStringList.Create;
-      try
-        AStringList.Text := x;
-        CxMsg := TX_CX_CUR + #9 + Piece(AStringList[0], ':', 1) + ':' + CRLF + CRLF
-                 + #9 + Copy(AStringList[0], 16, 99) + CRLF;
-        if AStringList.Count > 1 then
-        begin
-          CxMsg := CxMsg + CRLF + CRLF +
-                   TX_CX_FUT + #9 + Piece(AStringList[1], ':', 1) + ':' + CRLF + CRLF
-                   + #9 + Copy(AStringList[1], 22, 99) + CRLF;
-          if AStringList.Count > 2 then
-          for i := 2 to AStringList.Count - 1 do
-            CxMsg := CxMsg + #9 + TrimLeft(AStringList[i]) + CRLF;
-        end;
-      finally
-        AStringList.Free;
-      end;
-    end;
+    CheckForAutoDCDietOrders(Self.EvtID, Self.DisplayGroup, x, CxMsg, nbkDiet);
     if CxMsg <> '' then
     begin
       if InfoBox(CxMsg + CRLF +
@@ -744,7 +809,7 @@ begin
           Exit;
           end
         else
-          cboOPTFRecurringMeals.Items.Assign(uRecurringMealList);
+          FastAssign(uRecurringMealList, cboOPTFRecurringMeals.Items);
     end;
     cboOPTFRecurringMeals.Visible := not OrderForInpatient;
     calOPTFStart.Visible := False;
@@ -780,7 +845,7 @@ begin
             Exit;
           end
         else
-          cboOPELRecurringMeals.Items.Assign(uRecurringMealList);
+          FastAssign(uRecurringMealList, cboOPELRecurringMeals.Items);
       end
     else if (StrToIntDef(uDietParams.EarlyIEN, 0) = 0) or (StrToIntDef(uDietParams.LateIEN, 0) = 0) then
       begin
@@ -827,7 +892,7 @@ begin
           Exit;
         end
       else
-        cboOPAORecurringMeals.Items.Assign(uRecurringMealList);
+        FastAssign(uRecurringMealList, cboOPAORecurringMeals.Items);
     end;
     cboOPAORecurringMeals.Visible := not OrderForInpatient;
     calOPAOStart.Visible := False;  //not OrderForInpatient;
@@ -853,7 +918,7 @@ begin
       begin
        AllowQuickOrder := False;
        ResetControlsOP;
-       cboOPDietAvail.Items.AddStrings(SubsetOfOPDiets);
+       FastAddStrings(SubsetOfOPDiets, cboOPDietAvail.Items);
        { TODO -oRich V. -cOutpatient Meals : Need to DC Tubefeeding order for OP meals? }
        chkOPCancelTubefeeding.State := cbGrayed;
        chkOPCancelTubefeeding.Visible := False;
@@ -872,7 +937,7 @@ begin
        ResetControlsOP;
        LoadDietQuickList(cboOPDietAvail.Items, 'MEAL');              // use D.G. short name here
        cboOPDietAvail.InsertSeparator;
-       cboOPDietAvail.Items.AddStrings(SubsetOfOPDiets);
+       FastAddStrings(SubsetOfOPDiets, cboOPDietAvail.Items);
        cboOPDietAvail.SelectByIEN(uDietParams.OPDefaultDiet);
        { TODO -oRich V. -cOutpatient Meals : Need to DC Tubefeeding order for OP meals? }
        chkOPCancelTubefeeding.State := cbGrayed;
@@ -885,6 +950,11 @@ begin
   end;
   Changing := False;                                       // Changing reset
   StatusText('');
+  if FGiveMultiTabMessage then  // CQ#15483
+  begin
+    FGiveMultiTabMessage := FALSE;
+    GetScreenReader.Speak('Multi Tab Form');
+  end;
 end;
 
 { Diet Order tab ---------------------------------------------------------------------------- }
@@ -1614,7 +1684,7 @@ begin
           grpMeal.ItemIndex := 3;
         end
       else
-        cboOPELRecurringMeals.Items.Assign(uRecurringMealList);
+        FastAssign(uRecurringMealList, cboOPELRecurringMeals.Items);
     end;
   Changing := False;
   ELChange(grpMeal);
@@ -2141,15 +2211,24 @@ end;
 procedure TfrmODDiet.cmdAcceptClick(Sender: TObject);
 var
   DCOrder: TOrder;
-  AResponse, AnotherResponse: TResponse;
   LateTrayFields: TLateTrayFields;
-  NewOrder: TOrder;
-  CanSign: Integer;
+  //CxMsg: string;
 begin
   // these actions should be before inherited, so that InitDialog doesn't clear properties
   LateTrayFields.LateMeal := #0;      // #0 so only create late order if LT dialog invoked
   if nbkDiet.ActivePage = pgeDiet then
   begin
+(*    if Self.EvtID <> 0 then
+    begin
+      CheckForAutoDCDietOrders(Self.EvtID, Self.DisplayGroup, '', CxMsg, cmdAccept);
+      if CxMsg <> '' then
+      begin
+        if InfoBox(CxMsg + CRLF + CRLF +
+           'Have you done either of the above?', 'Possible delayed order conflict',
+           MB_ICONWARNING or MB_YESNO) = ID_NO
+           then exit;
+      end;
+    end;*)
     // create dc tubefeeding order
     if chkCancelTubeFeeding.State = cbChecked then
     begin
@@ -2159,12 +2238,7 @@ begin
       DCOrder.Free;
     end;
     // check if late tray should be ordered
-    AResponse := Responses.FindResponseByName('ORDERABLE', 1);
-    if (Self.EvtID = 0) and (AResponse <> nil) and (Copy(AResponse.EValue, 1, 3) <> 'NPO') then
-    begin
-      AResponse := Responses.FindResponseByName('START', 1);
-      if AResponse <> nil then CheckLateTray(AResponse.IValue, LateTrayFields, False);
-    end;
+    LateTrayCheck(Responses, Self.EvtID, FALSE, LateTrayFields);
   end;
 { TODO -oRich V. -cOutpatient Meals : Need to DC Tubefeeding order for OP meals? }
   if nbkDiet.ActivePage = pgeOutPt then
@@ -2178,38 +2252,10 @@ begin
       DCOrder.Free;
     end;
     // check if late tray should be ordered
-    AResponse := Responses.FindResponseByName('ORDERABLE', 1);
-    if (Self.EvtID = 0) and (AResponse <> nil) and (Copy(AResponse.EValue, 1, 3) <> 'NPO') then
-    begin
-      AResponse := Responses.FindResponseByName('START', 1);
-      AnotherResponse := Responses.FindResponseByName('MEAL', 1);
-      if (AResponse <> nil) and (AnotherResponse <> nil) then
-        CheckLateTray(AResponse.IValue, LateTrayFields, True, CharAt(AnotherResponse.IValue, 1));
-    end;
+    LateTrayCheck(Responses, Self.EvtID, TRUE, LateTrayFields);
   end;
   inherited;
-  with LateTrayFields do if LateMeal <> #0 then
-  begin
-    NewOrder := TOrder.Create;
-    OrderLateTray(NewOrder, LateMeal, LateTime, IsBagged);
-    if NewOrder.ID <> '' then
-    begin
-      if OrderForInpatient then
-        begin
-          if (Encounter.Provider = User.DUZ) and User.CanSignOrders
-            then CanSign := CH_SIGN_YES
-            else CanSign := CH_SIGN_NA;
-        end
-      else
-        begin
-          CanSign := CH_SIGN_NA;
-        end;
-      Changes.Add(CH_ORD, NewOrder.ID, NewOrder.Text, '', CanSign);
-      SendMessage(Application.MainForm.Handle, UM_NEWORDER, ORDER_NEW, Integer(NewOrder))
-    end
-    else InfoBox(TX_EL_SAVE_ERR, TC_EL_SAVE_ERR, MB_OK);
-    NewOrder.Free;
-  end;
+  with LateTrayFields do if LateMeal <> #0 then LateTrayOrder(LateTrayFields, OrderForInpatient);
 end;
 
 procedure TfrmODDiet.FormKeyDown(Sender: TObject; var Key: Word;

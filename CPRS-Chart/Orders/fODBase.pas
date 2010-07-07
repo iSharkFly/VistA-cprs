@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, fAutoSz, StdCtrls,
   ORCtrls, ORFn, uConst, rOrders, rODBase, uCore, ComCtrls, ExtCtrls, Menus, Mask,
-  Buttons, UBAGlobals, UBACore;
+  Buttons, UBAGlobals, UBACore, VA508AccessibilityManager;
 
 type
   TCtrlInit = class
@@ -181,6 +181,7 @@ type
     procedure InitDialog; virtual;
     procedure SetDialogIEN(Value: Integer); virtual;
     procedure Validate(var AnErrMsg: string); virtual;
+    procedure updateSig; virtual;
     function ValidSave: Boolean;
     procedure ShowOrderMessage(Show: boolean);
   public
@@ -220,7 +221,7 @@ type
   end;
 
 var
-  frmODBase: TfrmODBase;
+  frmODBase: TfrmODBase = nil;
   XfInToOutNow :boolean = False;       // it's used only for transfering Inpatient Meds to OutPatient Med for
                                        // immediately release (NO EVENT DELAY)
   XferOuttoInOnMeds : boolean = False; // it's used only for transfering Outpatient Meds to Inpatient Med for
@@ -245,7 +246,7 @@ implementation
 
 uses fOCAccept, uODBase, rCore, rMisc, fODMessage,
   fTemplateDialog, uEventHooks, uTemplates, rConsults,fOrders,uOrders,
-  fFrame, uTemplateFields, fClinicWardMeds;
+  fFrame, uTemplateFields, fClinicWardMeds, fODDietLT, rODDiet, VAUtils;
 
 const
   TX_ACCEPT = 'Accept the following order?' + CRLF + CRLF;
@@ -424,18 +425,18 @@ begin
   else if AControl is TStaticText then with TStaticText(AControl) do Caption := CtrlInit.Text
   else if AControl is TButton then with TButton(AControl) do Caption := CtrlInit.Text
   else if AControl is TEdit then with TEdit(AControl) do Text := CtrlInit.Text
-  else if AControl is TMemo then with TMemo(AControl) do Lines.Assign(CtrlInit.List)
-  else if AControl is TRichEdit then with TRichEdit(AControl) do Lines.Assign(CtrlInit.List)
-  else if AControl is TORListBox then with TORListBox(AControl) do Items.Assign(CtrlInit.List)
-  else if AControl is TListBox then with TListBox(AControl) do Items.Assign(CtrlInit.List)
+  else if AControl is TMemo then FastAssign(CtrlInit.List, TMemo(AControl).Lines)
+  else if AControl is TRichEdit then QuickCopy(CtrlInit.List, TRichEdit(AControl))
+  else if AControl is TORListBox then FastAssign(CtrlInit.List, TORListBox(AControl).Items)
+  else if AControl is TListBox then FastAssign(CtrlInit.List, TListBox(AControl).Items)
   else if AControl is TComboBox then with TComboBox(AControl) do
   begin
-    Items.Assign(CtrlInit.List);
+    FastAssign(CtrlInit.List, TComboBox(AControl).Items);
     Text := CtrlInit.Text;
   end
   else if AControl is TORComboBox then with TORComboBox(AControl) do
   begin
-    Items.Assign(CtrlInit.List);
+    FastAssign(CtrlInit.List, TORComboBox(AControl).Items);
     if LongList then InitLongList(Text) else Text := CtrlInit.Text;
     SelectByID(CtrlInit.ListID);
   end;
@@ -449,11 +450,11 @@ var
 begin
   CtrlInit := FindInitByName(ASection);
   if CtrlInit = nil then Exit;
-  if      AControl is TMemo       then with TMemo(AControl)       do Lines.Assign(CtrlInit.List)
-  else if AControl is TORListBox  then with TORListBox(AControl)  do Items.Assign(CtrlInit.List)
-  else if AControl is TListBox    then with TListBox(AControl)    do Items.Assign(CtrlInit.List)
-  else if AControl is TComboBox   then with TComboBox(AControl)   do Items.Assign(CtrlInit.List)
-  else if AControl is TORComboBox then with TORComboBox(AControl) do Items.Assign(CtrlInit.List);
+  if      AControl is TMemo       then FastAssign(CtrlInit.List, TMemo(AControl).Lines)
+  else if AControl is TORListBox  then FastAssign(CtrlInit.List, TORListBox(AControl).Items)
+  else if AControl is TListBox    then FastAssign(CtrlInit.List, TListBox(AControl).Items)
+  else if AControl is TComboBox   then FastAssign(CtrlInit.List, TComboBox(AControl).Items)
+  else if AControl is TORComboBox then FastAssign(CtrlInit.List, TORComboBox(AControl).Items);
 end;
 
 procedure TCtrlInits.SetPopupMenu(AMenu: TPopupMenu; AClickEvent: TNotifyEvent; const ASection: string);
@@ -1027,7 +1028,7 @@ begin
     //AGP Change 26.51, change logic to set text orders to IMO for outpatients at an outpatient location.
     //AGP Text orders are only treated as IMO if the order display group is a nursing display group
     if (Patient.Inpatient = False) and (IsValidIMOLoc(encounter.Location,Patient.DFN)=true) and
-       (((pos('OR GXTEXT WORD PROCESSING ORDE',ConstructOrder.DialogName)>0) and (ConstructOrder.DGroup = NurDisp)) or
+       (((pos('OR GXTEXT WORD PROCESSING ORDER',ConstructOrder.DialogName)>0) and (ConstructOrder.DGroup = NurDisp)) or
        ((ConstructOrder.DialogName = 'OR GXMISC GENERAL') and (ConstructOrder.DGroup = NurDisp)) or
        ((ConstructOrder.DialogName = 'OR GXTEXT TEXT ONLY ORDER') and (ConstructOrder.DGroup = NurDisp))) and //AGP Change CQ #10757
       ((FEditOrder = '') and (Self.FEventName = '') and (Self.FCopyOrder = '')) then
@@ -1143,7 +1144,12 @@ var
         //if (Length(tmp) > 0) and (not HasTemplateField(tmp)) then
         //  CheckBoilerplate4Fields(tmp, cptn)
         //else
-          ExecuteTemplateOrBoilerPlate(tmp, IEN, LType, nil, cptn, DocInfo);
+
+        // CQ #11669 - changing an existing order shouldn't restart template - JM
+          if assigned(frmODBase) and (frmODBase.FOrderAction = ORDER_EDIT) then
+            CheckBoilerplate4Fields(tmp, cptn)
+          else
+            ExecuteTemplateOrBoilerPlate(tmp, IEN, LType, nil, cptn, DocInfo);
       end
     else
       CheckBoilerplate4Fields(tmp, cptn);
@@ -1390,7 +1396,7 @@ end;
 procedure TfrmODBase.FormCreate(Sender: TObject);
 begin
   inherited;
-  memOrder.Color := ReadOnlyColor;
+  frmODBase   := Self;
   FAcceptOK   := False;
   FAutoAccept := False;
   FChanging   := False;
@@ -1419,10 +1425,12 @@ begin
   FEvtID     := OrderEventIDOnCreate;
   FEvtType   := OrderEventTypeOnCreate;
   FEvtName   := OrderEventNameOnCreate;
+  DefaultButton := cmdAccept;
 end;
 
 procedure TfrmODBase.FormDestroy(Sender: TObject);
 begin
+  frmODBase := nil;
   FCtrlInits.Free;
   FResponses.Free;
   FPreserve.Free;
@@ -1477,10 +1485,12 @@ var
   ErrMsg: string;
   NewOrder: TOrder;
   CanSign, OrderAction: Integer;
+  IsDelayOrder: boolean;
   //thisSourceOrder: TOrder;
 begin
   Result := True;
   Validate(ErrMsg);
+  IsDelayOrder := False;
   if Length(ErrMsg) > 0 then
   begin
     InfoBox(TX_NO_SAVE + ErrMsg, TX_NO_SAVE_CAP, MB_OK);
@@ -1530,7 +1540,8 @@ begin
         then CanSign := CH_SIGN_YES
         else CanSign := CH_SIGN_NA;
       if NewOrder.Signature = OSS_NOT_REQUIRE then CanSign := CH_SIGN_NA;
-      Changes.Add(CH_ORD, NewOrder.ID, NewOrder.Text, Responses.FViewName, CanSign);
+      if NewOrder.EventPtr <> '' then IsDelayOrder := True;
+      Changes.Add(CH_ORD, NewOrder.ID, NewOrder.Text, Responses.FViewName, CanSign,'',0, NewOrder.DGroupName, False,IsDelayOrder);
 
     UBAGlobals.TargetOrderID := NewOrder.ID;
 
@@ -1557,6 +1568,8 @@ const
 var
   theGrpName: string;
   alreadyClosed: boolean;
+  LateTrayFields: TLateTrayFields;
+  x, CxMsg: string;
 begin
   FAcceptOK := False;
   CIDCOkToSave := False;
@@ -1570,6 +1583,39 @@ begin
       SaveAsCurrent := True;
     end;
   end;
+
+  // check for diet orders that will be auto-DCd because of start/stop overlaps
+  if Responses.Dialog = 'FHW1' then
+  begin
+    if (Self.EvtID <> 0) then
+    begin
+      CheckForAutoDCDietOrders(Self.EvtID, Self.DisplayGroup, '', CxMsg, cmdAccept);
+      if CxMsg <> '' then
+      begin
+        if InfoBox(CxMsg + CRLF + CRLF +
+           'Have you done either of the above?', 'Possible delayed order conflict',
+           MB_ICONWARNING or MB_YESNO) = ID_NO
+           then exit;
+      end;
+    end
+    else if FAutoAccept then
+    begin
+      x := CurrentDietText;
+      CheckForAutoDCDietOrders(0, Self.DisplayGroup, x, CxMsg, nil);
+      if CxMsg <> '' then
+      begin
+        if InfoBox(CxMsg + CRLF +
+                  'Are you sure?', 'Confirm', MB_ICONWARNING or MB_YESNO) = ID_NO then
+        begin
+          //AbortOrder := True;
+          FAcceptOK := FALSE;
+          //cmdQuitClick(Self);
+          exit;
+        end;
+      end;
+    end;
+  end;
+
   if ValidSave then
   begin
     FAcceptOK := True;
@@ -1580,7 +1626,14 @@ begin
         then InitDialog           // ClearDialogControls is in InitDialog
         else
         begin
+          LateTrayFields.LateMeal := #0;
+          with Responses do
+            if FAutoAccept and ((Dialog = 'FHW1') or (Dialog = 'FHW OP MEAL') or (Dialog ='FHW SPECIAL MEAL')) then
+            begin
+              LateTrayCheck(Responses, Self.EvtID, not OrderForInpatient, LateTrayFields);
+            end;
           ClearDialogControls;    // to allow form to close without prompting to save order
+          with LateTrayFields do if LateMeal <> #0 then LateTrayOrder(LateTrayFields, OrderForInpatient);
           Close;
           alreadyClosed := True;
         end;
@@ -1626,6 +1679,7 @@ end;
 procedure TfrmODBase.cmdQuitClick(Sender: TObject);
 begin
   inherited;
+  FFromQuit := True;
   Close;
 end;
 
@@ -1664,6 +1718,7 @@ begin
       // close any sub-dialogs created by order dialog FIRST!!
       exit;
     end;
+  if FFromQuit = False then updateSig;
   if Length(memOrder.Text) > 0 then
   begin
     if InfoBox(TX_ACCEPT + memOrder.Text, TX_ACCEPT_CAP, MB_YESNO) = ID_YES
@@ -1680,6 +1735,11 @@ begin
     if InfoBox(TX_ACCEPT + memOrder.Text, TX_ACCEPT_CAP, MB_YESNO) = ID_YES then
       if not ValidSave then CanClose := False;
   if CanClose then InitDialog;
+end;
+
+procedure TfrmODBase.updateSig;
+begin
+
 end;
 
 procedure TfrmODBase.memMessageMouseUp(Sender: TObject;
@@ -1784,7 +1844,7 @@ begin
         end;
         if Length(TempMSG)>0 then
         begin
-          ShowMessage(TempMSG);
+          ShowMsg(TempMSG);
           Result := False;
         end;
       end;

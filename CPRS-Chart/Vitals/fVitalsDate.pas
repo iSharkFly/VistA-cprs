@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORDtTm;
+  StdCtrls, ORDtTm, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmVitalsDate = class(TForm)
+  TfrmVitalsDate = class(TfrmBase508Form)
     dteVitals: TORDateBox;
     Label1: TLabel;
     btnOK: TButton;

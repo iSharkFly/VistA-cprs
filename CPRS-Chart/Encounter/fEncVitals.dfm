@@ -2,11 +2,10 @@ inherited frmEncVitals: TfrmEncVitals
   Left = 353
   Top = 210
   Caption = 'Vitals'
-  KeyPreview = True
   OnActivate = FormActivate
-  OnDestroy = FormDestroy
-  OnKeyDown = FormKeyDown
-  OnResize = FormResize
+  OnShow = FormShow
+  ExplicitWidth = 632
+  ExplicitHeight = 427
   PixelsPerInch = 96
   TextHeight = 13
   object lvVitals: TCaptionListView [0]
@@ -14,7 +13,6 @@ inherited frmEncVitals: TfrmEncVitals
     Top = 0
     Width = 624
     Height = 368
-    Hint = 'To sort, click on column headers|'
     Align = alClient
     Columns = <>
     Constraints.MinHeight = 50
@@ -34,19 +32,54 @@ inherited frmEncVitals: TfrmEncVitals
     Height = 32
     Align = alBottom
     BevelOuter = bvNone
-    TabOrder = 5
+    TabOrder = 4
+    object btnEnterVitals: TButton
+      Left = 8
+      Top = 6
+      Width = 75
+      Height = 21
+      Caption = 'Enter Vitals'
+      TabOrder = 0
+      OnClick = btnEnterVitalsClick
+    end
+    object btnOKkludge: TButton
+      Left = 434
+      Top = 6
+      Width = 75
+      Height = 21
+      Caption = 'OK'
+      TabOrder = 1
+      OnClick = btnOKClick
+    end
+    object btnCancelkludge: TButton
+      Left = 522
+      Top = 6
+      Width = 75
+      Height = 21
+      Caption = 'Cancel'
+      TabOrder = 2
+      OnClick = btnCancelClick
+    end
   end
   inherited btnOK: TBitBtn
-    Left = 444
-    Top = 377
-    TabOrder = 3
+    Left = 208
+    Top = 374
+    Caption = 'OK No Show'
+    TabOrder = 2
+    Visible = False
+    ExplicitLeft = 208
+    ExplicitTop = 374
   end
   inherited btnCancel: TBitBtn
-    Left = 524
-    Top = 377
-    TabOrder = 4
+    Left = 289
+    Top = 374
+    Caption = 'Cancel No Show'
+    TabOrder = 3
+    Visible = False
+    ExplicitLeft = 289
+    ExplicitTop = 374
   end
-  object pnlmain: TPanel
+  object pnlmain: TPanel [4]
     Left = 28
     Top = 24
     Width = 569
@@ -442,13 +475,139 @@ inherited frmEncVitals: TfrmEncVitals
       Caption = 'Height'
     end
   end
-  object btnEnterVitals: TButton
-    Left = 8
-    Top = 377
-    Width = 75
-    Height = 21
-    Caption = 'Enter Vitals'
-    TabOrder = 2
-    OnClick = btnEnterVitalsClick
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lvVitals'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnEnterVitals'
+        'Status = stsDefault')
+      (
+        'Component = btnOKkludge'
+        'Status = stsDefault')
+      (
+        'Component = btnCancelkludge'
+        'Status = stsDefault')
+      (
+        'Component = pnlmain'
+        'Status = stsDefault')
+      (
+        'Component = lblDate'
+        'Status = stsDefault')
+      (
+        'Component = lblDateBP'
+        'Status = stsDefault')
+      (
+        'Component = lblDateTemp'
+        'Status = stsDefault')
+      (
+        'Component = lblDateResp'
+        'Status = stsDefault')
+      (
+        'Component = lblDatePulse'
+        'Status = stsDefault')
+      (
+        'Component = lblDateHeight'
+        'Status = stsDefault')
+      (
+        'Component = lblDateWeight'
+        'Status = stsDefault')
+      (
+        'Component = lblLstMeas'
+        'Status = stsDefault')
+      (
+        'Component = lbllastBP'
+        'Status = stsDefault')
+      (
+        'Component = lblLastTemp'
+        'Status = stsDefault')
+      (
+        'Component = lblLastResp'
+        'Status = stsDefault')
+      (
+        'Component = lblLastPulse'
+        'Status = stsDefault')
+      (
+        'Component = lblLastHeight'
+        'Status = stsDefault')
+      (
+        'Component = lblLastWeight'
+        'Status = stsDefault')
+      (
+        'Component = lblVital'
+        'Status = stsDefault')
+      (
+        'Component = lblVitBP'
+        'Status = stsDefault')
+      (
+        'Component = lnlVitTemp'
+        'Status = stsDefault')
+      (
+        'Component = lblVitResp'
+        'Status = stsDefault')
+      (
+        'Component = lblVitPulse'
+        'Status = stsDefault')
+      (
+        'Component = lblVitHeight'
+        'Status = stsDefault')
+      (
+        'Component = lblVitWeight'
+        'Status = stsDefault')
+      (
+        'Component = lblVitPain'
+        'Status = stsDefault')
+      (
+        'Component = lblLastPain'
+        'Status = stsDefault')
+      (
+        'Component = lblDatePain'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasBP'
+        'Status = stsDefault')
+      (
+        'Component = cboTemp'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasTemp'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasResp'
+        'Status = stsDefault')
+      (
+        'Component = cboHeight'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasWt'
+        'Status = stsDefault')
+      (
+        'Component = cboWeight'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasDate'
+        'Status = stsDefault')
+      (
+        'Component = cboPain'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasPulse'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasHt'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmEncVitals'
+        'Status = stsDefault'))
   end
 end

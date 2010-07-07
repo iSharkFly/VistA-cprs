@@ -1,4 +1,4 @@
-object frmOptionsCombinations: TfrmOptionsCombinations
+inherited frmOptionsCombinations: TfrmOptionsCombinations
   Left = 366
   Top = 189
   HelpContext = 9120
@@ -7,34 +7,27 @@ object frmOptionsCombinations: TfrmOptionsCombinations
   Caption = 'Source Combinations'
   ClientHeight = 306
   ClientWidth = 407
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   HelpFile = 'CPRSWT.HLP'
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object lblAddby: TLabel
+  object lblAddby: TLabel [0]
     Left = 7
     Top = 97
     Width = 29
     Height = 13
     Caption = 'Ward:'
   end
-  object lblCombinations: TLabel
+  object lblCombinations: TLabel [1]
     Left = 224
     Top = 97
     Width = 66
     Height = 13
     Caption = 'Combinations:'
   end
-  object lblInfo: TMemo
+  object lblInfo: TMemo [2]
     Left = 183
     Top = 16
     Width = 218
@@ -50,7 +43,7 @@ object frmOptionsCombinations: TfrmOptionsCombinations
     ReadOnly = True
     TabOrder = 6
   end
-  object radAddByType: TRadioGroup
+  object radAddByType: TRadioGroup [3]
     Left = 7
     Top = 8
     Width = 153
@@ -68,7 +61,7 @@ object frmOptionsCombinations: TfrmOptionsCombinations
     TabOrder = 0
     OnClick = radAddByTypeClick
   end
-  object lstAddBy: TORComboBox
+  object lstAddBy: TORComboBox [4]
     Left = 7
     Top = 112
     Width = 153
@@ -84,6 +77,7 @@ object frmOptionsCombinations: TfrmOptionsCombinations
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = False
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = True
@@ -95,8 +89,9 @@ object frmOptionsCombinations: TfrmOptionsCombinations
     OnExit = lstAddByExit
     OnKeyUp = lstAddByKeyUp
     OnNeedData = lstAddByNeedData
+    CharsNeedMatch = 1
   end
-  object btnAdd: TButton
+  object btnAdd: TButton [5]
     Left = 166
     Top = 145
     Width = 50
@@ -113,7 +108,7 @@ object frmOptionsCombinations: TfrmOptionsCombinations
     TabOrder = 2
     OnClick = btnAddClick
   end
-  object btnRemove: TButton
+  object btnRemove: TButton [6]
     Left = 165
     Top = 218
     Width = 50
@@ -130,7 +125,7 @@ object frmOptionsCombinations: TfrmOptionsCombinations
     TabOrder = 3
     OnClick = btnRemoveClick
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [7]
     Left = 0
     Top = 273
     Width = 407
@@ -171,7 +166,7 @@ object frmOptionsCombinations: TfrmOptionsCombinations
       TabOrder = 1
     end
   end
-  object lvwCombinations: TCaptionListView
+  object lvwCombinations: TCaptionListView [8]
     Left = 224
     Top = 112
     Width = 177
@@ -197,5 +192,38 @@ object frmOptionsCombinations: TfrmOptionsCombinations
     OnCompare = lvwCombinationsCompare
     OnDblClick = btnRemoveClick
     Caption = 'Combinations'
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblInfo'
+        'Status = stsDefault')
+      (
+        'Component = radAddByType'
+        'Status = stsDefault')
+      (
+        'Component = lstAddBy'
+        'Status = stsDefault')
+      (
+        'Component = btnAdd'
+        'Status = stsDefault')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = lvwCombinations'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsCombinations'
+        'Status = stsDefault'))
   end
 end

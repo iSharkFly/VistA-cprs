@@ -4,10 +4,10 @@ interface
 
 uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
   Buttons, ComCtrls, ExtCtrls, ORCtrls, OrFn, Dialogs, ORDtTmRng, fBAOptionsDiagnoses,
-  uBAGlobals;
+  uBAGlobals, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmOptions = class(TForm)
+  TfrmOptions = class(TfrmBase508Form)
     pnlMain: TPanel;
     pnlBottom: TPanel;
     pagOptions: TPageControl;
@@ -100,7 +100,6 @@ type
     memReport2: TMemo;
     imgReport1: TImage;
     imgReport2: TImage;
-    rdoRDV: TRadioGroup;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure btnCoverDaysClick(Sender: TObject);
@@ -131,7 +130,7 @@ type
     procedure btnDiagnosesClick(Sender: TObject);
     procedure btnGraphSettingsClick(Sender: TObject);
     procedure btnGraphViewsClick(Sender: TObject);
-    procedure rdoRDVClick(Sender: TObject);
+    procedure pagOptionsEnter(Sender: TObject);
   private
     { Private declarations }
     FdirtyNotifications: boolean;  // used to determine edit changes to Notifications
@@ -141,6 +140,7 @@ type
     FsortCol: integer;
     FsortAscending: boolean;
     FLastClickedItem: TListItem;
+    FGiveMultiTabMessage: boolean;
     procedure Offset(var topnum: integer; topoffset: integer; var leftnum: integer; leftoffset: integer);
     procedure LoadNotifications;
     procedure LoadOrderChecks;
@@ -165,7 +165,8 @@ uses fOptionsDays, fOptionsReminders, fOptionsSurrogate,
      fOptionsPatientSelection, fOptionsLists, fOptionsTeams, fOptionsCombinations,
      fOptionsOther, fOptionsNotes, fOptionsTitles, fOptionsReportsCustom, fOptionsReportsDefault,
      fGraphs, fGraphSettings, fGraphProfiles, rGraphs, uGraphs,
-     rOptions, rCore, uCore, uOptions, UBACore, fFrame;
+     rOptions, rCore, uCore, uOptions, UBACore, fFrame,
+  VA508AccessibilityRouter;
      //fTestDialog;
 
 {$R *.DFM}
@@ -272,8 +273,7 @@ begin
 
   if (Encounter.Provider = 0) and not IsCIDCProvider(User.DUZ) then
       btnDiagnoses.Enabled := False;
-  if UseVistaWeb then rdoRDV.ItemIndex := 1;
-
+  FGiveMultiTabMessage := ScreenReaderSystemActive;
 end;
 
 procedure TfrmOptions.FormDestroy(Sender: TObject);
@@ -371,6 +371,15 @@ begin
   if leftnum < 0 then leftnum := 0;
 end;
 
+procedure TfrmOptions.pagOptionsEnter(Sender: TObject);
+begin
+  if FGiveMultiTabMessage then // CQ#15483
+  begin
+    FGiveMultiTabMessage := FALSE;
+    GetScreenReader.Speak('Multi Tab Form');
+  end;
+end;
+
 procedure TfrmOptions.btnApplyClick(Sender: TObject);
 // save actions without exiting
 begin
@@ -426,7 +435,7 @@ begin
       newonoff := Uppercase(lvwNotifications.Items.Item[i].SubItems[0]);
       if aRule.OriginalValue <> newonoff then
       begin
-        //***showmessage(aRule.IEN + ' ' + aRule.OriginalValue + ' ' + newonoff);
+        //***Show508Message(aRule.IEN + ' ' + aRule.OriginalValue + ' ' + newonoff);
         aList.Add(aRule.IEN + '^' + newonoff);
         aRule.OriginalValue := lvwNotifications.Items.Item[i].SubItems[0];
       end;
@@ -722,60 +731,10 @@ procedure TfrmOptions.btnGraphViewsClick(Sender: TObject);
 // display Graph Views
 var
   actiontype: boolean;
-  topsize, leftsize: integer;
 begin
   actiontype := false;
-  Offset(topsize, -60, leftsize, -60);
-  DialogOptionsGraphProfiles(topsize, leftsize, Font.Size, actiontype);
-end;
-
-procedure TfrmOptions.rdoRDVClick(Sender: TObject);
-var
-  iIndex: integer;
-begin
-  iIndex := rdoRDV.ItemIndex;
-   with frmFrame do
-   if iIndex = 0 then
-    begin
-      ChangeVistaWebParam('0');
-      lblCIRN.Caption := ' Remote';
-      lblCIRNData.Caption := 'Data';
-      lblCIRNAvail.Caption := '';
-      lblCIRN.Width := 43;
-      lblCIRNData.Width := 43;
-      lblCIRNData.Alignment := taCenter;
-      lblCIRN.Alignment := taCenter;
-      lstCIRNLocations.Clear;
-      SetUpCIRN;
-    end
-  else
-    begin
-      ChangeVistaWebParam('1');
-      lblCIRN.Caption := 'Remote';
-      lblCIRNData.Caption := 'Data*';  //VistaWeb On
-      lblCIRN.Width := 43;
-      lblCIRNData.Width := 43;
-      lblCIRNData.Alignment := taCenter;
-      lblCIRN.Alignment := taCenter;
-      lblCIRN.Enabled     := True;
-      lblCIRNData.Enabled := True;
-      pnlCIRN.TabStop     := True;
-      if ColorToRGB(clWindowText) = ColorToRGB(clBlack) then
-        begin
-          lblCIRN.Font.Color  := clBlue;
-          lblCIRNData.Font.Color  := clBlue;
-          lblCIRNAvail.Font.Color := clBlue;
-          lstCIRNLocations.Font.Color  := clBlue;
-        end
-      else
-        begin
-          lblCIRN.Font.Color  := clWindowText;
-          lblCIRNData.Font.Color  := clWindowText;
-          lblCIRNAvail.Font.Color := clWindowText;
-          lstCIRNLocations.Font.Color  := clWindowText;
-        end;
-    end;
-
+  DialogOptionsGraphProfiles(actiontype);
+  // if changes were made then view listing should be updated ***********
 end;
 
 end.

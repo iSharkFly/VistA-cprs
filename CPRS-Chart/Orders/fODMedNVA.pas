@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fODBase, StdCtrls, ComCtrls, ExtCtrls, ORCtrls, Grids, Buttons, uConst, ORDtTm,
-  Menus, XUDIGSIGSC_TLB, rMisc, uOrders, StrUtils, oRFn;
+  Menus, XUDIGSIGSC_TLB, rMisc, uOrders, StrUtils, oRFn, contnrs,
+  VA508AccessibilityManager;
 
 const
   UM_DELAYCLICK = 11037;  // temporary for listview click event
@@ -93,10 +94,8 @@ type
 
   private
     {selection}
-    FAllItems:   TStringList;
-    FAllFirst:   Integer;
-    FAllLast:    Integer;
-    FAllList:    Integer;
+    FNVAMedCache:   TObjectList;
+    FCacheIEN:   integer;
     FQuickList:  Integer;
     FQuickItems: TStringList;
     FChangePending: Boolean;
@@ -134,11 +133,13 @@ type
     FShrinked: boolean;
     FQOInitial: boolean;
     FRemoveText : Boolean;
+    FMedName: string;
     {selection}
     procedure ChangeDelayed;
     procedure LoadNonVAMedCache(First, Last: Integer);
     function FindQuickOrder(const x: string): Integer;
     function isUniqueQuickOrder(iText: string): Boolean;
+    function GetCacheChunkIndex(idx: integer): integer;
     procedure ScrollToVisible(AListView: TListView);
     procedure StartKeyTimer;
     procedure StopKeyTimer;
@@ -179,6 +180,7 @@ type
   public
     procedure SetupDialog(OrderAction: Integer; const ID: string); override;
     procedure CheckDecimal(var AStr: string);
+    property MedName: string read FMedName write FMedName;
   end;
 
 var
@@ -193,7 +195,7 @@ implementation
 {$R *.DFM}
 
 uses rCore, uCore, rODMeds, rODBase, rOrders, fRptBox, fODMedOIFA,
-  uAccessibleStringGrid, fFrame, ORNet;
+  fFrame, ORNet, VAUtils;
 
 const
   {grid columns for complex dosing }
@@ -258,6 +260,8 @@ const
   TIMER_DELAY = 500;                              // 500 millisecond delay
   TIMER_FROM_DAYS = 1;
   TIMER_FROM_QTY  = 2;
+
+  MED_CACHE_CHUNK_SIZE = 100;  
   {text constants}
   TX_ADMIN      = 'Requested Start: ';
   TX_TAKE       = '';
@@ -345,11 +349,9 @@ begin
    // medication selection
   FRowHeight := MainFontHeight + 1;
   x := 'NV RX';  // CLA 6/3/03
-  ListForOrderable(FAllList, ListCount, x);
+  ListForOrderable(FCacheIEN, ListCount, x);
   lstAll.Items.Count := ListCount;
-  FAllItems := TStringList.Create;
-  FAllFirst := -1;
-  FAllLast  := -1;
+  FNVAMedCache := TObjectList.Create;
   FQuickItems := TStringList.Create;
   ListForQuickOrders(FQuickList, ListCount, x);
  if ListCount > 0 then
@@ -369,6 +371,8 @@ begin
   with lstQuick do if ListCount < VisibleRowCount
     then Height := (((Height - 6) div VisibleRowCount) * ListCount) + 6;
   pnlFields.Height := cmdAccept.Top - 4 - pnlFields.Top;
+  cmdAccept.Left := cmdQuit.Left;
+  cmdaccept.Anchors := cmdQuit.anchors;
   FNoZero := False;
   FShrinked := False;
   // Load OTC Statement/Explanations
@@ -381,7 +385,7 @@ procedure TfrmODMedNVA.FormDestroy(Sender: TObject);
 begin
   {selection}
   FQuickItems.Free;
-  FAllItems.Free;
+  FNVAMedCache.Free;
   {edit}
   FGuideline.Free;
   FAllDoses.Free;
@@ -552,6 +556,7 @@ begin
      end;
    end;
   end;
+  if Pos(U, self.memComment.Text) > 0 then SetError('Comments cannot contain a "^".');
 end;
 
 { Navigate medication selection lists ------------------------------------------------------- }
@@ -658,7 +663,7 @@ begin
   NewText := '';
   UserText := Copy(txtMed.Text, 1, txtMed.SelStart);
   QuickIndex := FindQuickOrder(UserText);
-  AllIndex := IndexOfOrderable(FAllList, UserText);  // but always synch the full list
+  AllIndex := IndexOfOrderable(FCacheIEN, UserText);  // but always synch the full list
   if UserText <> Copy(txtMed.Text, 1, txtMed.SelStart) then Exit;  // if typing during lookup
   if AllIndex > -1 then
   begin
@@ -771,41 +776,43 @@ end;
 
 { lstAll Methods (lstAll is TListView) }
 
+// Cache is a list of 100 string lists, starting at idx 0
 procedure TfrmODMedNVA.LoadNonVAMedCache(First, Last: Integer);
-const
-  MAX_CACHE_ITEMS = 1000;
+var
+  firstChunk, lastchunk, i: integer;
+  list: TStringList;
+  firstMed, LastMed: integer;
+
 begin
-  // if range is within cache range we don't need to update anything
-  if (First >= FAllFirst) and (Last <= FAllLast) then Exit;
-  // if range is outside of cache or a superset of cache, start over
-  if (Last < Pred(FAllFirst)) or (First > Succ(FAllLast)) or
-     ((First < FAllFirst) and (Last > FAllLast)) or
-     (FAllItems.Count > MAX_CACHE_ITEMS) then
+  firstChunk := GetCacheChunkIndex(First);
+  lastChunk := GetCacheChunkIndex(Last);
+  for i := firstChunk to lastChunk do
   begin
-    FAllItems.Clear;
-    FAllFirst := -1;
-    FAllLast  := -1;
+    if (FNVAMedCache.Count <= i) or (not assigned(FNVAMedCache[i])) then
+    begin
+      while FNVAMedCache.Count <= i do
+        FNVAMedCache.add(nil);
+      list := TStringList.Create;
+      FNVAMedCache[i] := list;
+      firstMed := i * MED_CACHE_CHUNK_SIZE;
+      LastMed := firstMed + MED_CACHE_CHUNK_SIZE - 1;
+      if LastMed >= lstAll.Items.Count then
+        LastMed := lstAll.Items.Count - 1;
+      SubsetOfOrderable(list, false, FCacheIEN, firstMed, lastMed);
+    end;
   end;
-  // if getting items immediately before cache range
-  if (First < FAllFirst) and (Last  >= FAllFirst) then Last  := Pred(FAllFirst);
-  // if getting items immediately after cache range
-  if (Last  > FAllLast)  and (First <= FAllLast)  then First := Succ(FAllLast);
-  // retrieve the items and append (First>FAllLast) or prepend them to FAllItems
-  SubsetOfOrderable(FAllItems, First>FAllLast, FAllList, First, Last);
-  // reset FAllFirst & FAllLast indexes to reflect current FAllItems
-  if FAllFirst < 0     then FAllFirst := First;
-  if FAllLast  < 0     then FAllLast  := Last;
-  if First < FAllFirst then FAllFirst := First;
-  if Last > FAllLast   then FAllLast := Last;
 end;
 
 procedure TfrmODMedNVA.lstAllData(Sender: TObject; Item: TListItem);
 var
   x: string;
+  chunk: integer;
+  list: TStringList;
 begin
-  if (FAllFirst = -1) or (Item.Index < FAllFirst) or (Item.Index > FAllLast)
-    then LoadNonVAMedCache(Item.Index, Item.Index);
-  x := FAllItems[Item.Index - FAllFirst];
+  LoadNonVAMedCache(Item.Index, Item.Index);
+  chunk := GetCacheChunkIndex(Item.Index);
+  list := TStringList(FNVAMedCache[chunk]);
+  x := list[Item.Index mod MED_CACHE_CHUNK_SIZE];
   Item.Caption := Piece(x, U, 2);
   Item.Data := Pointer(StrToIntDef(Piece(x, U, 1), 0));
 end;
@@ -821,13 +828,14 @@ end;
 procedure TfrmODMedNVA.btnSelectClick(Sender: TObject);
 var
   MedIEN: Integer;
-  MedName: string;
+  //MedName: string;
   QOQuantityStr: string;
-  ErrMsg: string;
+  ErrMsg, temp: string;
 begin
   inherited;
   QOQuantityStr := '';
-  btnSelect.SetFocus;                             // let the exit events finish
+  btnSelect.SetFocus;
+  self.MedName := '';                             // let the exit events finish
   if pnlMeds.Visible then                         // display the medication fields
   begin
     Changing := True;
@@ -844,7 +852,7 @@ begin
       begin
         //btnSelect.Visible := False;
         btnSelect.Enabled := False;
-        ShowMessage(ErrMsg);
+        ShowMsg(ErrMsg);
         Exit;
       end;
       if txtMed.Tag = 0 then
@@ -861,14 +869,14 @@ begin
     else if (FActiveMedList = lstAll) and (lstAll.Selected <> nil) then  // orderable item
     begin
       MedIEN := Integer(lstAll.Selected.Data);
-      MedName := lstAll.Selected.Caption;
+      self.MedName := lstAll.Selected.Caption;
       txtMed.Tag := MedIEN;
       ErrMsg := '';
       IsActivateOI(ErrMsg, txtMed.Tag);
       if Length(ErrMsg)>0 then
       begin
         btnSelect.Enabled := False;
-        ShowMessage(ErrMsg);
+        ShowMsg(ErrMsg);
         Exit;
       end;
 
@@ -881,7 +889,9 @@ begin
       if MedIEN <> txtMed.Tag then
       begin
         txtMed.Tag := MedIEN;
-        txtMed.Text := MedName;
+        temp := self.MedName;
+        self.MedName := txtMed.Text;
+        txtMed.Text := Temp;
       end;
       SetOnMedSelect;
       ShowMedFields;
@@ -917,7 +927,7 @@ end;
 procedure TfrmODMedNVA.SetOnMedSelect;
 var
   i,j: Integer;
-  x: string;
+  temp,x: string;
   QOPiUnChk: boolean;
   PKIEnviron: boolean;
 begin
@@ -932,6 +942,16 @@ begin
     LoadOrderItem(OIForNVA(txtMed.Tag, FNonVADlg, IncludeOIPI, PKIEnviron));
     // set up lists & initial values based on orderable item
     SetControl(txtMed,       'Medication');
+    if (self.MedName <> '') then
+       begin
+         if (txtMed.Text <> self.MedName) then
+           begin
+             temp := self.MedName;
+             self.MedName := txtMed.Text;
+             txtMed.Text := temp;
+           end
+         else MedName := '';
+       end;
     SetControl(cboDosage,    'Dosage');
     SetControl(cboRoute,     'Route');
     SetControl(calStart,     'START');   //cla 7-17-03
@@ -1043,8 +1063,9 @@ begin
       end
       else
         SetDosage(IValueFor('INSTR', 1));
-        SetControl(cboDosage, 'DOSAGE', 1); // CQ: HDS00007776
-        SetSchedule(IValueFor('SCHEDULE',  1));
+      SetControl(cboDosage, 'DOSAGE', 1); // CQ: HDS00007776
+      SetControl(cboRoute,  'ROUTE',     1);  //AGP ADDED ROUTE FOR CQ 11252
+      SetSchedule(IValueFor('SCHEDULE',  1));
       if (cboSchedule.Text = '') and FIsQuickOrder then
       begin
         cboSchedule.SelectByID(TempSch);
@@ -1612,7 +1633,8 @@ begin
   ADosageText := '';
   FUpdated := FALSE;
   Responses.Clear;
-  Responses.Update('ORDERABLE',  1, IntToStr(txtMed.Tag), txtMed.Text);
+  if self.MedName = '' then Responses.Update('ORDERABLE',  1, IntToStr(txtMed.Tag), txtMed.Text)
+  else Responses.Update('ORDERABLE',  1, IntToStr(txtMed.Tag), self.MedName);
   DoseList := TStringList.Create;
   case tabDose.TabIndex of
   TI_DOSE:
@@ -1728,6 +1750,29 @@ var
     RouteText <TAB> IEN^RouteName^Abbreviation
     Schedule  <TAB> (nothing)
     Duration  <TAB> Duration^Units }
+
+  // the following functions were created to get rid of a compile warning saying the
+  // return value may be undefined - too much branching logic in the case statements
+  // for the compiler to handle
+
+  function GetSchedule: string;
+  begin
+    Result := UpperCase(cboSchedule.Text);
+    if chkPRN.Checked then Result := Result + ' PRN';
+    if UpperCase(Copy(Result, Length(Result) - 6, Length(Result))) = 'PRN PRN'
+      then Result := Copy(Result, 1, Length(Result) - 4);
+  end;
+
+  function GetScheduleEX: string;
+  begin
+    Result := '';
+    with cboSchedule do
+      if ItemIndex > -1 then Result := Piece(Items[ItemIndex], U, 2);
+    if (Length(Result) > 0) and chkPRN.Checked then Result := Result + ' AS NEEDED';
+    if UpperCase(Copy(Result, Length(Result) - 18, Length(Result))) = 'AS NEEDED AS NEEDED'
+      then Result := Copy(Result, 1, Length(Result) - 10);
+  end;
+
 begin
   Result := '';
   if ARow < 0 then                                // use single dose controls
@@ -1762,17 +1807,10 @@ begin
     FLD_ROUTE_EX  : with cboRoute do
                      if ItemIndex > -1  then Result := Piece(Items[ItemIndex], U, 4);
     FLD_SCHEDULE  : begin
-                      Result := UpperCase(cboSchedule.Text);
-                      if chkPRN.Checked then Result := Result + ' PRN';
-                      if UpperCase(Copy(Result, Length(Result) - 6, Length(Result))) = 'PRN PRN'
-                        then Result := Copy(Result, 1, Length(Result) - 4);
+                      Result := GetSchedule;
                     end;
     FLD_SCHED_EX  : begin
-                      with cboSchedule do
-                        if ItemIndex > -1 then Result := Piece(Items[ItemIndex], U, 2);
-                      if (Length(Result) > 0) and chkPRN.Checked then Result := Result + ' AS NEEDED';
-                      if UpperCase(Copy(Result, Length(Result) - 18, Length(Result))) = 'AS NEEDED AS NEEDED'
-                        then Result := Copy(Result, 1, Length(Result) - 10);
+                      Result := GetScheduleEX;
                     end;
     FLD_SCHED_TYP : with cboSchedule do
                       if ItemIndex > -1 then Result := Piece(Items[ItemIndex], U, 3);
@@ -2183,6 +2221,11 @@ begin
   pnlFields.Height := cmdAccept.Top - 4 - pnlFields.Top;
 end;
 
+function TfrmODMedNVA.GetCacheChunkIndex(idx: integer): integer;
+begin
+  Result := idx div MED_CACHE_CHUNK_SIZE;
+end;
+
 procedure TfrmODMedNVA.lstQuickData(Sender: TObject; Item: TListItem);
 var
   x: string;
@@ -2208,7 +2251,7 @@ begin
             s:= tmplst.Strings[i];
             tmplst.Strings[i] := Piece(s,U,2);
         end;
-        Dest.Assign(tmplst);
+        FastAssign(tmplst, Dest);
     end;
  end;
 

@@ -5,6 +5,8 @@ inherited frmODLab: TfrmODLab
   Width = 523
   Height = 271
   Caption = 'Order a Lab Test'
+  ExplicitWidth = 523
+  ExplicitHeight = 271
   PixelsPerInch = 96
   TextHeight = 13
   object lblAvailTests: TLabel [0]
@@ -294,6 +296,7 @@ inherited frmODLab: TfrmODLab
   inherited cmdAccept: TButton
     Left = 443
     TabOrder = 18
+    ExplicitLeft = 443
   end
   inherited cmdQuit: TButton
     TabOrder = 19
@@ -303,17 +306,24 @@ inherited frmODLab: TfrmODLab
     Top = 192
     Height = 56
     TabOrder = 21
+    ExplicitLeft = 18
+    ExplicitTop = 192
+    ExplicitHeight = 56
     inherited imgMessage: TImage
       Top = 11
+      ExplicitTop = 11
     end
     inherited memMessage: TRichEdit
       Left = 41
       Top = 5
       Height = 43
       PopupMenu = MessagePopup
+      ExplicitLeft = 41
+      ExplicitTop = 5
+      ExplicitHeight = 43
     end
   end
-  object pnlCollTimeButton: TKeyClickPanel
+  object pnlCollTimeButton: TKeyClickPanel [24]
     Left = 288
     Top = 167
     Width = 20
@@ -349,7 +359,7 @@ inherited frmODLab: TfrmODLab
       OnClick = cmdImmedCollClick
     end
   end
-  object cboAvailTest: TORComboBox
+  object cboAvailTest: TORComboBox [25]
     Left = 6
     Top = 18
     Width = 168
@@ -375,7 +385,7 @@ inherited frmODLab: TfrmODLab
     OnNeedData = cboAvailTestNeedData
     CharsNeedMatch = 1
   end
-  object cboFrequency: TORComboBox
+  object cboFrequency: TORComboBox [26]
     Left = 326
     Top = 166
     Width = 97
@@ -399,7 +409,7 @@ inherited frmODLab: TfrmODLab
     OnChange = cboFrequencyChange
     CharsNeedMatch = 1
   end
-  object cboCollSamp: TORComboBox
+  object cboCollSamp: TORComboBox [27]
     Left = 269
     Top = 28
     Width = 100
@@ -426,7 +436,7 @@ inherited frmODLab: TfrmODLab
     OnMouseClick = cboCollSampMouseClick
     CharsNeedMatch = 1
   end
-  object cboSpecimen: TORComboBox
+  object cboSpecimen: TORComboBox [28]
     Left = 269
     Top = 55
     Width = 100
@@ -455,7 +465,7 @@ inherited frmODLab: TfrmODLab
     OnMouseClick = cboSpecimenMouseClick
     CharsNeedMatch = 1
   end
-  object cboUrgency: TORComboBox
+  object cboUrgency: TORComboBox [29]
     Left = 269
     Top = 82
     Width = 100
@@ -479,7 +489,7 @@ inherited frmODLab: TfrmODLab
     OnChange = cboUrgencyChange
     CharsNeedMatch = 1
   end
-  object txtAddlComment: TCaptionEdit
+  object txtAddlComment: TCaptionEdit [30]
     Left = 187
     Top = 122
     Width = 180
@@ -489,7 +499,7 @@ inherited frmODLab: TfrmODLab
     OnExit = txtAddlCommentExit
     Caption = 'Additional Comment'
   end
-  object txtDays: TCaptionEdit
+  object txtDays: TCaptionEdit [31]
     Left = 430
     Top = 166
     Width = 84
@@ -500,7 +510,7 @@ inherited frmODLab: TfrmODLab
     OnChange = ControlChange
     Caption = 'How Long?'
   end
-  object FLabCommonCombo: TORListBox
+  object FLabCommonCombo: TORListBox [32]
     Left = 440
     Top = 247
     Width = 121
@@ -514,7 +524,7 @@ inherited frmODLab: TfrmODLab
     ItemTipColor = clWindow
     LongList = False
   end
-  object cboCollTime: TORComboBox
+  object cboCollTime: TORComboBox [33]
     Left = 149
     Top = 166
     Width = 168
@@ -539,7 +549,7 @@ inherited frmODLab: TfrmODLab
     OnExit = cboCollTimeExit
     CharsNeedMatch = 1
   end
-  object cboCollType: TORComboBox
+  object cboCollType: TORComboBox [34]
     Left = 6
     Top = 166
     Width = 136
@@ -563,8 +573,104 @@ inherited frmODLab: TfrmODLab
     OnChange = cboCollTypeChange
     CharsNeedMatch = 1
   end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = txtImmedColl'
+        'Status = stsDefault')
+      (
+        'Component = calCollTime'
+        'Status = stsDefault')
+      (
+        'Component = pnlUrineVolume'
+        'Status = stsDefault')
+      (
+        'Component = txtUrineVolume'
+        'Status = stsDefault')
+      (
+        'Component = pnlAntiCoagulation'
+        'Status = stsDefault')
+      (
+        'Component = txtAntiCoagulant'
+        'Status = stsDefault')
+      (
+        'Component = pnlOrderComment'
+        'Status = stsDefault')
+      (
+        'Component = txtOrderComment'
+        'Status = stsDefault')
+      (
+        'Component = pnlHide'
+        'Status = stsDefault')
+      (
+        'Component = pnlDoseDraw'
+        'Status = stsDefault')
+      (
+        'Component = txtDoseTime'
+        'Status = stsDefault')
+      (
+        'Component = txtDrawTime'
+        'Status = stsDefault')
+      (
+        'Component = pnlPeakTrough'
+        'Status = stsDefault')
+      (
+        'Component = grpPeakTrough'
+        'Status = stsDefault')
+      (
+        'Component = pnlCollTimeButton'
+        'Status = stsDefault')
+      (
+        'Component = cboAvailTest'
+        'Status = stsDefault')
+      (
+        'Component = cboFrequency'
+        'Status = stsDefault')
+      (
+        'Component = cboCollSamp'
+        'Status = stsDefault')
+      (
+        'Component = cboSpecimen'
+        'Status = stsDefault')
+      (
+        'Component = cboUrgency'
+        'Status = stsDefault')
+      (
+        'Component = txtAddlComment'
+        'Status = stsDefault')
+      (
+        'Component = txtDays'
+        'Status = stsDefault')
+      (
+        'Component = FLabCommonCombo'
+        'Status = stsDefault')
+      (
+        'Component = cboCollTime'
+        'Status = stsDefault')
+      (
+        'Component = cboCollType'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODLab'
+        'Status = stsDefault'))
+  end
   object dlgLabCollTime: TORDateTimeDlg
-    FMDateTime = 2980923
+    FMDateTime = 2980923.000000000000000000
     DateOnly = False
     RequireTime = True
     Left = 219

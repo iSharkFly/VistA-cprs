@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORFn, uConst, ORCtrls, ExtCtrls;
+  fAutoSz, StdCtrls, ORFn, uConst, ORCtrls, ExtCtrls, VA508AccessibilityManager;
 
 type
   TfrmOCSession = class(TfrmAutoSz)
@@ -14,6 +14,8 @@ type
     txtJustify: TCaptionEdit;
     cmdCancelOrder: TButton;
     cmdContinue: TButton;
+    btnReturn: TButton;
+    memNote: TMemo;
     procedure cmdCancelOrderClick(Sender: TObject);
     procedure cmdContinueClick(Sender: TObject);
     procedure lstChecksMeasureItem(Control: TWinControl; Index: Integer;
@@ -25,23 +27,28 @@ type
     procedure FormResize(Sender: TObject);
     procedure txtJustifyKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure btnReturnClick(Sender: TObject);
+    procedure memNoteEnter(Sender: TObject);
   private
     FCritical: Boolean;
+    FCancelSignProcess : Boolean;
     FCheckList: TStringList;
     FOrderList: TStringList;
     procedure SetReqJustify;
+    procedure SetReturn(const Value: Boolean);
   public
     { Public declarations }
+    property CancelSignProcess : Boolean read FCancelSignProcess write SetReturn default false;
   end;
 
 procedure ExecuteReleaseOrderChecks(SelectList: TList);
-procedure ExecuteSessionOrderChecks(OrderList: TStringList);
+function ExecuteSessionOrderChecks(OrderList: TStringList) : Boolean;
 
 implementation
 
 {$R *.DFM}
 
-uses rOrders, uCore, rMisc;
+uses rOrders, uCore, rMisc, fFrame;
 
 type
   TOCRec = class
@@ -83,22 +90,26 @@ begin
       AnOrder := TOrder(SelectList.Items[i]);
       OrderIDList.Add(AnOrder.ID + '^^1');  // 3rd pce = 1 means releasing order
     end;
-    ExecuteSessionOrderChecks(OrderIDList);
-    for i := SelectList.Count - 1 downto 0 do
-    begin
-      AnOrder := TOrder(SelectList.Items[i]);
-      if OrderIDList.IndexOf(AnOrder.ID + '^^1') < 0 then
+    if ExecuteSessionOrderChecks(OrderIDList) then
+      for i := SelectList.Count - 1 downto 0 do
       begin
-        Changes.Remove(CH_ORD, AnOrder.ID);
-        SelectList.Delete(i);
-      end;
-    end;
+        AnOrder := TOrder(SelectList.Items[i]);
+        if OrderIDList.IndexOf(AnOrder.ID + '^^1') < 0 then
+        begin
+          Changes.Remove(CH_ORD, AnOrder.ID);
+          SelectList.Delete(i);
+        end;
+      end
+    else
+      SelectList.Clear;
   finally
     OrderIDList.Free;
   end;
 end;
 
-procedure ExecuteSessionOrderChecks(OrderList: TStringList);
+{Returns True if the Signature process should proceed.
+ Clears OrderList If False. }
+function ExecuteSessionOrderChecks(OrderList: TStringList) : Boolean;
 var
   i, j: Integer;
   LastID, NewID: string;
@@ -108,6 +119,7 @@ var
   frmOCSession: TfrmOCSession;
   x: string;
 begin
+  Result := True;
   CheckList := TStringList.Create;
   try
     StatusText('Order Checking...');
@@ -151,6 +163,12 @@ begin
         MessageBeep(MB_ICONASTERISK);
         if frmOCSession.Visible then frmOCSession.SetFocus;
         frmOCSession.ShowModal;
+        Result := not frmOCSession.CancelSignProcess;
+        if frmOCSession.CancelSignProcess then begin
+          OrderList.Clear;
+          if Assigned(frmFrame) then
+            frmFrame.SetActiveTab(CT_ORDERS);
+        end;
       finally
         with uCheckedOrders do for i := 0 to Count - 1 do TOCRec(Items[i]).Free;
         frmOCSession.Free;
@@ -175,6 +193,7 @@ begin
   end;
   lblJustify.Visible := FCritical;
   txtJustify.Visible := FCritical;
+  memNote.Visible := FCritical;
 
 end;
 
@@ -233,8 +252,7 @@ begin
                begin
                  if (Piece(OCRec.Checks[i], U, 2) = '1') then
                    begin
-                     if ColorToRGB(clWindowText) = ColorToRGB(clBlack) then
-                       Canvas.Font.Color := clBlue;
+                     Canvas.Font.Color := Get508CompliantColor(clBlue);
                      Canvas.Font.Style := [fsUnderline];
                    end
                  else Canvas.Font.Color := clWindowText;
@@ -297,6 +315,7 @@ procedure TfrmOCSession.FormShow(Sender: TObject);
 begin
   inherited;
   SetFormPosition(Self); //Get Saved Position & Size of Form
+  FCancelSignProcess := False;
 end;
 
 
@@ -312,6 +331,24 @@ begin
   inherited;
   //GE CQ9540  activate Return key, behave as "Continue" buttom clicked.
   if Key = VK_RETURN then cmdContinueClick(self);
+end;
+
+procedure TfrmOCSession.btnReturnClick(Sender: TObject);
+begin
+  inherited;
+  FCancelSignProcess := True;
+  Close;
+end;
+
+procedure TfrmOCSession.SetReturn(const Value: Boolean);
+begin
+  FCancelSignProcess := Value;
+end;
+
+procedure TfrmOCSession.memNoteEnter(Sender: TObject);
+begin
+  inherited;
+  memNote.SelStart := 0;
 end;
 
 end.

@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fODBase, ComCtrls, ExtCtrls, StdCtrls, ORDtTm, ORCtrls, ORFn, rODBase;
+  fODBase, ComCtrls, ExtCtrls, StdCtrls, ORDtTm, ORCtrls, ORFn, rODBase, fBase508Form,
+  VA508AccessibilityManager;
 
 type
   TDialogCtrl = class
@@ -22,6 +23,7 @@ type
     sbxMain: TScrollBox;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure cmdAcceptClick(Sender: TObject);
   private
     FilterOut: boolean;
     TsID: string; //treating specialty id
@@ -41,7 +43,9 @@ type
     procedure PlaceLookup(DialogCtrl: TDialogCtrl; DialogItem: TDialogItem);
     procedure PlaceMemo(DialogCtrl: TDialogCtrl; DialogItem: TDialogItem);
     procedure PlaceLabel(DialogCtrl: TDialogCtrl; DialogItem: TDialogItem);
+    procedure TrimAllMemos;
   protected
+    FFormCloseCalled : Boolean;
     FCharHt: Integer;
     FCharWd: Integer;
     FDialogItemList: TList;
@@ -53,6 +57,7 @@ type
     procedure InitDialog; override;
     procedure SetDialogIEN(Value: Integer); override;
     procedure Validate(var AnErrMsg: string); override;
+    procedure UpdateAccessabilityActions(var Actions: TAccessibilityActions); override;
   public
     procedure SetupDialog(OrderAction: Integer; const ID: string); override;
   end;
@@ -78,6 +83,7 @@ var
   TheEvtType: string;
   IDs,TSstr, AttendStr: string;
 begin
+  FFormCloseCalled := false;
   inherited;
   FilterOut := True;
   if Self.EvtID < 1 then
@@ -128,6 +134,7 @@ begin
   end;
   FDialogItemList.Free;
   FDialogCtrlList.Free;
+  FFormCloseCalled := true;
   inherited;
 end;
 
@@ -172,7 +179,7 @@ begin
         begin
           theEvtInfo := EventInfo1(AResponse.IValue);
           AResponse.EValue := Piece(theEvtInfo,'^',4);
-        end;        
+        end;
         if AResponse = nil then
         begin
           AnEvtResponse := TResponse.Create;
@@ -198,8 +205,15 @@ begin
     end; {with TDialogCtrl}
     Changing := False;
   end; {if OrderAction}
+  UpdateColorsFor508Compliance(Self);
   ControlChange(Self);
   if (FFirstCtrl <> nil) and (FFirstCtrl.Enabled) then SetFocusedControl(FFirstCtrl);
+end;
+
+procedure TfrmODGen.UpdateAccessabilityActions(
+  var Actions: TAccessibilityActions);
+begin
+  exclude(Actions, aaColorConversion);
 end;
 
 procedure TfrmODGen.InitDialog;
@@ -491,7 +505,7 @@ begin
         end;
         with TORComboBox(Editor) do
         begin
-          Items.AddStrings(TStrings(TopTSList));
+          FastAddStrings(TStrings(TopTSList), TORComboBox(Editor).Items);
           LongList := false;
         end;
       end else
@@ -570,6 +584,27 @@ begin
     Prompt.Alignment := taRightJustify;
     Prompt.Visible := True;
   end;
+end;
+
+procedure TfrmODGen.TrimAllMemos;
+var
+  i : integer;
+  Memo : TMemo;
+begin
+  if FFormCloseCalled then Exit; //it is possible for TrimAllMemos to get called after FormClose
+  if Not Assigned(FDialogCtrlList) then Exit;
+  for i := 0 to FDialogCtrlList.Count - 1 do
+    if TDialogCtrl(FDialogCtrlList.Items[i]).Editor is TMemo then begin
+      Memo := TMemo(TDialogCtrl(FDialogCtrlList.Items[i]).Editor);
+      Memo.Lines.Text := Trim(Memo.Lines.Text);
+    end;
+end;
+
+procedure TfrmODGen.cmdAcceptClick(Sender: TObject);
+begin
+  inherited;
+  Application.ProcessMessages;
+  TrimAllMemos;
 end;
 
 procedure TfrmODGen.ControlChange(Sender: TObject);

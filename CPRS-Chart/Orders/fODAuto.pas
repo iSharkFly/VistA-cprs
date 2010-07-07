@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fODBase, StdCtrls, ComCtrls, ExtCtrls, ORFn, ORCtrls;
+  fODBase, StdCtrls, ComCtrls, ExtCtrls, ORFn, ORCtrls,
+  VA508AccessibilityManager;
 
 type
   TfrmODAuto = class(TfrmODBase)

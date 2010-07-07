@@ -29,6 +29,7 @@ const
   HEAD_NECK_CANCER        = 'HNC';
   MILITARY_SEXUAL_TRAUMA  = 'MST';
   COMBAT_VETERAN          = 'CV';
+  SHIPBOARD_HAZARD_DEFENSE= 'SHD';
 
   MAX_DX = 4;
   DXREC_INIT_FIELD_VAL        = '';

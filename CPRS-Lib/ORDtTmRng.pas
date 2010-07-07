@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORFn, ORDtTm;
+  StdCtrls, ORFn, OR2006Compatibility, ORDtTm;
 
 type
-  TORfrmDateRange = class(TForm)
+  TORfrmDateRange = class(Tfrm2006Compatibility)
     lblStart: TLabel;
     lblStop: TLabel;
     cmdOK: TButton;
@@ -20,6 +20,8 @@ type
   private
     FCalStart: TORDateBox;
     FCalStop:  TORDateBox;
+  protected
+    procedure Loaded; override;
   end;
 
   TORDateRangeDlg = class(TComponent)
@@ -183,12 +185,19 @@ begin
   FCalStop.SetBounds(145, 58, 121, 21);
   FCalStop.TabOrder := 1;
   ResizeAnchoredFormToFont(self);
+  UpdateColorsFor508Compliance(self);
 end;
 
 procedure TORfrmDateRange.FormDestroy(Sender: TObject);
 begin
   FCalStart.Free;
   FCalStop.Free;
+end;
+
+procedure TORfrmDateRange.Loaded;
+begin
+  inherited Loaded;
+  UpdateColorsFor508Compliance(Self);
 end;
 
 end.

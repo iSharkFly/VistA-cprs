@@ -1,17 +1,20 @@
 inherited frmOrdersTS: TfrmOrdersTS
   Left = 84
   Top = 77
-  Width = 464
-  Height = 385
   Caption = 'Release Orders'
+  ClientHeight = 351
+  ClientWidth = 456
   Constraints.MinHeight = 365
   Constraints.MinWidth = 310
   OnClose = FormClose
   OnCreate = FormCreate
-  OnKeyDown = FormKeyDown
+  ExplicitLeft = 84
+  ExplicitTop = 77
+  ExplicitWidth = 464
+  ExplicitHeight = 385
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlMiddle: TPanel
+  object pnlMiddle: TPanel [0]
     Left = 0
     Top = 78
     Width = 456
@@ -35,10 +38,8 @@ inherited frmOrdersTS: TfrmOrdersTS
         Top = 13
         Width = 333
         Height = 17
-        BiDiMode = bdRightToLeft
         Caption = '  &Release new orders immediately'
         Enabled = False
-        ParentBiDiMode = False
         TabOrder = 0
         OnClick = radReleaseNowClick
       end
@@ -75,7 +76,7 @@ inherited frmOrdersTS: TfrmOrdersTS
       end
     end
   end
-  object pnlTop: TPanel
+  object pnlTop: TPanel [1]
     Left = 0
     Top = 0
     Width = 456
@@ -88,7 +89,7 @@ inherited frmOrdersTS: TfrmOrdersTS
     object lblPtInfo: TLabel
       Left = 1
       Top = 1
-      Width = 450
+      Width = 3
       Height = 34
       Align = alTop
       Color = clBtnFace
@@ -108,7 +109,7 @@ inherited frmOrdersTS: TfrmOrdersTS
         Left = 1
         Top = 1
         Width = 24
-        Height = 36
+        Height = 22
         Align = alLeft
         AutoSize = True
         Enabled = False
@@ -127,6 +128,7 @@ inherited frmOrdersTS: TfrmOrdersTS
           8888888887700F88888888888888888887700FFFFFFFFFFFFFFFFFFFFF708000
           00000000000000000008}
         Transparent = True
+        ExplicitHeight = 36
       end
       object Label1: TLabel
         Left = 34
@@ -148,47 +150,115 @@ inherited frmOrdersTS: TfrmOrdersTS
       end
     end
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [2]
     Left = 0
     Top = 134
     Width = 456
-    Height = 224
+    Height = 217
     Align = alClient
     TabOrder = 2
     inline fraEvntDelayList: TfraEvntDelayList
       Left = 1
       Top = 1
       Width = 454
-      Height = 222
+      Height = 215
       Align = alClient
-      AutoScroll = False
+      AutoScroll = True
       TabOrder = 0
+      TabStop = True
       Visible = False
+      ExplicitLeft = 1
+      ExplicitTop = 1
+      ExplicitWidth = 454
+      ExplicitHeight = 215
       inherited pnlDate: TPanel
         Left = 349
-        Height = 222
+        Height = 215
+        ExplicitLeft = 349
+        ExplicitHeight = 215
         inherited lblEffective: TLabel
           Left = 453
+          Width = 71
+          ExplicitLeft = 453
+          ExplicitWidth = 71
         end
         inherited orDateBox: TORDateBox
           Left = 453
+          ExplicitLeft = 453
         end
       end
       inherited pnlList: TPanel
         Width = 349
-        Height = 222
+        Height = 215
+        ExplicitWidth = 349
+        ExplicitHeight = 215
         inherited lblEvntDelayList: TLabel
           Width = 347
+          ExplicitWidth = 80
         end
         inherited mlstEvents: TORListBox
           Width = 347
-          Height = 186
+          Height = 179
           OnDblClick = cmdOKClick
+          ExplicitWidth = 347
+          ExplicitHeight = 179
         end
         inherited edtSearch: TCaptionEdit
           Width = 347
+          ExplicitWidth = 347
         end
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlMiddle'
+        'Status = stsDefault')
+      (
+        'Component = grpChoice'
+        'Status = stsDefault')
+      (
+        'Component = radReleaseNow'
+        'Status = stsDefault')
+      (
+        'Component = radDelayed'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = pnldif'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList.pnlDate'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList.orDateBox'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList.pnlList'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList.mlstEvents'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList.edtSearch'
+        'Status = stsDefault')
+      (
+        'Component = frmOrdersTS'
+        'Status = stsDefault'))
   end
 end

@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ExtCtrls, fAutoSz;
+  StdCtrls, ORCtrls, ExtCtrls, fAutoSz, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmODMedOIFA = class(TForm)
+  TfrmODMedOIFA = class(TfrmBase508Form)
     Label1: TLabel;
     lstFormAlt: TORListBox;
     Label2: TStaticText;
@@ -56,7 +56,7 @@ begin
         ResizeFormToFont(TForm(frmODMedOIFA));
         with frmODMedOIFA do
         begin
-          lstFormAlt.Items.Assign(FormAltList);
+          FastAssign(FormAltList, lstFormAlt.Items);
           ShowModal;
           if Length(FSelected) > 0 then
           begin
@@ -90,7 +90,7 @@ begin
         ResizeFormToFont(TForm(frmODMedOIFA));
         with frmODMedOIFA do
         begin
-          lstFormAlt.Items.Assign(FormAltList);
+          FastAssign(FormAltList, lstFormAlt.Items);
           ShowModal;
           if Length(FSelected) > 0 then
           begin

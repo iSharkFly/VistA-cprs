@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ExtCtrls, uPCE, ORFn;
+  StdCtrls, ORCtrls, ExtCtrls, uPCE, ORFn, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmPCEProvider = class(TForm)
+  TfrmPCEProvider = class(TfrmBase508Form)
     cboPrimary: TORComboBox;
     lblMsg: TMemo;
     btnYes: TButton;

@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ORCtrls, StdCtrls, ExtCtrls, ComCtrls, ORFn, dShared;
+  ORCtrls, StdCtrls, ExtCtrls, ComCtrls, ORFn, dShared, uTemplates, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmTemplateObjects = class(TForm)
+  TfrmTemplateObjects = class(TfrmBase508Form)
     cboObjects: TORComboBox;
     pnlBottom: TPanel;
     btnCancel: TButton;
@@ -92,12 +93,27 @@ begin
 end;
 
 procedure TfrmTemplateObjects.btnRefreshClick(Sender: TObject);
+var
+  i: integer;
+  DoIt: boolean;
 begin
-cboObjects.SelectAll;
-cboObjects.Clear;
-dmodShared.RefreshObject := true;
-dmodShared.LoadTIUObjects;
-CboOBJECTS.Items.AddStrings(dmodShared.TIUObjects);
+  cboObjects.Clear;
+  dmodShared.RefreshObject := true;
+  dmodShared.LoadTIUObjects;
+  //---------- CQ #8665 - RV ----------------
+  DoIt := TRUE;
+  UpdatePersonalObjects;
+  if uPersonalObjects.Count > 0 then
+  begin
+    DoIt := FALSE;
+    for i := 0 to dmodShared.TIUObjects.Count-1 do
+      if uPersonalObjects.IndexOf(Piece(dmodShared.TIUObjects[i],U,2)) >= 0 then
+        cboObjects.Items.Add(dmodShared.TIUObjects[i]);
+  end;
+  if DoIt then
+  //---------- end CQ #8665 ------------------
+    cboObjects.Items.Assign(dmodShared.TIUObjects);
 end;
 
 end.
+

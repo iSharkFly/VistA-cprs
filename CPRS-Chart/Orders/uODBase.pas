@@ -22,11 +22,13 @@ function GetKeyVars: string;
 procedure PopKeyVars(NumLevels: Integer = 1);
 procedure PushKeyVars(const NewVals: string);
 procedure ExpandOrderObjects(var Txt: string; var ContainsObjects: boolean; msg: string = '');
+procedure CheckForAutoDCDietOrders(EvtID: integer; DispGrp: integer; CurrentText: string;
+            var CancelText: string; Sender: TObject);
 
 implementation
 
 uses
-  dShared, Windows, rTemplates;
+  dShared, Windows, rTemplates, SysUtils, StdCtrls, fOrders, rOrders;
 
 var
   uOrderEventType: Char;
@@ -188,6 +190,98 @@ begin
     ObjList.Free;
   end;
 end;
+
+// Check for diet orders that will be auto-DCd on release because of start/stop overlaps.
+// Moved here for visibility because it also needs to be checked on an auto-accept order.
+procedure CheckForAutoDCDietOrders(EvtID: integer; DispGrp: integer; CurrentText: string;
+            var CancelText: string; Sender: TObject);
+const
+  TX_CX_CUR = 'A new diet order will CANCEL and REPLACE this current diet now unless' + CRLF +
+              'you specify a start date for when the new diet should replace the current' + CRLF +
+              'diet:' + CRLF + CRLF;
+  TX_CX_FUT = 'A new diet order with no expiration date will CANCEL and REPLACE these diets:' + CRLF + CRLF;
+  TX_CX_DELAYED1 =  'There are other delayed diet orders for this release event:';
+  TX_CX_DELAYED2 =  'This new diet order may cancel and replace those other diets' + CRLF +
+                    'IMMEDIATELY ON RELEASE, unless you either:' + CRLF + CRLF +
+
+                    '1. Specify an expiration date/time for this order that will' + CRLF +
+                    '   be prior to the start date/time of those other orders; or' + CRLF + CRLF +
+
+                    '2. Specify a later start date/time for this order for when you' + CRLF +
+                    '   would like it to cancel and replace those other orders.';
+
+var
+  i: integer;
+  AStringList: TStringList;
+  AList: TList;
+  x, PtEvtIFN, PtEvtName: string;
+  //AResponse: TResponse;
+begin
+  if EvtID = 0 then   // check current and future released diets
+  begin
+    x := CurrentText;
+    if Piece(x, #13, 1) <> 'Current Diet:  ' then
+    begin
+      AStringList := TStringList.Create;
+      try
+        AStringList.Text := x;
+        CancelText := TX_CX_CUR + #9 + Piece(AStringList[0], ':', 1) + ':' + CRLF + CRLF
+                 + #9 + Copy(AStringList[0], 16, 99) + CRLF;
+        if AStringList.Count > 1 then
+        begin
+          CancelText := CancelText + CRLF + CRLF +
+                   TX_CX_FUT + #9 + Piece(AStringList[1], ':', 1) + ':' + CRLF + CRLF
+                   + #9 + Copy(AStringList[1], 22, 99) + CRLF;
+          if AStringList.Count > 2 then
+          for i := 2 to AStringList.Count - 1 do
+            CancelText := CancelText + #9 + TrimLeft(AStringList[i]) + CRLF;
+        end;
+      finally
+        AStringList.Free;
+      end;
+    end;
+  end 
+  else if Sender is TButton then     // delayed orders code here - on accept only
+  begin
+    //AResponse := Responses.FindResponseByName('STOP', 1);
+    //if (AResponse <> nil) and (AResponse.EValue <> '') then exit;
+    AList := TList.Create;
+    try
+      PtEvtIFN := IntToStr(frmOrders.TheCurrentView.EventDelay.PtEventIFN);
+      PtEvtName := frmOrders.TheCurrentView.EventDelay.EventName;
+      LoadOrdersAbbr(AList, frmOrders.TheCurrentView, PtEvtIFN);
+      for i := AList.Count - 1 downto 0 do
+      begin
+        if TOrder(Alist.Items[i]).DGroup <> DispGrp then
+        begin
+          TOrder(AList.Items[i]).Free;
+          AList.Delete(i);
+        end;
+      end;
+      if AList.Count > 0 then
+      begin
+        x := '';
+        RetrieveOrderFields(AList, 0, 0);
+        CancelText := TX_CX_DELAYED1 + CRLF + CRLF + 'Release event: ' + PtEvtName; 
+        for i := 0 to AList.Count - 1 do
+          with TOrder(AList.Items[i]) do
+          begin
+            x := x + #9 + Text + CRLF;
+(*            if StartTime <> '' then
+              x := #9 + x + 'Start:   ' + StartTime + CRLF
+            else
+              x := #9 + x + 'Ordered: ' + FormatFMDateTime('mmm dd,yyyy@hh:nn', OrderTime) + CRLF;*)
+          end;
+        CancelText := CancelText + CRLF + CRLF + x;
+        CancelText := CancelText + CRLF + CRLF + TX_CX_DELAYED2;
+      end;
+    finally
+      with AList do for i := 0 to Count - 1 do TOrder(Items[i]).Free;
+      AList.Free;
+    end;
+  end;
+end;
+
 
 initialization
   uOrderEventType := #0;

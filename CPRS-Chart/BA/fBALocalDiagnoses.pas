@@ -6,7 +6,7 @@ uses
  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, fAutoSz, StdCtrls, ORCtrls, ExtCtrls,fPCELex, uConsults, ORFn,
   rPCE,DBCtrls, DB, DBClient, uPCE, fEncounterFrame, ComCtrls, Grids, UBAGlobals,
-  Buttons, Menus, UBACore, UCore;
+  Buttons, Menus, UBACore, UCore, VA508AccessibilityManager;
 
 type
   DxRecord = Record
@@ -22,7 +22,6 @@ type
     pnlMain: TPanel;
     lbSections: TORListBox;
     pnlBottom: TORAutoPanel;
-    lvDxGrid: TListView;
     cbAddToPDList: TCheckBox;
     cbAddToPL: TCheckBox;
     btnPrimary: TButton;
@@ -32,11 +31,11 @@ type
     buCancel: TButton;
     btnOther: TButton;
     lbDiagnosis: TORListBox;
-    ORStaticText1: TORStaticText;
-    ORStaticText2: TORStaticText;
-    ORStaticText3: TORStaticText;
-    ORStaticText4: TORStaticText;
+    lblDiagSect: TLabel;
+    lblDiagCodes: TLabel;
     lblPatientName: TStaticText;
+    gbProvDiag: TGroupBox;
+    lvDxGrid: TListView;
     procedure buOKClick(Sender: TObject);
     procedure buCancelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -64,10 +63,7 @@ type
     procedure lvDxGridClick(Sender: TObject);
     procedure lbOrdersMouseMove(Sender: TObject; Shift: TShiftState; X,
       Y: Integer);
-    procedure ORStaticText1Enter(Sender: TObject);
-    procedure ORStaticText1Exit(Sender: TObject);
-    procedure ORStaticText3Enter(Sender: TObject);
-    procedure ORStaticText3Exit(Sender: TObject);
+    procedure FormKeyPress(Sender: TObject; var Key: Char);
 
   private
     { Private declarations }
@@ -104,11 +100,14 @@ type
     function  ProblemListDxFound(pDxCode:string):boolean;
     function  PersonalListDxFound(pDxCode:string):boolean;
     procedure ReSetCheckBoxStatus(pDxCode:String);
+    procedure DeleteSelectedDx;
+    function  IsCtrlDown: boolean;
 
   public
      FLastHintItemNum: integer;
      procedure Enter(theCaller: smallint; pOrderIDList: TStringList);
      procedure LoadTempRec(var thisRec: TBADxRecord; thisOrderID: string);
+
   end;
 
   const
@@ -136,8 +135,8 @@ var
 implementation
 
 uses rCore, rODMeds, rODBase, rOrders, fRptBox, fODMedOIFA,
-  uAccessibleStringGrid,ORNet, fProbs, fOrdersSign, UBAConst,
-  UBAMessages, fReview, uSignItems, fODConsult, fFrame;
+  ORNet, fProbs, fOrdersSign, UBAConst,
+  UBAMessages, fReview, uSignItems, fODConsult, fFrame, VAUtils;
 
 var
   uProblems    : TStringList;
@@ -175,6 +174,17 @@ begin
      ClearAndDisableCBoxes
 end;
 
+procedure TfrmBALocalDiagnoses.FormKeyPress(Sender: TObject; var Key: Char);
+begin
+  inherited;
+   if frmBALocalDiagnoses.IsCtrlDown then
+   begin
+     if ( Key = #10 ) then
+        frmBALocalDiagnoses.buOK.Click;
+   end;
+   
+end;
+
 procedure TfrmBALocalDiagnoses.ListDiagnosisSections(Dest: TStrings);
 { return section names in format: ListIndex^SectionName (sections begin with '^') }
 var
@@ -194,7 +204,7 @@ begin
     BADiagnosis := TStringList.Create;
     ECFDiagnosis := TStringList.Create;
     uProblems := TStringList.Create;
-    lblPatientName.Caption := Patient.Name;
+    lblPatientName.Caption := Patient.Name + ' Selected Orders';
     DeselectGridItems;
     
     if whoCalled = F_CONSULTS then
@@ -500,7 +510,7 @@ begin
       else
       begin
          a :=  Piece(BADiagnosis[j], U, 2) + U + Piece(BADiagnosis[j], U, 1) + U + '        ' + Piece(BADiagnosis[j], U, 3) ;
-         if a = '' then showmessage('found nothing');
+         if a = '' then ShowMsg('found nothing');
             lbDiagnosis.Items.Add(a);
       end;
    end;
@@ -577,12 +587,12 @@ procedure TfrmBALocalDiagnoses.btnRemoveClick(Sender: TObject);
 begin
   inherited;
   deleteDX := True;
-  lvDxGrid.DeleteSelected;
+  frmBALocalDiagnoses.DeleteSelectedDX;
   ClearAndDisableCBoxes;
   DeselectGridItems;
   EnsurePrimary;
   deleteDX := False;
-                                // if all dx's removed, clear out displaycode
+  // if all dx's removed, clear out displaycode
   if lvDxGrid.items.Count = 0 then FODConsult.displayDXCode := '';
 end;
 
@@ -626,7 +636,7 @@ begin
  else
     begin
        DeselectGridItems;
-       ShowMessage(BA_MAX_DX); //** max  4 diagnoses per order
+       ShowMsg(BA_MAX_DX); //** max  4 diagnoses per order
     end;
 end;
 
@@ -811,7 +821,7 @@ begin
     NewList := TStringList.Create;
     NewList.Clear;
     // ** Add Diagnosis to Problem List if flagged with 'Add' in First Col.
-    with lvDxGrid do
+    with frmBALocalDiagnoses.lvDxGrid do
     begin
        for i := 0 to Items.Count-1 do
        begin
@@ -860,7 +870,7 @@ procedure TfrmBALocalDiagnoses.BuildTempDxList;
 var
    i : integer;
    tempStr1,tempStr2, tempStr3: string;
-   tempFactor1,x: string;
+   tempFactor1: string;
    tempStrList: TStringList;
 begin
    tempStrList := TStringList.Create;
@@ -876,14 +886,14 @@ begin
    tempstr3 := '';
    tempFactor1 := '';
 
-   if lvDxGrid.Items.Count > 0 then
-   with lvDxGrid do
+   if frmBALocalDiagnoses.lvDxGrid.Items.Count > 0 then
+   with frmBALocalDiagnoses.lvDxGrid do
    begin
       for i := 0 to Items.Count-1 do
       begin
-         x := lvDxGrid.Items[i].Subitems[0];
-         x := lvDxGrid.Items[i].Subitems[1];
-         x:= lvDxGrid.Items[i].Subitems[0] + '^' + lvDxGrid.Items[i].Subitems[1];
+     //    x := lvDxGrid.Items[i].Subitems[0];
+     //    x := lvDxGrid.Items[i].Subitems[1];
+     //    x:= lvDxGrid.Items[i].Subitems[0] + '^' + lvDxGrid.Items[i].Subitems[1];
          tempStrList.Add(lvDxGrid.Items[i].Subitems[0] + '^' + lvDxGrid.Items[i].Subitems[1]);
       end;
       if tempStrList.Count > 0 then
@@ -1120,7 +1130,7 @@ begin
    except
       on EListError do
          begin
-         {$ifdef debug}ShowMessage('EListError in frmBALocalDiagnoses.ListSelectedOrders()');{$endif}
+         {$ifdef debug}Show508Message('EListError in frmBALocalDiagnoses.ListSelectedOrders()');{$endif}
          raise;
          end;
     end; //try
@@ -1147,7 +1157,7 @@ begin
    except
       on EListError do
          begin
-         {$ifdef debug}ShowMessage('EListError in frmBALocalDiagnoses.AddDiagnosisToPersonalDiagnosesListClick()');{$endif}
+         {$ifdef debug}Show508Message('EListError in frmBALocalDiagnoses.AddDiagnosisToPersonalDiagnosesListClick()');{$endif}
          raise;
          end;
     end; //try
@@ -1155,7 +1165,7 @@ begin
      if selectedList.Count > 0 then
        if UBACore.rpcAddToPersonalDxList(User.DUZ,selectedList) then
        begin
-          ShowMessage(UBAMessages.BA_PERSONAL_LIST_UPDATED);
+          ShowMsg(UBAMessages.BA_PERSONAL_LIST_UPDATED);
           LoadEncounterForm;
           Refresh;
        end;
@@ -1178,7 +1188,7 @@ begin
   end;
   if UBACore.rpcAddToPersonalDxList(User.DUZ,selectedList) then
   begin
-     ShowMessage(UBAMessages.BA_PERSONAL_LIST_UPDATED);
+     ShowMsg(UBAMessages.BA_PERSONAL_LIST_UPDATED);
      LoadEncounterForm;
      Refresh;
   end;
@@ -1266,6 +1276,7 @@ begin
 
   (Control as TListBox).Canvas.TextOut(Rect.Left+2, Rect.Top+1, (Control as
               TListBox).Items[Index]); {** display the text }
+
 end;
 
 //** Loads string lists containing Diagnoses contained in the Problem and Personal DX List.
@@ -1525,39 +1536,38 @@ begin
      cbAddToPDList.Enabled := False;
 end;
 
-procedure TfrmBALocalDiagnoses.ORStaticText1Enter(Sender: TObject);
-begin
-  inherited;
-  (Sender as TORStaticText).Font.Style := [fsBold];
-end;
-
-procedure TfrmBALocalDiagnoses.ORStaticText1Exit(Sender: TObject);
-begin
-  inherited;
-  (Sender as TORStaticText).Font.Style := [];
-end;
-
-procedure TfrmBALocalDiagnoses.ORStaticText3Enter(Sender: TObject);
-begin
-  inherited;
-  (Sender as TORStaticText).Font.Style := [fsBold];
-end;
-
-procedure TfrmBALocalDiagnoses.ORStaticText3Exit(Sender: TObject);
-begin
-  inherited;
-  (Sender as TORStaticText).Font.Style := [];
-end;
-
 procedure TfrmBALocalDiagnoses.ResetCheckBoxStatus(pDxCode:string);
 begin
  if Not ProblemListDxFound(pDxCode) then
     cbAddToPL.Enabled := True;
  if  Not PersonalListDxFound(pDxCode) then
     cbAddToPDList.Enabled  := True;
+end;
 
+procedure TfrmBALocalDiagnoses.DeleteSelectedDx;
+var
+  I: Integer;
+begin
+  frmBALocalDiagnoses.lvDxGrid.Items.BeginUpdate;
+  try
+    for I := frmBALocalDiagnoses.lvDxGrid.Items.Count - 1 downto 0 do
+      if  frmBALocalDiagnoses.lvDxGrid.Items[I].Selected then
+        frmBALocalDiagnoses.lvdxGrid.Items[I].delete;
+  finally
+    lvDxGrid.Items.EndUpdate;
+  end;
 
 end;
+
+function  TfrmBALocalDiagnoses.IsCtrlDown: boolean;
+var
+  State: TKeyboardState;
+begin { isCtrlDown }
+  GetKeyboardState(State);
+  Result := ((State[VK_CONTROL] and 128)<>0); // Ctrl-button
+end; { isCtrlDown }
+
+
 
 
 Initialization

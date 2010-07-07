@@ -5,10 +5,10 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ORCtrls, ExtCtrls, ComCtrls, ORfn, uConst, uConsults, Buttons,
-  Menus;
+  Menus, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmEditProc = class(TForm)
+  TfrmEditProc = class(TfrmBase508Form)
     cmdAccept: TButton;
     cmdQuit: TButton;
     cboUrgency: TORComboBox;
@@ -166,7 +166,7 @@ var
 begin
   FChanging := True;
   Defaults := TStringList.Create;
-  Defaults.Assign(ODForProcedures);
+  FastAssign(ODForProcedures, Defaults);
   FLastProcID := '';
   cboProc.InitLongList(OldRec.ConsultProcName) ;
   cboProc.SelectByIEN(OldRec.OrderableItem);
@@ -205,7 +205,7 @@ begin
     InfoBox(TX_INACTIVE_CODE, TC_INACTIVE_CODE, MB_ICONWARNING or MB_OK);
     ProvDx.CodeInactive := True;
    end;
-  memReason.Lines.Assign(OldRec.RequestReason);
+  QuickCopy(OldRec.RequestReason, memReason);
   btnCmtCancel.Enabled := (OldRec.DenyComments.Count > 0);
   btnCmtOther.Enabled := (OldRec.OtherComments.Count > 0);
   memComment.Clear ;
@@ -393,11 +393,11 @@ begin
         if Lines.Equals(OldRec.RequestReason) then
           RequestReason.Clear
         else
-          RequestReason.Assign(Lines);
+          QuickCopy(memReason, RequestReason);
 
       with memComment do
         if GetTextLen > 0 then
-          NewComments.Assign(Lines)
+          QuickCopy(memComment, NewComments)
         else
           NewComments.Clear;
     end;
@@ -442,7 +442,7 @@ begin
     with cboService do
       begin
         Clear;
-        Items.Assign(GetProcedureServices(cboProc.ItemIEN));
+        FastAssign(GetProcedureServices(cboProc.ItemIEN), cboService.Items);
         if Items.Count > 0 then
           begin
             ItemIndex := 0 ;
@@ -470,9 +470,11 @@ begin
   inherited;
   AStringList := TStringList.Create;
   try
-    AStringList.Assign(memReason.Lines);
+    //QuickCopy(memReason, AStringList);
+    AStringList.Text := memReason.Text;
     LimitStringLength(AStringList, 74);
-    memReason.Lines.Assign(AstringList);
+    //QuickCopy(AstringList, memReason);
+    memReason.Text := AStringList.Text;
     ControlChange(Self);
   finally
     AStringList.Free;

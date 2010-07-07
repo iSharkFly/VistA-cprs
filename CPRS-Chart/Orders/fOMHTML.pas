@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fOMAction, StdCtrls, OleCtrls, SHDocVw, MSHTML, activex, rOrders, uConst,
-  ExtCtrls;
+  ExtCtrls, VA508AccessibilityManager;
 
 type
   TfrmOMHTML = class(TfrmOMAction)
@@ -129,7 +129,7 @@ begin
     RPCBrokerV.Param[0].Mult[Subs] := Copy(Src[i], 1, 245);
   end; {for i}
   CallBroker;
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure NameValueToOrderSet(Src, Dest: TStringList);
@@ -158,7 +158,7 @@ begin
   end; {for i}
   CallBroker;
   WPText.Free;
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 { general procedures }

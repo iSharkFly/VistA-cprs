@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, ExtCtrls, StdCtrls, ORCtrls, fAutoSz, uOrders, ORFn, ORDtTm, rOrders;
+  Dialogs, ExtCtrls, StdCtrls, ORCtrls, fAutoSz, uOrders, ORFn, ORDtTm, rOrders,
+  VA508AccessibilityManager;
 
 type
   TfrmODChangeUnreleasedRenew = class(TFrmAutoSz)

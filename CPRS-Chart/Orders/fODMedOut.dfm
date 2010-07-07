@@ -3,6 +3,7 @@ inherited frmODMedOut: TfrmODMedOut
   Top = 145
   Height = 316
   Caption = 'Outpatient Medication Order'
+  ExplicitHeight = 316
   PixelsPerInch = 96
   TextHeight = 13
   object lblMedication: TLabel [0]
@@ -197,12 +198,9 @@ inherited frmODMedOut: TfrmODMedOut
   inherited memOrder: TCaptionMemo
     Top = 235
     TabOrder = 15
+    ExplicitTop = 235
   end
-  inherited cmdAccept: TButton
-    Top = 235
-    TabOrder = 13
-  end
-  object cboRoute: TORComboBox [20]
+  object cboRoute: TORComboBox [19]
     Left = 314
     Top = 59
     Width = 72
@@ -225,7 +223,7 @@ inherited frmODMedOut: TfrmODMedOut
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object cboSchedule: TORComboBox [21]
+  object cboSchedule: TORComboBox [20]
     Left = 392
     Top = 59
     Width = 72
@@ -247,7 +245,7 @@ inherited frmODMedOut: TfrmODMedOut
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object memComments: TMemo [22]
+  object memComments: TMemo [21]
     Left = 202
     Top = 197
     Width = 311
@@ -257,7 +255,7 @@ inherited frmODMedOut: TfrmODMedOut
     OnChange = ControlChange
     OnEnter = memCommentsEnter
   end
-  object cboPriority: TORComboBox [23]
+  object cboPriority: TORComboBox [22]
     Left = 392
     Top = 156
     Width = 72
@@ -280,7 +278,7 @@ inherited frmODMedOut: TfrmODMedOut
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object cboMedAlt: TORComboBox [24]
+  object cboMedAlt: TORComboBox [23]
     Left = 6
     Top = 18
     Width = 180
@@ -307,7 +305,7 @@ inherited frmODMedOut: TfrmODMedOut
     OnNeedData = cboMedicationNeedData
     CharsNeedMatch = 1
   end
-  object cboInstructions: TORComboBox [25]
+  object cboInstructions: TORComboBox [24]
     Left = 203
     Top = 59
     Width = 45
@@ -329,7 +327,7 @@ inherited frmODMedOut: TfrmODMedOut
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object cboPickup: TORComboBox [26]
+  object cboPickup: TORComboBox [25]
     Left = 202
     Top = 156
     Width = 106
@@ -352,7 +350,7 @@ inherited frmODMedOut: TfrmODMedOut
     OnChange = ControlChange
     CharsNeedMatch = 1
   end
-  object cboSC: TORComboBox [27]
+  object cboSC: TORComboBox [26]
     Left = 314
     Top = 156
     Width = 72
@@ -376,7 +374,7 @@ inherited frmODMedOut: TfrmODMedOut
     OnEnter = cboSCEnter
     CharsNeedMatch = 1
   end
-  object txtQuantity: TCaptionEdit [28]
+  object txtQuantity: TCaptionEdit [27]
     Left = 470
     Top = 59
     Width = 44
@@ -386,7 +384,7 @@ inherited frmODMedOut: TfrmODMedOut
     OnEnter = txtQuantityEnter
     Caption = 'Quantity'
   end
-  object txtRefills: TCaptionEdit [29]
+  object txtRefills: TCaptionEdit [28]
     Left = 470
     Top = 105
     Width = 31
@@ -396,19 +394,16 @@ inherited frmODMedOut: TfrmODMedOut
     OnChange = ControlChange
     Caption = 'Refills'
   end
-  object spnRefills: TUpDown [30]
+  object spnRefills: TUpDown [29]
     Left = 501
     Top = 105
     Width = 15
     Height = 21
     Associate = txtRefills
-    Min = 0
     Max = 11
-    Position = 0
     TabOrder = 8
-    Wrap = False
   end
-  object cmdComplex: TButton [31]
+  object cmdComplex: TButton [30]
     Left = 202
     Top = 18
     Width = 106
@@ -417,14 +412,91 @@ inherited frmODMedOut: TfrmODMedOut
     TabOrder = 17
     OnClick = cmdComplexClick
   end
+  inherited cmdAccept: TButton
+    Top = 235
+    TabOrder = 13
+    ExplicitTop = 235
+  end
   inherited cmdQuit: TButton
     Top = 262
     TabOrder = 14
+    ExplicitTop = 262
   end
   inherited pnlMessage: TPanel
     Left = 6
     Top = 190
     TabOrder = 16
+    ExplicitLeft = 6
+    ExplicitTop = 190
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memComplex'
+        'Status = stsDefault')
+      (
+        'Component = txtSIG'
+        'Status = stsDefault')
+      (
+        'Component = cboDispense'
+        'Status = stsDefault')
+      (
+        'Component = cboMedication'
+        'Status = stsDefault')
+      (
+        'Component = cboRoute'
+        'Status = stsDefault')
+      (
+        'Component = cboSchedule'
+        'Status = stsDefault')
+      (
+        'Component = memComments'
+        'Status = stsDefault')
+      (
+        'Component = cboPriority'
+        'Status = stsDefault')
+      (
+        'Component = cboMedAlt'
+        'Status = stsDefault')
+      (
+        'Component = cboInstructions'
+        'Status = stsDefault')
+      (
+        'Component = cboPickup'
+        'Status = stsDefault')
+      (
+        'Component = cboSC'
+        'Status = stsDefault')
+      (
+        'Component = txtQuantity'
+        'Status = stsDefault')
+      (
+        'Component = txtRefills'
+        'Status = stsDefault')
+      (
+        'Component = spnRefills'
+        'Status = stsDefault')
+      (
+        'Component = cmdComplex'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODMedOut'
+        'Status = stsDefault'))
   end
   object popUnits: TPopupMenu
     AutoHotkeys = maManual

@@ -4,13 +4,12 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORCtrls, CheckLst, ORFn;
+  fAutoSz, StdCtrls, ORCtrls, CheckLst, ORFn, VA508AccessibilityManager;
 
 type
   TfrmOMProgress = class(TfrmAutoSz)
     lstItems: TCheckListBox;
     cmdStop: TORAlignButton;
-    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -43,12 +42,6 @@ end;
 
 procedure OrderSetDone;
 begin
-end;
-
-procedure TfrmOMProgress.FormCreate(Sender: TObject);
-begin
-  inherited;
-  lstItems.Color := ReadOnlyColor;
 end;
 
 end.

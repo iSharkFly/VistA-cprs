@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, ORFn, StdCtrls, ComCtrls, ORCtrls, ExtCtrls;
+  fAutoSz, ORFn, StdCtrls, ComCtrls, ORCtrls, ExtCtrls,
+  VA508AccessibilityManager, VA508ImageListLabeler;
 
 type
   TfrmHFSearch = class(TfrmAutoSz)
@@ -15,6 +16,7 @@ type
     btnCancel: TButton;
     splMain: TSplitter;
     lblCat: TLabel;
+    imgListHFtvSearch: TVA508ImageListLabeler;
     procedure FormCreate(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure tvSearchDblClick(Sender: TObject);
@@ -114,7 +116,7 @@ procedure TfrmHFSearch.FormCreate(Sender: TObject);
 var
   HFList: TStringList;
   i: integer;
-  Node :TORTreeNode;
+  Node, Child :TORTreeNode;
   CAT: string;
 
 begin
@@ -134,7 +136,8 @@ begin
         with TORTreeNode(tvSearch.Items.Add(nil, '')) do
         begin
           StringData := HFList[i];
-          StateIndex := 2;
+          ImageIndex := 2;
+          SelectedIndex := 2;
         end;
       end;
     end;
@@ -150,7 +153,10 @@ begin
             break;
           Node := TORTreeNode(Node.GetNextSibling);
         end;
-        TORTreeNode(tvSearch.Items.AddChild(Node, '')).StringData := Pieces(HFList[i],U,1,2);
+        Child := TORTreeNode(tvSearch.Items.AddChild(Node, ''));
+        Child.StringData := Pieces(HFList[i],U,1,2);
+        Child.ImageIndex := -1;
+        Child.StateIndex := -1;
       end;
     end;
 //    tvSearch.Invalidate;
@@ -180,10 +186,13 @@ begin
   if(piece(TORTreeNode(Node).StringData,U,3)= 'C') then
   begin
     if(Node.Expanded) then
-      Node.StateIndex := 3
+      Node.ImageIndex := 3
     else
-      Node.StateIndex := 2;
-  end;
+      Node.ImageIndex := 2;
+  end
+  else
+    Node.ImageIndex := -1;
+  Node.SelectedIndex := Node.ImageIndex;
 //  tvSearch.Invalidate;
 end;
 

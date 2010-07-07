@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fPCEBase, StdCtrls, ORCtrls, CheckLst, ExtCtrls, Buttons, uPCE, rPCE, ORFn,
-  fPCELex, fPCEOther, ComCtrls, fPCEBaseMain;
+  fPCELex, fPCEOther, ComCtrls, fPCEBaseMain, VA508AccessibilityManager;
 
 type
   TfrmPatientEd = class(TfrmPCEBaseMain)
@@ -28,7 +28,7 @@ implementation
 {$R *.DFM}
 
 uses
-  fEncounterFrame;
+  fEncounterFrame, VA508AccessibilityRouter;
 
 {///////////////////////////////////////////////////////////////////////////////
 //Name:procedure tfrmPatientEd.cboPatUnderstandingChange(Sender: TObject);
@@ -119,5 +119,8 @@ begin
     end;
   end;
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmPatientEd);
 
 end.

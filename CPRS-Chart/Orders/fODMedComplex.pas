@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fAutoSz, StdCtrls, Grids, Buttons, ExtCtrls, ORCtrls, Menus, ORFn, fODBase, uConst,
-  ComCtrls;
+  ComCtrls, VA508AccessibilityManager;
 
 type
   TfrmODMedComplex = class(TfrmAutoSz)

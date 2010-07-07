@@ -1,10 +1,12 @@
 inherited frmODMedNVA: TfrmODMedNVA
-  Left = 100
-  Top = 167
+  Left = 203
+  Top = 183
   Width = 632
   Height = 536
   Caption = 'Document Herbal/OTC/Non-VA Medications'
   Constraints.MinHeight = 365
+  ExplicitWidth = 632
+  ExplicitHeight = 536
   PixelsPerInch = 96
   TextHeight = 13
   inherited memOrder: TCaptionMemo
@@ -14,26 +16,11 @@ inherited frmODMedNVA: TfrmODMedNVA
     Anchors = [akLeft, akRight, akBottom]
     Constraints.MinWidth = 25
     TabOrder = 4
+    ExplicitLeft = 0
+    ExplicitTop = 461
+    ExplicitWidth = 525
   end
-  inherited cmdAccept: TButton
-    Left = 540
-    Top = 463
-    Width = 69
-    Anchors = [akRight, akBottom]
-    TabOrder = 6
-    Visible = False
-  end
-  inherited cmdQuit: TButton
-    Left = 546
-    Top = 489
-    Width = 49
-    Anchors = [akRight, akBottom]
-    TabOrder = 7
-  end
-  inherited pnlMessage: TPanel
-    Top = 240
-  end
-  object pnlMeds: TPanel
+  object pnlMeds: TPanel [1]
     Left = 6
     Top = 34
     Width = 593
@@ -63,6 +50,7 @@ inherited frmODMedNVA: TfrmODMedNVA
           Width = 420
         end>
       ColumnClick = False
+      Constraints.MaxHeight = 165
       HideSelection = False
       HotTrack = True
       OwnerData = True
@@ -108,7 +96,7 @@ inherited frmODMedNVA: TfrmODMedNVA
       Caption = 'All Medication orders'
     end
   end
-  object txtMed: TEdit
+  object txtMed: TEdit [2]
     Left = 5
     Top = 6
     Width = 596
@@ -122,7 +110,7 @@ inherited frmODMedNVA: TfrmODMedNVA
     OnKeyDown = txtMedKeyDown
     OnKeyUp = txtMedKeyUp
   end
-  object pnlFields: TPanel
+  object pnlFields: TPanel [3]
     Left = 3
     Top = 30
     Width = 624
@@ -180,6 +168,7 @@ inherited frmODMedNVA: TfrmODMedNVA
         TabOrder = 0
         TabStop = True
         Visible = False
+        OnClick = lblGuidelineClick
       end
       object tabDose: TTabControl
         Left = -7
@@ -396,7 +385,7 @@ inherited frmODMedNVA: TfrmODMedNVA
       end
     end
   end
-  object btnSelect: TButton
+  object btnSelect: TButton [4]
     Left = 539
     Top = 463
     Width = 72
@@ -408,8 +397,111 @@ inherited frmODMedNVA: TfrmODMedNVA
     TabOrder = 5
     OnClick = btnSelectClick
   end
+  inherited cmdAccept: TButton
+    Left = 540
+    Top = 463
+    Width = 69
+    Anchors = [akRight, akBottom]
+    TabOrder = 6
+    Visible = False
+    ExplicitLeft = 540
+    ExplicitTop = 463
+    ExplicitWidth = 69
+  end
+  inherited cmdQuit: TButton
+    Left = 546
+    Top = 489
+    Width = 49
+    Anchors = [akRight, akBottom]
+    TabOrder = 7
+    ExplicitLeft = 546
+    ExplicitTop = 489
+    ExplicitWidth = 49
+  end
+  inherited pnlMessage: TPanel
+    Top = 240
+    ExplicitTop = 240
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlMeds'
+        'Status = stsDefault')
+      (
+        'Component = lstQuick'
+        'Status = stsDefault')
+      (
+        'Component = lstAll'
+        'Status = stsDefault')
+      (
+        'Component = txtMed'
+        'Status = stsDefault')
+      (
+        'Component = pnlFields'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = lblGuideline'
+        'Status = stsDefault')
+      (
+        'Component = tabDose'
+        'Status = stsDefault')
+      (
+        'Component = cboDosage'
+        'Status = stsDefault')
+      (
+        'Component = cboRoute'
+        'Status = stsDefault')
+      (
+        'Component = cboSchedule'
+        'Status = stsDefault')
+      (
+        'Component = chkPRN'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = memComment'
+        'Status = stsDefault')
+      (
+        'Component = lblAdminTime'
+        'Status = stsDefault')
+      (
+        'Component = calStart'
+        'Status = stsDefault')
+      (
+        'Component = lbStatements'
+        'Status = stsDefault')
+      (
+        'Component = memDrugMsg'
+        'Status = stsDefault')
+      (
+        'Component = btnSelect'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODMedNVA'
+        'Status = stsDefault'))
+  end
   object dlgStart: TORDateTimeDlg
-    FMDateTime = 3001101
+    FMDateTime = 3001101.000000000000000000
     DateOnly = False
     RequireTime = True
     Left = 500

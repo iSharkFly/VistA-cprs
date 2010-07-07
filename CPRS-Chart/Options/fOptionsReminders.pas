@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORCtrls, OrFn;
+  StdCtrls, ExtCtrls, ORCtrls, OrFn, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmOptionsReminders = class(TForm)
+  TfrmOptionsReminders = class(TfrmBase508Form)
     pnlBottom: TPanel;
     btnOK: TButton;
     btnCancel: TButton;

@@ -1,4 +1,4 @@
-object frmOptionsSurrogate: TfrmOptionsSurrogate
+inherited frmOptionsSurrogate: TfrmOptionsSurrogate
   Left = 232
   Top = 107
   HelpContext = 9100
@@ -7,18 +7,13 @@ object frmOptionsSurrogate: TfrmOptionsSurrogate
   Caption = 'Surrogate for Notifications'
   ClientHeight = 136
   ClientWidth = 313
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   HelpFile = 'CPRSWT.HLP'
-  OldCreateOrder = False
   OnShow = FormShow
+  ExplicitLeft = 232
+  ExplicitTop = 107
   PixelsPerInch = 96
   TextHeight = 13
-  object lblSurrogate: TLabel
+  object lblSurrogate: TLabel [0]
     Left = 7
     Top = 51
     Width = 49
@@ -31,7 +26,7 @@ object frmOptionsSurrogate: TfrmOptionsSurrogate
     Font.Style = []
     ParentFont = False
   end
-  object lblSurrogateText: TStaticText
+  object lblSurrogateText: TStaticText [1]
     Left = 157
     Top = 4
     Width = 81
@@ -39,7 +34,7 @@ object frmOptionsSurrogate: TfrmOptionsSurrogate
     Caption = 'lblSurrogateText'
     TabOrder = 4
   end
-  object lblStart: TStaticText
+  object lblStart: TStaticText [2]
     Left = 157
     Top = 24
     Width = 36
@@ -47,7 +42,7 @@ object frmOptionsSurrogate: TfrmOptionsSurrogate
     Caption = 'lblStart'
     TabOrder = 5
   end
-  object lblStop: TStaticText
+  object lblStop: TStaticText [3]
     Left = 157
     Top = 44
     Width = 36
@@ -55,7 +50,7 @@ object frmOptionsSurrogate: TfrmOptionsSurrogate
     Caption = 'lblStop'
     TabOrder = 6
   end
-  object cboSurrogate: TORComboBox
+  object cboSurrogate: TORComboBox [4]
     Left = 7
     Top = 66
     Width = 145
@@ -81,8 +76,9 @@ object frmOptionsSurrogate: TfrmOptionsSurrogate
     OnExit = cboSurrogateChange
     OnKeyDown = cboSurrogateKeyDown
     OnNeedData = cboSurrogateNeedData
+    CharsNeedMatch = 1
   end
-  object btnSurrogateDateRange: TButton
+  object btnSurrogateDateRange: TButton [5]
     Left = 157
     Top = 66
     Width = 145
@@ -98,7 +94,7 @@ object frmOptionsSurrogate: TfrmOptionsSurrogate
     TabOrder = 1
     OnClick = btnSurrogateDateRangeClick
   end
-  object btnRemove: TButton
+  object btnRemove: TButton [6]
     Left = 7
     Top = 20
     Width = 145
@@ -114,7 +110,7 @@ object frmOptionsSurrogate: TfrmOptionsSurrogate
     TabOrder = 3
     OnClick = btnRemoveClick
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [7]
     Left = 0
     Top = 103
     Width = 313
@@ -159,6 +155,39 @@ object frmOptionsSurrogate: TfrmOptionsSurrogate
       TabOrder = 0
       OnClick = btnOKClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblSurrogateText'
+        'Status = stsDefault')
+      (
+        'Component = lblStart'
+        'Status = stsDefault')
+      (
+        'Component = lblStop'
+        'Status = stsDefault')
+      (
+        'Component = cboSurrogate'
+        'Status = stsDefault')
+      (
+        'Component = btnSurrogateDateRange'
+        'Status = stsDefault')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsSurrogate'
+        'Status = stsDefault'))
   end
   object dlgSurrogateDateRange: TORDateRangeDlg
     DateOnly = False

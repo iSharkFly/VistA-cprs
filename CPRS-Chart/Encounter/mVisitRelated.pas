@@ -8,10 +8,7 @@ uses
 
 type
   TfraVisitRelated = class(TFrame)
-    lblSCYes: TStaticText;
-    lblSCNo: TStaticText;
-    lblSCSelect: TStaticText;
-    bvlSCFrame: TBevel;
+    gbVisitRelatedTo: TGroupBox;
     chkSCYes: TCheckBox;
     chkAOYes: TCheckBox;
     chkIRYes: TCheckBox;
@@ -26,24 +23,32 @@ type
     chkHNCNo: TCheckBox;
     chkCVYes: TCheckBox;
     chkCVNo: TCheckBox;
+    chkSHDYes: TCheckBox;
+    chkSHDNo: TCheckBox;
+    lblSCNo: TStaticText;
+    lblSCYes: TStaticText;
     procedure chkClick(Sender: TObject);
   private
     FSCCond: TSCConditions;
     procedure SetCheckEnable(CheckYes, CheckNo: TCheckBox; Allow: Boolean);
     procedure SetCheckState(CheckYes, CheckNo: TCheckBox; CheckState: Integer);
     function GetCheckState(CheckYes, CheckNo: TCheckBox): Integer;
+
   public
     constructor Create(AOwner: TComponent); override;
     procedure GetRelated(PCEData: TPCEData); overload;
     procedure GetRelated(var ASCRelated, AAORelated, AIRRelated,
-                                AECRelated, AMSTRelated, AHNCRelated, ACVRelated: integer); overload;
+                                AECRelated, AMSTRelated, AHNCRelated, ACVRelated,ASHDRelated: integer); overload;
     procedure InitAllow(SCCond: TSCConditions);
     procedure InitRelated(PCEData: TPCEData); overload;
     procedure InitRelated(const ASCRelated, AAORelated, AIRRelated,
-                                AECRelated, AMSTRelated, AHNCRelated, ACVRelated: integer); overload;
+                                AECRelated, AMSTRelated, AHNCRelated, ACVRelated,ASHDRelated: integer); overload;
+
   end;
 
 implementation
+
+uses VA508AccessibilityRouter;
 
 {$R *.DFM}
 
@@ -55,6 +60,7 @@ const
   TAG_MSTYES     = 5;
   TAG_HNCYES     = 6;
   TAG_CVYES      = 7;
+  TAG_SHDYES     = 8;
   TAG_SCNO       = 11;
   TAG_AONO       = 12;
   TAG_IRNO       = 13;
@@ -62,6 +68,8 @@ const
   TAG_MSTNO      = 15;
   TAG_HNCNO      = 16;
   TAG_CVNO       = 17;
+  TAG_SHDNO      = 18;
+
 
 procedure TfraVisitRelated.chkClick(Sender: TObject);
 
@@ -73,30 +81,34 @@ procedure TfraVisitRelated.chkClick(Sender: TObject);
 begin
   inherited;
   if Sender is TCheckBox then with TCheckBox(Sender) do case Tag of
-    TAG_SCYES:  if Checked then chkSCNo.Checked   := False;
-    TAG_AOYES:  if Checked then chkAONo.Checked   := False;
-    TAG_IRYES:  if Checked then chkIRNo.Checked   := False;
-    TAG_ECYES:  if Checked then chkECNo.Checked   := False;
-    TAG_MSTYES: if Checked then chkMSTNo.Checked  := False;
-    TAG_HNCYES: if Checked then chkHNCNo.Checked  := False;
-    TAG_CVYES:  if Checked then chkCVNo.Checked   := False;
-    TAG_SCNO:   if Checked then chkSCYes.Checked  := False;
-    TAG_AONO:   if Checked then chkAOYes.Checked  := False;
-    TAG_IRNO:   if Checked then chkIRYes.Checked  := False;
-    TAG_ECNO:   if Checked then chkECYes.Checked  := False;
-    TAG_MSTNO:  if Checked then chkMSTYes.Checked := False;
-    TAG_HNCNO:  if Checked then chkHNCYes.Checked := False;
-    TAG_CVNO:   if Checked then chkCVYes.Checked  := False;
+    TAG_SCYES:   if Checked then chkSCNo.Checked    := False;
+    TAG_AOYES:   if Checked then chkAONo.Checked    := False;
+    TAG_IRYES:   if Checked then chkIRNo.Checked    := False;
+    TAG_ECYES:   if Checked then chkECNo.Checked    := False;
+    TAG_MSTYES:  if Checked then chkMSTNo.Checked   := False;
+    TAG_HNCYES:  if Checked then chkHNCNo.Checked   := False;
+    TAG_CVYES:   if Checked then chkCVNo.Checked    := False;
+    TAG_SHDYES:  if Checked then chkSHDNo.Checked   := False;
+    TAG_SCNO:    if Checked then chkSCYes.Checked   := False;
+    TAG_AONO:    if Checked then chkAOYes.Checked   := False;
+    TAG_IRNO:    if Checked then chkIRYes.Checked   := False;
+    TAG_ECNO:    if Checked then chkECYes.Checked   := False;
+    TAG_MSTNO:   if Checked then chkMSTYes.Checked  := False;
+    TAG_HNCNO:   if Checked then chkHNCYes.Checked  := False;
+    TAG_CVNO:    if Checked then chkCVYes.Checked   := False;
+    TAG_SHDNO:   if Checked then chkSHDYes.Checked := False;
   end;
   if chkSCYes.Checked then
   begin
     DisableCheck(chkAOYes);
     DisableCheck(chkIRYes);
     DisableCheck(chkECYes);
+    DisableCheck(chkSHDYes);
 //    DisableCheck(chkMSTYes);
     DisableCheck(chkAONo);
     DisableCheck(chkIRNo);
     DisableCheck(chkECNo);
+    DisableCheck(chkSHDNo);
 //    DisableCheck(chkMSTNo);
   end else
   begin
@@ -104,30 +116,28 @@ begin
     SetCheckEnable(chkAOYes,  chkAONo,  FSCCond.AOAllow);
     SetCheckEnable(chkIRYes,  chkIRNo,  FSCCond.IRAllow);
     SetCheckEnable(chkECYes,  chkECNo,  FSCCond.ECAllow);
+    SetCheckEnable(chkSHDYEs, chkSHDNo, FSCCond.SHDAllow);
   end;
   SetCheckEnable(chkMSTYes, chkMSTNo, FSCCond.MSTAllow);
   SetCheckEnable(chkHNCYes, chkHNCNo, FSCCond.HNCAllow);
-  SetCheckEnable(chkCVYes, chkCVNo, FSCCond.CVAllow);
-  if chkAOYes.Checked or chkIRYes.Checked or chkECYes.Checked then //or chkMSTYes.Checked then
+  SetCheckEnable(chkCVYes, chkCVNo,   FSCCond.CVAllow);
+
+  if chkAOYes.Checked or chkIRYes.Checked or chkECYes.Checked or chkSHDYes.Checked then //or chkMSTYes.Checked then
   begin
-    chkSCYes.Checked := False;
-    chkSCNo.Checked := True;
+    if FSCCond.SCAllow then
+    begin
+       chkSCYes.Checked := False;
+       chkSCNo.Checked := True;
+    end;
   end;
 end;
 
 constructor TfraVisitRelated.Create(AOwner: TComponent);
 begin
-  inherited;
-
+  inherited Create(AOwner);
+  TabStop := FALSE;
   lblSCYes.Height := 13;
   lblSCNo.Height := 13;
-//  chkHNCYes.Visible := HNCOK;
-//  chkHNCNo.Visible := HNCOK;
-//  if not HNCOK then
-//  begin
-//    height := height - chkHNCYes.height + 1;
-//    bvlSCFrame.height := bvlSCFrame.height - chkHNCYes.height + 1;
-//  end;
 end;
 
 function TfraVisitRelated.GetCheckState(CheckYes, CheckNo: TCheckBox): Integer;
@@ -146,10 +156,11 @@ begin
   PCEData.MSTRelated := GetCheckState(chkMSTYes, chkMSTNo);
   PCEData.HNCRelated := GetCheckState(chkHNCYes, chkHNCNo);
   PCEData.CVRelated  := GetCheckState(chkCVYes,  chkCVNo);
+  PCEData.SHADRelated := GetCheckState(chkSHDYes, chkSHDNo);
 end;
 
 procedure TfraVisitRelated.GetRelated(var ASCRelated, AAORelated,
-  AIRRelated, AECRelated, AMSTRelated, AHNCRelated, ACVRelated: integer);
+  AIRRelated, AECRelated, AMSTRelated, AHNCRelated, ACVRelated, ASHDRelated: integer);
 begin
   ASCRelated  := GetCheckState(chkSCYes,  chkSCNo);
   AAORelated  := GetCheckState(chkAOYes,  chkAONo);
@@ -158,6 +169,7 @@ begin
   AMSTRelated := GetCheckState(chkMSTYes, chkMSTNo);
   AHNCRelated := GetCheckState(chkHNCYes, chkHNCNo);
   ACVRelated  := GetCheckState(chkCVYes,  chkCVNo);
+  ASHDRelated := GetCheckState(chkSHDYes, chkSHDNo);
 end;
 
 procedure TfraVisitRelated.InitAllow(SCCond: TSCConditions);
@@ -172,6 +184,7 @@ begin
     SetCheckEnable(chkMSTYes, chkMSTNo, MSTAllow);
     SetCheckEnable(chkHNCYes, chkHNCNo, HNCAllow);
     SetCheckEnable(chkCVYes,  chkCVNo,  CVAllow);
+    SetCheckEnable(chkSHDYes, chkSHDNo, SHDAllow);
   end;
 end;
 
@@ -184,10 +197,18 @@ begin
   SetCheckState(chkMSTYes, chkMSTNo, PCEData.MSTRelated);
   SetCheckState(chkHNCYes, chkHNCNo, PCEData.HNCRelated);
   SetCheckState(chkCVYes,  chkCVNo,  PCEData.CVRelated);
+  SetCheckState(chkSHDYes, chkSHDNo, PCEData.SHADRelated);
+   //HDS00015356: GWOT Default, if Related no specified default to "Yes"
+  // -1=Null, 0=No, 1 = Yes
+  if FSCCond.CVAllow then
+  begin
+    if PCEData.CVRelated = SCC_NA then
+       chkCVYes.Checked := True;
+  end;
 end;
 
 procedure TfraVisitRelated.InitRelated(const ASCRelated, AAORelated, AIRRelated,
-  AECRelated, AMSTRelated, AHNCRelated, ACVRelated: integer);
+  AECRelated, AMSTRelated, AHNCRelated, ACVRelated, ASHDRelated: integer);
 begin
   SetCheckState(chkSCYes,  chkSCNo,  ASCRelated);
   SetCheckState(chkAOYes,  chkAONo,  AAORelated);
@@ -196,6 +217,14 @@ begin
   SetCheckState(chkMSTYes, chkMSTNo, AMSTRelated);
   SetCheckState(chkHNCYes, chkHNCNo, AHNCRelated);
   SetCheckState(chkCVYes,  chkCVNo,  ACVRelated);
+  SetCheckState(chkSHDYes, chkSHDNo, ASHDRelated);
+   //HDS00015356: GWOT Default, if Related no specified default to "Yes"
+   // -1=Null, 0=No, 1 = Yes
+  if FSCCond.CVAllow then
+  begin
+    if ACVRelated = SCC_NA then
+       chkCVYes.Checked := True;
+  end;
 end;
 
 procedure TfraVisitRelated.SetCheckEnable(CheckYes, CheckNo: TCheckBox;
@@ -224,5 +253,9 @@ begin
     end; {case}
   chkClick(Self);
 end;
+
+
+initialization
+  SpecifyFormIsNotADialog(TfraVisitRelated);
 
 end.

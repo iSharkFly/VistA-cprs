@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   Tabs, ComCtrls, ExtCtrls, Menus, StdCtrls, Buttons, fPCEBase,
   fVisitType, fDiagnoses, fProcedure, fImmunization, fSkinTest, fPatientEd,
-  fHealthFactor, fExam, uPCE, rPCE, rTIU, ORCtrls, ORFn, fEncVitals,rvitals;
+  fHealthFactor, fExam, uPCE, rPCE, rTIU, ORCtrls, ORFn, fEncVitals, rvitals, fBase508Form,
+  VA508AccessibilityManager;
 
 const
   //tab names
@@ -55,7 +56,7 @@ const
   TC_PROV_REQ = 'Missing Primary Provider for Encounter';
 
 type
-  TfrmEncounterFrame = class(TForm)
+  TfrmEncounterFrame = class(TfrmBase508Form)
     StatusBar1: TStatusBar;
     pnlPage: TPanel;
     Bevel1: TBevel;
@@ -71,12 +72,13 @@ type
     procedure TabControlChange(Sender: TObject);
     procedure TabControlChanging(Sender: TObject;
       var AllowChange: Boolean);
-    procedure TabControlExit(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCanResize(Sender: TObject; var NewWidth,
       NewHeight: Integer; var Resize: Boolean);
+    procedure FormShow(Sender: TObject);
+    procedure TabControlEnter(Sender: TObject);
 
   private
     FAutoSave: boolean;
@@ -87,6 +89,7 @@ type
     FormList: TStringList;  //Holds the types of any forms that will be used
                             //in the frame.  They must be available at compile time
     FLastPage: TfrmPCEBase;
+    FGiveMultiTabMessage: boolean;
     procedure CreateChildForms(Sender: TObject; Location: integer);
     procedure SynchPCEData;
     procedure SwitchToPage(NewForm: TfrmPCEBase);   //was tfrmPage
@@ -123,7 +126,7 @@ implementation
 uses
   uCore,
   fGAF, uConst,
-  rCore, fPCEProvider, rMisc;
+  rCore, fPCEProvider, rMisc, VA508AccessibilityRouter, VAUtils;
 
 {$R *.DFM}
 
@@ -548,6 +551,7 @@ begin
   fCancel := False;
   FAbort := TRUE;
   SetFormFonts;
+  FGiveMultiTabMessage := ScreenReaderSystemActive;
 end;
 
 
@@ -581,7 +585,7 @@ begin
         StoreMessage := ValAndStoreVitals(frmEncVitals.VitalNew);
         if (Storemessage <> 'True') then
         begin
-          showmessage(storemessage);
+          ShowMsg(storemessage);
 //        exit;
         end;
       end;
@@ -679,6 +683,9 @@ begin
 //must switch based on caption, as all tabs may not be present.
   if (sender as tTabControl).tabindex = -1 then exit;
 
+  if TabControl.CanFocus and Assigned(FLastPage) and not TabControl.Focused then
+    TabControl.SetFocus;  //CQ: 14845
+
   for i := CT_FIRST to CT_LAST do
   begin
     with Formlist do
@@ -687,6 +694,7 @@ begin
       begin
         PageIDToForm(i).show;
         SwitchToPage(PageIDToForm(i));
+        Exit;
       end;
   end;
 end;
@@ -735,21 +743,12 @@ begin
   tabPageChange(Self, tabControl.TabIndex, AllowChange);
 end;
 
-procedure TfrmEncounterFrame.TabControlExit(Sender: TObject);
-var
-  i: integer;
+procedure TfrmEncounterFrame.TabControlEnter(Sender: TObject);
 begin
-  //Keep the focus on the active page
-  if (sender as tTabControl).tabindex = -1 then exit;
-
-  for i := CT_FIRST to CT_LAST do
+  if FGiveMultiTabMessage then // CQ#15483
   begin
-    with Formlist do
-      with sender as tTabControl do
-        if Tabindex = IndexOf(PageIdToTab(i)) then
-      begin
-        PageIDToForm(i).FocusFirstControl;
-      end;
+    FGiveMultiTabMessage := FALSE;
+    GetScreenReader.Speak('Multi tab form');
   end;
 end;
 
@@ -758,6 +757,7 @@ procedure TfrmEncounterFrame.FormKeyDown(Sender: TObject; var Key: Word;
 var
   CanChange: boolean;
 begin
+  inherited;
   if (Key = VK_ESCAPE) then
   begin
     Key := 0;
@@ -787,8 +787,6 @@ begin
       Key := 0;
     end;
   end;
-  if FLastPage = frmEncVitals then
-    frmEncVitals.FormKeyDown(Sender, Key, Shift);
 end;
 
 procedure TfrmEncounterFrame.SetFormFonts;
@@ -833,6 +831,13 @@ begin
      NewWidth := 200;
      Resize := false;
      end;
+end;
+
+procedure TfrmEncounterFrame.FormShow(Sender: TObject);
+begin
+  inherited;
+  if TabControl.CanFocus then
+    TabControl.SetFocus;
 end;
 
 end.

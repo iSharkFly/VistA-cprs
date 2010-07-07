@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORFn, ORCtrls;
+  fAutoSz, StdCtrls, ORFn, ORCtrls, VA508AccessibilityManager;
 
 type
   TfrmPCELex = class(TfrmAutoSz)

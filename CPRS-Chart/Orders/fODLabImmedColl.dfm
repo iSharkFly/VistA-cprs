@@ -1,20 +1,14 @@
-object frmODLabImmedColl: TfrmODLabImmedColl
+inherited frmODLabImmedColl: TfrmODLabImmedColl
   Left = 146
   Top = 150
-  Width = 524
-  Height = 286
   Caption = 'Immediate Collection Times'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 259
+  ClientWidth = 516
   OldCreateOrder = True
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 516
@@ -83,5 +77,26 @@ object frmODLabImmedColl: TfrmODLabImmedColl
       TabOrder = 3
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = memImmedCollect'
+        'Status = stsDefault')
+      (
+        'Component = calImmedCollect'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmODLabImmedColl'
+        'Status = stsDefault'))
   end
 end

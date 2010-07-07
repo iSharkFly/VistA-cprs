@@ -1,38 +1,34 @@
-object frmOtherSchedule: TfrmOtherSchedule
+inherited frmOtherSchedule: TfrmOtherSchedule
   Left = 544
   Top = 262
-  AutoScroll = False
   Caption = 'Order with schedule '#39'OTHER'#39
   ClientHeight = 362
-  ClientWidth = 369
-  Color = clBtnFace
+  ClientWidth = 592
   Constraints.MinHeight = 70
   Constraints.MinWidth = 280
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = False
   Position = poOwnerFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
+  ExplicitWidth = 600
+  ExplicitHeight = 389
   PixelsPerInch = 96
   TextHeight = 13
-  object Splitter1: TSplitter
+  object Splitter1: TSplitter [0]
     Left = 0
     Top = 82
-    Width = 369
+    Width = 592
     Height = 8
     Cursor = crVSplit
     Align = alTop
     Beveled = True
     MinSize = 1
+    ExplicitWidth = 369
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [1]
     Left = 0
     Top = 0
-    Width = 369
+    Width = 592
     Height = 82
     Align = alTop
     BorderWidth = 3
@@ -49,7 +45,7 @@ object frmOtherSchedule: TfrmOtherSchedule
     object memMessage: TMemo
       Left = 52
       Top = 4
-      Width = 313
+      Width = 536
       Height = 74
       Align = alClient
       BevelInner = bvNone
@@ -60,10 +56,10 @@ object frmOtherSchedule: TfrmOtherSchedule
       TabOrder = 0
     end
   end
-  object Panel3: TPanel
+  object Panel3: TPanel [2]
     Left = 0
     Top = 90
-    Width = 369
+    Width = 592
     Height = 272
     Align = alClient
     AutoSize = True
@@ -161,7 +157,6 @@ object frmOtherSchedule: TfrmOtherSchedule
       Top = 1
       Width = 188
       Height = 202
-      Align = alRight
       Caption = 'Set Administration Time'
       TabOrder = 1
       object lstHour: TListBox
@@ -249,12 +244,12 @@ object frmOtherSchedule: TfrmOtherSchedule
     object Panel4: TPanel
       Left = 1
       Top = 203
-      Width = 367
+      Width = 590
       Height = 68
       Align = alBottom
-      TabOrder = 2
+      TabOrder = 3
       DesignSize = (
-        367
+        590
         68)
       object Label1: TLabel
         Left = 6
@@ -264,7 +259,7 @@ object frmOtherSchedule: TfrmOtherSchedule
         Caption = 'Schedule :'
       end
       object btn0k1: TButton
-        Left = 204
+        Left = 427
         Top = 43
         Width = 75
         Height = 20
@@ -274,7 +269,7 @@ object frmOtherSchedule: TfrmOtherSchedule
         OnClick = btn0k1Click
       end
       object btnCancel: TButton
-        Left = 285
+        Left = 508
         Top = 42
         Width = 75
         Height = 20
@@ -283,24 +278,6 @@ object frmOtherSchedule: TfrmOtherSchedule
         ModalResult = 2
         TabOrder = 2
         OnClick = btnCancelClick
-      end
-      object txtSchedule: TEdit
-        Left = 64
-        Top = 8
-        Width = 296
-        Height = 21
-        Anchors = [akLeft, akTop, akRight]
-        Color = clInfoBk
-        Enabled = False
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = [fsBold]
-        ParentFont = False
-        ReadOnly = True
-        TabOrder = 0
-        OnChange = txtScheduleChange
       end
       object btnReset: TButton
         Left = 8
@@ -311,6 +288,148 @@ object frmOtherSchedule: TfrmOtherSchedule
         TabOrder = 3
         OnClick = btnResetClick
       end
+      object txtSchedule: TEdit
+        Left = 63
+        Top = 6
+        Width = 520
+        Height = 21
+        Color = clInfoBk
+        ReadOnly = True
+        TabOrder = 0
+      end
     end
+    object GroupBox3: TGroupBox
+      Left = 374
+      Top = -2
+      Width = 211
+      Height = 202
+      Caption = 'Schedule'
+      TabOrder = 2
+      object NSScboSchedule: TORComboBox
+        Left = 5
+        Top = 16
+        Width = 121
+        Height = 180
+        Style = orcsSimple
+        AutoSelect = True
+        Color = clWindow
+        DropDownCount = 8
+        ItemHeight = 13
+        ItemTipColor = clWindow
+        ItemTipEnable = True
+        ListItemsOnly = False
+        LongList = False
+        LookupPiece = 1
+        MaxLength = 0
+        Pieces = '1'
+        Sorted = False
+        SynonymChars = '<>'
+        TabOrder = 0
+        CharsNeedMatch = 1
+        UniqueAutoComplete = True
+      end
+      object btnSchAdd: TButton
+        Left = 132
+        Top = 64
+        Width = 60
+        Height = 19
+        Caption = 'Add'
+        TabOrder = 1
+        OnClick = btnSchAddClick
+      end
+      object btnSchRemove: TButton
+        Left = 132
+        Top = 94
+        Width = 60
+        Height = 19
+        Caption = 'Remove'
+        TabOrder = 2
+        OnClick = btnSchRemoveClick
+      end
+    end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = Panel3'
+        'Status = stsDefault')
+      (
+        'Component = GroupBox1'
+        'Status = stsDefault')
+      (
+        'Component = cbo7'
+        'Status = stsDefault')
+      (
+        'Component = cbo1'
+        'Status = stsDefault')
+      (
+        'Component = cbo2'
+        'Status = stsDefault')
+      (
+        'Component = cbo3'
+        'Status = stsDefault')
+      (
+        'Component = cbo4'
+        'Status = stsDefault')
+      (
+        'Component = cbo5'
+        'Status = stsDefault')
+      (
+        'Component = cbo6'
+        'Status = stsDefault')
+      (
+        'Component = Button1'
+        'Status = stsDefault')
+      (
+        'Component = GroupBox2'
+        'Status = stsDefault')
+      (
+        'Component = lstHour'
+        'Status = stsDefault')
+      (
+        'Component = lstMinute'
+        'Status = stsDefault')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = btnAdd'
+        'Status = stsDefault')
+      (
+        'Component = Panel4'
+        'Status = stsDefault')
+      (
+        'Component = btn0k1'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnReset'
+        'Status = stsDefault')
+      (
+        'Component = GroupBox3'
+        'Status = stsDefault')
+      (
+        'Component = NSScboSchedule'
+        'Status = stsDefault')
+      (
+        'Component = btnSchAdd'
+        'Status = stsDefault')
+      (
+        'Component = btnSchRemove'
+        'Status = stsDefault')
+      (
+        'Component = frmOtherSchedule'
+        'Status = stsDefault')
+      (
+        'Component = txtSchedule'
+        'Status = stsDefault'))
   end
 end

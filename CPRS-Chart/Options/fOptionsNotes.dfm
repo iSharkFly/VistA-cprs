@@ -1,4 +1,4 @@
-object frmOptionsNotes: TfrmOptionsNotes
+inherited frmOptionsNotes: TfrmOptionsNotes
   Left = 360
   Top = 264
   HelpContext = 9210
@@ -7,40 +7,33 @@ object frmOptionsNotes: TfrmOptionsNotes
   Caption = 'Notes'
   ClientHeight = 150
   ClientWidth = 399
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   HelpFile = 'CPRSWT.HLP'
-  OldCreateOrder = False
   Position = poScreenCenter
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object lblAutoSave1: TLabel
+  object lblAutoSave1: TLabel [0]
     Left = 9
     Top = 14
     Width = 97
     Height = 13
     Caption = 'Interval for autosave'
   end
-  object lblCosigner: TLabel
+  object lblCosigner: TLabel [1]
     Left = 9
     Top = 75
     Width = 80
     Height = 13
     Caption = 'Default cosigner:'
   end
-  object lblAutoSave2: TLabel
+  object lblAutoSave2: TLabel [2]
     Left = 9
     Top = 28
     Width = 67
     Height = 13
     Caption = 'of notes (sec):'
   end
-  object txtAutoSave: TCaptionEdit
+  object txtAutoSave: TCaptionEdit [3]
     Left = 9
     Top = 42
     Width = 42
@@ -52,23 +45,21 @@ object frmOptionsNotes: TfrmOptionsNotes
     OnExit = txtAutoSaveExit
     OnKeyPress = txtAutoSaveKeyPress
   end
-  object spnAutoSave: TUpDown
+  object spnAutoSave: TUpDown [4]
     Left = 51
     Top = 42
     Width = 15
     Height = 21
     HelpContext = 9213
     Associate = txtAutoSave
-    Min = 0
     Max = 10000
     Increment = 5
     Position = 5
     TabOrder = 1
     Thousands = False
-    Wrap = False
     OnClick = spnAutoSaveClick
   end
-  object chkVerifyNote: TCheckBox
+  object chkVerifyNote: TCheckBox [5]
     Left = 177
     Top = 59
     Width = 169
@@ -77,7 +68,7 @@ object frmOptionsNotes: TfrmOptionsNotes
     Caption = 'Verify note title'
     TabOrder = 3
   end
-  object chkAskSubject: TCheckBox
+  object chkAskSubject: TCheckBox [6]
     Left = 177
     Top = 30
     Width = 217
@@ -86,7 +77,7 @@ object frmOptionsNotes: TfrmOptionsNotes
     Caption = 'Ask subject for progress notes'
     TabOrder = 2
   end
-  object cboCosigner: TORComboBox
+  object cboCosigner: TORComboBox [7]
     Left = 9
     Top = 88
     Width = 297
@@ -110,8 +101,9 @@ object frmOptionsNotes: TfrmOptionsNotes
     TabOrder = 4
     OnExit = cboCosignerExit
     OnNeedData = cboCosignerNeedData
+    CharsNeedMatch = 1
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [8]
     Left = 0
     Top = 117
     Width = 399
@@ -151,5 +143,35 @@ object frmOptionsNotes: TfrmOptionsNotes
       ModalResult = 2
       TabOrder = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = txtAutoSave'
+        'Status = stsDefault')
+      (
+        'Component = spnAutoSave'
+        'Status = stsDefault')
+      (
+        'Component = chkVerifyNote'
+        'Status = stsDefault')
+      (
+        'Component = chkAskSubject'
+        'Status = stsDefault')
+      (
+        'Component = cboCosigner'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmOptionsNotes'
+        'Status = stsDefault'))
   end
 end

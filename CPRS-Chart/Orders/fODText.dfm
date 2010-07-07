@@ -23,16 +23,13 @@ inherited frmODText: TfrmODText
     Height = 13
     Caption = 'Stop Date/Time'
   end
-  inherited memOrder: TMemo
+  inherited memOrder: TCaptionMemo
     TabOrder = 6
   end
   inherited cmdAccept: TButton
     TabOrder = 3
   end
-  inherited cmdQuit: TButton
-    TabOrder = 4
-  end
-  object memText: TMemo [6]
+  object memText: TMemo [5]
     Left = 6
     Top = 18
     Width = 508
@@ -40,7 +37,7 @@ inherited frmODText: TfrmODText
     TabOrder = 0
     OnChange = ControlChange
   end
-  object txtStart: TORDateBox [7]
+  object txtStart: TORDateBox [6]
     Left = 226
     Top = 164
     Width = 140
@@ -51,7 +48,7 @@ inherited frmODText: TfrmODText
     RequireTime = False
     Caption = 'Start Date/Time'
   end
-  object txtStop: TORDateBox [8]
+  object txtStop: TORDateBox [7]
     Left = 374
     Top = 164
     Width = 140
@@ -62,7 +59,40 @@ inherited frmODText: TfrmODText
     RequireTime = False
     Caption = 'Stop Date/Time'
   end
+  inherited cmdQuit: TButton
+    TabOrder = 4
+  end
   inherited pnlMessage: TPanel
     TabOrder = 5
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memText'
+        'Status = stsDefault')
+      (
+        'Component = txtStart'
+        'Status = stsDefault')
+      (
+        'Component = txtStop'
+        'Status = stsDefault')
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = cmdAccept'
+        'Status = stsDefault')
+      (
+        'Component = cmdQuit'
+        'Status = stsDefault')
+      (
+        'Component = pnlMessage'
+        'Status = stsDefault')
+      (
+        'Component = memMessage'
+        'Status = stsDefault')
+      (
+        'Component = frmODText'
+        'Status = stsDefault'))
   end
 end

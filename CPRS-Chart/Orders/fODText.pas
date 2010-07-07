@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fODBase, StdCtrls, ORCtrls, ComCtrls, ExtCtrls, ORFn, uConst, ORDtTm;
+  fODBase, StdCtrls, ORCtrls, ComCtrls, ExtCtrls, ORFn, uConst, ORDtTm,
+  VA508AccessibilityManager;
 
 type
   TfrmODText = class(TfrmODBase)
@@ -16,6 +17,7 @@ type
     lblStop: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure ControlChange(Sender: TObject);
+    procedure cmdAcceptClick(Sender: TObject);
   public
     procedure InitDialog; override;
     procedure SetupDialog(OrderAction: Integer; const ID: string); override;
@@ -44,7 +46,7 @@ begin
   inherited;
   FillerID := 'OR';                     // does 'on Display' order check **KCM**
   StatusText('Loading Dialog Definition');
-  Responses.Dialog := 'OR GXTEXT WORD PROCESSING ORDE';  // loads formatting info
+  Responses.Dialog := 'OR GXTEXT WORD PROCESSING ORDER';  // loads formatting info
   //StatusText('Loading Default Values');                // there are no defaults for text only
   //CtrlInits.LoadDefaults(ODForText);
   InitDialog;
@@ -107,6 +109,13 @@ begin
   //  Responses.Update('START', 1, FloatToStr(StartTime), txtStart.Text);
   //  Responses.Update('STOP', 1, FloatToStr(StopTime), txtStop.Text);
   //end;
+end;
+
+procedure TfrmODText.cmdAcceptClick(Sender: TObject);
+begin
+  inherited;
+  Application.ProcessMessages; //CQ 14670
+  memText.Lines.Text := Trim(memText.Lines.Text); //CQ 14670
 end;
 
 procedure TfrmODText.ControlChange(Sender: TObject);

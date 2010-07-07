@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORFn, uPCE;
+  StdCtrls, ORFn, uPCE, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmPCEEdit = class(TForm)
+  TfrmPCEEdit = class(TfrmBase508Form)
     btnNew: TButton;
     btnNote: TButton;
     lblNew: TMemo;

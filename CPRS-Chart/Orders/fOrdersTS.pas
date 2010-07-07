@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORCtrls, ORFn, ExtCtrls, rOrders, ORDtTm, mEvntDelay,uConst;
+  fAutoSz, StdCtrls, ORCtrls, ORFn, ExtCtrls, rOrders, ORDtTm, mEvntDelay,uConst,
+  VA508AccessibilityManager;
 
 type
   TfrmOrdersTS = class(TfrmAutoSz)
