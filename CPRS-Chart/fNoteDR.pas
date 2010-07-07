@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls;
+  fAutoSz, StdCtrls, VA508AccessibilityManager;
 
 type
   TfrmNoteDelReason = class(TfrmAutoSz)

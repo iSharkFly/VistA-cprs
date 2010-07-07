@@ -1,23 +1,16 @@
-object frmDbgList: TfrmDbgList
+inherited frmDbgList: TfrmDbgList
   Left = 313
   Top = 248
-  Width = 480
-  Height = 280
   BorderIcons = [biSystemMenu]
   Caption = 'Show ListBox Data'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
+  ClientHeight = 253
+  ClientWidth = 472
   OldCreateOrder = True
   Position = poScreenCenter
   OnKeyUp = FormKeyUp
   PixelsPerInch = 96
   TextHeight = 13
-  object memData: TMemo
+  object memData: TMemo [0]
     Left = 0
     Top = 0
     Width = 472
@@ -26,5 +19,14 @@ object frmDbgList: TfrmDbgList
     ReadOnly = True
     TabOrder = 0
     WantReturns = False
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memData'
+        'Status = stsDefault')
+      (
+        'Component = frmDbgList'
+        'Status = stsDefault'))
   end
 end

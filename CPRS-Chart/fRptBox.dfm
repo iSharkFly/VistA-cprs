@@ -1,25 +1,20 @@
-object frmReportBox: TfrmReportBox
+inherited frmReportBox: TfrmReportBox
   Left = 512
   Top = 214
   Anchors = []
-  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'frmReportBox'
-  ClientHeight = 321
-  ClientWidth = 350
-  Color = clBtnFace
+  ClientHeight = 319
+  ClientWidth = 348
   Font.Charset = ANSI_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   OnClose = FormClose
-  OnCreate = FormCreate
+  ExplicitWidth = 356
+  ExplicitHeight = 353
   PixelsPerInch = 96
   TextHeight = 13
-  object lblFontTest: TLabel
+  object lblFontTest: TLabel [0]
     Left = 148
     Top = 208
     Width = 77
@@ -32,11 +27,11 @@ object frmReportBox: TfrmReportBox
     Font.Style = []
     ParentFont = False
   end
-  object memReport: TRichEdit
+  object memReport: TRichEdit [1]
     Left = 0
     Top = 0
-    Width = 350
-    Height = 300
+    Width = 348
+    Height = 298
     Align = alClient
     Color = clCream
     Font.Charset = ANSI_CHARSET
@@ -53,10 +48,10 @@ object frmReportBox: TfrmReportBox
     WantReturns = False
     WordWrap = False
   end
-  object pnlButton: TPanel
+  object pnlButton: TPanel [2]
     Left = 0
-    Top = 300
-    Width = 350
+    Top = 298
+    Width = 348
     Height = 21
     Align = alBottom
     Anchors = []
@@ -64,10 +59,10 @@ object frmReportBox: TfrmReportBox
     BevelOuter = bvNone
     TabOrder = 1
     DesignSize = (
-      350
+      348
       21)
     object cmdPrint: TButton
-      Left = 191
+      Left = 189
       Top = 0
       Width = 75
       Height = 21
@@ -77,7 +72,7 @@ object frmReportBox: TfrmReportBox
       OnClick = cmdPrintClick
     end
     object cmdClose: TButton
-      Left = 274
+      Left = 272
       Top = 0
       Width = 75
       Height = 21
@@ -88,6 +83,24 @@ object frmReportBox: TfrmReportBox
       TabOrder = 1
       OnClick = cmdCloseClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memReport'
+        'Status = stsDefault')
+      (
+        'Component = pnlButton'
+        'Status = stsDefault')
+      (
+        'Component = cmdPrint'
+        'Status = stsDefault')
+      (
+        'Component = cmdClose'
+        'Status = stsDefault')
+      (
+        'Component = frmReportBox'
+        'Status = stsDefault'))
   end
   object dlgPrintReport: TPrintDialog
     Left = 318

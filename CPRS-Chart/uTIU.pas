@@ -155,7 +155,7 @@ begin
         Parent := AParent;
         Lines.Text := AStrings.Text;
         Width := 525;
-        Result.Assign(Lines);
+        QuickCopy(ARichEdit74, Result);
       end;
   finally
     ARichEdit74.Free;

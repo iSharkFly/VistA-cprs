@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORCtrls, ORFn, ComCtrls;
+  StdCtrls, ExtCtrls, ORCtrls, ORFn, ComCtrls, fBase508Form,
+  VA508AccessibilityManager, uReports;
 
 type
-  TfrmPtDemo = class(TForm)
+  TfrmPtDemo = class(TfrmBase508Form)
     lblFontTest: TLabel;
     memPtDemo: TRichEdit;
     pnlTop: TORAutoPanel;
@@ -57,7 +58,6 @@ var
   i, MaxWidth, AWidth, AHeight: Integer;
   Rect: TRect;
 begin
-  memPtDemo.Color := ReadOnlyColor;
   FNewPt := False;
   LoadDemographics(memPtDemo.Lines);
   memPtDemo.SelStart := 0;
@@ -112,18 +112,13 @@ begin
     begin
       AHeader := TStringList.Create;
       CreatePatientHeader(AHeader, Self.Caption);
-      memPrintReport := TRichEdit.Create(Self);
+      memPrintReport := CreateReportTextComponent(Self);
       try
         MaxLines := 60 - AHeader.Count;
         LastLine := 0;
         ThisPage := 0;
         with memPrintReport do
           begin
-            Visible := False;
-            Parent := Self;
-            Width := Printer.Canvas.TextWidth(StringOfChar('-', 74));
-            Font.Name := 'Courier New';
-            Font.Size := MainFontSize;
             StartLine := 4;
             repeat
               with Lines do
@@ -137,7 +132,7 @@ begin
                       Break;
                   LastLine := LastLine + i;
                   Add(' ');
-                  Add(' ');                      
+                  Add(' ');
                   Add(StringOfChar('-', 74));
                   if LastLine >= memPtDemo.Lines.Count - 1 then
                     Add('End of report')

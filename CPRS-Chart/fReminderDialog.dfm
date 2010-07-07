@@ -1,50 +1,39 @@
-object frmRemDlg: TfrmRemDlg
-  Left = 357
-  Top = 260
-  Width = 545
-  Height = 407
+inherited frmRemDlg: TfrmRemDlg
+  Left = 310
+  Top = 154
+  Width = 543
+  Height = 405
   HelpContext = 11100
   VertScrollBar.Range = 162
-  AutoScroll = False
   BorderIcons = [biSystemMenu]
   Caption = 'Reminder Dialog'
-  Color = clBtnFace
   Constraints.MinHeight = 250
   Constraints.MinWidth = 250
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   FormStyle = fsStayOnTop
-  OldCreateOrder = False
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
+  ExplicitWidth = 543
+  ExplicitHeight = 405
   PixelsPerInch = 96
   TextHeight = 13
-  object splTxtData: TSplitter
+  object splTxtData: TSplitter [0]
     Left = 0
-    Top = 218
-    Width = 537
+    Top = 216
+    Width = 535
     Height = 3
     Cursor = crVSplit
     Align = alBottom
+    ExplicitTop = 218
+    ExplicitWidth = 537
   end
-  object Label1: TLabel
-    Left = 176
-    Top = 368
-    Width = 32
-    Height = 13
-    Caption = 'Label1'
-  end
-  object sb1: TScrollBox
+  object sb1: TScrollBox [1]
     Left = 0
     Top = 0
-    Width = 537
-    Height = 218
+    Width = 535
+    Height = 216
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alClient
@@ -57,12 +46,14 @@ object frmRemDlg: TfrmRemDlg
     TabOrder = 0
     Visible = False
     OnResize = sbResize
+    ExplicitWidth = 537
+    ExplicitHeight = 218
   end
-  object sb2: TScrollBox
+  object sb2: TScrollBox [2]
     Left = 0
     Top = 0
-    Width = 537
-    Height = 218
+    Width = 535
+    Height = 216
     HorzScrollBar.Tracking = True
     VertScrollBar.Tracking = True
     Align = alClient
@@ -74,34 +65,50 @@ object frmRemDlg: TfrmRemDlg
     ParentFont = False
     TabOrder = 1
     OnResize = sbResize
+    ExplicitWidth = 537
+    ExplicitHeight = 218
   end
-  object pnlFrmBottom: TPanel
+  object pnlFrmBottom: TPanel [3]
     Left = 0
-    Top = 221
-    Width = 537
+    Top = 219
+    Width = 535
     Height = 159
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
+    ExplicitTop = 221
+    ExplicitWidth = 537
+    object lblFootnotes: TLabel
+      Left = 0
+      Top = 144
+      Width = 535
+      Height = 15
+      Align = alBottom
+      AutoSize = False
+      Caption = ' * Indicates a Required Field'
+      ExplicitWidth = 537
+    end
     object pnlBottom: TPanel
       Left = 0
       Top = 0
-      Width = 537
+      Width = 535
       Height = 144
       Align = alClient
       TabOrder = 0
+      ExplicitWidth = 537
       object splText: TSplitter
         Left = 1
         Top = 94
-        Width = 535
+        Width = 533
         Height = 3
         Cursor = crVSplit
         Align = alBottom
+        ExplicitWidth = 535
       end
       object reData: TRichEdit
         Left = 1
         Top = 97
-        Width = 535
+        Width = 533
         Height = 46
         Align = alBottom
         Color = clCream
@@ -109,11 +116,12 @@ object frmRemDlg: TfrmRemDlg
         ScrollBars = ssVertical
         TabOrder = 2
         WantReturns = False
+        ExplicitWidth = 535
       end
       object reText: TRichEdit
         Left = 1
         Top = 25
-        Width = 535
+        Width = 533
         Height = 69
         Align = alClient
         Color = clCream
@@ -128,17 +136,19 @@ object frmRemDlg: TfrmRemDlg
         TabOrder = 1
         WantReturns = False
         WordWrap = False
+        ExplicitWidth = 535
       end
       object pnlButtons: TORAutoPanel
         Left = 1
         Top = 1
-        Width = 535
+        Width = 533
         Height = 24
         Align = alTop
         BevelOuter = bvNone
         ParentShowHint = False
         ShowHint = True
         TabOrder = 0
+        ExplicitWidth = 535
         object btnClear: TButton
           Left = 2
           Top = 2
@@ -211,15 +221,59 @@ object frmRemDlg: TfrmRemDlg
         end
       end
     end
-    object lblFootnotes: TStaticText
-      Left = 0
-      Top = 144
-      Width = 537
-      Height = 15
-      Align = alBottom
-      AutoSize = False
-      Caption = ' * Indicates a Required Field'
-      TabOrder = 1
-    end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = sb1'
+        'Status = stsDefault')
+      (
+        'Component = sb2'
+        'Status = stsDefault')
+      (
+        'Component = pnlFrmBottom'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = reData'
+        'Status = stsDefault')
+      (
+        'Component = reText'
+        'Status = stsDefault')
+      (
+        'Component = pnlButtons'
+        'Status = stsDefault')
+      (
+        'Component = btnClear'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = btnBack'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = btnCancel'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = btnNext'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = btnFinish'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = btnClinMaint'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = btnVisit'
+        'Status = stsDefault')
+      (
+        'Component = frmRemDlg'
+        'Status = stsDefault'))
   end
 end

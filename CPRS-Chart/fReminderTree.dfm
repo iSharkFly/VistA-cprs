@@ -1,31 +1,25 @@
-object frmReminderTree: TfrmReminderTree
-  Left = 256
-  Top = 220
-  Width = 480
-  Height = 255
+inherited frmReminderTree: TfrmReminderTree
+  Left = 229
+  Top = 197
   HelpContext = 11200
   BorderIcons = [biSystemMenu]
   Caption = 'Available Reminders'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 221
+  ClientWidth = 472
   FormStyle = fsStayOnTop
-  KeyPreview = True
   Menu = mmMain
-  OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  ExplicitWidth = 480
+  ExplicitHeight = 267
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlTop: TPanel
+  object pnlTop: TPanel [0]
     Left = 0
     Top = 0
     Width = 472
-    Height = 209
+    Height = 221
     Align = alClient
     BevelOuter = bvNone
     Caption = 'pnlTop'
@@ -47,11 +41,9 @@ object frmReminderTree: TfrmReminderTree
       RowSelect = True
       StateImages = dmodShared.imgReminders
       TabOrder = 0
-      OnAddition = tvRemAddition
       OnChange = tvRemChange
       OnClick = tvRemClick
       OnCollapsed = tvRemCollapsed
-      OnDeletion = tvRemDeletion
       OnEnter = tvRemEnter
       OnExit = tvRemExit
       OnExpanded = tvRemExpanded
@@ -65,7 +57,6 @@ object frmReminderTree: TfrmReminderTree
       Top = 0
       Width = 472
       Height = 17
-      DragReorder = False
       Sections = <
         item
           ImageIndex = -1
@@ -103,25 +94,26 @@ object frmReminderTree: TfrmReminderTree
       Left = 266
       Top = 17
       Width = 206
-      Height = 192
+      Height = 204
       Align = alRight
       BevelOuter = bvNone
       Caption = 'pnlTopRight'
       TabOrder = 2
       object bvlGap: TBevel
         Left = 0
-        Top = 175
+        Top = 187
         Width = 206
         Height = 17
         Align = alBottom
         Shape = bsSpacer
         Visible = False
+        ExplicitTop = 175
       end
       object lbRem: TORListBox
         Left = 0
         Top = 0
         Width = 206
-        Height = 175
+        Height = 187
         TabStop = False
         Style = lbOwnerDrawFixed
         Align = alClient
@@ -139,6 +131,27 @@ object frmReminderTree: TfrmReminderTree
         OnChange = lbRemChange
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = tvRem'
+        'Status = stsDefault')
+      (
+        'Component = hcRem'
+        'Status = stsDefault')
+      (
+        'Component = pnlTopRight'
+        'Status = stsDefault')
+      (
+        'Component = lbRem'
+        'Status = stsDefault')
+      (
+        'Component = frmReminderTree'
+        'Status = stsDefault'))
   end
   object mmMain: TMainMenu
     Images = dmodShared.imgReminders2
@@ -176,5 +189,15 @@ object frmReminderTree: TfrmReminderTree
         OnClick = mnuExitClick
       end
     end
+  end
+  object imgLblReminders: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvRem
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblReminders
+    Left = 120
+    Top = 56
   end
 end

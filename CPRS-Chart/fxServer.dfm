@@ -1,30 +1,25 @@
-object frmDbgServer: TfrmDbgServer
+inherited frmDbgServer: TfrmDbgServer
   Left = 206
   Top = 168
-  Width = 508
-  Height = 328
   Caption = 'Server Information'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
+  ClientHeight = 301
+  ClientWidth = 500
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   OnKeyUp = FormKeyUp
+  ExplicitWidth = 508
+  ExplicitHeight = 328
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TLabel [0]
     Left = 6
     Top = 6
     Width = 101
     Height = 13
     Caption = 'Current Symbol Table'
   end
-  object memSymbols: TRichEdit
+  object memSymbols: TRichEdit [1]
     Left = 6
     Top = 20
     Width = 488
@@ -42,7 +37,7 @@ object frmDbgServer: TfrmDbgServer
     TabOrder = 0
     WantReturns = False
   end
-  object RadioButton1: TRadioButton
+  object RadioButton1: TRadioButton [2]
     Left = 8
     Top = 276
     Width = 125
@@ -52,7 +47,7 @@ object frmDbgServer: TfrmDbgServer
     TabOrder = 1
     TabStop = True
   end
-  object RadioButton2: TRadioButton
+  object RadioButton2: TRadioButton [3]
     Left = 156
     Top = 276
     Width = 105
@@ -60,12 +55,30 @@ object frmDbgServer: TfrmDbgServer
     Caption = 'Global Reference'
     TabOrder = 2
   end
-  object Edit1: TEdit
+  object Edit1: TEdit [4]
     Left = 264
     Top = 274
     Width = 229
     Height = 21
     Enabled = False
     TabOrder = 3
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memSymbols'
+        'Status = stsDefault')
+      (
+        'Component = RadioButton1'
+        'Status = stsDefault')
+      (
+        'Component = RadioButton2'
+        'Status = stsDefault')
+      (
+        'Component = Edit1'
+        'Status = stsDefault')
+      (
+        'Component = frmDbgServer'
+        'Status = stsDefault'))
   end
 end

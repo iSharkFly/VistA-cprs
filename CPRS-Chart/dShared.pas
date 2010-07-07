@@ -3,7 +3,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, ImgList, uTemplates, ORFn, ORNet, ExtCtrls, ORCtrls, Richedit;
+  ComCtrls, ImgList, uTemplates, ORFn, ORNet, ExtCtrls, ORCtrls, Richedit,
+  VA508ImageListLabeler;
 
 type
   TdmodShared = class(TDataModule)
@@ -14,6 +15,13 @@ type
     imgReminders2: TImageList;
     imgConsults: TImageList;
     imgSurgery: TImageList;
+    imgLblReminders: TVA508ImageListLabeler;
+    imgLblHealthFactorLabels: TVA508ImageListLabeler;
+    imgLblNotes: TVA508ImageListLabeler;
+    imgLblImages: TVA508ImageListLabeler;
+    imgLblConsults: TVA508ImageListLabeler;
+    imgLblSurgery: TVA508ImageListLabeler;
+    imgLblReminders2: TVA508ImageListLabeler;
     procedure dmodSharedCreate(Sender: TObject);
     procedure dmodSharedDestroy(Sender: TObject);
   private
@@ -66,7 +74,7 @@ const
 
 implementation
 
-uses fDrawers, rTemplates, uCore, uTemplateFields, uEventHooks;
+uses fDrawers, rTemplates, uCore, uTemplateFields, uEventHooks, VA508AccessibilityRouter;
 
 {$R *.DFM}
 
@@ -875,6 +883,9 @@ begin
   else
     FindRichEditText(AReplaceDialog, ARichEdit);
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TdmodShared);
 
 end.
 

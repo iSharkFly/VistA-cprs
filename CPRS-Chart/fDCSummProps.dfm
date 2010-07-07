@@ -1,31 +1,25 @@
-object frmDCSummProperties: TfrmDCSummProperties
+inherited frmDCSummProperties: TfrmDCSummProperties
   Left = 298
   Top = 186
-  AutoScroll = False
   BorderIcons = []
   Caption = 'Discharge Summary Properties'
   ClientHeight = 437
   ClientWidth = 498
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
   OnShow = FormShow
+  ExplicitWidth = 506
+  ExplicitHeight = 471
   PixelsPerInch = 96
   TextHeight = 13
-  object bvlConsult: TBevel
+  object bvlConsult: TBevel [0]
     Tag = 1
     Left = 6
     Top = 119
     Width = 483
     Height = 2
   end
-  object pnlFields: TORAutoPanel
+  object pnlFields: TORAutoPanel [1]
     Left = 0
     Top = 0
     Width = 498
@@ -88,6 +82,7 @@ object frmDCSummProperties: TfrmDCSummProperties
       Sorted = False
       SynonymChars = '<>'
       TabOrder = 0
+      OnChange = cboNewTitleChange
       OnDblClick = cboNewTitleDblClick
       OnDropDownClose = cboNewTitleDropDownClose
       OnEnter = cboNewTitleEnter
@@ -183,7 +178,7 @@ object frmDCSummProperties: TfrmDCSummProperties
       OnClick = cmdCancelClick
     end
   end
-  object pnlTranscription: TORAutoPanel
+  object pnlTranscription: TORAutoPanel [2]
     Left = 0
     Top = 218
     Width = 498
@@ -258,7 +253,7 @@ object frmDCSummProperties: TfrmDCSummProperties
       CharsNeedMatch = 1
     end
   end
-  object pnlAdmissions: TORAutoPanel
+  object pnlAdmissions: TORAutoPanel [3]
     Left = 0
     Top = 327
     Width = 498
@@ -286,7 +281,7 @@ object frmDCSummProperties: TfrmDCSummProperties
       OnChange = lstAdmissionsChange
     end
   end
-  object pnlLabels: TORAutoPanel
+  object pnlLabels: TORAutoPanel [4]
     Left = 0
     Top = 281
     Width = 498
@@ -353,5 +348,56 @@ object frmDCSummProperties: TfrmDCSummProperties
       Caption = 'Select one of the following or press cancel.'
       TabOrder = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlFields'
+        'Status = stsDefault')
+      (
+        'Component = cboNewTitle'
+        'Status = stsDefault')
+      (
+        'Component = calSumm'
+        'Status = stsDefault')
+      (
+        'Component = cboAuthor'
+        'Status = stsDefault')
+      (
+        'Component = cboAttending'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = pnlTranscription'
+        'Status = stsDefault')
+      (
+        'Component = cboTranscriptionist'
+        'Status = stsDefault')
+      (
+        'Component = cboUrgency'
+        'Status = stsDefault')
+      (
+        'Component = pnlAdmissions'
+        'Status = stsDefault')
+      (
+        'Component = lstAdmissions'
+        'Status = stsDefault')
+      (
+        'Component = pnlLabels'
+        'Status = stsDefault')
+      (
+        'Component = lblDCSumm1'
+        'Status = stsDefault')
+      (
+        'Component = lblDCSumm2'
+        'Status = stsDefault')
+      (
+        'Component = frmDCSummProperties'
+        'Status = stsDefault'))
   end
 end

@@ -1,25 +1,21 @@
-object frmPtSel: TfrmPtSel
-  Left = 194
+inherited frmPtSel: TfrmPtSel
   Top = 131
-  Width = 793
-  Height = 589
   BorderIcons = []
   Caption = 'Patient Selection'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
+  ClientHeight = 555
+  ClientWidth = 785
   OldCreateOrder = True
   OnClose = FormClose
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
-  OnKeyDown = FormKeyDown
+  OnResize = FormResize
   OnShow = FormShow
+  ExplicitTop = 131
+  ExplicitWidth = 793
+  ExplicitHeight = 589
   PixelsPerInch = 96
   TextHeight = 13
-  object sptVert: TSplitter
+  object sptVert: TSplitter [0]
     Left = 0
     Top = 290
     Width = 785
@@ -27,7 +23,7 @@ object frmPtSel: TfrmPtSel
     Cursor = crVSplit
     Align = alTop
   end
-  object pnlDivide: TORAutoPanel
+  object pnlDivide: TORAutoPanel [1]
     Left = 0
     Top = 294
     Width = 785
@@ -49,8 +45,9 @@ object frmPtSel: TfrmPtSel
       Top = 1
       Width = 100
       Height = 15
+      BackColor = clHighlightText
       Color = clBtnFace
-      ForeColor = clActiveCaption
+      ForeColor = clHighlight
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clCaptionText
       Font.Height = -11
@@ -62,7 +59,7 @@ object frmPtSel: TfrmPtSel
       Visible = False
     end
   end
-  object pnlPtSel: TORAutoPanel
+  object pnlPtSel: TORAutoPanel [2]
     Left = 0
     Top = 0
     Width = 785
@@ -72,18 +69,18 @@ object frmPtSel: TfrmPtSel
     TabOrder = 3
     OnResize = pnlPtSelResize
     object lblPatient: TLabel
-      Left = 185
-      Top = 8
+      Left = 216
+      Top = 4
       Width = 33
       Height = 13
       Caption = 'Patient'
       ShowAccelChar = False
     end
     object cboPatient: TORComboBox
-      Left = 185
-      Top = 22
+      Left = 216
+      Top = 33
       Width = 272
-      Height = 262
+      Height = 251
       Hint = 'Enter name,Full SSN ,Last 4 (x1234),'#39'HRN'#39',DOB, or Phone#'
       Style = orcsSimple
       AutoSelect = True
@@ -113,39 +110,40 @@ object frmPtSel: TfrmPtSel
       OnMouseClick = cboPatientMouseClick
       OnNeedData = cboPatientNeedData
       CharsNeedMatch = 1
+      UniqueAutoComplete = True
     end
     object cmdOK: TButton
       Left = 698
-      Top = 22
+      Top = 3
       Width = 78
-      Height = 19
+      Height = 21
       Caption = 'OK'
       TabOrder = 2
       OnClick = cmdOKClick
     end
     object cmdCancel: TButton
       Left = 698
-      Top = 43
+      Top = 24
       Width = 78
-      Height = 19
+      Height = 21
       Cancel = True
       Caption = 'Cancel'
       TabOrder = 3
       OnClick = cmdCancelClick
     end
     object cmdSaveList: TButton
-      Left = 499
+      Left = 494
       Top = 265
       Width = 175
-      Height = 18
+      Height = 21
       Caption = 'Save Patient List Settings'
       TabOrder = 0
       OnClick = cmdSaveListClick
     end
     object RadioGroup1: TRadioGroup
-      Left = 464
+      Left = 512
       Top = 192
-      Width = 313
+      Width = 265
       Height = 65
       Caption = 'Specific "In-Depth" Lookup by '
       ItemIndex = 0
@@ -157,7 +155,7 @@ object frmPtSel: TfrmPtSel
       OnClick = onclick1
     end
   end
-  object pnlNotifications: TORAutoPanel
+  object pnlNotifications: TORAutoPanel [3]
     Left = 0
     Top = 520
     Width = 785
@@ -201,21 +199,31 @@ object frmPtSel: TfrmPtSel
       Height = 21
       Caption = 'Forward'
       Enabled = False
-      TabOrder = 4
+      TabOrder = 3
       OnClick = cmdForwardClick
     end
     object cmdRemove: TButton
-      Left = 490
+      Left = 577
       Top = 10
       Width = 95
       Height = 21
       Caption = 'Remove'
       Enabled = False
-      TabOrder = 3
+      TabOrder = 5
       OnClick = cmdRemoveClick
     end
+    object cmdComments: TButton
+      Left = 441
+      Top = 10
+      Width = 95
+      Height = 21
+      Caption = 'Show Comments'
+      Enabled = False
+      TabOrder = 4
+      OnClick = cmdCommentsClick
+    end
   end
-  object lstvAlerts: TCaptionListView
+  object lstvAlerts: TCaptionListView [4]
     Left = 0
     Top = 311
     Width = 785
@@ -256,6 +264,7 @@ object frmPtSel: TfrmPtSel
         Tag = 6
         Width = 180
       end>
+    HideSelection = False
     HoverTime = 0
     IconOptions.WrapText = False
     MultiSelect = True
@@ -274,6 +283,54 @@ object frmPtSel: TfrmPtSel
     OnKeyDown = lstvAlertsKeyDown
     OnSelectItem = lstvAlertsSelectItem
     Caption = 'Notifications'
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlDivide'
+        'Status = stsDefault')
+      (
+        'Component = pnlPtSel'
+        'Status = stsDefault')
+      (
+        'Component = cboPatient'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cmdSaveList'
+        'Status = stsDefault')
+      (
+        'Component = pnlNotifications'
+        'Status = stsDefault')
+      (
+        'Component = cmdProcessInfo'
+        'Status = stsDefault')
+      (
+        'Component = cmdProcessAll'
+        'Status = stsDefault')
+      (
+        'Component = cmdProcess'
+        'Status = stsDefault')
+      (
+        'Component = cmdForward'
+        'Status = stsDefault')
+      (
+        'Component = cmdRemove'
+        'Status = stsDefault')
+      (
+        'Component = lstvAlerts'
+        'Status = stsDefault')
+      (
+        'Component = frmPtSel'
+        'Status = stsDefault')
+      (
+        'Component = cmdComments'
+        'Status = stsDefault'))
   end
   object popNotifications: TPopupMenu
     Left = 508

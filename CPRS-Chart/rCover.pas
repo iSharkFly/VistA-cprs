@@ -123,7 +123,7 @@ end;
 procedure LoadCoverSheetList(Dest: TStrings);
 begin
   CallV('ORWCV1 COVERSHEET LIST', [nil]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ExtractActiveMeds(Dest: TStrings; Src: TStringList);
@@ -175,7 +175,7 @@ begin
   InvertStringList(Src);        // makes inverse chronological by order time
   MixedCaseList(Src);
   if Src.Count = 0 then Src.Add('0^No active medications found');
-  Dest.Assign(Src);
+  FastAssign(Src, Dest);
 end;
 
 procedure ListGeneric(Dest: TStrings; ARpc: String; ACase, AInvert: Boolean;
@@ -197,7 +197,7 @@ begin
           CallV('ORQQPX REMINDERS LIST', [Patient.DFN]);
           SetListFMDateTime('mmm dd,yy', TStringList(RPCBrokerV.Results), U, 3, TRUE);
         end;
-      Dest.Assign(RPCBrokerV.Results);
+        FastAssign(RPCBrokerV.Results, Dest);
       exit;
     end;
   tmplist := TStringList.Create;
@@ -213,7 +213,7 @@ begin
     if AID = '40' then
       ExtractActiveMeds(TStringList(tmplist), TStringList(RPCBrokerV.Results))
     else
-      tmpList.Assign(RPCBrokerV.Results);
+      FastAssign(RPCBrokerV.Results, tmpList);
     if ACase = TRUE then MixedCaseList(tmplist);
     if AID = '10' then for i := 0 to tmplist.Count - 1 do    // capitalize SC exposures for problems
     begin
@@ -240,7 +240,7 @@ begin
             tmplist[i] := s
           end;
       end;
-    Dest.Assign(tmplist);
+    FastAssign(tmplist, Dest);
   finally
     tmplist.Free;
   end;
@@ -256,7 +256,7 @@ var
 begin
   CallV('ORQQPL LIST', [Patient.DFN, ACTIVE_PROBLEMS]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
   for i := 0 to Dest.Count - 1 do
     begin
       x0 := Dest[i];
@@ -272,7 +272,7 @@ procedure ListAllergies(Dest: TStrings);
 begin
   CallV('ORQQAL LIST', [Patient.DFN]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListPostings(Dest: TStrings);
@@ -282,7 +282,7 @@ begin
   begin
     MixedCaseList(Results);
     SetListFMDateTime('mmm dd,yy', TStringList(Results), U, 3);
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -298,7 +298,7 @@ begin
       SetListFMDateTime('mmm dd,yy', TStringList(Results), U, 3, TRUE);
     end;
 //    MixedCaseList(Results);
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -315,7 +315,7 @@ begin
   begin
     MixedCaseList(Results);
     SetListFMDateTime('mmm dd,yy', TStringList(Results), U, 3);
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -326,7 +326,7 @@ begin
   begin
     SetListFMDateTime('mmm dd,yy', TStringList(Results), U, 4);
     if Results.Count = 0 then Results.Add('0^No vitals found');
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -338,7 +338,7 @@ begin
     InvertStringList(TStringList(Results));
     MixedCaseList(Results);
     SetListFMDateTime('mmm dd,yy hh:nn', TStringList(Results), U, 2);
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -386,7 +386,7 @@ var
     end;
     if tmplst.Count = 0 then
       tmplst.Add(NoDataText(SectionID = 'RMND'));
-    DestList.Assign(tmplst);
+    FastAssign(tmplst, DestList);
   end;
 
 begin
@@ -426,7 +426,7 @@ end;
 procedure LoadDemographics(Dest: TStrings);
 begin
   CallV('ORWPT PTINQ', [Patient.DFN]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 function StartCoverSheet(const IPAddress: string; const AHandle: HWND;

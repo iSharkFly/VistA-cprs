@@ -6,12 +6,13 @@ inherited frmTimeout: TfrmTimeout
   Caption = 'CPRS Timeout'
   ClientHeight = 102
   ClientWidth = 247
-  FormStyle = fsStayOnTop
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
-  object lblCount: TStaticText
+  object lblCount: TStaticText [0]
     Left = 8
     Top = 60
     Width = 30
@@ -26,7 +27,7 @@ inherited frmTimeout: TfrmTimeout
     ParentFont = False
     TabOrder = 3
   end
-  object Label1: TStaticText
+  object Label1: TStaticText [1]
     Left = 8
     Top = 8
     Width = 234
@@ -40,7 +41,7 @@ inherited frmTimeout: TfrmTimeout
     ParentFont = False
     TabOrder = 1
   end
-  object Label2: TStaticText
+  object Label2: TStaticText [2]
     Left = 8
     Top = 32
     Width = 234
@@ -48,7 +49,7 @@ inherited frmTimeout: TfrmTimeout
     Caption = 'Press the button to continue working with CPRS.'
     TabOrder = 2
   end
-  object cmdContinue: TButton
+  object cmdContinue: TButton [3]
     Left = 134
     Top = 64
     Width = 105
@@ -57,6 +58,24 @@ inherited frmTimeout: TfrmTimeout
     Caption = 'Don'#39't Close CPRS'
     TabOrder = 0
     OnClick = cmdContinueClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblCount'
+        'Status = stsDefault')
+      (
+        'Component = Label1'
+        'Status = stsDefault')
+      (
+        'Component = Label2'
+        'Status = stsDefault')
+      (
+        'Component = cmdContinue'
+        'Status = stsDefault')
+      (
+        'Component = frmTimeout'
+        'Status = stsDefault'))
   end
   object timCountDown: TTimer
     Interval = 5000

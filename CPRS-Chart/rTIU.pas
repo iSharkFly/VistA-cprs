@@ -25,7 +25,7 @@ function SubSetOfNoteTitles(const StartFrom: string; Direction: Integer; IDNotes
 { TIU Preferences }
 procedure ResetTIUPreferences;
 function AskCosignerForNotes: Boolean;
-function AskCosignerForDocument(ADocument: Integer; AnAuthor: Int64): Boolean;
+function AskCosignerForDocument(ADocument: Integer; AnAuthor: Int64; ADate: TFMDateTime): Boolean;
 function AskCosignerForTitle(ATitle: integer; AnAuthor: Int64; ADate: TFMDateTime): Boolean;
 function AskSubjectForNotes: Boolean;
 function CanCosign(ATitle, ADocType: integer; AUser: Int64; ADate: TFMDateTime): Boolean;
@@ -185,7 +185,8 @@ procedure ListNoteTitlesShort(Dest: TStrings);
 { returns the user defined list (short list) of progress note titles }
 begin
   if uNoteTitles = nil then LoadNoteTitles;
-  Dest.AddStrings(uNoteTitles.ShortList);
+  Dest.AddStrings(uNoteTitles.Shortlist);
+  //FastAddStrings(uNoteTitles.ShortList, Dest);  // backed out from v27.27 - CQ #14619 - RV
   if uNoteTitles.ShortList.Count > 0 then
   begin
     Dest.Add('0^________________________________________________________________________');
@@ -197,7 +198,7 @@ procedure LoadBoilerPlate(Dest: TStrings; Title: Integer);
 { returns the boilerplate text (if any) for a given progress note title }
 begin
   CallV('TIU LOAD BOILERPLATE TEXT', [Title, Patient.DFN, Encounter.VisitStr]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 function PrintNameForTitle(TitleIEN: Integer): string;
@@ -252,9 +253,12 @@ begin
     end;
 end;
 
-function AskCosignerForDocument(ADocument: Integer; AnAuthor: Int64): Boolean;
+function AskCosignerForDocument(ADocument: Integer; AnAuthor: Int64; ADate: TFMDateTime): Boolean;
 begin
-  Result := Piece(sCallV('TIU REQUIRES COSIGNATURE', [0, ADocument, AnAuthor]), U, 1) = '1';
+  if TIUPatch175Installed then
+    Result := Piece(sCallV('TIU REQUIRES COSIGNATURE', [0, ADocument, AnAuthor, ADate]), U, 1) = '1'
+  else
+    Result := Piece(sCallV('TIU REQUIRES COSIGNATURE', [0, ADocument, AnAuthor]), U, 1) = '1';
 end;
 
 function AskCosignerForTitle(ATitle: integer; AnAuthor: Int64; ADate: TFMDateTime): Boolean;
@@ -371,7 +375,7 @@ begin
   { remove first returned string, it is just a count }
   if RPCBrokerV.Results.Count > 0 then RPCBrokerV.Results.Delete(0);
   SetListFMDateTime('mmm dd,yy hh:nn', TStringList(RPCBrokerV.Results), U, 2);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListNotes(Dest: TStrings; Context: Integer; Early, Late: TFMDateTime;
@@ -398,7 +402,7 @@ begin
            U + Piece(x, U, 11) + U + Piece(x, U, 8) + U + Piece(x, U, 3);
       Results[i] := x;
     end; {for}
-    Dest.Assign(Results);
+    FastAssign(RPCBrokerV.Results, Dest);
   end; {with}
 end;
 
@@ -416,7 +420,7 @@ begin
   if Context > 0 then
     begin
       CallV('TIU DOCUMENTS BY CONTEXT', [3, Context, Patient.DFN, Early, Late, Person, OccLim, SortSeq, SHOW_ADDENDA]);
-      Dest.Assign(RPCBrokerV.Results);
+      FastAssign(RPCBrokerV.Results, Dest);
     end;
 end;
 
@@ -438,7 +442,7 @@ begin
            + U + Piece(x, U, 2) + ', ' + Piece(x, U, 6) + ', ' + Piece(Piece(x, U, 5), ';', 2);
       Results[i] := x;
     end; {for}
-    Dest.Assign(Results);
+    FastAssign(RPCBrokerV.Results, Dest);
   end; {with}
 end;
 
@@ -446,13 +450,13 @@ procedure LoadDocumentText(Dest: TStrings; IEN: Integer);
 { returns the text of a document (progress note, discharge summary, etc.) }
 begin
   CallV('TIU GET RECORD TEXT', [IEN]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure LoadDetailText(Dest: TStrings; IEN: Integer);    //**KCM**
 begin
   CallV('TIU DETAILED DISPLAY', [IEN]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure GetNoteForEdit(var EditRec: TEditNoteRec; IEN: Integer);
@@ -557,7 +561,7 @@ begin
       // -------------------- v19.1 (RV) LOST NOTES?----------------------------
       //Lines := Results;   'Lines' is being overwritten by subsequent Broker calls
       if not Assigned(Lines) then Lines := TStringList.Create;
-      Lines.Assign(Results);
+      FastAssign(RPCBrokerV.Results, Lines);
       // -----------------------------------------------------------------------
     end;
   end;

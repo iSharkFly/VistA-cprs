@@ -1,15 +1,17 @@
 inherited frmARTFreeTextMsg: TfrmARTFreeTextMsg
   Left = 426
   Top = 266
-  Width = 394
-  Height = 359
   Caption = 'Enter Optional Comments'
+  ClientHeight = 332
+  ClientWidth = 386
   Constraints.MinHeight = 180
   Constraints.MinWidth = 394
   Position = poMainFormCenter
+  ExplicitWidth = 394
+  ExplicitHeight = 366
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlText: TORAutoPanel
+  object pnlText: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 386
@@ -36,7 +38,7 @@ inherited frmARTFreeTextMsg: TfrmARTFreeTextMsg
       WordWrap = False
     end
   end
-  object pnlButton: TORAutoPanel
+  object pnlButton: TORAutoPanel [1]
     Left = 0
     Top = 294
     Width = 386
@@ -50,13 +52,13 @@ inherited frmARTFreeTextMsg: TfrmARTFreeTextMsg
       Top = 9
       Width = 75
       Height = 21
-      Caption = 'Continue'
+      Caption = '&Continue'
       Constraints.MinHeight = 21
       TabOrder = 0
       OnClick = cmdContinueClick
     end
   end
-  object memFreeText: TCaptionRichEdit
+  object memFreeText: TCaptionRichEdit [2]
     Left = 0
     Top = 133
     Width = 386
@@ -71,5 +73,23 @@ inherited frmARTFreeTextMsg: TfrmARTFreeTextMsg
     PlainText = True
     TabOrder = 1
     Caption = 'Additional comments:'
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlText'
+        'Status = stsDefault')
+      (
+        'Component = pnlButton'
+        'Status = stsDefault')
+      (
+        'Component = cmdContinue'
+        'Status = stsDefault')
+      (
+        'Component = memFreeText'
+        'Status = stsDefault')
+      (
+        'Component = frmARTFreeTextMsg'
+        'Status = stsDefault'))
   end
 end

@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, ORFN,
-  StdCtrls, ExtCtrls, ORCtrls, ComCtrls, ORDtTm, Spin, uTIU;
+  StdCtrls, ExtCtrls, ORCtrls, ComCtrls, ORDtTm, Spin, uTIU, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmTIUView = class(TForm)
+  TfrmTIUView = class(TfrmBase508Form)
     pnlBase: TORAutoPanel;
     lblBeginDate: TLabel;
     calBeginDate: TORDateBox;

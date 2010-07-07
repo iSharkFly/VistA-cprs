@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, fAutoSz, ORCtrls, ORNet, Mask, ExtCtrls;
+  StdCtrls, fAutoSz, ORCtrls, ORNet, Mask, ExtCtrls, VA508AccessibilityManager;
 
 type
   TfrmDeviceSelect = class(TfrmAutoSz)
@@ -24,8 +24,8 @@ type
     procedure cmdCancelClick(Sender: TObject);
     procedure cboDeviceNeedData(Sender: TObject; const StartFrom: String;
       Direction, InsertAt: Integer);
-    procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure FormCreate(Sender: TObject);
   private
     FWinPrint: Boolean;
   end;
@@ -55,7 +55,6 @@ var
 begin
   frmDeviceSelect := TfrmDeviceSelect.Create(Application);
   try
-    ResizeFormToFont(TForm(frmDeviceSelect));
     with frmDeviceSelect do
       begin
         FWinPrint := AllowWindowsPrinter;
@@ -146,17 +145,18 @@ begin
   cboDevice.ForDataUse(SubsetOfDevices(StartFrom, Direction));
 end;
 
-procedure TfrmDeviceSelect.FormShow(Sender: TObject);
-begin
-  SetFormPosition(Self);
-  inherited;
-end;
-
 procedure TfrmDeviceSelect.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
   inherited;
   SaveUserBounds(Self);
+end;
+
+procedure TfrmDeviceSelect.FormCreate(Sender: TObject);
+begin
+  inherited;
+  ResizeFormToFont(Self);
+  SetFormPosition(Self);
 end;
 
 end.

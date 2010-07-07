@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, ORCtrls, ComCtrls, StdCtrls, ORFn;
+  fAutoSz, ORCtrls, ComCtrls, StdCtrls, ORFn, VA508AccessibilityManager;
 
 type
   TfrmNoteIDParents = class(TfrmAutoSz)
@@ -53,7 +53,7 @@ begin
       end;
     SortByPiece(tmpList, U, 3);
     InvertStringList(tmpList);
-    frmNoteIDParents.lstIDParents.Items.Assign(tmpList);
+    FastAssign(tmpList, frmNoteIDParents.lstIDParents.Items);
     frmNoteIDParents.ShowModal;
     Result := frmNoteIDParents.FParentNode;
   finally

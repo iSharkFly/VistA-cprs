@@ -1,4 +1,4 @@
-object frmIconLegend: TfrmIconLegend
+inherited frmIconLegend: TfrmIconLegend
   Left = 294
   Top = 224
   BorderIcons = [biSystemMenu]
@@ -6,32 +6,28 @@ object frmIconLegend: TfrmIconLegend
   Caption = 'Icon Legend'
   ClientHeight = 317
   ClientWidth = 366
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   FormStyle = fsStayOnTop
-  KeyPreview = True
   OldCreateOrder = False
   OnClose = FormClose
-  OnDestroy = FormDestroy
-  OnKeyDown = FormKeyDown
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
-  object pcMain: TPageControl
+  object pcMain: TPageControl [0]
     Left = 0
     Top = 0
     Width = 366
     Height = 293
     ActivePage = Templates
     Align = alClient
-    TabIndex = 0
     TabOrder = 0
     object Templates: TTabSheet
       Caption = 'Templates'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label3: TLabel
         Left = 0
         Top = 251
@@ -48,7 +44,10 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 0
+        TabStop = True
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 28
           Width = 30
@@ -66,11 +65,15 @@ object frmIconLegend: TfrmIconLegend
             880007777777000888888077777770008800800B3B3B3008888888003B3B3B00
             8800888003B3B3008888888800B3B3B008008888700000008888888887000000
             0800}
+          ExplicitLeft = 28
+          ExplicitWidth = 30
         end
         inherited lblText: TLabel
           Left = 64
           Width = 163
           Caption = 'Shared or Personal Template Root'
+          ExplicitLeft = 64
+          ExplicitWidth = 163
         end
       end
       object Panel1: TPanel
@@ -103,7 +106,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 182
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 0
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 161
+          ExplicitWidth = 182
           inherited img: TImage
             Left = 14
             Picture.Data = {
@@ -117,11 +125,14 @@ object frmIconLegend: TfrmIconLegend
               887D78F8887778F8887DD78FF7D7D78FF7DDDD777DD7DD777DDDDDDDDD777DDD
               DDDD}
             Transparent = True
+            ExplicitLeft = 14
           end
           inherited lblText: TLabel
             Left = 46
             Width = 122
             Caption = 'Personal Reminder Dialog'
+            ExplicitLeft = 46
+            ExplicitWidth = 122
           end
         end
         inline fraImgText10: TfraImgText
@@ -130,7 +141,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 182
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 1
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 21
+          ExplicitWidth = 182
           inherited img: TImage
             Left = 14
             Picture.Data = {
@@ -144,11 +160,14 @@ object frmIconLegend: TfrmIconLegend
               55555550FFFFF005555555500000005555555555555555555555555555555555
               5555}
             Transparent = True
+            ExplicitLeft = 14
           end
           inherited lblText: TLabel
             Left = 46
             Width = 88
             Caption = 'Personal Template'
+            ExplicitLeft = 46
+            ExplicitWidth = 88
           end
         end
         inline fraImgText15: TfraImgText
@@ -157,7 +176,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 182
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 2
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 81
+          ExplicitWidth = 182
           inherited img: TImage
             Width = 36
             Picture.Data = {
@@ -177,11 +201,14 @@ object frmIconLegend: TfrmIconLegend
               DDDDDDDDDDD0F000000DDDDD0000DDD000000DDDDDDDDDDDDDD000000DDDDDDD
               0000}
             Transparent = True
+            ExplicitWidth = 36
           end
           inherited lblText: TLabel
             Left = 46
             Width = 120
             Caption = 'Personal Group Template'
+            ExplicitLeft = 46
+            ExplicitWidth = 120
           end
         end
         inline fraImgText16: TfraImgText
@@ -190,7 +217,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 182
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 3
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 101
+          ExplicitWidth = 182
           inherited img: TImage
             Width = 36
             Picture.Data = {
@@ -210,11 +242,14 @@ object frmIconLegend: TfrmIconLegend
               DDDDDDDDDDD08000000DDDDD0000DDD000000DDDDDDDDDDDDDD000000DDDDDDD
               0000}
             Transparent = True
+            ExplicitWidth = 36
           end
           inherited lblText: TLabel
             Left = 46
             Width = 127
             Caption = 'Personal Group Template *'
+            ExplicitLeft = 46
+            ExplicitWidth = 127
           end
         end
         inline fraImgText17: TfraImgText
@@ -223,7 +258,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 182
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 4
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 61
+          ExplicitWidth = 182
           inherited img: TImage
             Left = 7
             Width = 30
@@ -242,11 +282,15 @@ object frmIconLegend: TfrmIconLegend
               DD00DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD00DDDDDDDDDDDDDDDDDDDDDDDDDDDD
               DD00}
             Transparent = True
+            ExplicitLeft = 7
+            ExplicitWidth = 30
           end
           inherited lblText: TLabel
             Left = 46
             Width = 120
             Caption = 'Personal Template Folder'
+            ExplicitLeft = 46
+            ExplicitWidth = 120
           end
         end
         inline fraImgText13: TfraImgText
@@ -255,7 +299,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 182
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 5
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 121
+          ExplicitWidth = 182
           inherited img: TImage
             Width = 36
             Picture.Data = {
@@ -275,11 +324,14 @@ object frmIconLegend: TfrmIconLegend
               CC40DDDDDDD04CCCCCCCCC400000DDDD00000000000DDDDDDDDD00000000000D
               0000}
             Transparent = True
+            ExplicitWidth = 36
           end
           inherited lblText: TLabel
             Left = 46
             Width = 121
             Caption = 'Personal Template Dialog'
+            ExplicitLeft = 46
+            ExplicitWidth = 121
           end
         end
         inline fraImgText14: TfraImgText
@@ -288,7 +340,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 182
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 6
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 141
+          ExplicitWidth = 182
           inherited img: TImage
             Width = 36
             Picture.Data = {
@@ -308,11 +365,14 @@ object frmIconLegend: TfrmIconLegend
               4440DDDDDDD04444444444400000DDDD00000000000DDDDDDDDD00000000000D
               0000}
             Transparent = True
+            ExplicitWidth = 36
           end
           inherited lblText: TLabel
             Left = 46
             Width = 128
             Caption = 'Personal Template Dialog *'
+            ExplicitLeft = 46
+            ExplicitWidth = 128
           end
         end
         inline fraImgText23: TfraImgText
@@ -321,7 +381,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 182
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 7
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 41
+          ExplicitWidth = 182
           inherited img: TImage
             Left = 14
             Picture.Data = {
@@ -335,11 +400,14 @@ object frmIconLegend: TfrmIconLegend
               5555555088888005555555500000005555555555555555555555555555555555
               5555}
             Transparent = True
+            ExplicitLeft = 14
           end
           inherited lblText: TLabel
             Left = 46
             Width = 95
             Caption = 'Personal Template *'
+            ExplicitLeft = 46
+            ExplicitWidth = 95
           end
         end
       end
@@ -373,7 +441,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 171
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 0
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 141
+          ExplicitWidth = 171
           inherited img: TImage
             Width = 36
             Picture.Data = {
@@ -393,11 +466,14 @@ object frmIconLegend: TfrmIconLegend
               4440DDDDDDD04444444444400000DDD0000000000000DDDDDDD0000000000000
               0000}
             Transparent = True
+            ExplicitWidth = 36
           end
           inherited lblText: TLabel
             Left = 46
             Width = 121
             Caption = 'Shared Template Dialog *'
+            ExplicitLeft = 46
+            ExplicitWidth = 121
           end
         end
         inline fraImgText20: TfraImgText
@@ -406,7 +482,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 171
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 1
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 61
+          ExplicitWidth = 171
           inherited img: TImage
             Left = 7
             Width = 30
@@ -425,11 +506,15 @@ object frmIconLegend: TfrmIconLegend
               DD00DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD00DDDDDDDDDDDDDDDDDDDDDDDDDDDD
               DD00}
             Transparent = True
+            ExplicitLeft = 7
+            ExplicitWidth = 30
           end
           inherited lblText: TLabel
             Left = 46
             Width = 113
             Caption = 'Shared Template Folder'
+            ExplicitLeft = 46
+            ExplicitWidth = 113
           end
         end
         inline fraImgText19: TfraImgText
@@ -438,7 +523,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 171
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 2
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 101
+          ExplicitWidth = 171
           inherited img: TImage
             Width = 36
             Picture.Data = {
@@ -458,11 +548,14 @@ object frmIconLegend: TfrmIconLegend
               00DDDDDDDDD08000000000DD0000DDD000000000DDDDDDDDDDD000000000DDDD
               0000}
             Transparent = True
+            ExplicitWidth = 36
           end
           inherited lblText: TLabel
             Left = 46
             Width = 120
             Caption = 'Shared Group Template *'
+            ExplicitLeft = 46
+            ExplicitWidth = 120
           end
         end
         inline fraImgText18: TfraImgText
@@ -471,7 +564,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 171
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 3
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 81
+          ExplicitWidth = 171
           inherited img: TImage
             Width = 36
             Picture.Data = {
@@ -491,11 +589,14 @@ object frmIconLegend: TfrmIconLegend
               00DDDDDDDDD0F000000000DD0000DDD000000000DDDDDDDDDDD000000000DDDD
               0000}
             Transparent = True
+            ExplicitWidth = 36
           end
           inherited lblText: TLabel
             Left = 46
             Width = 113
             Caption = 'Shared Group Template'
+            ExplicitLeft = 46
+            ExplicitWidth = 113
           end
         end
         inline fraImgText21: TfraImgText
@@ -504,7 +605,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 171
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 4
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 121
+          ExplicitWidth = 171
           inherited img: TImage
             Width = 36
             Picture.Data = {
@@ -524,11 +630,14 @@ object frmIconLegend: TfrmIconLegend
               CCC0DDDDDDD0CCCCCCCCCCC00000DDD0000000000000DDDDDDD0000000000000
               0000}
             Transparent = True
+            ExplicitWidth = 36
           end
           inherited lblText: TLabel
             Left = 46
             Width = 114
             Caption = 'Shared Template Dialog'
+            ExplicitLeft = 46
+            ExplicitWidth = 114
           end
         end
         inline fraImgText11: TfraImgText
@@ -537,7 +646,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 171
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 5
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 21
+          ExplicitWidth = 171
           inherited img: TImage
             Left = 14
             Picture.Data = {
@@ -551,11 +665,14 @@ object frmIconLegend: TfrmIconLegend
               05555550FFFFFFFF055555500000000005555555555555555555555555555555
               5555}
             Transparent = True
+            ExplicitLeft = 14
           end
           inherited lblText: TLabel
             Left = 46
             Width = 81
             Caption = 'Shared Template'
+            ExplicitLeft = 46
+            ExplicitWidth = 81
           end
         end
         inline fraImgText9: TfraImgText
@@ -564,7 +681,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 171
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 6
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 161
+          ExplicitWidth = 171
           inherited img: TImage
             Left = 14
             Picture.Data = {
@@ -578,11 +700,14 @@ object frmIconLegend: TfrmIconLegend
               887D78F8887778F8887DD78FF7D7D78FF7DDDD777DD7DD777DDDDDDDDD777DDD
               DDDD}
             Transparent = True
+            ExplicitLeft = 14
           end
           inherited lblText: TLabel
             Left = 46
             Width = 115
             Caption = 'Shared Reminder Dialog'
+            ExplicitLeft = 46
+            ExplicitWidth = 115
           end
         end
         inline fraImgText24: TfraImgText
@@ -591,7 +716,12 @@ object frmIconLegend: TfrmIconLegend
           Width = 171
           Height = 20
           Align = alTop
+          AutoScroll = True
           TabOrder = 7
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 41
+          ExplicitWidth = 171
           inherited img: TImage
             Left = 14
             Picture.Data = {
@@ -605,11 +735,14 @@ object frmIconLegend: TfrmIconLegend
               0555555088888888055555500000000005555555555555555555555555555555
               5555}
             Transparent = True
+            ExplicitLeft = 14
           end
           inherited lblText: TLabel
             Left = 46
             Width = 88
             Caption = 'Shared Template *'
+            ExplicitLeft = 46
+            ExplicitWidth = 88
           end
         end
       end
@@ -619,7 +752,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 3
+        TabStop = True
+        ExplicitTop = 20
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 35
           Picture.Data = {
@@ -633,11 +770,14 @@ object frmIconLegend: TfrmIconLegend
             0805578444444F0F080557888888888888055777777777777705555555555555
             5555}
           Transparent = True
+          ExplicitLeft = 35
         end
         inherited lblText: TLabel
           Left = 64
           Width = 291
           Caption = 'COM Object Template (external application linked into CPRS) '
+          ExplicitLeft = 64
+          ExplicitWidth = 291
         end
       end
       inline fraImgText57: TfraImgText
@@ -646,7 +786,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 4
+        TabStop = True
+        ExplicitTop = 40
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 35
           Picture.Data = {
@@ -660,23 +804,36 @@ object frmIconLegend: TfrmIconLegend
             9905578994444FF9980557889999999988055777779999777705555555555555
             5555}
           Transparent = True
+          ExplicitLeft = 35
         end
         inherited lblText: TLabel
           Left = 64
           Width = 236
           Caption = 'COM Object Template not installed on workstation'
+          ExplicitLeft = 64
+          ExplicitWidth = 236
         end
       end
     end
     object Reminders: TTabSheet
       Caption = 'Reminders'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       inline fraImgText1: TfraImgText
         Left = 0
         Top = 8
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 0
+        TabStop = True
+        ExplicitTop = 8
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 47
           Width = 30
@@ -694,11 +851,15 @@ object frmIconLegend: TfrmIconLegend
             8800870000788888888870000788888888008888888888888888888888888888
             8800888888888888888888888888888888008888888888888888888888888888
             8800}
+          ExplicitLeft = 47
+          ExplicitWidth = 30
         end
         inherited lblText: TLabel
           Left = 118
           Width = 90
           Caption = 'Reminder Category'
+          ExplicitLeft = 118
+          ExplicitWidth = 90
         end
       end
       inline fraImgText2: TfraImgText
@@ -706,7 +867,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 34
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 1
+        TabStop = True
+        ExplicitTop = 34
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 52
           Picture.Data = {
@@ -719,11 +886,14 @@ object frmIconLegend: TfrmIconLegend
             0708BB0098F0F8900BB800000999990000080887000000087708088887707888
             8708B078800B008870B808700BBBBB007808880BB0B0B0BB088880BB08B0B80B
             B088}
+          ExplicitLeft = 52
         end
         inherited lblText: TLabel
           Left = 118
           Width = 78
           Caption = 'Reminder is Due'
+          ExplicitLeft = 118
+          ExplicitWidth = 78
         end
       end
       inline fraImgText3: TfraImgText
@@ -731,7 +901,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 60
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 2
+        TabStop = True
+        ExplicitTop = 60
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 52
           Picture.Data = {
@@ -744,11 +920,14 @@ object frmIconLegend: TfrmIconLegend
             07888800E8F0F8E0088800000EEEEE0000080887000000087708088887707888
             8708807880707088708888700880880078888888880008888888888888888888
             8888}
+          ExplicitLeft = 52
         end
         inherited lblText: TLabel
           Left = 118
           Width = 177
           Caption = 'Reminder is not due, but is Applicable'
+          ExplicitLeft = 118
+          ExplicitWidth = 177
         end
       end
       inline fraImgText4: TfraImgText
@@ -756,7 +935,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 86
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 3
+        TabStop = True
+        ExplicitTop = 86
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 52
           Picture.Data = {
@@ -769,11 +954,14 @@ object frmIconLegend: TfrmIconLegend
             F70807FFFFFF0FFFF708078FFFFFF0FF8708807FCFFFFFFF70888077FFFCFFF7
             7088880778FCF877088888800777770088888888800000888888888888888888
             8888}
+          ExplicitLeft = 52
         end
         inherited lblText: TLabel
           Left = 118
           Width = 127
           Caption = 'Reminder is Not Applicable'
+          ExplicitLeft = 118
+          ExplicitWidth = 127
         end
       end
       inline fraImgText5: TfraImgText
@@ -781,7 +969,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 112
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 4
+        TabStop = True
+        ExplicitTop = 112
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 52
           Width = 20
@@ -798,11 +992,15 @@ object frmIconLegend: TfrmIconLegend
             06666600FFFFFFFF0000FFFFF00000FFFFFFFFFF0000FFFFFFFFFFFFFFFFFFFF
             0000}
           Transparent = True
+          ExplicitLeft = 52
+          ExplicitWidth = 20
         end
         inherited lblText: TLabel
           Left = 118
           Width = 208
           Caption = 'Reminder status has not yet been evaluated'
+          ExplicitLeft = 118
+          ExplicitWidth = 208
         end
       end
       inline fraImgText6: TfraImgText
@@ -810,7 +1008,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 138
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 5
+        TabStop = True
+        ExplicitTop = 138
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 20
           Width = 86
@@ -842,11 +1046,15 @@ object frmIconLegend: TfrmIconLegend
             8888800000888888888888888880000088888888880080BB08B0B80BB0888888
             8888888888888888888888888888888888888888888888888888888888888888
             8800}
+          ExplicitLeft = 20
+          ExplicitWidth = 86
         end
         inherited lblText: TLabel
           Left = 118
           Width = 215
           Caption = 'Reminder has an associated Reminder Dialog'
+          ExplicitLeft = 118
+          ExplicitWidth = 215
         end
       end
       inline fraImgText7: TfraImgText
@@ -854,7 +1062,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 164
         Width = 358
         Height = 40
+        Align = alTop
+        AutoScroll = True
         TabOrder = 6
+        TabStop = True
+        ExplicitTop = 164
+        ExplicitWidth = 358
+        ExplicitHeight = 40
         inherited img: TImage
           Left = 20
           Top = 8
@@ -887,6 +1101,9 @@ object frmIconLegend: TfrmIconLegend
             8888800000888888888888888880000088888888880080BB08B0B80BB0888888
             8888888888888888888888888888888888888888888888888888888888888888
             8800}
+          ExplicitLeft = 20
+          ExplicitTop = 8
+          ExplicitWidth = 86
         end
         inherited lblText: TLabel
           Left = 118
@@ -894,19 +1111,30 @@ object frmIconLegend: TfrmIconLegend
           Height = 26
           Caption = 'Reminder'#39's associated Reminder Dialog has been processed'
           WordWrap = True
+          ExplicitLeft = 118
+          ExplicitWidth = 210
+          ExplicitHeight = 26
         end
       end
     end
     object Notes: TTabSheet
       Caption = 'Notes'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       inline fraImgText25: TfraImgText
         Left = 0
         Top = 40
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 0
+        TabStop = True
+        ExplicitTop = 40
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -920,11 +1148,14 @@ object frmIconLegend: TfrmIconLegend
             05555550FFFFFFFF055555500000000005555555555555555555555555555555
             5555}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Width = 80
           Caption = 'Standalone Note'
+          ExplicitLeft = 150
+          ExplicitWidth = 80
         end
       end
       inline fraImgText26: TfraImgText
@@ -933,7 +1164,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 1
+        TabStop = True
+        ExplicitTop = 60
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -947,11 +1182,14 @@ object frmIconLegend: TfrmIconLegend
             05555550FFFFFFFF055555500000000005555555555555555555555555555555
             5555}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Width = 51
           Caption = 'Addendum'
+          ExplicitLeft = 150
+          ExplicitWidth = 51
         end
       end
       inline fraImgText27: TfraImgText
@@ -960,7 +1198,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 2
+        TabStop = True
+        ExplicitTop = 80
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -984,11 +1226,14 @@ object frmIconLegend: TfrmIconLegend
             1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C
             1F7C1F7C1F7C1F7C1F7C1F7C1F7C}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Width = 145
           Caption = 'Standalone note with addenda'
+          ExplicitLeft = 150
+          ExplicitWidth = 145
         end
       end
       inline fraImgText28: TfraImgText
@@ -997,7 +1242,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 3
+        TabStop = True
+        ExplicitTop = 100
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Width = 30
@@ -1015,11 +1264,15 @@ object frmIconLegend: TfrmIconLegend
             8800870000788888888870000788888888008888888888888888888888888888
             8800888888888888888888888888888888008888888888888888888888888888
             8800}
+          ExplicitLeft = 74
+          ExplicitWidth = 30
         end
         inherited lblText: TLabel
           Left = 150
           Width = 98
           Caption = 'Interdisciplinary Note'
+          ExplicitLeft = 150
+          ExplicitWidth = 98
         end
       end
       inline fraImgText29: TfraImgText
@@ -1028,7 +1281,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 4
+        TabStop = True
+        ExplicitTop = 120
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Width = 32
@@ -1047,11 +1304,15 @@ object frmIconLegend: TfrmIconLegend
             DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD
             DDDD}
           Transparent = True
+          ExplicitLeft = 74
+          ExplicitWidth = 32
         end
         inherited lblText: TLabel
           Left = 150
           Width = 165
           Caption = 'Interdisciplinary Note with addenda'
+          ExplicitLeft = 150
+          ExplicitWidth = 165
         end
       end
       inline fraImgText30: TfraImgText
@@ -1060,7 +1321,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 5
+        TabStop = True
+        ExplicitTop = 140
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -1084,11 +1349,14 @@ object frmIconLegend: TfrmIconLegend
             1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C
             1F7C1F7C1F7C1F7C1F7C1F7C1F7C}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Width = 98
           Caption = 'Interdisciplinary entry'
+          ExplicitLeft = 150
+          ExplicitWidth = 98
         end
       end
       inline fraImgText31: TfraImgText
@@ -1097,7 +1365,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 6
+        TabStop = True
+        ExplicitTop = 160
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -1129,11 +1401,14 @@ object frmIconLegend: TfrmIconLegend
             FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF
             00FF}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Width = 165
           Caption = 'Interdisciplinary entry with addenda'
+          ExplicitLeft = 150
+          ExplicitWidth = 165
         end
       end
       inline fraImgText32: TfraImgText
@@ -1142,7 +1417,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 7
+        TabStop = True
+        ExplicitTop = 180
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Top = 1
@@ -1157,12 +1436,17 @@ object frmIconLegend: TfrmIconLegend
             0FFFFFF7EFEFEFEF0FFFFFF7777777777FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
             FFFF}
           Transparent = True
+          ExplicitLeft = 74
+          ExplicitTop = 1
         end
         inherited lblText: TLabel
           Left = 150
           Top = 3
           Width = 130
           Caption = 'Note has attached image(s)'
+          ExplicitLeft = 150
+          ExplicitTop = 3
+          ExplicitWidth = 130
         end
       end
       inline fraImgText33: TfraImgText
@@ -1171,7 +1455,10 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 8
+        TabStop = True
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -1195,12 +1482,16 @@ object frmIconLegend: TfrmIconLegend
             1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C000000001F7C1F7C1F7C1F7C1F7C1F7C
             1F7C1F7C1F7C1F7C1F7C1F7C1F7C}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Top = 5
           Width = 88
           Caption = 'Top level grouping'
+          ExplicitLeft = 150
+          ExplicitTop = 5
+          ExplicitWidth = 88
         end
       end
       inline fraImgText34: TfraImgText
@@ -1209,7 +1500,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 9
+        TabStop = True
+        ExplicitTop = 20
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Top = 1
@@ -1228,11 +1523,16 @@ object frmIconLegend: TfrmIconLegend
             880007777777000888888077777770008800800B3B3B3008888888003B3B3B00
             8800888003B3B3008888888800B3B3B008008888700000008888888887000000
             0800}
+          ExplicitLeft = 74
+          ExplicitTop = 1
+          ExplicitWidth = 30
         end
         inherited lblText: TLabel
           Left = 150
           Width = 103
           Caption = 'Selected subgrouping'
+          ExplicitLeft = 150
+          ExplicitWidth = 103
         end
       end
       inline fraImgText53: TfraImgText
@@ -1241,7 +1541,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 10
+        TabStop = True
+        ExplicitTop = 220
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Top = 1
@@ -1256,12 +1560,17 @@ object frmIconLegend: TfrmIconLegend
             0FFFFFF08F8F8F890FFFFFF0000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
             FFFF}
           Transparent = True
+          ExplicitLeft = 74
+          ExplicitTop = 1
         end
         inherited lblText: TLabel
           Left = 150
           Top = 3
           Width = 154
           Caption = 'Note'#39's images cannot be viewed'
+          ExplicitLeft = 150
+          ExplicitTop = 3
+          ExplicitWidth = 154
         end
       end
       inline fraImgText54: TfraImgText
@@ -1270,7 +1579,11 @@ object frmIconLegend: TfrmIconLegend
         Width = 358
         Height = 20
         Align = alTop
+        AutoScroll = True
         TabOrder = 11
+        TabStop = True
+        ExplicitTop = 200
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Top = 1
@@ -1285,6 +1598,8 @@ object frmIconLegend: TfrmIconLegend
             0FFFFFF7EFEFEFEF0FFFFFF7777777777FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
             FFFF}
           Transparent = True
+          ExplicitLeft = 74
+          ExplicitTop = 1
         end
         inherited lblText: TLabel
           Left = 150
@@ -1292,12 +1607,19 @@ object frmIconLegend: TfrmIconLegend
           Width = 156
           Caption = 'Note'#39's child has attached images'
           WordWrap = True
+          ExplicitLeft = 150
+          ExplicitTop = 3
+          ExplicitWidth = 156
         end
       end
     end
     object Consults: TTabSheet
       Caption = 'Consults'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Panel3: TPanel
         Left = 0
         Top = 0
@@ -1326,7 +1648,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 176
           Height = 22
           Align = alTop
+          AutoScroll = True
           TabOrder = 0
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 14
+          ExplicitWidth = 176
+          ExplicitHeight = 22
           inherited img: TImage
             Left = 5
             Picture.Data = {
@@ -1350,12 +1678,16 @@ object frmIconLegend: TfrmIconLegend
               1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C000000001F7C1F7C1F7C1F7C1F7C1F7C
               1F7C1F7C1F7C1F7C1F7C1F7C1F7C}
             Transparent = True
+            ExplicitLeft = 5
           end
           inherited lblText: TLabel
             Left = 50
             Top = 5
             Width = 88
             Caption = 'Top level grouping'
+            ExplicitLeft = 50
+            ExplicitTop = 5
+            ExplicitWidth = 88
           end
         end
         inline fraImgText36: TfraImgText
@@ -1364,7 +1696,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 176
           Height = 22
           Align = alTop
+          AutoScroll = True
           TabOrder = 1
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 36
+          ExplicitWidth = 176
+          ExplicitHeight = 22
           inherited img: TImage
             Left = 5
             Top = 1
@@ -1383,11 +1721,16 @@ object frmIconLegend: TfrmIconLegend
               880007777777000888888077777770008800800B3B3B3008888888003B3B3B00
               8800888003B3B3008888888800B3B3B008008888700000008888888887000000
               0800}
+            ExplicitLeft = 5
+            ExplicitTop = 1
+            ExplicitWidth = 30
           end
           inherited lblText: TLabel
             Left = 50
             Width = 103
             Caption = 'Selected subgrouping'
+            ExplicitLeft = 50
+            ExplicitWidth = 103
           end
         end
         inline fraImgText43: TfraImgText
@@ -1396,7 +1739,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 176
           Height = 36
           Align = alTop
+          AutoScroll = True
           TabOrder = 2
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 102
+          ExplicitWidth = 176
+          ExplicitHeight = 36
           inherited img: TImage
             Left = 5
             Picture.Data = {
@@ -1428,6 +1777,7 @@ object frmIconLegend: TfrmIconLegend
               FF000000FFFFFF000000FFFFFF000000FFFFFF000000FFFFFFFFFFFFFFFFFFFF
               FFFF}
             Transparent = True
+            ExplicitLeft = 5
           end
           inherited lblText: TLabel
             Left = 50
@@ -1436,6 +1786,10 @@ object frmIconLegend: TfrmIconLegend
             Height = 26
             Caption = 'Interfacility Consult request'
             WordWrap = True
+            ExplicitLeft = 50
+            ExplicitTop = 5
+            ExplicitWidth = 91
+            ExplicitHeight = 26
           end
         end
         inline fraImgText44: TfraImgText
@@ -1444,7 +1798,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 176
           Height = 35
           Align = alTop
+          AutoScroll = True
           TabOrder = 3
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 138
+          ExplicitWidth = 176
+          ExplicitHeight = 35
           inherited img: TImage
             Left = 5
             Picture.Data = {
@@ -1476,6 +1836,7 @@ object frmIconLegend: TfrmIconLegend
               FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
               FFFF}
             Transparent = True
+            ExplicitLeft = 5
           end
           inherited lblText: TLabel
             Left = 50
@@ -1484,6 +1845,10 @@ object frmIconLegend: TfrmIconLegend
             Height = 26
             Caption = 'Interfacility Procedure request'
             WordWrap = True
+            ExplicitLeft = 50
+            ExplicitTop = 5
+            ExplicitWidth = 87
+            ExplicitHeight = 26
           end
         end
         inline fraImgText60: TfraImgText
@@ -1492,7 +1857,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 176
           Height = 22
           Align = alTop
+          AutoScroll = True
           TabOrder = 4
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 58
+          ExplicitWidth = 176
+          ExplicitHeight = 22
           inherited img: TImage
             Left = 5
             Picture.Data = {
@@ -1506,12 +1877,16 @@ object frmIconLegend: TfrmIconLegend
               F05550F00F0F0F0F005550550707070705555505070707070555555050505050
               5555}
             Transparent = True
+            ExplicitLeft = 5
           end
           inherited lblText: TLabel
             Left = 50
             Top = 5
             Width = 73
             Caption = 'Consult request'
+            ExplicitLeft = 50
+            ExplicitTop = 5
+            ExplicitWidth = 73
           end
         end
         inline fraImgText61: TfraImgText
@@ -1520,7 +1895,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 176
           Height = 22
           Align = alTop
+          AutoScroll = True
           TabOrder = 5
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 80
+          ExplicitWidth = 176
+          ExplicitHeight = 22
           inherited img: TImage
             Left = 5
             Picture.Data = {
@@ -1568,12 +1949,16 @@ object frmIconLegend: TfrmIconLegend
               FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
               FFFF}
             Transparent = True
+            ExplicitLeft = 5
           end
           inherited lblText: TLabel
             Left = 50
             Top = 5
             Width = 87
             Caption = 'Procedure request'
+            ExplicitLeft = 50
+            ExplicitTop = 5
+            ExplicitWidth = 87
           end
         end
       end
@@ -1605,7 +1990,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 178
           Height = 33
           Align = alTop
+          AutoScroll = True
           TabOrder = 0
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 14
+          ExplicitWidth = 178
+          ExplicitHeight = 33
           inherited img: TImage
             Left = 5
             Picture.Data = {
@@ -1629,6 +2020,7 @@ object frmIconLegend: TfrmIconLegend
               1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C000000001F7C1F7C1F7C1F7C1F7C1F7C
               1F7C1F7C1F7C1F7C1F7C1F7C1F7C}
             Transparent = True
+            ExplicitLeft = 5
           end
           inherited lblText: TLabel
             Left = 51
@@ -1637,6 +2029,10 @@ object frmIconLegend: TfrmIconLegend
             Height = 26
             Caption = 'Top level - all related documents'
             WordWrap = True
+            ExplicitLeft = 51
+            ExplicitTop = -1
+            ExplicitWidth = 101
+            ExplicitHeight = 26
           end
         end
         inline fraImgText37: TfraImgText
@@ -1645,7 +2041,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 178
           Height = 22
           Align = alTop
+          AutoScroll = True
           TabOrder = 1
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 47
+          ExplicitWidth = 178
+          ExplicitHeight = 22
           inherited img: TImage
             Left = 5
             Picture.Data = {
@@ -1659,11 +2061,14 @@ object frmIconLegend: TfrmIconLegend
               05555550FFFFFFFF055555500000000005555555555555555555555555555555
               5555}
             Transparent = True
+            ExplicitLeft = 5
           end
           inherited lblText: TLabel
             Left = 51
             Width = 49
             Caption = 'Document'
+            ExplicitLeft = 51
+            ExplicitWidth = 49
           end
         end
         inline fraImgText38: TfraImgText
@@ -1672,7 +2077,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 178
           Height = 22
           Align = alTop
+          AutoScroll = True
           TabOrder = 2
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 69
+          ExplicitWidth = 178
+          ExplicitHeight = 22
           inherited img: TImage
             Left = 5
             Picture.Data = {
@@ -1686,11 +2097,14 @@ object frmIconLegend: TfrmIconLegend
               05555550FFFFFFFF055555500000000005555555555555555555555555555555
               5555}
             Transparent = True
+            ExplicitLeft = 5
           end
           inherited lblText: TLabel
             Left = 51
             Width = 51
             Caption = 'Addendum'
+            ExplicitLeft = 51
+            ExplicitWidth = 51
           end
         end
         inline fraImgText39: TfraImgText
@@ -1699,7 +2113,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 178
           Height = 22
           Align = alTop
+          AutoScroll = True
           TabOrder = 3
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 91
+          ExplicitWidth = 178
+          ExplicitHeight = 22
           inherited img: TImage
             Left = 5
             Picture.Data = {
@@ -1723,11 +2143,14 @@ object frmIconLegend: TfrmIconLegend
               1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C
               1F7C1F7C1F7C1F7C1F7C1F7C1F7C}
             Transparent = True
+            ExplicitLeft = 5
           end
           inherited lblText: TLabel
             Left = 51
             Width = 116
             Caption = 'Document with addenda'
+            ExplicitLeft = 51
+            ExplicitWidth = 116
           end
         end
         inline fraImgText40: TfraImgText
@@ -1736,7 +2159,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 178
           Height = 35
           Align = alTop
+          AutoScroll = True
           TabOrder = 4
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 151
+          ExplicitWidth = 178
+          ExplicitHeight = 35
           inherited img: TImage
             Left = 5
             Top = 1
@@ -1751,6 +2180,8 @@ object frmIconLegend: TfrmIconLegend
               0FFFFFF7EFEFEFEF0FFFFFF7777777777FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
               FFFF}
             Transparent = True
+            ExplicitLeft = 5
+            ExplicitTop = 1
           end
           inherited lblText: TLabel
             Left = 51
@@ -1759,6 +2190,10 @@ object frmIconLegend: TfrmIconLegend
             Height = 26
             Caption = 'Document'#39's child has attached images'
             WordWrap = True
+            ExplicitLeft = 51
+            ExplicitTop = 3
+            ExplicitWidth = 104
+            ExplicitHeight = 26
           end
         end
         inline fraImgText52: TfraImgText
@@ -1767,7 +2202,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 178
           Height = 38
           Align = alTop
+          AutoScroll = True
           TabOrder = 5
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 113
+          ExplicitWidth = 178
+          ExplicitHeight = 38
           inherited img: TImage
             Left = 5
             Top = 1
@@ -1782,6 +2223,8 @@ object frmIconLegend: TfrmIconLegend
               0FFFFFF7EFEFEFEF0FFFFFF7777777777FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
               FFFF}
             Transparent = True
+            ExplicitLeft = 5
+            ExplicitTop = 1
           end
           inherited lblText: TLabel
             Left = 51
@@ -1790,6 +2233,10 @@ object frmIconLegend: TfrmIconLegend
             Height = 26
             Caption = 'Document has attached image(s)'
             WordWrap = True
+            ExplicitLeft = 51
+            ExplicitTop = 3
+            ExplicitWidth = 114
+            ExplicitHeight = 26
           end
         end
         inline fraImgText55: TfraImgText
@@ -1798,7 +2245,13 @@ object frmIconLegend: TfrmIconLegend
           Width = 178
           Height = 34
           Align = alTop
+          AutoScroll = True
           TabOrder = 6
+          TabStop = True
+          ExplicitLeft = 1
+          ExplicitTop = 186
+          ExplicitWidth = 178
+          ExplicitHeight = 34
           inherited img: TImage
             Left = 5
             Top = 1
@@ -1813,6 +2266,8 @@ object frmIconLegend: TfrmIconLegend
               0FFFFFF08F8F8F890FFFFFF0000000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
               FFFF}
             Transparent = True
+            ExplicitLeft = 5
+            ExplicitTop = 1
           end
           inherited lblText: TLabel
             Left = 51
@@ -1821,6 +2276,10 @@ object frmIconLegend: TfrmIconLegend
             Height = 26
             Caption = 'Document'#39's images cannot be viewed'
             WordWrap = True
+            ExplicitLeft = 51
+            ExplicitTop = 1
+            ExplicitWidth = 95
+            ExplicitHeight = 26
           end
         end
       end
@@ -1828,12 +2287,21 @@ object frmIconLegend: TfrmIconLegend
     object Surgery: TTabSheet
       Caption = 'Surgery'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       inline fraImgText42: TfraImgText
         Left = 0
         Top = 0
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 0
+        TabStop = True
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -1857,12 +2325,16 @@ object frmIconLegend: TfrmIconLegend
             1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C000000001F7C1F7C1F7C1F7C1F7C1F7C
             1F7C1F7C1F7C1F7C1F7C1F7C1F7C}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Top = 5
           Width = 88
           Caption = 'Top level grouping'
+          ExplicitLeft = 150
+          ExplicitTop = 5
+          ExplicitWidth = 88
         end
       end
       inline fraImgText45: TfraImgText
@@ -1870,7 +2342,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 22
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 1
+        TabStop = True
+        ExplicitTop = 22
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 74
           Top = 1
@@ -1889,11 +2367,16 @@ object frmIconLegend: TfrmIconLegend
             880007777777000888888077777770008800800B3B3B3008888888003B3B3B00
             8800888003B3B3008888888800B3B3B008008888700000008888888887000000
             0800}
+          ExplicitLeft = 74
+          ExplicitTop = 1
+          ExplicitWidth = 30
         end
         inherited lblText: TLabel
           Left = 150
           Width = 103
           Caption = 'Selected subgrouping'
+          ExplicitLeft = 150
+          ExplicitWidth = 103
         end
       end
       inline fraImgText46: TfraImgText
@@ -1901,7 +2384,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 162
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 2
+        TabStop = True
+        ExplicitTop = 162
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -1915,11 +2404,12 @@ object frmIconLegend: TfrmIconLegend
             05555550FFFFFFFF055555500000000005555555555555555555555555555555
             5555}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
-          Width = 32
           Caption = 'Report'
+          ExplicitLeft = 150
         end
       end
       inline fraImgText47: TfraImgText
@@ -1927,7 +2417,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 181
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 3
+        TabStop = True
+        ExplicitTop = 181
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -1941,11 +2437,14 @@ object frmIconLegend: TfrmIconLegend
             05555550FFFFFFFF055555500000000005555555555555555555555555555555
             5555}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Width = 51
           Caption = 'Addendum'
+          ExplicitLeft = 150
+          ExplicitWidth = 51
         end
       end
       inline fraImgText48: TfraImgText
@@ -1953,7 +2452,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 201
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 4
+        TabStop = True
+        ExplicitTop = 201
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -1977,11 +2482,14 @@ object frmIconLegend: TfrmIconLegend
             1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C1F7C
             1F7C1F7C1F7C1F7C1F7C1F7C1F7C}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Width = 99
           Caption = 'Report with addenda'
+          ExplicitLeft = 150
+          ExplicitWidth = 99
         end
       end
       inline fraImgText49: TfraImgText
@@ -1989,7 +2497,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 237
         Width = 358
         Height = 26
+        Align = alTop
+        AutoScroll = True
         TabOrder = 5
+        TabStop = True
+        ExplicitTop = 237
+        ExplicitWidth = 358
+        ExplicitHeight = 26
         inherited img: TImage
           Left = 74
           Top = 1
@@ -2004,12 +2518,17 @@ object frmIconLegend: TfrmIconLegend
             0FFFFFF7EFEFEFEF0FFFFFF7777777777FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
             FFFF}
           Transparent = True
+          ExplicitLeft = 74
+          ExplicitTop = 1
         end
         inherited lblText: TLabel
           Left = 150
           Top = 3
           Width = 139
           Caption = 'Report has attached image(s)'
+          ExplicitLeft = 150
+          ExplicitTop = 3
+          ExplicitWidth = 139
         end
       end
       inline fraImgText50: TfraImgText
@@ -2017,7 +2536,12 @@ object frmIconLegend: TfrmIconLegend
         Top = 77
         Width = 358
         Height = 20
+        Align = alTop
+        AutoScroll = True
         TabOrder = 6
+        TabStop = True
+        ExplicitTop = 77
+        ExplicitWidth = 358
         inherited img: TImage
           Left = 74
           Width = 32
@@ -2036,11 +2560,15 @@ object frmIconLegend: TfrmIconLegend
             FFF05550F000000555555550F000000000005550000005555555555000000555
             5555}
           Transparent = True
+          ExplicitLeft = 74
+          ExplicitWidth = 32
         end
         inherited lblText: TLabel
           Left = 150
           Width = 144
           Caption = 'OR case with attached reports'
+          ExplicitLeft = 150
+          ExplicitWidth = 144
         end
       end
       inline fraImgText51: TfraImgText
@@ -2048,7 +2576,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 57
         Width = 358
         Height = 21
+        Align = alTop
+        AutoScroll = True
         TabOrder = 7
+        TabStop = True
+        ExplicitTop = 57
+        ExplicitWidth = 358
+        ExplicitHeight = 21
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -2062,11 +2596,14 @@ object frmIconLegend: TfrmIconLegend
             5555555000000555555555555555555555555555555555555555555555555555
             5555}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Width = 159
           Caption = 'OR case with no attached reports'
+          ExplicitLeft = 150
+          ExplicitWidth = 159
         end
       end
       inline fraImgText58: TfraImgText
@@ -2074,7 +2611,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 107
         Width = 358
         Height = 21
+        Align = alTop
+        AutoScroll = True
         TabOrder = 8
+        TabStop = True
+        ExplicitTop = 107
+        ExplicitWidth = 358
+        ExplicitHeight = 21
         inherited img: TImage
           Left = 74
           Picture.Data = {
@@ -2088,11 +2631,14 @@ object frmIconLegend: TfrmIconLegend
             5555555000000555555555555555555555555555555555555555555555555555
             5555}
           Transparent = True
+          ExplicitLeft = 74
         end
         inherited lblText: TLabel
           Left = 150
           Width = 182
           Caption = 'Non-OR case without attached reports'
+          ExplicitLeft = 150
+          ExplicitWidth = 182
         end
       end
       inline fraImgText59: TfraImgText
@@ -2100,7 +2646,13 @@ object frmIconLegend: TfrmIconLegend
         Top = 126
         Width = 358
         Height = 21
+        Align = alTop
+        AutoScroll = True
         TabOrder = 9
+        TabStop = True
+        ExplicitTop = 126
+        ExplicitWidth = 358
+        ExplicitHeight = 21
         inherited img: TImage
           Left = 74
           Width = 32
@@ -2119,16 +2671,20 @@ object frmIconLegend: TfrmIconLegend
             FFF05550F000000555555550F000000000005550000005555555555000000555
             5555}
           Transparent = True
+          ExplicitLeft = 74
+          ExplicitWidth = 32
         end
         inherited lblText: TLabel
           Left = 150
           Width = 167
           Caption = 'Non-OR case with attached reports'
+          ExplicitLeft = 150
+          ExplicitWidth = 167
         end
       end
     end
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 293
     Width = 366
@@ -2151,5 +2707,230 @@ object frmIconLegend: TfrmIconLegend
       TabOrder = 0
       OnClick = btnOKClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pcMain'
+        'Status = stsDefault')
+      (
+        'Component = Templates'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText12'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText8'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText10'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText15'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText16'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText17'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText13'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText14'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText23'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText22'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText20'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText19'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText18'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText21'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText11'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText9'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText24'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText56'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText57'
+        'Status = stsDefault')
+      (
+        'Component = Reminders'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText1'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText2'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText3'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText4'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText5'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText6'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText7'
+        'Status = stsDefault')
+      (
+        'Component = Notes'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText25'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText26'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText27'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText28'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText29'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText30'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText31'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText32'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText33'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText34'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText53'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText54'
+        'Status = stsDefault')
+      (
+        'Component = Consults'
+        'Status = stsDefault')
+      (
+        'Component = Panel3'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText35'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText36'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText43'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText44'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText60'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText61'
+        'Status = stsDefault')
+      (
+        'Component = Panel4'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText41'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText37'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText38'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText39'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText40'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText52'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText55'
+        'Status = stsDefault')
+      (
+        'Component = Surgery'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText42'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText45'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText46'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText47'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText48'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText49'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText50'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText51'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText58'
+        'Status = stsDefault')
+      (
+        'Component = fraImgText59'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = frmIconLegend'
+        'Status = stsDefault'))
   end
 end

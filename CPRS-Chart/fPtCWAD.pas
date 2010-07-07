@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, ORCtrls, StdCtrls, ORFn, ExtCtrls;
+  fAutoSz, ORCtrls, StdCtrls, ORFn, ExtCtrls, VA508AccessibilityManager;
 
 type
   TfrmPtCWAD = class(TfrmAutoSz)

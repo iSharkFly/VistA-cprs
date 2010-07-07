@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORCtrls, Buttons, ORfn, fAutoSz;
+  StdCtrls, ExtCtrls, ORCtrls, Buttons, ORfn, fAutoSz, VA508AccessibilityManager;
 
 type
   TfrmReportsAdhocSubItem1 = class(TfrmAutoSz)
@@ -63,7 +63,7 @@ function ExecuteForm2: Boolean;
 
 implementation
 
-uses fReportsAdhocComponent1, rReports;
+uses fReportsAdhocComponent1, rReports, VAUtils;
 
 {$R *.DFM}
 
@@ -315,7 +315,7 @@ begin
       uLimitCount := uLimitCount + 1;
     end;
   If (uLimit <> 0) and (uLimitCount > (uLimit+1)) then
-    ShowMessage(
+    ShowMsg(
       'MAXIMUM SELECTION LIMIT EXCEEDED! Only the first '
       + IntToStr(uLimit) + ' items in the list will be used');
   If ORListBox1.Items.Count > 0 then

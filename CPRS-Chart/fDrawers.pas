@@ -9,13 +9,14 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, StdCtrls, Buttons, ORCtrls, ComCtrls, ImgList, uTemplates,
-  Menus, ORClasses, ORFn;
+  Menus, ORClasses, ORFn, fBase508Form, VA508AccessibilityManager,
+  VA508ImageListLabeler;
 
 type
   TDrawer = (odNone, odTemplates, odEncounter, odReminders, odOrders);
   TDrawers = set of TDrawer;
 
-  TfrmDrawers = class(TForm)
+  TfrmDrawers = class(TfrmBase508Form)
     lbOrders: TORListBox;
     sbOrders: TORAlignSpeedButton;
     sbReminders: TORAlignSpeedButton;
@@ -51,6 +52,10 @@ type
     mnuCopyTemplate: TMenuItem;
     N5: TMenuItem;
     mnuViewTemplateIconLegend: TMenuItem;
+    fldAccessTemplates: TVA508ComponentAccessibility;
+    fldAccessReminders: TVA508ComponentAccessibility;
+    imgLblReminders: TVA508ImageListLabeler;
+    imgLblTemplates: TVA508ImageListLabeler;
     procedure FormCanResize(Sender: TObject; var NewWidth,
       NewHeight: Integer; var Resize: Boolean);
     procedure FormResize(Sender: TObject);
@@ -104,8 +109,12 @@ type
       Shift: TShiftState);
     procedure tvRemindersNodeCaptioning(Sender: TObject;
       var Caption: String);
-    procedure tvRemindersAddition(Sender: TObject; Node: TTreeNode);
-    procedure tvRemindersDeletion(Sender: TObject; Node: TTreeNode);
+    procedure fldAccessTemplatesStateQuery(Sender: TObject; var Text: string);
+    procedure fldAccessTemplatesInstructionsQuery(Sender: TObject;
+      var Text: string);
+    procedure fldAccessRemindersInstructionsQuery(Sender: TObject;
+      var Text: string);
+    procedure fldAccessRemindersStateQuery(Sender: TObject; var Text: string);
   private
     FOpenToNode: string;
     FOldMouseUp: TMouseEvent;
@@ -210,7 +219,7 @@ implementation
 
 uses fTemplateView, uCore, rTemplates, fTemplateEditor, dShared, uReminders,
   fReminderDialog, RichEdit, fRptBox, Clipbrd, fTemplateDialog, fIconLegend,
-  uAccessibleTreeView, uAccessibleTreeNode;
+  VA508AccessibilityRouter, uVA508CPRSCompatibility, VAUtils, fFindingTemplates;
 
 {$R *.DFM}
 
@@ -533,6 +542,8 @@ begin
     pnlTemplateSearch.Visible := mnuFindTemplates.Checked;
   end;
   ToggleDrawer(odTemplates);
+  if ScreenReaderActive then
+    pnlTemplatesButton.SetFocus;
 end;
 
 procedure TfrmDrawers.sbEncounterClick(Sender: TObject);
@@ -558,6 +569,8 @@ begin
     else
       ToggleDrawer(odReminders)
   end;
+  if ScreenReaderActive then
+    pnlRemindersButton.SetFocus;
 end;
 
 procedure TfrmDrawers.sbOrdersClick(Sender: TObject);
@@ -883,12 +896,16 @@ begin
       if(txt <> '') then
       begin
         CheckBoilerplate4Fields(txt, 'Template: ' + Template.PrintName);
-        BeforeLine := SendMessage(FRichEditControl.Handle, EM_EXLINEFROMCHAR, 0, FRichEditControl.SelStart);
-        FRichEditControl.SelText := txt;
-        FRichEditControl.SetFocus;
-        SendMessage(FRichEditControl.Handle, EM_SCROLLCARET, 0, 0);
-        AfterTop := SendMessage(FRichEditControl.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
-        SendMessage(FRichEditControl.Handle, EM_LINESCROLL, 0, -1 * (AfterTop - BeforeLine));
+        if txt <> '' then
+        begin
+          BeforeLine := SendMessage(FRichEditControl.Handle, EM_EXLINEFROMCHAR, 0, FRichEditControl.SelStart);
+          FRichEditControl.SelText := txt;
+          FRichEditControl.SetFocus;
+          SendMessage(FRichEditControl.Handle, EM_SCROLLCARET, 0, 0);
+          AfterTop := SendMessage(FRichEditControl.Handle, EM_GETFIRSTVISIBLELINE, 0, 0);
+          SendMessage(FRichEditControl.Handle, EM_LINESCROLL, 0, -1 * (AfterTop - BeforeLine));
+          SpeakTextInserted;
+        end;
       end;
     end;
   end;
@@ -959,7 +976,6 @@ end;
 
 procedure TfrmDrawers.FormDestroy(Sender: TObject);
 begin
-  TAccessibleTreeView.UnwrapControl(tvReminders);
   dmodShared.RemoveDrawerTree(Self);
   KillObj(@FRemNotifyList);
 end;
@@ -972,6 +988,7 @@ end;
 
 procedure TfrmDrawers.ReloadTemplates;
 begin
+  SetFindNext(FALSE);
   LoadTemplateData;
   if(UserTemplateAccessLevel <> taNone) and (assigned(MyTemplate)) and
     (MyTemplate.Children in [tcActive, tcBoth]) then
@@ -985,68 +1002,37 @@ end;
 
 procedure TfrmDrawers.btnFindClick(Sender: TObject);
 var
-  TmpNode: TTreeNode;
-  Found: boolean;
-  S1,S2: string;
+  Found, TmpNode: TTreeNode;
+  IsNext: boolean;
 
 begin
   if(edtSearch.text <> '') then
   begin
-    if(FEmptyNodeCount > 0) then
-    begin
-      FInternalExpand := TRUE;
-      FInternalHiddenExpand := TRUE;
-      try
-        TmpNode := tvTemplates.Items.GetFirstNode;
-        while(assigned(TmpNode)) do
-        begin
-          TmpNode.Expand(TRUE);
-          TmpNode := TmpNode.GetNextSibling;
-        end;
-      finally
-        FInternalExpand := FALSE;
-        FInternalHiddenExpand := FALSE;
-      end;
-    end;
-    if((FFindNext) and assigned (FLastFoundNode)) then
-      TmpNode := FLastFoundNode.GetNext
+    IsNext := ((FFindNext) and assigned (FLastFoundNode));
+    if IsNext then
+      TmpNode := FLastFoundNode
     else
       TmpNode := tvTemplates.Items.GetFirstNode;
-    Found := FALSE;
-    if(assigned(TmpNode)) then
-    begin
-      S1 := edtSearch.Text;
-      if(not cbMatchCase.Checked) then
-        S1 := UpperCase(S1);
-      while (assigned(TmpNode) and (not Found)) do
-      begin
-        S2 := TmpNode.Text;
-        if(not cbMatchCase.Checked) then
-          S2 := UpperCase(S2);
-        Found := SearchMatch(S1, S2, cbWholeWords.Checked);
-        if(not Found) then
-          TmpNode := TmpNode.GetNext;
-      end;
+    FInternalExpand := TRUE;
+    FInternalHiddenExpand := TRUE;
+    try
+      Found := FindTemplate(edtSearch.Text, tvTemplates, Application.MainForm, TmpNode,
+                            IsNext, not cbMatchCase.Checked, cbWholeWords.Checked);
+    finally
+      FInternalExpand := FALSE;
+      FInternalHiddenExpand := FALSE;
     end;
-    if(Found) then
+
+    if assigned(Found) then
     begin
-      FLastFoundNode := TmpNode;
+      FLastFoundNode := Found;
       SetFindNext(TRUE);
       FInternalExpand := TRUE;
       try
-        tvTemplates.Selected := TmpNode;
+        tvTemplates.Selected := Found;
       finally
         FInternalExpand := FALSE;
       end;
-    end
-    else
-    begin
-      if(FFindNext) then
-        S1 := ''
-      else
-        S1 := '  "' + edtSearch.Text + '" was not Found.';
-      SetFindNext(FALSE);
-      InfoBox('Search Complete.' + S1, 'Information', MB_OK or MB_ICONINFORMATION);
     end;
   end;
   edtSearch.SetFocus;
@@ -1131,7 +1117,6 @@ procedure TfrmDrawers.FormCreate(Sender: TObject);
 begin
   dmodShared.AddDrawerTree(Self);
   FHasPersonalTemplates := FALSE;
-  TAccessibleTreeView.WrapControl(tvReminders);
 end;
 
 procedure TfrmDrawers.ExternalReloadTemplates;
@@ -1142,6 +1127,47 @@ begin
   FHasPersonalTemplates := FALSE;
   FEmptyNodeCount := 0;
   ReloadTemplates;
+end;
+
+procedure TfrmDrawers.fldAccessRemindersInstructionsQuery(Sender: TObject;
+  var Text: string);
+begin
+  inherited;
+  if FOpenDrawer = odReminders then
+    Text := 'to close'
+  else
+    Text := 'to open';
+  Text := Text + ' drawer press space bar';
+end;
+
+procedure TfrmDrawers.fldAccessRemindersStateQuery(Sender: TObject;
+  var Text: string);
+begin
+  inherited;
+  if FOpenDrawer = odReminders then
+    Text := ', Drawer Open'
+  else
+    Text := ', Drawer Closed';
+end;
+
+procedure TfrmDrawers.fldAccessTemplatesInstructionsQuery(Sender: TObject;
+  var Text: string);
+begin
+  inherited;
+  if FOpenDrawer = odTemplates then
+    Text := 'to close'
+  else
+    Text := 'to open';
+  Text := Text + ' drawer press space bar';
+end;
+
+procedure TfrmDrawers.fldAccessTemplatesStateQuery(Sender: TObject;
+  var Text: string);
+begin
+  if FOpenDrawer = odTemplates then
+    Text := ', Drawer Open'
+  else
+    Text := ', Drawer Closed';
 end;
 
 procedure TfrmDrawers.DisplayDrawers(Show: Boolean);
@@ -1389,7 +1415,7 @@ end;
 procedure TfrmDrawers.OpenToNode(Path: string = '');
 var
   OldInternalHE, OldInternalEX: boolean;
-  
+
 begin
   if(Path <> '') then
     FOpenToNode := PATH;
@@ -1424,7 +1450,7 @@ begin
   begin
     tmpl := TTemplate(tvTemplates.Selected.Data);
     if(tmpl.Description = '') then
-      ShowMessage('No notes found for ' + tmpl.PrintName)
+      ShowMsg('No notes found for ' + tmpl.PrintName)
     else
     begin
       tmpSL := TStringList.Create;
@@ -1453,7 +1479,10 @@ begin
     txt := Template.Text;
     CheckBoilerplate4Fields(txt, 'Template: ' + Template.PrintName);
     if txt <> '' then
+    begin
       Clipboard.SetTextBuf(PChar(txt));
+      GetScreenReader.Speak('Text Copied to Clip board');
+    end;
   end;
   if txt <> '' then
     StatusText('Templated Text copied to clipboard.');
@@ -1530,18 +1559,6 @@ begin
     end;
 end;
 
-procedure TfrmDrawers.tvRemindersAddition(Sender: TObject;
-  Node: TTreeNode);
-begin
-  TAccessibleTreeNode.WrapControl(Node as TORTreeNode);
-end;
-
-procedure TfrmDrawers.tvRemindersDeletion(Sender: TObject;
-  Node: TTreeNode);
-begin
-  TAccessibleTreeNode.UnwrapControl(Node as TORTreeNode);
-end;
-
 procedure TfrmDrawers.DisableArrowKeyMove(Sender: TObject);
 var
   CurrPanel : TKeyClickPanel;
@@ -1559,6 +1576,9 @@ begin
     end;
   end;
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmDrawers);
 
 end.
 

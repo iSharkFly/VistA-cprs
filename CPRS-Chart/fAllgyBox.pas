@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, fRptBox, StdCtrls, ExtCtrls, ComCtrls, fARTAllgy, ORFn;
+  Dialogs, fRptBox, StdCtrls, ExtCtrls, ComCtrls, fARTAllgy, ORFn,
+  VA508AccessibilityManager;
 
 type
   TfrmAllgyBox = class(TfrmReportBox)
@@ -79,10 +80,22 @@ begin
       ForceInsideWorkArea(Rect);
       BoundsRect := Rect;
       ResizeAnchoredFormToFont(Result);
+
+      //CQ6889 - force Print & Close buttons to bottom right of form regardless of selected font size
+      cmdClose.Left := (pnlButton.Left+pnlButton.Width)-cmdClose.Width;
+      cmdPrint.Left := (cmdClose.Left-cmdPrint.Width) - 1;
+      //end CQ6889
+
+      Constraints.MinWidth := cmdAdd.Width + cmdEdit.Width + cmdInError.Width + cmdPrint.Width + cmdClose.Width + 20;
+      Constraints.MinHeight := 2*pnlButton.Height + memReport.Height;
+      cmdAdd.Left := 1;
+      cmdEdit.Left := (cmdAdd.Left + cmdAdd.Width) + 1;
+      cmdInError.Left := (cmdEdit.Left + cmdEdit.Width) + 1;
+
       SetLength(BtnLeft, k);
       for j := 0 to k - 1 do
         BtnLeft[j] := pnlButton.Width - BtnArray[j].Width - BtnRight[j];
-      memReport.Lines.Assign(ReportText);
+      QuickCopy(ReportText, memReport);
       for i := 1 to Length(ReportTitle) do if ReportTitle[i] = #9 then ReportTitle[i] := ' ';
       Caption := ReportTitle;
       memReport.SelStart := 0;
@@ -157,7 +170,7 @@ end;
 procedure TfrmAllgyBox.RefreshText;
 begin
   memReport.Clear;
-  memReport.Lines.Assign(DetailAllergy(FAllergyIEN));
+  QuickCopy(DetailAllergy(FAllergyIEN), memReport);
 end;
 
 end.

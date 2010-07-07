@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ORDtTm, ORFn, ExtCtrls, ComCtrls;
+  StdCtrls, ORCtrls, ORDtTm, ORFn, ExtCtrls, ComCtrls, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmLabCollectTimes = class(TForm)
+  TfrmLabCollectTimes = class(TfrmBase508Form)
     calLabCollect: TORDateBox;
     lstLabCollTimes: TORListBox;
     cmdOK: TButton;

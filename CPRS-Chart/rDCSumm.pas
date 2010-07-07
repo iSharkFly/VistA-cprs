@@ -101,7 +101,7 @@ procedure ListDCSummTitlesShort(Dest: TStrings);
 { returns the user defined list (short list) of Discharge Summary titles }
 begin
   if uDCSummTitles = nil then LoadDCSummTitles;
-  Dest.AddStrings(uDCSummTitles.ShortList);
+  FastAddStrings(uDCSummTitles.ShortList, Dest);
   if uDCSummTitles.ShortList.Count > 0 then
   begin
     Dest.Add('0^________________________________________________________________________');
@@ -211,7 +211,7 @@ begin
         U + Piece(x, U, 3) + U + Piece(x, U, 11);
       Results[i] := x;
     end; {for}
-    Dest.Assign(Results);
+    FastAssign(RPCBrokerV.Results, Dest);
   end; {with}
 end;*)
 
@@ -227,7 +227,7 @@ begin
   if Context > 0 then
     begin
       CallV('TIU DOCUMENTS BY CONTEXT', [CLS_DC_SUMM, Context, Patient.DFN, Early, Late, Person, OccLim, SortSeq, SHOW_ADDENDA]);
-      Dest.Assign(RPCBrokerV.Results);
+      FastAssign(RPCBrokerV.Results, Dest);
     end;
 end;
 
@@ -320,7 +320,7 @@ begin
       // -------------------- v19.1 (RV) LOST NOTES?----------------------------
       //Lines := Results;   'Lines' is being overwritten by subsequent Broker calls
       if not Assigned(Lines) then Lines := TStringList.Create;
-      Lines.Assign(Results);
+      FastAssign(RPCBrokerV.Results, Lines);
       // -----------------------------------------------------------------------
     end;
   end;

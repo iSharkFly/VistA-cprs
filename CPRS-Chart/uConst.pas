@@ -33,6 +33,8 @@ const
   UM_STILLDELAY   = (WM_USER + 9248);  // used by EDO related form fOrdersTS,fOrdersCopy,fMedsCopy
   UM_EVENTOCCUR   = (WM_USER + 9249);  // used by EDO for background occured event
   UM_NSSOTHER     = (WM_USER + 9250);  // used by NSS for auto-display schedule builder
+  UM_MISC         = (WM_USER + 9251);  // used for misc stuff across forms
+  UM_508          = (WM_USER + 9508);  // used for 508 messages at 508 base form level
 
   { Tab Indexes, moved from fFrame }
   CT_NOPAGE   = -1;                             // chart tab - none selected
@@ -378,6 +380,16 @@ const
 
    DISCONTINUED_ORDER = '2';
 
+   CaptionProperty = 'Caption';
+   ShowAccelCharProperty = 'ShowAccelChar';
+   DrawersProperty = 'Drawers';
+
+   {Sensitive Patient Access}
+    DGSR_FAIL = -1;
+    DGSR_NONE =  0;
+    DGSR_SHOW =  1;
+    DGSR_ASK  =  2;
+    DGSR_DENY =  3;
 
 var
   ScrollBarWidth: integer = 0;

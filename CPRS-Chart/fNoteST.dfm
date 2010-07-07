@@ -1,27 +1,20 @@
-object frmNotesSearchText: TfrmNotesSearchText
+inherited frmNotesSearchText: TfrmNotesSearchText
   Left = 473
   Top = 272
-  Width = 339
-  Height = 150
   BorderIcons = []
   Caption = 'List Signed Notes by Author'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = True
+  ClientHeight = 123
+  ClientWidth = 331
   Position = poScreenCenter
-  OnDestroy = FormDestroy
-  OnResize = FormResize
   OnShow = FormShow
+  ExplicitWidth = 339
+  ExplicitHeight = 150
   DesignSize = (
     331
     123)
   PixelsPerInch = 96
   TextHeight = 13
-  object lblSearchInfo: TLabel
+  object lblSearchInfo: TLabel [0]
     Left = 8
     Top = 56
     Width = 221
@@ -33,14 +26,14 @@ object frmNotesSearchText: TfrmNotesSearchText
       'o pull up that view prior to searching.'
     WordWrap = True
   end
-  object lblAuthor: TLabel
+  object lblAuthor: TLabel [1]
     Left = 8
     Top = 8
     Width = 65
     Height = 13
     Caption = 'Search string:'
   end
-  object edtSearchText: TEdit
+  object edtSearchText: TEdit [2]
     Left = 8
     Top = 24
     Width = 224
@@ -48,7 +41,7 @@ object frmNotesSearchText: TfrmNotesSearchText
     Anchors = [akLeft, akTop, akRight]
     TabOrder = 0
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [3]
     Left = 251
     Top = 24
     Width = 72
@@ -59,7 +52,7 @@ object frmNotesSearchText: TfrmNotesSearchText
     TabOrder = 1
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [4]
     Left = 251
     Top = 49
     Width = 72
@@ -69,5 +62,20 @@ object frmNotesSearchText: TfrmNotesSearchText
     Caption = 'Cancel'
     TabOrder = 2
     OnClick = cmdCancelClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = edtSearchText'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmNotesSearchText'
+        'Status = stsDefault'))
   end
 end

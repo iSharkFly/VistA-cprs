@@ -4,10 +4,44 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORCtrls, ORFn, uConst;
+  StdCtrls, ExtCtrls, ORCtrls, ORFn, uConst, fBase508Form, uDlgComponents,
+  VA508AccessibilityManager, uCore, orNet, TRPCB, StrUtils, rCore, VAUtils;
 
 type
-  TfrmMHTest = class(TForm)
+TShowProc = procedure(Broker: TRPCBroker;
+  InstrumentName,
+  PatientDFN,
+  OrderedBy,
+  OrderedByDUZ,
+  AdministeredBy,
+  AdministeredByDUZ,
+  Location,
+  LocationIEN: string;
+  Required: boolean;
+  var ProgressNote: string); stdcall;
+
+TSaveProc = procedure(Broker: TRPCBroker;
+  InstrumentName,
+  PatientDFN,
+  OrderedByDUZ,
+  AdministeredByDUZ,
+  AdminDate,
+  LocationIEN: string;
+  var Status: string); stdcall;
+
+TRemoveTempFile = procedure(
+  InstrumentName,
+  PatientDFN: string); stdcall;
+
+TCloseProc = procedure;
+
+TUsedMHDll = record
+  Checked: boolean;
+  Display: boolean;
+end;
+
+type
+  TfrmMHTest = class(TfrmBase508Form)
     sbMain: TScrollBox;
     pnlBottom: TPanel;
     btnCancel: TButton;
@@ -26,7 +60,7 @@ type
     FAnswers: TStringList;
     FObjs: TList;
     FInfoText: string;
-    FInfoLabel: TMemo;
+    FInfoLabel: TMentalHealthMemo;
     FBuilt: boolean;
     FMaxLines: integer;
     FBuildingControls: boolean;
@@ -39,13 +73,21 @@ type
   public
   MHTestComp: string;
   MHA3: boolean;
+  function CallMHDLL(TestName: string; Required: boolean): String;
   end;
 
-function PerformMHTest(InitialAnswers, TestName: string; QText: TStringList): string;
+function PerformMHTest(InitialAnswers, TestName: string; QText: TStringList; Required: boolean): string;
+function SaveMHTest(TestName, Date, Loc: string): boolean;
+procedure RemoveMHTest(TestName: string);
+function CheckforMHDll: boolean;
+procedure CloseMHDLL;
 
+var
+  MHDLLHandle: THandle = 0;
+  
 implementation
 
-uses rReminders;
+uses fFrame,rReminders, VA508AccessibilityRouter;
 
 {$R *.DFM}
 
@@ -62,10 +104,17 @@ const
   QGap = 4;
   Gap = 2;
 
+  ShowProc                    : TShowProc = nil;
+  SaveProc                    : TSaveProc = nil;
+  RemoveTempFile              : TRemoveTempFile = nil;
+  CloseProc                  : TCloseProc = nil;
+  SHARE_DIR = '\VISTA\Common Files\';
 var
   frmMHTest: TfrmMHTest;
   FFirstCtrl: TList;
   FYPos: TList;
+  UsedMHDll: TUsedMHDll;
+  //DLLForceClose: boolean = false;
 
 type
   TMHQuestion = class(TObject)
@@ -116,9 +165,38 @@ begin
     Application.ProcessMessages;
 end;
 
-function PerformMHTest(InitialAnswers, TestName: string; QText: TStringList): string;
+function PerformMHTest(InitialAnswers, TestName: string; QText: TStringList; Required: boolean): string;
+var
+str,scores, tempStr: string;
 begin
   Result := InitialAnswers;
+  str := frmMHTest.CallMHDLL(testName, Required);
+  if str <> '' then
+    begin
+      if Piece(str,U,1) = 'COMPLETE' then
+        begin
+         Scores := Piece(str, U, 4);
+         if QText <> nil then
+           begin
+             tempStr := Piece(Str, U, 5);
+             if Pos('GAF Score', tempStr) = 0 then tempStr := Copy(tempStr, 2, Length(tempStr));
+             tempStr := AnsiReplaceStr(tempStr,'1156','Response not required due to responses to other questions.');
+             tempStr := AnsiReplaceStr(tempStr,'*','~~');
+             PiecesToList(tempStr,'~',QText);
+           end;
+         Result := 'New MH dll^COMPLETE^'+ Scores;
+        end
+      else if Piece(str,U,1) = 'INCOMPLETE' then
+        begin
+          Result := 'New MH dll^INCOMPLETE^';
+        end
+      else if (Piece(str,U,1) = 'CANCELLED') or (Piece(str, U, 1) = 'NOT STARTED') then
+        begin
+          Result := 'New MH dll^CANCELLED^';
+        end;
+      frmMHTest.Free;
+      exit;
+    end;
   frmMHTest := TfrmMHTest.Create(Application);
   try
     frmMHTest.Caption := TestName;
@@ -141,6 +219,160 @@ begin
   finally
     frmMHTest.Free;
   end;
+end;
+
+function SaveMHTest(TestName, date, Loc: string): boolean;
+var
+  MHPath, save: string;
+  
+begin
+  MHPath := GetProgramFilesPath + SHARE_DIR + 'YS_MHA';
+  if MHDLLHandle = 0 then
+    MHDLLHandle := LoadLibrary(PChar(MHPath));
+  Result := true;
+  if MHDLLHandle = 0 then
+    begin
+      InfoBox('YS_MHA.DLL not available', 'Error', MB_OK);
+      Exit;
+    end
+  else
+    begin
+      try
+        @SaveProc := GetProcAddress(MHDLLHandle, 'SaveInstrument');
+
+        if @SaveProc = nil then
+          begin
+          // function not found.. misspelled?
+            infoBox('Save Instrument Function not found within YS_MHA.DLL.', 'Error', MB_OK);
+            Exit;
+          end;
+
+        if Assigned(SaveProc) then
+         begin
+//          fFrame.frmFrame.DLLActive := True;
+          try
+            SaveProc(RPCBrokerV,
+            UpperCase(TestName), //InstrumentName
+            Patient.DFN, //PatientDFN
+            InttoStr(User.duz), //OrderedByDUZ
+            InttoStr(User.duz), //AdministeredByDUZ
+            date,
+            Loc, //LocationIEN
+            save);
+          finally
+//            fFrame.frmFrame.DLLActive := false;
+            if RPCBrokerV.CurrentContext <> 'OR CPRS GUI CHART' then
+               begin
+                 if RPCBrokerV.CreateContext('OR CPRS GUI CHART') = false then
+                    infoBox('Error switching broker context','Error', MB_OK);
+               end;
+          end;  {inner try..finally}
+         end;
+      finally
+        if MHDLLHandle <> 0 then
+        begin
+          FreeLibrary(MHDLLHandle);
+          MHDLLHandle := 0;
+        end;
+      end; {try..finally}
+  end;
+end;
+
+procedure RemoveMHTest(TestName: string);
+var
+  MHPath: string;
+begin
+  MHPath := GetProgramFilesPath + SHARE_DIR + 'YS_MHA';
+  if MHDLLHandle = 0 then
+    MHDLLHandle := LoadLibrary(PChar(MHPath));
+  if MHDLLHandle = 0 then
+    begin
+      InfoBox('YS_MHA.DLL not available', 'Error', MB_OK);
+      Exit;
+    end
+  else
+    begin
+      try
+        @RemoveTempFile := GetProcAddress(MHDLLHandle, 'RemoveTempFile');
+
+        if @RemoveTempFile = nil then
+          begin
+          // function not found.. misspelled?
+            InfoBox('Remove Temp File function not found within YS_MHA.DLL.', 'Error', MB_OK);
+            Exit;
+          end;
+
+        if Assigned(RemoveTempFile) then
+         begin
+//          fFrame.frmFrame.DLLActive := True;
+          try
+            RemoveTempFile(UpperCase(TestName), //InstrumentName
+            Patient.DFN);
+          finally
+//            fFrame.frmFrame.DLLActive := False;
+            if RPCBrokerV.CurrentContext <> 'OR CPRS GUI CHART' then
+               begin
+                 if RPCBrokerV.CreateContext('OR CPRS GUI CHART') = false then
+                    infoBox('Error switching broker context','Error', MB_OK);
+               end;
+          end;  {inner try..finally}
+         end;
+      finally
+        if MHDLLHandle <> 0 then
+        begin
+          FreeLibrary(MHDLLHandle);
+          MHDLLHandle := 0;
+        end;
+      end; {try..finally}
+  end;
+end;
+
+function CheckforMHDll: boolean;
+var
+  MHPath: string;
+begin
+  Result := True;
+    if (UsedMHDll.Checked = True) and (UsedMHDll.Display = False) then Exit
+  else if UsedMHDll.Checked = false then
+    begin
+      UsedMHDll.Display := UsedMHDllRPC;
+      UsedMHDll.Checked := True;
+      if UsedMHDll.Display = false then
+        begin
+          Result := False;
+          exit;
+        end;
+    end;
+  if MHDLLHandle = 0 then // if not 0 the DLL already loaded - result = true
+  begin
+    MHPath := GetProgramFilesPath + SHARE_DIR + 'YS_MHA';
+    MHDLLHandle := LoadLibrary(PChar(MHPath));
+    if MHDLLHandle = 0 then
+      Result := false
+    else
+    begin
+      FreeLibrary(MHDLLHandle);
+      MHDLLHandle := 0;
+    end;
+  end;
+end;
+
+procedure CloseMHDLL;
+begin
+  if MHDLLHandle = 0 then Exit;
+  try
+    @CloseProc := GetProcAddress(MHDLLHandle, 'CloseDLL');
+    if Assigned(CloseProc) then
+    begin
+      CloseProc;
+    end;
+  finally
+    if MHDLLHandle <> 0 then
+    begin
+      FreeLibrary(MHDLLHandle);
+      MHDLLHandle := 0;
+    end;
+  end; {try..finally}
 end;
 
 { TfrmMHTest }
@@ -249,7 +481,7 @@ begin
   Result := TRUE;
   TstData := TStringList.Create;
   try
-    TstData.Assign(LoadMentalHealthTest(TestName));
+    FastAssign(LoadMentalHealthTest(TestName), TstData);
     if TstData.Strings[0] = '1' then MHA3 := True
     else MHA3 := False;
     Screen.Cursor := crHourGlass;
@@ -359,7 +591,7 @@ begin
     TstData.Free;
   end;
   if(not Result) then
-    ShowMessage('Error encountered loading ' + TestName)
+    InfoBox('Error encountered loading ' + TestName, 'Error', MB_OK)
   else
   begin
     for i := 0 to FObjs.Count-1 do
@@ -406,15 +638,16 @@ begin
      begin
      if(not assigned(FInfoLabel)) then
       begin
-        FInfoLabel := TMemo.Create(Self);
+        FInfoLabel := TMentalHealthMemo.Create(Self);
         FInfoLabel.Color := clBtnFace;
         FInfoLabel.BorderStyle := bsNone;
         FInfoLabel.ReadOnly := TRUE;
-        FInfoLabel.TabStop := FALSE;
+        FInfoLabel.TabStop := ScreenReaderSystemActive;
         FInfoLabel.Parent := sbMain;
         FInfoLabel.WordWrap := TRUE;
         FInfoLabel.Text := FInfoText;
         FInfoLabel.Left := Gap;
+        UpdateColorsFor508Compliance(FInfoLabel);
       end;
       BoundsRect := FInfoLabel.BoundsRect;
       //Wide := sbMain.Width - (Gap * 2) - ScrollBarWidth - 4;
@@ -438,6 +671,7 @@ begin
       FBuildingControls := FALSE;
     end;
   end;
+  amgrMain.RefreshComponents;
 end;
 
 procedure TfrmMHTest.GetQText(QText: TStringList);
@@ -454,6 +688,80 @@ begin
     lx := 3;
   for i := 0 to FObjs.Count-1 do
     QText.Add(copy(IntToStr(i+1) + '.      ', 1, lx) + TMHQuestion(FObjs[i]).Question);
+end;
+
+function TfrmMHTest.CallMHDLL(TestName: string; Required: boolean): String;
+var                               
+//  dllHandle                   : THandle;
+  ProgressNote, MHPath                : string;
+begin
+  ProgressNote := '';
+  if (UsedMHDll.Checked = True) and (UsedMHDll.Display = False) then Exit
+  else if UsedMHDll.Checked = false then
+    begin
+      UsedMHDll.Display := UsedMHDllRPC;
+      UsedMHDll.Checked := True;
+      if UsedMHDll.Display = false then exit;
+    end;
+  MHPath := GetProgramFilesPath + SHARE_DIR + 'YS_MHA';
+  if MHDLLHandle = 0 then
+    MHDLLHandle := LoadLibrary(PChar(MHPath));
+  Result := '';
+  if MHDLLHandle = 0 then
+    begin
+      InfoBox('YS_MHA.dll not available.' + CRLF + 'CPRS will continue processing the MH test using the previous format.' +
+                  CRLF + CRLF + 'Contact IRM to install the YS_MHA.dll file on this machine.', 'Warning', MB_OK);
+      Exit;
+    end
+  else
+    begin
+      try
+        @ShowProc := GetProcAddress(MHDLLHandle, 'ShowInstrument');
+
+        if @ShowProc = nil then
+          begin
+          // function not found.. misspelled?
+            InfoBox('Function ShowInstrument not found within YS_MHA.DLL not available', 'Error', MB_OK);
+            Exit;
+          end;
+
+        if Assigned(ShowProc) then
+           begin
+//             MHDLLHandle := dllHandle;
+             Result := '';
+//             fFrame.frmFrame.DLLActive := True;
+             try
+               ShowProc(RPCBrokerV,
+               UpperCase(TestName), //InstrumentName
+               Patient.DFN, //PatientDFN
+               '', //OrderedByName
+               InttoStr(User.duz), //OrderedByDUZ
+               User.Name, //AdministeredByName
+               InttoStr(User.duz), //AdministeredByDUZ
+               Encounter.LocationName, //Location
+               InttoStr(Encounter.Location), //LocationIEN
+               Required,
+               ProgressNote);
+               Result := ProgressNote;
+           finally
+//             MHDllHandle := 0;
+//             fFrame.frmFrame.DLLActive := false;
+             if RPCBrokerV.CurrentContext <> 'OR CPRS GUI CHART' then
+               begin
+                 if RPCBrokerV.CreateContext('OR CPRS GUI CHART') = false then
+                    infoBox('Error switching broker context','Error', MB_OK);
+                end;
+               end; {inner try ..finally}
+            end;
+      finally
+        if MHDLLHandle <> 0 then
+        begin
+          FreeLibrary(MHDLLHandle);
+          MHDllHandle := 0;
+        end;
+      end; {try..finally}
+      //Result := ProgressNote;
+  end;
 end;
 
 function TfrmMHTest.CurrentQ: integer;
@@ -501,6 +809,7 @@ end;
 procedure TfrmMHTest.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  inherited;
   if Key = VK_PRIOR then
   begin
     GotoQ(CurrentQ - 1);
@@ -519,7 +828,7 @@ end;
 procedure TMHQuestion.BuildControls(var Y: integer; Wide: integer);
 var
   RCombo: TComboBox;
-  LNLbl, RLbl: TMemo;
+  LNLbl, RLbl: TMentalHealthMemo;
   Bvl: TBevel;
   cb: TORCheckBox;
   ans, idx, DX, MaxDX, MaxDY: integer;
@@ -555,19 +864,20 @@ var
   begin
     if(FText <> '') then
     begin
-      RLbl := TMemo(GetCtrl(QuestionLabelTag));
+      RLbl := TMentalHealthMemo(GetCtrl(QuestionLabelTag));
       if(not assigned(RLbl)) then
       begin
-        RLbl := TMemo.Create(frmMHTest);
+        RLbl := TMentalHealthMemo.Create(frmMHTest);
         RLbl.Color := clBtnFace;
         RLbl.BorderStyle := bsNone;
         RLbl.ReadOnly := TRUE;
-        RLbl.TabStop := FALSE;
+        RLbl.TabStop := ScreenReaderSystemActive;
         RLbl.Parent := frmMHTest.sbMain;
         RLbl.Tag := FID + QuestionLabelTag;
         RLbl.WordWrap := TRUE;
         RLbl.Text := FText;
         FObjects.Add(RLbl);
+        UpdateColorsFor508Compliance(RLbl);
       end;
       BoundsRect.Top := Y;
       BoundsRect.Left := Offset;
@@ -595,20 +905,23 @@ begin
   MaxDY := 0;
   if(frmMHTest.FObjs.Count >= NumberThreshhold) then
   begin
-    LNLbl := TMemo(GetCtrl(LineNumberTag));
+    LNLbl := TMentalHealthMemo(GetCtrl(LineNumberTag));
     if(not assigned(LNLbl)) then
     begin
-      LNLbl := TMemo.Create(frmMHTest);
+      LNLbl := TMentalHealthMemo.Create(frmMHTest);
       LNLbl.Color := clBtnFace;
       LNLbl.BorderStyle := bsNone;
       LNLbl.ReadOnly := TRUE;
-      LNLbl.TabStop := FALSE;
+      LNLbl.TabStop := ScreenReaderSystemActive;
       LNLbl.Parent := frmMHTest.sbMain;
       LNLbl.Tag := FID + LineNumberTag;
       LNLbl.Text := IntToStr(QNum+1) + '.';
+      if ScreenReaderSystemActive then
+        frmMHTest.amgrMain.AccessText[LNLbl] := 'Question';      
       LNLbl.Width := TextWidthByFont(LNLbl.Font.Handle, LNLbl.Text);
       LNLbl.Height := TextHeightByFont(LNLbl.Font.Handle, LNLbl.Text);
       FObjects.Add(LNLbl);
+      UpdateColorsFor508Compliance(LNLbl);
     end;
     LNLbl.Top := Y;
     LNLbl.Left := Offset;
@@ -624,6 +937,7 @@ begin
     Bvl.Tag := FID + BevelTag;
     Bvl.Shape := bsFrame;
     FObjects.Add(Bvl);
+    UpdateColorsFor508Compliance(Bvl);
   end;
   Bvl.Top := Y;
   Bvl.Left := Offset;
@@ -659,6 +973,7 @@ begin
         cb.OnClick := OnChange;
         cb.Caption := Piece(frmMHTest.FAnswers[FAnswerIndex + idx], U, 2);
         FObjects.Add(cb);
+        UpdateColorsFor508Compliance(cb);
       end;
       cb.Top := Y;
       cb.Left := Offset;
@@ -691,6 +1006,7 @@ begin
       RCombo.ItemIndex := ans;
       RCombo.Width := MaxDX + 24;
       RCombo.OnChange := OnChange;
+      UpdateColorsFor508Compliance(RCombo);
     end;
     RCombo.Top := Y;
     RCombo.Left := Offset;

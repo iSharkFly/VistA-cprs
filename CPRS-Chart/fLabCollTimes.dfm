@@ -1,22 +1,17 @@
-object frmLabCollectTimes: TfrmLabCollectTimes
+inherited frmLabCollectTimes: TfrmLabCollectTimes
   Left = 332
   Top = 310
-  Width = 447
-  Height = 197
   BorderIcons = []
   Caption = 'Future Lab Collect Times'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
+  ClientHeight = 170
+  ClientWidth = 439
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 447
+  ExplicitHeight = 197
   PixelsPerInch = 96
   TextHeight = 13
-  object lblFutureTimes: TMemo
+  object lblFutureTimes: TMemo [0]
     Left = 211
     Top = 113
     Width = 129
@@ -31,7 +26,7 @@ object frmLabCollectTimes: TfrmLabCollectTimes
     ReadOnly = True
     TabOrder = 5
   end
-  object calLabCollect: TORDateBox
+  object calLabCollect: TORDateBox [1]
     Left = 241
     Top = 22
     Width = 158
@@ -42,7 +37,7 @@ object frmLabCollectTimes: TfrmLabCollectTimes
     DateOnly = True
     RequireTime = False
   end
-  object lstLabCollTimes: TORListBox
+  object lstLabCollTimes: TORListBox [2]
     Left = 210
     Top = 6
     Width = 218
@@ -55,7 +50,7 @@ object frmLabCollectTimes: TfrmLabCollectTimes
     LongList = False
     Pieces = '2'
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [3]
     Left = 353
     Top = 112
     Width = 75
@@ -64,7 +59,7 @@ object frmLabCollectTimes: TfrmLabCollectTimes
     TabOrder = 2
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [4]
     Left = 353
     Top = 139
     Width = 75
@@ -74,7 +69,7 @@ object frmLabCollectTimes: TfrmLabCollectTimes
     TabOrder = 3
     OnClick = cmdCancelClick
   end
-  object calMonth: TMonthCalendar
+  object calMonth: TMonthCalendar [5]
     Left = 8
     Top = 5
     Width = 190
@@ -83,11 +78,35 @@ object frmLabCollectTimes: TfrmLabCollectTimes
     CalColors.TitleTextColor = clBtnText
     CalColors.MonthBackColor = clWindow
     CalColors.TrailingTextColor = clGrayText
-    Date = 36507.6194967361
+    Date = 36507.853976585640000000
     ShowTodayCircle = False
     TabOrder = 4
     TabStop = True
     OnClick = calMonthClick
     OnKeyDown = calMonthKeyDown
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblFutureTimes'
+        'Status = stsDefault')
+      (
+        'Component = calLabCollect'
+        'Status = stsDefault')
+      (
+        'Component = lstLabCollTimes'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = calMonth'
+        'Status = stsDefault')
+      (
+        'Component = frmLabCollectTimes'
+        'Status = stsDefault'))
   end
 end

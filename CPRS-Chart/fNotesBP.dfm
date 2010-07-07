@@ -1,16 +1,17 @@
 inherited frmNotesBP: TfrmNotesBP
   Left = 230
   Top = 376
-  Width = 318
-  Height = 182
   BorderIcons = []
   Caption = 'Boilerplate Text'
-  KeyPreview = True
+  ClientHeight = 155
+  ClientWidth = 310
   Position = poScreenCenter
   OnKeyUp = FormKeyUp
+  ExplicitWidth = 318
+  ExplicitHeight = 182
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TStaticText
+  object Label1: TStaticText [0]
     Left = 0
     Top = 0
     Width = 310
@@ -20,11 +21,11 @@ inherited frmNotesBP: TfrmNotesBP
     Caption = 'The selected title has associated boilerplate text.'
     TabOrder = 1
   end
-  object radOptions: TRadioGroup
+  object radOptions: TRadioGroup [1]
     Left = 0
     Top = 17
     Width = 310
-    Height = 103
+    Height = 110
     Align = alClient
     Caption = ' Choose from: '
     ItemIndex = 0
@@ -33,14 +34,16 @@ inherited frmNotesBP: TfrmNotesBP
       '&Append the boilerplate text to the text in the note.'
       '&Replace the text in the note with the boilerplate text.')
     TabOrder = 0
+    ExplicitHeight = 103
   end
-  object btnPanel: TPanel
+  object btnPanel: TPanel [2]
     Left = 0
-    Top = 120
+    Top = 127
     Width = 310
     Height = 28
     Align = alBottom
     TabOrder = 2
+    ExplicitTop = 120
     object cmdPreview: TButton
       Left = 6
       Top = 4
@@ -60,5 +63,26 @@ inherited frmNotesBP: TfrmNotesBP
       TabOrder = 1
       OnClick = cmdCloseClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Label1'
+        'Status = stsDefault')
+      (
+        'Component = radOptions'
+        'Status = stsDefault')
+      (
+        'Component = btnPanel'
+        'Status = stsDefault')
+      (
+        'Component = cmdPreview'
+        'Status = stsDefault')
+      (
+        'Component = cmdClose'
+        'Status = stsDefault')
+      (
+        'Component = frmNotesBP'
+        'Status = stsDefault'))
   end
 end

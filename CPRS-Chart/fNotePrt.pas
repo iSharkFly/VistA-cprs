@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, ORCtrls, StdCtrls, Mask, ORNet, ORFn, ComCtrls;
+  fAutoSz, ORCtrls, StdCtrls, Mask, ORNet, ORFn, ComCtrls,
+  VA508AccessibilityManager;
 
 type
   TfrmNotePrint = class(TfrmAutoSz)
@@ -25,7 +26,6 @@ type
     chkDefault: TCheckBox;
     procedure cboDeviceNeedData(Sender: TObject; const StartFrom: String;
       Direction, InsertAt: Integer);
-    procedure FormCreate(Sender: TObject);
     procedure cboDeviceChange(Sender: TObject);
     procedure radChartCopyClick(Sender: TObject);
     procedure radWorkCopyClick(Sender: TObject);
@@ -46,7 +46,7 @@ implementation
 
 {$R *.DFM}
 
-uses rCore, rTIU, rReports, uCore, Printers;
+uses rCore, rTIU, rReports, uCore, Printers, uReports;
 
 const
   TX_NODEVICE = 'A device must be selected to print, or press ''Cancel'' to not print.';
@@ -126,18 +126,6 @@ begin
   end;
 end;
 
-procedure TfrmNotePrint.FormCreate(Sender: TObject);
-begin
-  inherited;
-  FReportText := TRichEdit.Create(Self);
-  with FReportText do
-    begin
-      Parent := Self;
-      Visible := False;
-      Width := 600;
-    end;
-end;
-
 procedure TfrmNotePrint.DisplaySelectDevice;
 begin
   with cboDevice, lblPrintTo do
@@ -203,7 +191,8 @@ begin
     begin
     if dlgWinPrinter.Execute then
        begin
-       FReportText.Lines.Assign(GetFormattedNote(FNote, ChartCopy));
+       FReportText := CreateReportTextComponent(Self);
+       FastAssign(GetFormattedNote(FNote, ChartCopy), FReportText.Lines);
        PrintWindowsReport(FReportText, PAGE_BREAK, Self.Caption, ErrMsg);
        if Length(ErrMsg) > 0 then InfoBox(ErrMsg, TX_ERR_CAP, MB_OK);
        end
@@ -219,7 +208,7 @@ begin
 
   if chkDefault.Checked then
      SaveDefaultPrinter(Piece(cboDevice.ItemID, ';', 1));
-     
+
   User.CurrentPrinter := cboDevice.ItemID;
   Close;
 end;

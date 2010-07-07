@@ -1,16 +1,10 @@
-object frmPlVuFilt: TfrmPlVuFilt
+inherited frmPlVuFilt: TfrmPlVuFilt
   Left = 353
   Top = 217
   BorderStyle = bsDialog
   Caption = 'Problem List View Filters'
   ClientHeight = 343
   ClientWidth = 349
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   OnClose = FormClose
@@ -18,7 +12,7 @@ object frmPlVuFilt: TfrmPlVuFilt
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 349
@@ -194,6 +188,7 @@ object frmPlVuFilt: TfrmPlVuFilt
       SynonymChars = '<>'
       TabOrder = 8
       OnNeedData = cboProviderNeedData
+      CharsNeedMatch = 1
     end
     object cmdDefaultView: TBitBtn
       Left = 180
@@ -232,6 +227,7 @@ object frmPlVuFilt: TfrmPlVuFilt
       OnEnter = cboSourceEnter
       OnExit = cboSourceExit
       OnNeedData = cboSourceNeedData
+      CharsNeedMatch = 1
     end
     object cmdSave: TButton
       Left = 48
@@ -272,6 +268,55 @@ object frmPlVuFilt: TfrmPlVuFilt
       Sorted = False
       SynonymChars = '<>'
       TabOrder = 1
+      CharsNeedMatch = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = cmdAdd'
+        'Status = stsDefault')
+      (
+        'Component = cmdRemove'
+        'Status = stsDefault')
+      (
+        'Component = cmdRemoveAll'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = lstDest'
+        'Status = stsDefault')
+      (
+        'Component = rgVu'
+        'Status = stsDefault')
+      (
+        'Component = cboProvider'
+        'Status = stsDefault')
+      (
+        'Component = cmdDefaultView'
+        'Status = stsDefault')
+      (
+        'Component = cboSource'
+        'Status = stsDefault')
+      (
+        'Component = cmdSave'
+        'Status = stsDefault')
+      (
+        'Component = chkComments'
+        'Status = stsDefault')
+      (
+        'Component = cboStatus'
+        'Status = stsDefault')
+      (
+        'Component = frmPlVuFilt'
+        'Status = stsDefault'))
   end
 end

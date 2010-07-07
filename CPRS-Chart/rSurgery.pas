@@ -123,7 +123,7 @@ procedure ListSurgeryTitlesShort(Dest: TStrings; AClassName: string);
 { returns the user defined list (short list) of Surgery titles }
 begin
   if (uSurgeryTitles = nil) or (AClassName <> uSurgeryTitles.ClassName) then LoadSurgeryTitles(AClassName);
-  Dest.AddStrings(uSurgeryTitles.ShortList);
+  FastAddStrings(uSurgeryTitles.ShortList, Dest);
   if uSurgeryTitles.ShortList.Count > 0 then
   begin
     Dest.Add('0^________________________________________________________________________');
@@ -168,7 +168,7 @@ begin
       begin
        SortByPiece(TStringList(Results), U, 2);
        InvertStringList(TStringList(Results));
-       Dest.Assign(Results);
+       FastAssign(Results, Dest);
      end
     else
      begin
@@ -190,7 +190,7 @@ begin
        SortByPiece(TStringList(Results), U, 3);
        InvertStringList(TStringList(Results));
        SetListFMDateTime('mmm dd,yy hh:nn', TStringList(Results), U, 3);
-       Dest.Assign(Results);
+       FastAssign(Results, Dest);
      end
     else
      begin
@@ -205,14 +205,14 @@ procedure LoadSurgReportText(Dest: TStrings; IEN: integer) ;
 { returns the text of a surgery report }
 begin
   CallV('TIU GET RECORD TEXT', [IEN]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure LoadSurgReportDetail(Dest: TStrings; IEN: integer) ;
 { returns the detail of a surgery report }
 begin
   CallV('TIU DETAILED DISPLAY', [IEN]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 (*procedure LoadOpTop(Dest: TStrings; ACaseIEN: integer; IsNonORProc, ShowReport: boolean) ;
@@ -225,7 +225,7 @@ begin
   with RPCBrokerV do
     begin
       //if Results.Count > 0 then Results.Delete(0);   //This is the value of the ShowOpTopOnSignature site parameter.
-      Dest.Assign(Results);
+      FastAssign(Results, Dest);
     end;
 end;*)
 
@@ -280,7 +280,7 @@ end;
 procedure GetSingleCaseListItemWithDocs(Dest: TStrings; NoteIEN: integer);
 begin
   CallV('ORWSR ONECASE', [NoteIEN]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 function GetSingleCaseListItemWithoutDocs(NoteIEN: integer): string;

@@ -78,7 +78,7 @@ begin
   SrcList := TStringList.Create;
   try
     //ReportBox(Source, '', True);
-    SrcList.Assign(Source);
+    FastAssign(Source, SrcList);
     with SrcList do
       begin
         if (Count = 1) and (Piece(SrcList[0], U, 1) = '-1') then

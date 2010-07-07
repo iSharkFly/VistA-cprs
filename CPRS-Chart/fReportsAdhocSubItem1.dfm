@@ -1,22 +1,17 @@
-object frmReportsAdhocSubItem1: TfrmReportsAdhocSubItem1
+inherited frmReportsAdhocSubItem1: TfrmReportsAdhocSubItem1
   Left = 223
   Top = 170
-  Width = 435
-  Height = 341
   BorderIcons = [biSystemMenu]
   Caption = 'frmReportsAdhocSubItem1'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 314
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 320
+  ExplicitHeight = 341
   PixelsPerInch = 96
   TextHeight = 13
-  object GroupBox1: TGroupBox
+  object GroupBox1: TGroupBox [0]
     Left = 0
     Top = 0
     Width = 427
@@ -30,7 +25,6 @@ object frmReportsAdhocSubItem1: TfrmReportsAdhocSubItem1
       Top = 49
       Width = 5
       Height = 230
-      Cursor = crHSplit
     end
     object pnl7Button: TKeyClickPanel
       Left = 395
@@ -252,6 +246,57 @@ object frmReportsAdhocSubItem1: TfrmReportsAdhocSubItem1
         OnClick = btnRemoveAllSelClick
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = GroupBox1'
+        'Status = stsDefault')
+      (
+        'Component = pnl7Button'
+        'Status = stsDefault')
+      (
+        'Component = pnl8Button'
+        'Status = stsDefault')
+      (
+        'Component = ORComboBox2'
+        'Status = stsDefault')
+      (
+        'Component = ORListBox1'
+        'Status = stsDefault')
+      (
+        'Component = Panel4'
+        'Status = stsDefault')
+      (
+        'Component = Label6'
+        'Status = stsDefault')
+      (
+        'Component = lblLimit'
+        'Status = stsDefault')
+      (
+        'Component = Panel5'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = Panel8'
+        'Status = stsDefault')
+      (
+        'Component = btnAddSel'
+        'Status = stsDefault')
+      (
+        'Component = btnRemoveSel'
+        'Status = stsDefault')
+      (
+        'Component = btnRemoveAllSel'
+        'Status = stsDefault')
+      (
+        'Component = frmReportsAdhocSubItem1'
+        'Status = stsDefault'))
   end
   object Timer2: TTimer
     OnTimer = Timer2Timer

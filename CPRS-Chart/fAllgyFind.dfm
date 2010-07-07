@@ -8,9 +8,13 @@ inherited frmAllgyFind: TfrmAllgyFind
   ClientWidth = 445
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitLeft = 408
+  ExplicitTop = 234
+  ExplicitWidth = 453
+  ExplicitHeight = 506
   PixelsPerInch = 96
   TextHeight = 13
-  object lblSearch: TLabel
+  object lblSearch: TLabel [0]
     Left = 0
     Top = 0
     Width = 445
@@ -26,7 +30,7 @@ inherited frmAllgyFind: TfrmAllgyFind
     ParentFont = False
     Layout = tlBottom
   end
-  object lblSelect: TLabel
+  object lblSelect: TLabel [1]
     Left = 5
     Top = 124
     Width = 152
@@ -34,7 +38,7 @@ inherited frmAllgyFind: TfrmAllgyFind
     Caption = 'Select one of the following items'
     Visible = False
   end
-  object lblDetail: TLabel
+  object lblDetail: TLabel [2]
     Left = 0
     Top = 25
     Width = 445
@@ -48,14 +52,14 @@ inherited frmAllgyFind: TfrmAllgyFind
     Layout = tlBottom
     WordWrap = True
   end
-  object lblSearchCaption: TLabel
+  object lblSearchCaption: TLabel [3]
     Left = 6
     Top = 73
     Width = 52
     Height = 13
     Caption = 'Search for:'
   end
-  object txtSearch: TCaptionEdit
+  object txtSearch: TCaptionEdit [4]
     Left = 4
     Top = 88
     Width = 331
@@ -66,36 +70,36 @@ inherited frmAllgyFind: TfrmAllgyFind
       'Enter causative agent for Allergy or Adverse Drug Reaction (Ente' +
       'r at least 3 characters)'
   end
-  object cmdSearch: TButton
+  object cmdSearch: TButton [5]
     Left = 362
     Top = 88
     Width = 75
     Height = 21
-    Caption = 'Search'
+    Caption = '&Search'
     Default = True
     TabOrder = 1
     OnClick = cmdSearchClick
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [6]
     Left = 263
     Top = 422
     Width = 75
     Height = 22
-    Caption = 'OK'
+    Caption = '&OK'
     TabOrder = 4
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [7]
     Left = 345
     Top = 422
     Width = 75
     Height = 22
     Cancel = True
-    Caption = 'Cancel'
+    Caption = '&Cancel'
     TabOrder = 5
     OnClick = cmdCancelClick
   end
-  object stsFound: TStatusBar
+  object stsFound: TStatusBar [8]
     Left = 0
     Top = 453
     Width = 445
@@ -103,16 +107,16 @@ inherited frmAllgyFind: TfrmAllgyFind
     Panels = <>
     SimplePanel = True
   end
-  object ckNoKnownAllergies: TCheckBox
+  object ckNoKnownAllergies: TCheckBox [9]
     Left = 320
     Top = 118
     Width = 119
     Height = 17
-    Caption = 'No Known Allergies'
+    Caption = '&No Known Allergies'
     TabOrder = 3
     OnClick = ckNoKnownAllergiesClick
   end
-  object tvAgent: TORTreeView
+  object tvAgent: TORTreeView [10]
     Left = 2
     Top = 138
     Width = 437
@@ -125,6 +129,33 @@ inherited frmAllgyFind: TfrmAllgyFind
     OnDblClick = tvAgentDblClick
     Caption = 'Select from one of the following items'
     NodePiece = 0
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = txtSearch'
+        'Status = stsDefault')
+      (
+        'Component = cmdSearch'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = stsFound'
+        'Status = stsDefault')
+      (
+        'Component = ckNoKnownAllergies'
+        'Status = stsDefault')
+      (
+        'Component = tvAgent'
+        'Status = stsDefault')
+      (
+        'Component = frmAllgyFind'
+        'Status = stsDefault'))
   end
   object imTree: TImageList
     Left = 396
@@ -268,5 +299,29 @@ inherited frmAllgyFind: TfrmAllgyFind
       FFFFFF1FF2210000FFFFFF8FE2000000FFFFFFC7C7710000FFFFFFE3FFFF0000
       FFFFFFF8FFFF0000FFFFFFFFFFFF000000000000000000000000000000000000
       000000000000}
+  end
+  object imgLblAllgyFindTree: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvAgent
+      end>
+    ImageList = imTree
+    Labels = <
+      item
+        ImageIndex = 0
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Check'
+        ImageIndex = 1
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Greyed X and Exclaimation'
+        ImageIndex = 2
+        OverlayIndex = -1
+      end>
+    Left = 400
+    Top = 192
   end
 end

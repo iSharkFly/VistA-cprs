@@ -158,12 +158,13 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure Clear;
+    procedure EncounterSwitch(Loc: integer; LocName, LocText: string; DT: TFMDateTime; vCat: Char);
     function NeedVisit: Boolean;
     property DateTime:      TFMDateTime read FDateTime  write SetDateTime;
     property Inpatient:     Boolean     read FInpatient write SetInpatient;
     property Location:      Integer     read FLocation  write SetLocation;
-    property LocationName:  string      read GetLocationName;
-    property LocationText:  string      read GetLocationText;
+    property LocationName:  string      read GetLocationName write FLocationName;
+    property LocationText:  string      read GetLocationText write FLocationText;
     property Provider:      Int64       read FProvider  write SetProvider;
     property ProviderName:  string      read GetProviderName;
     property StandAlone:    Boolean     read FStandAlone write SetStandAlone;
@@ -180,8 +181,12 @@ type
     FGroupName: string;
     FSignState: Integer;
     FParentID : string;
+    FUser     : Int64;
+    FOrderDG  : String;
+    FDCOrder  : boolean;
+    FDelay    : boolean;
     constructor Create(AnItemType: Integer; const AnID, AText, AGroupName: string;
-      ASignState: Integer; AParentID: string = '');
+      ASignState: Integer; AParentID: string = ''; User: int64 = 0; OrderDG: string = ''; DCOrder: boolean = False; Delay: boolean = False);
   public
     property ItemType:  Integer read FItemType;
     property ID:        string  read FID;
@@ -189,6 +194,10 @@ type
     property GroupName: string  read FGroupName;
     property SignState: Integer read FSignState write FSignState;
     property ParentID : string  read FParentID;
+    property User: Int64 read FUser write FUser;
+    property OrderDG: string read FOrderDG write FOrderDG;
+    property DCOrder: boolean read FDCOrder write FDCOrder;
+    property Delay: boolean read FDelay write FDelay;
   end;
 
   TORRemoveChangesEvent = procedure(Sender: TObject; ChangeItem: TChangeItem) of object;  {**RV**}
@@ -207,7 +216,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure Add(ItemType: Integer; const AnID, ItemText, GroupName: string; SignState: Integer; AParentID: string = '');
+    procedure Add(ItemType: Integer; const AnID, ItemText, GroupName: string; SignState: Integer; AParentID: string = '';
+                  User: int64 = 0; OrderDG: String = ''; DCOrder: boolean = FALSE; Delay: boolean = FALSE);
     procedure Clear;
     function CanSign: Boolean;
     function Exist(ItemType: Integer; const AnID: string): Boolean;
@@ -366,11 +376,18 @@ var
   //hds7591  Clinic/Ward movement.
   TempEncounterLoc: Integer; // used to Save Encounter Location when user selected "Review Sign Changes" from "File"
   TempEncounterLocName: string; // since in the path PatientRefresh is done prior to checking if patient has been admitted while entering OPT orders.
+  TempEncounterText: string;
+  TempEncounterDateTime: TFMDateTime;
+  TempEncounterVistCat: Char;
+  //TempOutEncounterLoc: Integer;
+  //TempOutEncounterLocName: string;
 
 procedure NotifyOtherApps(const AppEvent, AppData: string);
 procedure FlushNotifierBuffer;
 procedure TerminateOtherAppNotification;
 procedure GotoWebPage(const URL: WideString);
+function AllowAccessToSensitivePatient(NewDFN: string; var AccessStatus: integer): boolean;
+
 
 implementation
 
@@ -409,6 +426,48 @@ const
   LONG_BROADCAST_TIMEOUT = 30000; // 30 seconds
   SHORT_BROADCAST_TIMEOUT = 2000; // 2 seconds
   MSG_TYPE: array[TMsgType] of String = ('V','D');
+
+function AllowAccessToSensitivePatient(NewDFN: string; var AccessStatus: integer): boolean;
+const
+  TX_DGSR_ERR    = 'Unable to perform sensitive record checks';
+  TC_DGSR_ERR    = 'Error';
+  TC_DGSR_SHOW   = 'Restricted Record';
+  TC_DGSR_DENY   = 'Access Denied';
+  TX_DGSR_YESNO  = CRLF + 'Do you want to continue processing this patient record?';
+  TC_NEXT_NOTIF  = 'NEXT NOTIFICATION:  ';
+var
+  //AccessStatus: integer;
+  AMsg, PrefixC, PrefixT: string;
+begin
+  Result := TRUE;
+  if Notifications.Active then
+  begin
+    PrefixT := Piece(Notifications.RecordID, U, 1) + CRLF + CRLF;
+    PrefixC := TC_NEXT_NOTIF;
+  end
+  else
+  begin
+    PrefixT := '';
+    PrefixC := '';
+  end;
+  CheckSensitiveRecordAccess(NewDFN, AccessStatus, AMsg);
+  case AccessStatus of
+  DGSR_FAIL: begin
+               InfoBox(PrefixT + TX_DGSR_ERR, PrefixC + TC_DGSR_ERR, MB_OK);
+               Result := FALSE;
+             end;
+  DGSR_NONE: { Nothing - allow access to the patient. };
+  DGSR_SHOW: InfoBox(PrefixT + AMsg, PrefixC + TC_DGSR_SHOW, MB_OK);
+  DGSR_ASK:  if InfoBox(PrefixT + AMsg + TX_DGSR_YESNO, PrefixC + TC_DGSR_SHOW, MB_YESNO or MB_ICONWARNING or
+               MB_DEFBUTTON2) = IDYES then LogSensitiveRecordAccess(NewDFN)
+             else Result := FALSE;
+  else       begin
+               InfoBox(PrefixT + AMsg, PrefixC + TC_DGSR_DENY, MB_OK);
+               if Notifications.Active then Notifications.DeleteForCurrentUser;
+               Result := FALSE;
+             end;
+  end;
+end;
 
 function QueuePending: boolean;
 begin
@@ -739,6 +798,15 @@ begin
   inherited;
 end;
 
+procedure TEncounter.EncounterSwitch(Loc: integer; LocName, LocText: string; DT: TFMDateTime; vCat: Char);
+begin
+ Encounter.Location := Loc;
+ Encounter.LocationName := LocName;
+ Encounter.LocationText := LocText;
+ Encounter.VisitCategory := vCat;
+ Encounter.DateTime := DT;;
+end;
+
 procedure TEncounter.Clear;
 { clears all the fields of an Encounter (usually done upon patient selection }
 begin
@@ -886,7 +954,7 @@ end;
 { TChangeItem ------------------------------------------------------------------------------ }
 
 constructor TChangeItem.Create(AnItemType: Integer; const AnID, AText, AGroupName: string;
-  ASignState: Integer; AParentID: string);
+  ASignState: Integer; AParentID: string; user: int64; OrderDG: string; DCOrder, Delay: boolean);
 begin
   FItemType  := AnItemType;
   FID        := AnID;
@@ -894,6 +962,10 @@ begin
   FGroupName := AGroupName;
   FSignState := ASignState;
   FParentID  := AParentID;
+  FUser      := User;
+  FOrderDG   := OrderDG;
+  FDCOrder   := DCOrder;
+  FDelay     := Delay;
 end;
 
 { TChanges --------------------------------------------------------------------------------- }
@@ -920,7 +992,7 @@ begin
 end;
 
 procedure TChanges.Add(ItemType: Integer; const AnID, ItemText, GroupName: string;
-  SignState: Integer; AParentID: string);
+  SignState: Integer; AParentID: string; User: int64; OrderDG: String; DCOrder, Delay: boolean);
 var
   i: Integer;
   Found: Boolean;
@@ -947,7 +1019,7 @@ begin
     end;
   if not Found then
   begin
-    NewChangeItem := TChangeItem.Create(ItemType, AnID, ItemText, GroupName, SignState, AParentID);
+    NewChangeItem := TChangeItem.Create(ItemType, AnID, ItemText, GroupName, SignState, AParentID, User, OrderDG, DCOrder, Delay);
     case ItemType of
     CH_DOC: begin
               FDocuments.Add(NewChangeItem);
@@ -1212,7 +1284,8 @@ end;
 procedure TChanges.AddUnsignedToChanges;
 { retrieves unsigned orders outside this session based on OR UNSIGNED ORDERS ON EXIT }
 var
-  i, CanSign: Integer;
+  i, CanSign(*, OrderUser*): Integer;
+  OrderUser: int64;
   AnID: string;
   HaveOrders, OtherOrders: TStringList;
   AChangeItem: TChangeItem;
@@ -1234,8 +1307,10 @@ begin
       else CanSign := CH_SIGN_NA;
     for i := 0 to Pred(OtherOrders.Count) do
     begin
-      AnID := OtherOrders[i];
-      Add(CH_ORD, AnID, TextForOrder(AnID), 'Other Unsigned', CanSign);
+      AnID := Piece(OtherOrders[i],U,1);
+      if Piece(OtherOrders[i],U,2) = '' then OrderUser := 0
+      else OrderUser := StrtoInt64(Piece(OtherOrders[i],U,2));
+      Add(CH_ORD, AnID, TextForOrder(AnID), 'Other Unsigned', CanSign,'', OrderUser);
     end;
   finally
     StatusText('');

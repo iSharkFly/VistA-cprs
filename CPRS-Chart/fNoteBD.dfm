@@ -1,21 +1,17 @@
-object frmNotesByDate: TfrmNotesByDate
+inherited frmNotesByDate: TfrmNotesByDate
   Left = 590
   Top = 294
-  Width = 259
-  Height = 178
   BorderIcons = []
   Caption = 'List Signed Notes by Date Range'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 151
+  ClientWidth = 251
   OldCreateOrder = True
   Position = poScreenCenter
+  ExplicitWidth = 259
+  ExplicitHeight = 178
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 251
@@ -90,5 +86,29 @@ object frmNotesByDate: TfrmNotesByDate
       TabOrder = 4
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = calBeginDate'
+        'Status = stsDefault')
+      (
+        'Component = calEndDate'
+        'Status = stsDefault')
+      (
+        'Component = radSort'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmNotesByDate'
+        'Status = stsDefault'))
   end
 end

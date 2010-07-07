@@ -5,14 +5,14 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   ExtCtrls, ORFn, StdCtrls, ComCtrls, Buttons, ORCtrls, uReminders, uConst,
-  ORClasses, fRptBox, Menus, rPCE, uTemplates;
+  ORClasses, fRptBox, Menus, rPCE, uTemplates,fBase508Form,
+  VA508AccessibilityManager, fMHTest;
 
 type
-  TfrmRemDlg = class(TForm)
+  TfrmRemDlg = class(TfrmBase508Form)
     sb1: TScrollBox;
     sb2: TScrollBox;
     splTxtData: TSplitter;
-    Label1: TLabel;
     pnlFrmBottom: TPanel;
     pnlBottom: TPanel;
     splText: TSplitter;
@@ -26,7 +26,7 @@ type
     btnFinish: TButton;
     btnClinMaint: TButton;
     btnVisit: TButton;
-    lblFootnotes: TStaticText;
+    lblFootnotes: TLabel;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
@@ -53,6 +53,7 @@ type
     FMSTRelated: integer;
     FHNCRelated: integer;
     FCVRelated: integer;
+    FSHDRelated: integer;
     FLastWidth: integer;
     FUseBox2: boolean;
     FExitOK: boolean;
@@ -115,7 +116,8 @@ implementation
 
 uses fNotes, uPCE, uOrders, rOrders, uCore, rMisc, rReminders,
   fReminderTree, uVitals, rVitals, RichEdit, fConsults, fTemplateDialog,
-  uTemplateFields, fRemVisitInfo, rCore;
+  uTemplateFields, fRemVisitInfo, rCore, uVA508CPRSCompatibility,
+  VA508AccessibilityRouter, VAUtils;
 
 {$R *.DFM}
 
@@ -164,6 +166,9 @@ begin
     Result := frmRemDlg.FReminder;
 end;
 
+var
+  uRemDlgStarting: boolean = False;
+
 procedure ViewRemDlgFromForm(OwningForm: TForm; RemNode: TORTreeNode; Template: TTemplate;
                              InitDlg, IsTemplate: boolean);
 var
@@ -171,77 +176,84 @@ var
   Err: string;
 
 begin
-  Err := '';
-  if assigned(frmRemDlg) then
-  begin
-    if IsTemplate then
-      Err := 'Can not process template while another reminder dialog is being processed.'
-    else
-    if frmRemDlg.FProcessingTemplate then
-      Err := 'Can not process reminder while a reminder dialog template is being processed.'
-  end;
-  Update := FALSE;
-  if Err = '' then
-  begin
-    if(RemForm.Form <> OwningForm) then
+  if uRemDlgStarting then exit;  // CQ#16219 - double click started reminder creation twice
+  uRemDlgStarting := True;
+  try
+    Err := '';
+    if assigned(frmRemDlg) then
     begin
-      if(assigned(RemForm.Form)) then
-        Err := 'Reminders currently begin processed on another tab.'
+      if IsTemplate then
+        Err := 'Can not process template while another reminder dialog is being processed.'
       else
-      begin
-        if(OwningForm = frmNotes) then
-          frmNotes.AssignRemForm
-        else
-        if(OwningForm = frmConsults) then
-          frmConsults.AssignRemForm
-        else
-          Err := 'Can not process reminder dialogs on this tab.';
-        Update := TRUE;
-      end;
+      if frmRemDlg.FProcessingTemplate then
+        Err := 'Can not process reminder while a reminder dialog template is being processed.'
     end;
-  end;
-  if Err <> '' then
-  begin
-    InfoBox(Err, 'Reminders in Process', MB_OK or MB_ICONERROR);
-    exit;
-  end;
-
-  if(InitDlg and (not assigned(frmRemDlg))) then
-  begin
-  //(AGP add) Check for a bad encounter date
-    if RemForm.PCEObj.DateTime < 0 then
-      begin
-        InfoBox('The parent note has an invalid encounter date. Please contact IRM support for assistance.','Warning',MB_OK);
-        exit;
-      end;
-    frmRemDlg := TfrmRemDlg.Create(Application);
-    frmRemDlg.SetFontSize;
-    Update := TRUE;
-  end;
-  if(assigned(frmRemDlg)) then
-  begin
-    if Update then
+    Update := FALSE;
+    if Err = '' then
     begin
-      frmRemDlg.FSCRelated  := RemForm.PCEObj.SCRelated;
-      frmRemDlg.FAORelated  := RemForm.PCEObj.AORelated;
-      frmRemDlg.FIRRelated  := RemForm.PCEObj.IRRelated;
-      frmRemDlg.FECRelated  := RemForm.PCEObj.ECRelated;
-      frmRemDlg.FMSTRelated := RemForm.PCEObj.MSTRelated;
-      frmRemDlg.FHNCRelated := RemForm.PCEObj.HNCRelated;
-      frmRemDlg.FCVRelated  := RemForm.PCEObj.CVRelated;
+      if(RemForm.Form <> OwningForm) then
+      begin
+        if(assigned(RemForm.Form)) then
+          Err := 'Reminders currently begin processed on another tab.'
+        else
+        begin
+          if(OwningForm = frmNotes) then
+            frmNotes.AssignRemForm
+          else
+          if(OwningForm = frmConsults) then
+            frmConsults.AssignRemForm
+          else
+            Err := 'Can not process reminder dialogs on this tab.';
+          Update := TRUE;
+        end;
+      end;
     end;
-    UpdateReminderFinish;
-    if IsTemplate then
-      frmRemDlg.ProcessTemplate(Template)
-    else if assigned(RemNode) then
-      frmRemDlg.ProcessReminder(RemNode.StringData, RemNode.TreeView.GetNodeID(RemNode, 1, IncludeParentID));
+    if Err <> '' then
+    begin
+      InfoBox(Err, 'Reminders in Process', MB_OK or MB_ICONERROR);
+      exit;
+    end;
+
+    if(InitDlg and (not assigned(frmRemDlg))) then
+    begin
+    //(AGP add) Check for a bad encounter date
+      if RemForm.PCEObj.DateTime < 0 then
+        begin
+          InfoBox('The parent note has an invalid encounter date. Please contact IRM support for assistance.','Warning',MB_OK);
+          exit;
+        end;
+      frmRemDlg := TfrmRemDlg.Create(Application);
+      frmRemDlg.SetFontSize;
+      Update := TRUE;
+    end;
+    if(assigned(frmRemDlg)) then
+    begin
+      if Update then
+      begin
+        frmRemDlg.FSCRelated  := RemForm.PCEObj.SCRelated;
+        frmRemDlg.FAORelated  := RemForm.PCEObj.AORelated;
+        frmRemDlg.FIRRelated  := RemForm.PCEObj.IRRelated;
+        frmRemDlg.FECRelated  := RemForm.PCEObj.ECRelated;
+        frmRemDlg.FMSTRelated := RemForm.PCEObj.MSTRelated;
+        frmRemDlg.FHNCRelated := RemForm.PCEObj.HNCRelated;
+        frmRemDlg.FCVRelated  := RemForm.PCEObj.CVRelated;
+        frmRemDlg.FSHDRelated := RemForm.PCEObj.SHADRelated;
+      end;
+      UpdateReminderFinish;
+      if IsTemplate then
+        frmRemDlg.ProcessTemplate(Template)
+      else if assigned(RemNode) then
+        frmRemDlg.ProcessReminder(RemNode.StringData, RemNode.TreeView.GetNodeID(RemNode, 1, IncludeParentID));
+    end;
+  finally
+    uRemDlgStarting := False;
   end;
 end;
 
 procedure ViewRemDlg(RemNode: TORTreeNode; InitDlg, IsTemplate: boolean);
 var
   own: TComponent;
-  
+
 begin
   if assigned(RemNode) then
   begin
@@ -366,8 +378,8 @@ end;
 
 procedure TfrmRemDlg.FormCreate(Sender: TObject);
 begin
-  reData.Color := ReadOnlyColor;
-  reText.Color := ReadOnlyColor;
+ // reData.Color := ReadOnlyColor;
+//  reText.Color := ReadOnlyColor;
   FSCCond := EligbleConditions;
  (* FSCRelated  := SCC_NA;
   FAORelated  := SCC_NA;
@@ -547,6 +559,7 @@ begin
     end;
 
     ClearControls;
+
     FReminder.OnNeedRedraw := ControlsChanged;
     FReminder.OnTextChanged := UpdateText;
   end;
@@ -565,6 +578,9 @@ begin
   sb2.Visible := FUseBox2;
   sb1.Visible := not FUseBox2;
   FUseBox2 := not FUseBox2;
+  ClearControls;
+  if ScreenReaderSystemActive then
+    amgrMain.RefreshComponents;
   Application.ProcessMessages; // allows new ScrollBox to repaint
 end;
 
@@ -650,7 +666,7 @@ begin
     reData.Clear;
     LastCat := BadType;
     tmp := RemForm.PCEObj.StrVisitType(FSCRelated, FAORelated, FIRRelated,
-                          FECRelated, FMSTRelated, FHNCRelated, FCVRelated);
+                          FECRelated, FMSTRelated, FHNCRelated, FCVRelated,FSHDRelated);
     if FProcessingTemplate then
       i := GetReminderData(FReminder, TmpData)
     else
@@ -719,6 +735,8 @@ var
 begin
   if(assigned(FReminder)) then
   begin
+    try
+    self.btnClear.Enabled := false;
     i := RemindersInProcess.IndexOf(FReminder.IEN);
     if(i >= 0) then
     begin
@@ -729,6 +747,8 @@ begin
         OK := TRUE;
       if(OK) then
       begin
+        FReminder.ClearMHTest(FReminder.IEN);
+        if (FReminder.MHTestArray <> nil) and (FReminder.MHTestArray.Count = 0) then FReminder.MHTestArray.Free;
         RemindersInProcess.Delete(i);
         Tmp := (FReminder as TReminder).RemData; // clear should never be active if template
         TmpNode := (FReminder as TReminder).CurrentNodeID;
@@ -736,16 +756,24 @@ begin
         ProcessReminder(Tmp, TmpNode);
       end;
     end;
+    finally
+      self.btnClear.Enabled := true;
+    end;
   end;
 end;
 
 procedure TfrmRemDlg.btnCancelClick(Sender: TObject);
 begin
+  try
+    self.btnCancel.Enabled := false;
   if(KillAll) then
   begin
     FExitOK := TRUE;
     frmRemDlg.Release;
     frmRemDlg := nil;
+  end;
+  finally
+    self.btnCancel.Enabled := true;
   end;
 end;
 
@@ -753,12 +781,13 @@ function TfrmRemDlg.KillAll: boolean;
 var
   i, cnt: integer;
   msg, RemWipe: string;
-
+  ClearMH: boolean;
 
 begin
  //AGP 25.11 Added RemWipe section to cancel button to
  //flag the patient specific dialog to be destroy if not in process.
  RemWipe := '';
+ ClearMH := false;
   if FProcessingTemplate or FSilent then
     begin
       Result := TRUE;
@@ -796,7 +825,27 @@ begin
       Result := TRUE;
   end;
   if(Result) then
+    begin
+      for i := 0 to RemindersInProcess.Count - 1 do
+        begin
+          if (TReminderDialog(TReminder(RemindersInProcess.Objects[i])).MHTestArray <> nil) and
+             (TReminderDialog(TReminder(RemindersInProcess.Objects[i])).MHTestArray.Count > 0) then
+             begin
+               if ClearMH = false then
+                 begin
+                   RemoveMHTest('');
+                   ClearMH := true;
+                 end;
+                TReminderDialog(TReminder(RemindersInProcess.Objects[i])).MHTestArray.Free;
+             end;
+        end;
+      (* if (FReminder.MHTestArray <> nil) and (FReminder.MHTestArray.Count > 0) then
+         begin
+           RemoveMHTest('');
+           FReminder.MHTestArray.Free;
+         end; *)
     ResetProcessing(RemWipe);
+  end;
 end;
 
 function TfrmRemDlg.GetCurReminderList: integer;
@@ -953,7 +1002,7 @@ var
   WHNode,WHPrint,WHResult,WHTmp, WHValue: String;
   WHType: TStrings;
   //Test: String;
-  WHCnt,x: Integer;
+  MHLoc, WHCnt,x: Integer;
   WHArray: TStringlist;
   GecRemIen, GecRemStr, RemWipe: String;
 
@@ -1028,6 +1077,7 @@ begin
   Rem := nil;
   RemWipe := '';   //AGP CHANGE 24.8
   try
+    self.btnFinish.Enabled := false;
     OldRemCount := ProcessedReminders.Count;
     if not FProcessingTemplate then
       ProcessedReminders.Notifier.BeginUpdate;
@@ -1144,7 +1194,10 @@ begin
                 if RemForm.PCEObj.NeedProviderInfo and MissingProviderInfo(RemForm.PCEObj, PCEType) then
                   Process := FALSE
                 else
+                begin
                   RemForm.NewNoteRE.SelText := TmpText.Text;
+                  SpeakTextInserted;
+                end;
               end;
             end;
             if(Process) then
@@ -1358,7 +1411,7 @@ begin
                      VitalList.Insert(2, VitalLocationStr + IntToStr(RemForm.PCEObj.Location));;
                   Tmp := ValAndStoreVitals(VitalList);
                   if (Tmp <> 'True') then
-                    showmessage(Tmp);
+                    ShowMsg(Tmp);
                 end;
 
               finally
@@ -1383,7 +1436,7 @@ begin
                     TestStaff := StrToInt64Def(Piece(MHList[i],U,5), 0);
                     if TestStaff <= 0 then
                       TestStaff := User.DUZ;
-                    if(Piece(MHList[i],U,3) = '1') then
+                   if (Piece(MHList[i],U,3) = '1') and (MHDLLFound = false) then
                     begin
                       GAFScore := StrToIntDef(Piece(MHList[i],U,6),0);
                       if(GAFScore > 0) then
@@ -1391,6 +1444,15 @@ begin
                     end
                     else
                     begin
+                      if Piece(MHLIst[i],U,6) = 'New MH dll' then
+                        begin
+                          //The dll take date and time the original code took only date.
+                          if Encounter.Location <> FReminder.PCEDataObj.Location then
+                            MHLoc := FReminder.PCEDataObj.Location
+                            else MHLoc := Encounter.Location;
+                          saveMHTest(Piece(MHList[i],U,2), FloattoStr(FReminder.PCEDataObj.VisitDateTime), InttoStr(MHLoc));
+                        end
+                      else
                       SaveMentalHealthTest(Piece(MHList[i],U,2), TestDate, TestStaff,
                                            Piece(MHList[i],U,6));
                     end;
@@ -1400,6 +1462,7 @@ begin
 
             finally
               MHList.Free;
+              if (FReminder.MHTestArray <> nil) and (FReminder.MHTestArray.Count > 0) then FReminder.MHTestArray.Free;
             end;
 
             if(WHList.Count > 0) then
@@ -1457,7 +1520,7 @@ begin
                   else
                   begin
                     DoOrders := FALSE;
-                    ShowMessage('No Orders Placed.');
+                    ShowMsg('No Orders Placed.');
                   end;
                 end;
               until(Done);
@@ -1495,6 +1558,7 @@ begin
         ProcessedReminders.Notifier.EndUpdate(ProcessedReminders.Count <> OldRemCount);
     end;
   finally
+    self.btnFinish.Enabled := true;
     if(Kill) then
     begin
       FExitOK := TRUE;
@@ -1599,7 +1663,7 @@ begin
   try
     frmRemVisitInfo.fraVisitRelated.InitAllow(FSCCond);
     frmRemVisitInfo.fraVisitRelated.InitRelated(FSCRelated, FAORelated,
-                FIRRelated, FECRelated, FMSTRelated, FHNCRelated, FCVRelated);
+                FIRRelated, FECRelated, FMSTRelated, FHNCRelated, FCVRelated, FSHDRelated);
     frmRemVisitInfo.dteVitals.FMDateTime := VitalsDate;
     frmRemVisitInfo.ShowModal;
     if frmRemVisitInfo.ModalResult = mrOK then
@@ -1608,7 +1672,7 @@ begin
       if VitalsDate <= FMNow then
         FVitalsDate := VitalsDate;
       frmRemVisitInfo.fraVisitRelated.GetRelated(FSCRelated, FAORelated,
-                FIRRelated, FECRelated, FMSTRelated, FHNCRelated, FCVRelated);
+                FIRRelated, FECRelated, FMSTRelated, FHNCRelated, FCVRelated, FSHDRelated);
       FSCPrompt := FALSE;
       UpdateText(nil);
     end;

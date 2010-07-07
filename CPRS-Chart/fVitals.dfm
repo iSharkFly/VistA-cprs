@@ -1,17 +1,10 @@
-object frmVitals: TfrmVitals
+inherited frmVitals: TfrmVitals
   Left = 224
   Top = 211
-  Width = 522
-  Height = 402
   BorderIcons = [biSystemMenu]
   Caption = 'Vitals'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
+  ClientHeight = 375
+  ClientWidth = 514
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
@@ -20,7 +13,7 @@ object frmVitals: TfrmVitals
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlTop: TPanel
+  object pnlTop: TPanel [0]
     Left = 0
     Top = 0
     Width = 514
@@ -73,11 +66,11 @@ object frmVitals: TfrmVitals
         Pointer.Visible = True
         XValues.DateTime = True
         XValues.Name = 'X'
-        XValues.Multiplier = 1
+        XValues.Multiplier = 1.000000000000000000
         XValues.Order = loAscending
         YValues.DateTime = False
         YValues.Name = 'Y'
-        YValues.Multiplier = 1
+        YValues.Multiplier = 1.000000000000000000
         YValues.Order = loNone
       end
       object serTestX: TLineSeries
@@ -94,11 +87,11 @@ object frmVitals: TfrmVitals
         Pointer.Visible = True
         XValues.DateTime = True
         XValues.Name = 'X'
-        XValues.Multiplier = 1
+        XValues.Multiplier = 1.000000000000000000
         XValues.Order = loAscending
         YValues.DateTime = False
         YValues.Name = 'Y'
-        YValues.Multiplier = 1
+        YValues.Multiplier = 1.000000000000000000
         YValues.Order = loNone
       end
       object serTest: TLineSeries
@@ -111,11 +104,11 @@ object frmVitals: TfrmVitals
         Pointer.Visible = True
         XValues.DateTime = True
         XValues.Name = 'X'
-        XValues.Multiplier = 1
+        XValues.Multiplier = 1.000000000000000000
         XValues.Order = loAscending
         YValues.DateTime = False
         YValues.Name = 'Y'
-        YValues.Multiplier = 1
+        YValues.Multiplier = 1.000000000000000000
         YValues.Order = loNone
       end
       object serTime: TPointSeries
@@ -132,11 +125,11 @@ object frmVitals: TfrmVitals
         Pointer.Visible = False
         XValues.DateTime = False
         XValues.Name = 'X'
-        XValues.Multiplier = 1
+        XValues.Multiplier = 1.000000000000000000
         XValues.Order = loAscending
         YValues.DateTime = False
         YValues.Name = 'Y'
-        YValues.Multiplier = 1
+        YValues.Multiplier = 1.000000000000000000
         YValues.Order = loNone
       end
     end
@@ -229,7 +222,7 @@ object frmVitals: TfrmVitals
       end
     end
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 221
     Width = 514
@@ -299,6 +292,57 @@ object frmVitals: TfrmVitals
         Caption = 'Vitals'
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = lblNoResults'
+        'Status = stsDefault')
+      (
+        'Component = chtChart'
+        'Status = stsDefault')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = lstDates'
+        'Status = stsDefault')
+      (
+        'Component = pnlLeftClient'
+        'Status = stsDefault')
+      (
+        'Component = chkValues'
+        'Status = stsDefault')
+      (
+        'Component = chk3D'
+        'Status = stsDefault')
+      (
+        'Component = chkZoom'
+        'Status = stsDefault')
+      (
+        'Component = pnlEnterVitals'
+        'Status = stsDefault')
+      (
+        'Component = btnEnterVitals'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = grdVitals'
+        'Status = stsDefault')
+      (
+        'Component = pnlButtons'
+        'Status = stsDefault')
+      (
+        'Component = lstVitals'
+        'Status = stsDefault')
+      (
+        'Component = frmVitals'
+        'Status = stsDefault'))
   end
   object popChart: TPopupMenu
     OnPopup = popChartPopup

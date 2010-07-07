@@ -4,18 +4,18 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ORCtrls, StdCtrls, ExtCtrls, ComCtrls, ImgList, mImgText, Buttons, ORClasses;
+  ORCtrls, StdCtrls, ExtCtrls, ComCtrls, ImgList, mImgText, Buttons, ORClasses, fBase508Form,
+  VA508AccessibilityManager, VA508ImageListLabeler;
 
 type
   TRemCoverDataLevel = (dlPackage, dlSystem, dlDivision, dlService, dlLocation, dlUserClass, dlUser);
 
-  TfrmRemCoverSheet = class(TForm)
+  TfrmRemCoverSheet = class(TfrmBase508Form)
     pnlBottom: TORAutoPanel;
     pnlUser: TPanel;
     cbxUserLoc: TORComboBox;
     lblRemLoc: TLabel;
     pnlMiddle: TPanel;
-    lvView: TCaptionListView;
     pnlRight: TPanel;
     mlgnCat: TfraImgText;
     mlgnRem: TfraImgText;
@@ -58,10 +58,16 @@ type
     sbCopyRight: TBitBtn;
     sbCopyLeft: TBitBtn;
     splMain: TSplitter;
-    lblView: TLabel;
-    lblCAC: TStaticText;
     btnView: TButton;
     lblLegend: TLabel;
+    imgLblRemCoverSheet: TVA508ImageListLabeler;
+    compAccessCopyRight: TVA508ComponentAccessibility;
+    compAccessCopyLeft: TVA508ComponentAccessibility;
+    pnlTopLeft: TPanel;
+    lvView: TCaptionListView;
+    lblView: TLabel;
+    lblCAC: TVA508StaticText;
+    VA508ImageListLabeler1: TVA508ImageListLabeler;
     procedure cbxLocationNeedData(Sender: TObject; const StartFrom: String;
       Direction, InsertAt: Integer);
     procedure cbxServiceNeedData(Sender: TObject; const StartFrom: String;
@@ -104,13 +110,20 @@ type
     procedure btnApplyClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure lvCoverDblClick(Sender: TObject);
-    procedure lvViewClick(Sender: TObject);
     procedure btnViewClick(Sender: TObject);
     procedure lvCoverKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure edtSeqKeyPress(Sender: TObject; var Key: Char);
     procedure cbxDivisionKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure FormCreate(Sender: TObject);
+    procedure compAccessCopyRightCaptionQuery(Sender: TObject;
+      var Text: string);
+    procedure compAccessCopyLeftCaptionQuery(Sender: TObject; var Text: string);
+    procedure lvViewChange(Sender: TObject; Item: TListItem;
+      Change: TItemChange);
+    procedure lvViewSelectItem(Sender: TObject; Item: TListItem;
+      Selected: Boolean);
   private
     FData: TORStringList;     // DataCode IEN ^ Modified Flag  Object=TStringList
     FUserInfo: TORStringList; // C^User Class, D^Division
@@ -140,6 +153,11 @@ type
     FDataSaved: boolean;
     FUpdatingView: boolean;
     FInternalExpansion: boolean;
+    FSavePause: integer;
+    FSelection: boolean;
+    fOldFocusChanged: TNotifyEvent;
+    procedure ActiveControlChanged(Sender: TObject);
+    procedure SetButtonHints;
     procedure GetUserInfo(AUser: Int64);
     function GetCurrent(IEN: Int64; Level: TRemCoverDataLevel; Show: boolean;
                         Add: boolean = FALSE): TORStringList;
@@ -159,8 +177,9 @@ type
     procedure SaveData(FromApply: boolean);
     function RPad(Str: String): String;
     function GetCoverSheetLvlData(ALevel, AClass: string): TStrings;
+    procedure LockButtonUpdate(data, FNAME, hint: string);
   public
-    procedure Init(AsUser: boolean);
+     procedure Init(AsUser: boolean);
   end;
 
 procedure EditCoverSheetReminderList(AsUser: boolean);
@@ -168,9 +187,10 @@ procedure EditCoverSheetReminderList(AsUser: boolean);
 implementation
 
 uses rCore, uCore, uPCE, rProbs, rTIU, ORFn, rReminders, uReminders,
-  fRemCoverPreview;
+  fRemCoverPreview, VAUtils, VA508AccessibilityRouter;
 
 {$R *.DFM}
+{$R sremcvr}
 
 const
   DataCode: array[TRemCoverDataLevel] of string[1] =
@@ -220,6 +240,18 @@ const
   IdxAdd  = 5;
   IdxIEN  = 6;
 
+  UnlockHint = 'Unlock a Reminder, reverting it''s status back to Added';
+  LockHint = 'Lock a Reminder to prevent it''s removal from a lower'
+        + CRLF + 'level Coversheet display.  For example, if you lock'
+        + CRLF + 'a Reminder at the Service level, then that Reminder'
+        + CRLF + 'can not be removed from the coversheet display at'
+        + CRLF + 'the Location, User Class, or User levels.';
+  AddLockHint = 'Add and Lock a Reminder to prevent it''s removal from a lower'
+        + CRLF + 'level Coversheet display.  For example, if you lock'
+        + CRLF + 'a Reminder at the Service level, then that Reminder'
+        + CRLF + 'can not be removed from the coversheet display at'
+        + CRLF + 'the Location, User Class, or User levels.';
+
 procedure EditCoverSheetReminderList(AsUser: boolean);
 var
   frmRemCoverSheet: TfrmRemCoverSheet;
@@ -268,7 +300,8 @@ begin
   FClasses := TORStringList.Create;
   FUsers := TORStringList.Create;
   FMasterList := TORStringList.Create;
-  FMasterList.Assign(GetAllRemindersAndCategories);
+  //FMasterList.Assign(GetAllRemindersAndCategories);
+  FastAssign(GetAllRemindersAndCategories, FMasterList);
   for i := 0 to FMasterList.Count-1 do
   begin
     tmp := FMasterList[i];
@@ -323,7 +356,8 @@ begin
   begin
     pnlUser.Visible := FALSE;
     LocCombo := cbxLocation;
-    cbxDivision.Items.Assign(FDivisions);
+    //cbxDivision.Items.Assign(FDivisions);
+    FastAssign(Fdivisions, cbxDivision.Items);
     cbxDivision.SelectByIEN(FCurDiv);
     cbxService.InitLongList(GetExternalName(dlService, FCurSer));
     cbxService.SelectByIEN(FCurSer);
@@ -387,6 +421,7 @@ end;
 
 procedure TfrmRemCoverSheet.FormDestroy(Sender: TObject);
 begin
+  Screen.OnActiveControlChange := fOldFocusChanged;
   FMasterList.Free;
   FUsers.Free;
   FClasses.Free;
@@ -398,6 +433,7 @@ begin
   FData.Free;
   FCatInfo.KillObjects;
   FCatInfo.Free;
+  Application.HintHidePause := FSavePause  //Reset Hint pause to original setting
 end;
 
 procedure TfrmRemCoverSheet.GetUserInfo(AUser: Int64);
@@ -405,7 +441,8 @@ begin
   if FUser <> AUser then
   begin
     FUser := AUser;
-    FUserInfo.Assign(UserDivClassInfo(FUser));
+    //FUserInfo.Assign(UserDivClassInfo(FUser));
+    FastAssign(UserDivClassInfo(FUser), FUserInfo);
   end;
 end;
 
@@ -438,7 +475,8 @@ begin
     begin
       tmpSL := TORStringList.Create;
       try
-        tmpSL.Assign(GetCoverSheetLvlData(lvl, cls));
+        //tmpSL.Assign(GetCoverSheetLvlData(lvl, cls));
+        FastAssign(GetCoverSheetLvlData(lvl, cls),  tmpSL);
         if (not Add) and (tmpSL.Count = 0) then
           FreeAndNil(tmpSL);
         idx := FData.AddObject(DataCode[Level] + IntToStr(IEN), tmpSL);
@@ -500,6 +538,18 @@ begin
   end;
 end;
 
+procedure TfrmRemCoverSheet.compAccessCopyLeftCaptionQuery(Sender: TObject;
+  var Text: string);
+begin
+  Text := 'Remove Reminder from ' + DataName[FEditingLevel] + ' Level Reminders List';
+end;
+
+procedure TfrmRemCoverSheet.compAccessCopyRightCaptionQuery(
+  Sender: TObject; var Text: string);
+begin
+  Text := 'Copy Reminder into ' + DataName[FEditingLevel] + ' Level Reminders List';
+end;
+
 procedure TfrmRemCoverSheet.SetupItem(Item: TListItem; const Data: string);
 var
   AddCode, RemCode, rIEN, Seq: string;
@@ -556,7 +606,7 @@ function TfrmRemCoverSheet.GetExternalName(Level: TRemCoverDataLevel; IEN: Int64
     idx := List.IndexOfPiece(IntToStr(IEN));
     if idx < 0 then
       idx := List.Add(IntToStr(IEN) + U + ExternalName(IEN, FileNum));
-    Result := piece(List[idx],U,2);
+      Result := piece(List[idx],U,2);
   end;
 
 begin
@@ -573,6 +623,14 @@ end;
 procedure TfrmRemCoverSheet.cbxDivisionChange(Sender: TObject);
 begin
   FCurDiv := cbxDivision.ItemIEN;
+  If FCurDiv < 1  then   //No value in Division combobox
+  begin
+    sbCopyLeft.Enabled := false;
+    sbCopyRight.Enabled := false;
+    FSelection := false;
+  end
+  else
+    FSelection := true;
   FUpdatePending := cbDivision;
   if not cbxDivision.DroppedDown then
     cbxDropDownClose(nil);
@@ -581,6 +639,14 @@ end;
 procedure TfrmRemCoverSheet.cbxServiceChange(Sender: TObject);
 begin
   FCurSer := cbxService.ItemIEN;
+  If FCurSer < 1  then   //No value in Service combobox
+  begin
+    sbCopyLeft.Enabled := false;
+    sbCopyRight.Enabled := false;
+    FSelection := false;
+  end
+  else
+    FSelection := true;
   FUpdatePending := cbService;
   if not cbxService.DroppedDown then
     cbxDropDownClose(nil);
@@ -589,6 +655,14 @@ end;
 procedure TfrmRemCoverSheet.cbxLocationChange(Sender: TObject);
 begin
   FCurLoc := TORComboBox(Sender).ItemIEN;
+  If FCurLoc < 1  then   //No value in Location combobox
+  begin
+    sbCopyLeft.Enabled := false;
+    sbCopyRight.Enabled := false;
+    FSelection := false;
+  end
+  else
+    FSelection := true;
   FUpdatePending := cbLocation;
   if not TORComboBox(Sender).DroppedDown then
     cbxDropDownClose(nil);
@@ -597,6 +671,14 @@ end;
 procedure TfrmRemCoverSheet.cbxClassChange(Sender: TObject);
 begin
   FCurClass := cbxClass.ItemIEN;
+  If FCurClass < 1  then   //No value in User Class combobox
+  begin
+    sbCopyLeft.Enabled := false;
+    sbCopyRight.Enabled := false;
+    FSelection := false;
+  end
+  else
+    FSelection := true;
   FUpdatePending := cbUserClass;
   if not cbxClass.DroppedDown then
     cbxDropDownClose(nil);
@@ -608,6 +690,14 @@ var
 
 begin
   FCurUser := cbxUser.ItemIEN;
+  If FCurUser < 1  then   //No value in User combobox
+  begin
+    sbCopyLeft.Enabled := false;
+    sbCopyRight.Enabled := false;
+    FSelection := false;
+  end
+  else
+    FSelection := true;
   GetUserInfo(FCurUser);
   idx := FUserInfo.IndexOfPiece(DivisionCode);
   if idx >= 0 then
@@ -678,17 +768,36 @@ begin
       else         FEditingIEN := 0;
     end;
     if FEditingIEN = 0 then
-      tmp := ' '
+    begin
+      tmp := ' ';
+      IF FEditingLevel = dlSystem then
+        FSelection := true
+      else
+      begin
+        sbCopyLeft.Enabled := false;
+        sbCopyRight.Enabled := false;
+        FSelection := false;
+      end;
+    end
     else
+    begin
       tmp := ': ';
+      FSelection := true;
+    end;
     lblEdit.Caption := '  Editing Cover Sheet Reminders for ' + DataName[FEditingLevel] +
                         tmp + GetExternalName(FEditingLevel, FEditingIEN);
     lvCover.Columns[0].Caption := DataName[FEditingLevel] + ' Level Reminders';
+
+    SetButtonHints;   {Setup hints for Lock, Add, Remove buttons based on
+                       Parameter Level}
     UpdateView;
     UpdateMasterListView;
   end
   else
   begin
+    FSelection := false;
+    sbCopyLeft.Enabled := false;
+    sbCopyRight.Enabled := false;
     FEditingLevel := dlPackage;
     FEditingIEN := 0;
     lblEdit.Caption := '';
@@ -732,16 +841,19 @@ end;
 
 procedure TfrmRemCoverSheet.UpdateButtons;
 var
-  ok: boolean;
-  i: integer;
+  FocusOK, ok: boolean;
+  i, idx: integer;
   Current, Lowest, Highest: integer;
+  tmp: string;
+  tmpSL: TORstringlist;
+  doDownButton, doUpButton: boolean;
 
 begin
   lvCover.Enabled := (FEditingLevel <> dlPackage);
-  ok := assigned(tvAll.Selected) and (FEditingLevel <> dlPackage);
+  ok := assigned(tvAll.Selected) and (FEditingLevel <> dlPackage) and (FSelection);
   sbCopyRight.Enabled := ok;
 
-  ok := assigned(lvCover.Selected) and (FEditingLevel <> dlPackage);
+  ok := assigned(lvCover.Selected) and (FEditingLevel <> dlPackage) and (FSelection);
   sbCopyLeft.Enabled := ok;
 
   ok := assigned(lvCover.Selected);
@@ -759,11 +871,39 @@ begin
     FUpdating := FALSE;
   end;
 
-  btnAdd.Enabled := ok;
-  btnRemove.Enabled := ok;
-  btnLock.Enabled := ok and (FEditingLevel <> dlUser);
+  FocusOK := lvCover.Focused or sbUp.Focused or sbDown.Focused or edtSeq.Focused or
+             udSeq.Focused or btnAdd.Focused or btnRemove.Focused or btnLock.Focused or
+             btnOK.Focused; // add btnOK so you can shift-tab backwards into list
+  btnAdd.Enabled := ok and FocusOK;
+  btnRemove.Enabled := ok and (FEditingLevel <> dlSystem) and FocusOK;
+  btnLock.Enabled := ok and (FEditingLevel <> dlUser) and FocusOK;
   if ok then
+  begin
+    tmpSL := GetCurrent(FEditingIEN, FEditingLevel, FALSE);
+    if assigned(tmpSL) then
+    begin
+      Idx := GetIndex(tmpSL, lvCover.Selected);
+      if Idx >= 0 then
+      begin
+        tmp := tmpSL[idx];
+        tmp := piece(tmp,u,2);
+        tmp := copy(tmp,1,1);
+        if tmp = 'L' then
+        begin
+          LockButtonUpdate('Unlock', 'BMP_UNLOCK', UnlockHint);
+        end;
+        if tmp = 'N' then
+        begin
+          LockButtonUpdate('Lock', 'BMP_LOCK', LockHint);
+        end;
+        if tmp = 'R' then
+        begin
+          LockButtonUpdate('Add && Lock', 'BMP_LOCK', AddLockHint);
+        end;
+      end;
+    end;
     ok :=(lvCover.Items.Count > 1);
+  end;
   Lowest := 99999;
   Highest := -1;
   if ok then
@@ -776,12 +916,16 @@ begin
       if Highest < Current then
         Highest := Current;
     end;
-    Current := StrToIntDef(lvCover.Selected.SubItems[IdxSeq], 0)
+    Current := StrToIntDef(lvCover.Selected.SubItems[IdxSeq], 0);
   end
   else
     Current := 0;
+  doDownButton := (sbUp.Focused and (Current = Lowest));
+  doUpButton := (sbDown.Focused and (Current = Highest));
   sbUp.Enabled := ok and (Current > Lowest);
   sbDown.Enabled := ok and (Current < Highest);
+  if doDownButton and sbDown.enabled then sbDown.SetFocus;
+  if doUpButton and sbUp.enabled then sbUp.SetFocus;
 end;
 
 procedure TfrmRemCoverSheet.tvAllExpanding(Sender: TObject;
@@ -945,6 +1089,20 @@ begin
       tmpSL[idx] := tmp;
       MarkListAsChanged;
       SetupItem(lvCover.Selected, tmp);
+      tmp := piece(tmp,u,2);
+      tmp := copy(tmp,1,1);
+      if tmp = 'L' then
+      begin
+        LockButtonUpdate('Unlock', 'BMP_UNLOCK', UnlockHint);
+      end;
+      if tmp = 'N' then
+      begin
+        LockButtonUpdate('Lock', 'BMP_LOCK', LockHint);
+      end;
+      if tmp = 'R' then
+      begin
+        LockButtonUpdate('Add && Lock', 'BMP_LOCK', AddLockHint);
+      end;
     end;
   end;
 end;
@@ -1114,6 +1272,8 @@ begin
       SetSeq(NextItem, Seq2);
       SetSeq(lvCover.Selected, Seq1);
       lvCover.CustomSort(nil, 0);
+      If ScreenReaderSystemActive then
+        GetScreenReader.Speak('Reminder Moved up in Sequence');
       UpdateButtons;
     end;            
   end;
@@ -1140,6 +1300,8 @@ begin
       SetSeq(NextItem, Seq2);
       SetSeq(lvCover.Selected, Seq1);
       lvCover.CustomSort(nil, 0);
+      If ScreenReaderSystemActive then
+        GetScreenReader.Speak('Reminder Moved down in Sequence');
       UpdateButtons;
     end;
   end;
@@ -1183,7 +1345,7 @@ begin
     IEN := Piece(TORTreeNode(tvAll.Selected).StringData, U, 1);
     if ListHasData(IEN, IdxIEN) then
     begin
-      ShowMessage('List already contains this Reminder');
+      ShowMsg('List already contains this Reminder');
       exit;
     end;
     if lvCover.Items.Count = 0 then
@@ -1220,6 +1382,8 @@ begin
             break;
           end;
       end;
+      if ScreenReaderSystemActive then
+        GetScreenReader.Speak('Reminder Added to ' + DataName[FEditingLevel] + ' Level Reminders List');
     end;
   end;
 end;
@@ -1282,8 +1446,12 @@ begin
               break;
             end;
         end;
+        if ScreenReaderSystemActive then
+          GetScreenReader.Speak('Reminder Removed from ' + DataName[FEditingLevel] + ' Level Reminders List');
       end;
     end;
+    if sbCopyLeft.Enabled and (not sbCopyLeft.Focused) then
+      sbCopyLeft.SetFocus;    
   end;
 end;
 
@@ -1369,7 +1537,14 @@ begin
     sbCopyLeft.Click;
 end;
 
-procedure TfrmRemCoverSheet.lvViewClick(Sender: TObject);
+procedure TfrmRemCoverSheet.lvViewChange(Sender: TObject; Item: TListItem;
+  Change: TItemChange);
+begin
+  lvViewSelectItem(Sender, Item, FALSE);
+end;
+
+procedure TfrmRemCoverSheet.lvViewSelectItem(Sender: TObject; Item: TListItem;
+  Selected: Boolean);
 var
   lvl: TRemCoverDataLevel;
   i: integer;
@@ -1474,116 +1649,122 @@ var
   end;
 
 begin
-  frmRemCoverPreview := TfrmRemCoverPreview.Create(Application);
+  Screen.OnActiveControlChange := fOldFocusChanged;
   try
-    CurSortOrder := FTopSortTag;
-    CurSortDir := FTopSortUp;
-    lvView.Items.BeginUpdate;
+    frmRemCoverPreview := TfrmRemCoverPreview.Create(Application);
     try
-      FTopSortTag := 3;
-      FTopSortUp := TRUE;
-      lvView.CustomSort(nil, 0);
-      RemList := TORStringList.Create;
+      CurSortOrder := FTopSortTag;
+      CurSortDir := FTopSortUp;
+      lvView.Items.BeginUpdate;
       try
-        LvlList := TORStringList.Create;
+        FTopSortTag := 3;
+        FTopSortUp := TRUE;
+        lvView.CustomSort(nil, 0);
+        RemList := TORStringList.Create;
         try
-          LastLvl := '';
-          for i := 0 to lvView.Items.Count-1 do
-          begin
-            Lvl := lvView.Items[i].SubItems[IdxLvl2];
-            if LvL <> LastLvl then
+          LvlList := TORStringList.Create;
+          try
+            LastLvl := '';
+            for i := 0 to lvView.Items.Count-1 do
             begin
-              RemList.AddStrings(LvlList);
-              LvlList.Clear;
-              LastLvl := Lvl;
-            end;
-            IEN := lvView.Items[i].SubItems[IdxIEN];
-            AddCode := lvView.Items[i].SubItems[IdxAdd];
-            idx := RemList.IndexOfPiece(IEN);
-            if AddCode = CVRemoveCode then
-            begin
-              if(idx >= 0) and (piece(RemList[idx],U,5) <> '1') then
-                RemList.Delete(idx);
-            end
-            else
-            begin
-              if idx < 0 then
+              Lvl := lvView.Items[i].SubItems[IdxLvl2];
+              if LvL <> LastLvl then
               begin
-                Seq := lvView.Items[i].SubItems[IdxSeq];
-                SortID := RPad(Seq) + '0000000' + lvl + copy(lvView.Items[i].SubItems[IdxTIEN] + '0000000000',1,10);
-                tmp := IEN + U + lvView.Items[i].Caption + U + Seq + U + SortID;
-                if AddCode = CVLockCode then
-                  tmp := tmp + U + '1';
-                RemList.Add(tmp);
+                RemList.AddStrings(LvlList);
+                LvlList.Clear;
+                LastLvl := Lvl;
+              end;
+              IEN := lvView.Items[i].SubItems[IdxIEN];
+              AddCode := lvView.Items[i].SubItems[IdxAdd];
+              idx := RemList.IndexOfPiece(IEN);
+              if AddCode = CVRemoveCode then
+              begin
+                if(idx >= 0) and (piece(RemList[idx],U,5) <> '1') then
+                  RemList.Delete(idx);
               end
               else
-              if (AddCode = CVLockCode) and (piece(RemList[idx],U,5) <> '1') then
               begin
-                tmp := RemList[idx];
-                SetPiece(tmp,U,5,'1');
-                RemList[idx] := tmp;
+                if idx < 0 then
+                begin
+                  Seq := lvView.Items[i].SubItems[IdxSeq];
+                  SortID := RPad(Seq) + '0000000' + lvl + copy(lvView.Items[i].SubItems[IdxTIEN] + '0000000000',1,10);
+                  tmp := IEN + U + lvView.Items[i].Caption + U + Seq + U + SortID;
+                  if AddCode = CVLockCode then
+                    tmp := tmp + U + '1';
+                  RemList.Add(tmp);
+                end
+                else
+                if (AddCode = CVLockCode) and (piece(RemList[idx],U,5) <> '1') then
+                begin
+                  tmp := RemList[idx];
+                  SetPiece(tmp,U,5,'1');
+                  RemList[idx] := tmp;
+                end;
               end;
             end;
-          end;
-          RemList.AddStrings(LvlList);
-          FTopSortTag := CurSortOrder;
-          FTopSortUp := CurSortDir;
-          lvView.CustomSort(nil, 0);
+            RemList.AddStrings(LvlList);
+            FTopSortTag := CurSortOrder;
+            FTopSortUp := CurSortDir;
+            lvView.CustomSort(nil, 0);
 
-          LvlList.Clear;
-          LvlList.Assign(RemList);
-          RemList.Clear;
-          FInternalExpansion := TRUE;
-          try
-            for i := 0 to LvlList.Count-1 do
-            begin
-              IEN := piece(LvlList[i],U,1);
-              if (copy(LvlList[i],1,1) = CVCatCode) then
+            LvlList.Clear;
+            //LvlList.Assign(RemList);
+            FastAssign(RemList, LvlList);
+            RemList.Clear;
+            FInternalExpansion := TRUE;
+            try
+              for i := 0 to LvlList.Count-1 do
               begin
-                ANode := tvAll.Items.GetFirstNode;
-                while assigned(ANode) do
+                IEN := piece(LvlList[i],U,1);
+                if (copy(LvlList[i],1,1) = CVCatCode) then
                 begin
-                  if IEN = piece(TORTreeNode(ANode).StringData,U,1) then
+                  ANode := tvAll.Items.GetFirstNode;
+                  while assigned(ANode) do
                   begin
-                    SeqCnt := 0;
-                    GetAllChildren(ANode, Piece(LvlList[i], U, 3), Piece(LvlList[i], U, 4));
-                    ANode := nil;
-                  end
-                  else
-                    ANode := ANode.GetNextSibling;
-                end;
-              end
-              else
-              if RemList.IndexOfPiece(IEN) < 0 then
-                RemList.Add(LvlList[i]);
+                    if IEN = piece(TORTreeNode(ANode).StringData,U,1) then
+                    begin
+                      SeqCnt := 0;
+                      GetAllChildren(ANode, Piece(LvlList[i], U, 3), Piece(LvlList[i], U, 4));
+                      ANode := nil;
+                    end
+                    else
+                      ANode := ANode.GetNextSibling;
+                  end;
+                end
+                else
+                if RemList.IndexOfPiece(IEN) < 0 then
+                  RemList.Add(LvlList[i]);
+              end;
+            finally
+              FInternalExpansion := FALSE;
             end;
           finally
-            FInternalExpansion := FALSE;
+            LvlList.Free;
+          end;
+
+          RemList.SortByPiece(4);
+          for i := 0 to RemList.Count-1 do
+          begin
+            with frmRemCoverPreview.lvMain.Items.Add do
+            begin
+              tmp := RemList[i];
+              Caption := Piece(tmp, U, 2);
+              SubItems.Add(Piece(tmp, U, 3));
+              SubItems.Add(Piece(tmp, U, 4));
+            end;
           end;
         finally
-          LvlList.Free;
-        end;
-
-        RemList.SortByPiece(4);
-        for i := 0 to RemList.Count-1 do
-        begin
-          with frmRemCoverPreview.lvMain.Items.Add do
-          begin
-            tmp := RemList[i];
-            Caption := Piece(tmp, U, 2);
-            SubItems.Add(Piece(tmp, U, 3));
-            SubItems.Add(Piece(tmp, U, 4));
-          end;
+          RemList.Free;
         end;
       finally
-        RemList.Free;
+        lvView.Items.EndUpdate;
       end;
+      frmRemCoverPreview.ShowModal;
     finally
-      lvView.Items.EndUpdate;
+      frmRemCoverPreview.Free;
     end;
-    frmRemCoverPreview.ShowModal;
   finally
-    frmRemCoverPreview.Free;
+    Screen.OnActiveControlChange := ActiveControlChanged;
   end;
 end;
 
@@ -1591,20 +1772,20 @@ procedure TfrmRemCoverSheet.lvCoverKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (Key = VK_DELETE) and sbCopyLeft.Enabled then
-    sbCopyLeft.Click; 
+    sbCopyLeft.Click;
 end;
 
 procedure TfrmRemCoverSheet.edtSeqKeyPress(Sender: TObject; var Key: Char);
 begin
   if (Key < '0') or (Key > '9') then
-    Key := #0; 
+    Key := #0;
 end;
 
 procedure TfrmRemCoverSheet.cbxDivisionKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 begin
-  if (Key = VK_RETURN) and TORComboBox(Sender).DroppedDown then 
-    TORComboBox(Sender).DroppedDown := FALSE; 
+  if (Key = VK_RETURN) and TORComboBox(Sender).DroppedDown then
+    TORComboBox(Sender).DroppedDown := FALSE;
 end;
 
 function TfrmRemCoverSheet.GetCoverSheetLvlData(ALevel,
@@ -1622,6 +1803,101 @@ begin
     if j >= 0 then
       Result[i] := Result[i] + piece(FMasterList[j],U,3);
   end;
+end;
+
+procedure TfrmRemCoverSheet.SetButtonHints;
+{This procedure sets the Lock, Add, and Remove button hints based on the
+ selected parameter level}
+begin
+  if FEditingLevel = dlDivision then
+  begin
+    btnLock.hint := 'Adds Reminder to the Coversheet display and Locks the Reminder'
+          + CRLF + 'so it can not be removed from the Coversheet display at any'
+          + CRLF + 'of the lower levels (Service, Location, User Class, User).';
+    btnRemove.hint := 'Removes Reminders from the Coversheet display.  Will not'
+          + CRLF + 'remove Reminders which are locked at the System level.';
+    btnAdd.hint := 'Adds Reminders to the Coversheet at the Division level and'
+          + CRLF + 'below.  It also removes the lock from a Reminder locked at'
+          + CRLF + 'the Division level while leaving the Reminder on the Coversheet.';
+  end
+  else if FEditingLevel = dlService then
+  begin
+    btnLock.hint := 'Adds Reminder to the Coversheet display and Locks the Reminder'
+          + CRLF + 'so it can not be removed from the Coversheet display at any of'
+          + CRLF + 'the lower levels (Location, User Class, User).';
+    btnRemove.hint := 'Removes Reminders from the Coversheet display.  Will not'
+          + CRLF + 'remove Reminders which are locked at the Division level or higher.';
+    btnAdd.hint := 'Adds Reminders to the Coversheet at the Service level and'
+          + CRLF + 'below.  It also removes the lock from a Reminder locked at the'
+          + CRLF + 'Service level while leaving the Reminder on the Coversheet.';
+  end
+  else if FEditingLevel = dlLocation then
+  begin
+    btnLock.hint := 'Adds Reminder to the Coversheet display and Locks the Reminder'
+          + CRLF + 'so it can not be removed from the Coversheet display at any of'
+          + CRLF + 'the lower levels (User Class, User).';
+    btnRemove.hint := 'Removes Reminders from the Coversheet display.  Will not'
+          + CRLF + 'remove Reminders which are locked at the Service level or higher.';
+    btnAdd.hint := 'Adds Reminders to the Coversheet at the Location level and'
+          + CRLF + 'below.  It also removes the lock from a Reminder locked at the'
+          + CRLF + 'Location level while leaving the Reminder on the Coversheet.';
+  end
+  else if FEditingLevel = dlUserClass then
+  begin
+    btnLock.hint := 'Adds Reminder to the Coversheet display and Locks the Reminder so'
+          + CRLF + 'it can not be removed from the Coversheet display at the User level.';
+    btnRemove.hint := 'Removes Reminders from the Coversheet display.  Will not remove'
+          + CRLF + 'Reminders which are locked at the Location level or higher.';
+    btnAdd.hint := 'Adds Reminders to the Coversheet at the User Class level and'
+          + CRLF + 'below.  It also removes the lock from a Reminder locked at the'
+          + CRLF + 'User Class level while leaving the Reminder on the Coversheet.';
+  end
+  else if FEditingLevel = dlUser then
+  begin
+    btnRemove.hint := 'Removes Reminders from the Coversheet display.  Will not'
+          + CRLF + 'remove Reminders which are locked at the User Class level'
+          + CRLF + 'or higher.';
+    btnAdd.hint := 'Adds Reminders to the Coversheet at the User level.';
+  end
+  else
+  begin
+    btnLock.hint := 'Adds Reminder to the Coversheet display and Locks the Reminder'
+          + CRLF + 'so it can not be removed from the Coversheet display at any of'
+          + CRLF + 'the lower levels (Division, Service, Location, User Class, User).';
+    btnRemove.hint := 'Removes Reminders from the Coversheet display.';
+    btnAdd.hint := 'Adds Reminders to the Coversheet at the System level and'
+          + CRLF + 'below.  It also removes the lock from a Reminder locked at the'
+          + CRLF + 'System level while leaving the Reminder on the Coversheet.';
+  end;
+end;
+
+procedure TfrmRemCoverSheet.FormCreate(Sender: TObject);
+begin
+  FSavePause := Application.HintHidePause;   //Save Hint Pause setting
+  Application.HintHidePause := 20000;   //Reset Hint Pause to 20 seconds
+  mlgnLock.hint := 'Lock a Reminder to prevent it''s removal from a lower'
+          + CRLF + 'level  Coversheet display.  For example, if you lock'
+          + CRLF + 'a Reminder at the Service level, then that Reminder'
+          + CRLF + 'can not be removed from the coversheet display at'
+          + CRLF + 'the Location, User Class, or User levels.';
+  fOldFocusChanged := Screen.OnActiveControlChange;
+  Screen.OnActiveControlChange := ActiveControlChanged;
+end;
+
+procedure TfrmRemCoverSheet.ActiveControlChanged(Sender: TObject);
+begin
+  if assigned(fOldFocusChanged) then fOldFocusChanged(Sender);
+  UpdateButtons;
+end;
+
+procedure TfrmRemCoverSheet.LockButtonUpdate(Data, FNAME, Hint: string);
+begin
+  btnLock.Caption := Data;
+  btnLock.Glyph.LoadFromResourceName(hinstance, FNAME);
+  if btnLock.Hint <> Hint then btnLock.Hint := Hint;
+  if FNAME = 'BMP_LOCK' then btnLock.OnClick := btnLockClick
+  else
+    btnLock.OnClick := btnAddClick;
 end;
 
 end.

@@ -1,31 +1,37 @@
 inherited frmNotes: TfrmNotes
-  Left = 307
-  Top = 177
-  Width = 687
-  Height = 409
+  Left = 402
+  Top = 171
   HelpContext = 5000
   Caption = 'Progress Notes Page'
+  ClientHeight = 394
+  ClientWidth = 679
   HelpFile = 'overvw'
-  KeyPreview = True
   Menu = mnuNotes
   OnDestroy = FormDestroy
   OnHide = FormHide
-  OnMouseMove = FormMouseMove
   OnShow = FormShow
+  ExplicitWidth = 687
+  ExplicitHeight = 440
   PixelsPerInch = 96
   TextHeight = 13
   inherited shpPageBottom: TShape
-    Top = 358
+    Top = 389
     Width = 679
+    ExplicitTop = 358
+    ExplicitWidth = 679
   end
   inherited sptHorz: TSplitter
     Left = 64
-    Height = 358
+    Height = 389
     OnCanResize = sptHorzCanResize
+    ExplicitLeft = 64
+    ExplicitHeight = 358
   end
   inherited pnlLeft: TPanel
     Width = 64
-    Height = 358
+    Height = 389
+    ExplicitWidth = 64
+    ExplicitHeight = 389
     object lblNotes: TOROffsetLabel
       Left = 0
       Top = 0
@@ -42,53 +48,53 @@ inherited frmNotes: TfrmNotes
     end
     object lblSpace1: TLabel
       Left = 0
-      Top = 313
+      Top = 344
       Width = 64
       Height = 3
       Align = alBottom
       AutoSize = False
       Caption = ' '
+      ExplicitTop = 313
     end
     object cmdNewNote: TORAlignButton
       Left = 0
-      Top = 316
+      Top = 347
       Width = 64
       Height = 21
+      Align = alBottom
       Caption = 'New Note'
       TabOrder = 1
       OnClick = cmdNewNoteClick
       OnExit = cmdNewNoteExit
-      OnMouseMove = FormMouseMove
-      Align = alBottom
     end
     object cmdPCE: TORAlignButton
       Left = 0
-      Top = 337
+      Top = 368
       Width = 64
       Height = 21
+      Align = alBottom
       Caption = 'Encounter'
       TabOrder = 2
       Visible = False
       OnClick = cmdPCEClick
       OnExit = cmdPCEExit
-      OnMouseMove = FormMouseMove
-      Align = alBottom
     end
     object pnlDrawers: TPanel
       Left = 0
       Top = 19
       Width = 64
-      Height = 294
+      Height = 325
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
       object splDrawers: TSplitter
         Left = 0
-        Top = 291
+        Top = 322
         Width = 64
         Height = 3
         Cursor = crVSplit
         Align = alBottom
+        ExplicitTop = 291
       end
       object lstNotes: TORListBox
         Left = 0
@@ -114,24 +120,23 @@ inherited frmNotes: TfrmNotes
         Left = 0
         Top = 0
         Width = 64
-        Height = 291
+        Height = 322
         Align = alClient
         Constraints.MinWidth = 30
         HideSelection = False
+        Images = dmodShared.imgNotes
         Indent = 19
         PopupMenu = popNoteList
         ReadOnly = True
+        StateImages = dmodShared.imgImages
         TabOrder = 1
-        OnAddition = tvNotesAddition
         OnChange = tvNotesChange
         OnClick = tvNotesClick
         OnCollapsed = tvNotesCollapsed
-        OnDeletion = tvNotesDeletion
         OnDragDrop = tvNotesDragDrop
         OnDragOver = tvNotesDragOver
         OnExit = tvNotesExit
         OnExpanded = tvNotesExpanded
-        OnMouseMove = FormMouseMove
         OnStartDrag = tvNotesStartDrag
         Caption = 'Last 100 Notes'
         NodePiece = 0
@@ -142,18 +147,22 @@ inherited frmNotes: TfrmNotes
   inherited pnlRight: TPanel
     Left = 68
     Width = 611
-    Height = 358
+    Height = 389
+    ExplicitLeft = 68
+    ExplicitWidth = 611
+    ExplicitHeight = 389
     object sptVert: TSplitter
       Left = 0
-      Top = 309
+      Top = 340
       Width = 611
       Height = 4
       Cursor = crVSplit
       Align = alBottom
+      ExplicitTop = 309
     end
     object memPCEShow: TRichEdit
       Left = 0
-      Top = 313
+      Top = 344
       Width = 611
       Height = 45
       Align = alBottom
@@ -170,7 +179,7 @@ inherited frmNotes: TfrmNotes
       Left = 0
       Top = 0
       Width = 611
-      Height = 309
+      Height = 340
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
@@ -180,7 +189,7 @@ inherited frmNotes: TfrmNotes
         Left = 0
         Top = 67
         Width = 611
-        Height = 242
+        Height = 273
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -300,7 +309,6 @@ inherited frmNotes: TfrmNotes
           Top = 6
           Width = 58
           Height = 21
-          Anchors = [akTop, akRight]
           Caption = 'Change...'
           TabOrder = 0
           OnClick = cmdChangeClick
@@ -326,7 +334,7 @@ inherited frmNotes: TfrmNotes
       Left = 0
       Top = 0
       Width = 611
-      Height = 309
+      Height = 340
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
@@ -355,7 +363,7 @@ inherited frmNotes: TfrmNotes
         Left = 0
         Top = 116
         Width = 611
-        Height = 193
+        Height = 224
         Align = alClient
         Color = clCream
         Ctl3D = True
@@ -376,7 +384,6 @@ inherited frmNotes: TfrmNotes
         ScrollBars = ssBoth
         TabOrder = 1
         WordWrap = False
-        OnMouseMove = FormMouseMove
       end
       object lvNotes: TCaptionListView
         Left = 0
@@ -417,17 +424,91 @@ inherited frmNotes: TfrmNotes
         HideSelection = False
         ReadOnly = True
         RowSelect = True
+        SmallImages = dmodShared.imgNotes
+        StateImages = dmodShared.imgImages
         TabOrder = 0
         ViewStyle = vsReport
         Visible = False
         OnColumnClick = lvNotesColumnClick
         OnCompare = lvNotesCompare
-        OnMouseMove = FormMouseMove
         OnResize = lvNotesResize
         OnSelectItem = lvNotesSelectItem
         Caption = 'No Progress Notes Found'
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cmdNewNote'
+        'Status = stsDefault')
+      (
+        'Component = cmdPCE'
+        'Status = stsDefault')
+      (
+        'Component = pnlDrawers'
+        'Status = stsDefault')
+      (
+        'Component = lstNotes'
+        'Status = stsDefault')
+      (
+        'Component = tvNotes'
+        'Status = stsDefault')
+      (
+        'Component = memPCEShow'
+        'Text = Encounter Information'
+        'Status = stsOK')
+      (
+        'Component = pnlWrite'
+        'Status = stsDefault')
+      (
+        'Component = memNewNote'
+        'Status = stsDefault')
+      (
+        'Component = pnlFields'
+        'Status = stsDefault')
+      (
+        'Component = lblRefDate'
+        'Status = stsDefault')
+      (
+        'Component = lblAuthor'
+        'Status = stsDefault')
+      (
+        'Component = lblVisit'
+        'Status = stsDefault')
+      (
+        'Component = lblCosigner'
+        'Status = stsDefault')
+      (
+        'Component = lblSubject'
+        'Status = stsDefault')
+      (
+        'Component = lblNewTitle'
+        'Status = stsDefault')
+      (
+        'Component = cmdChange'
+        'Status = stsDefault')
+      (
+        'Component = txtSubject'
+        'Status = stsDefault')
+      (
+        'Component = pnlRead'
+        'Status = stsDefault')
+      (
+        'Component = memNote'
+        'Status = stsDefault')
+      (
+        'Component = lvNotes'
+        'Status = stsDefault')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = pnlRight'
+        'Status = stsDefault')
+      (
+        'Component = frmNotes'
+        'Status = stsDefault'))
   end
   object mnuNotes: TMainMenu
     Left = 601
@@ -639,6 +720,11 @@ inherited frmNotes: TfrmNotes
         Caption = 'Detac&h from Interdisciplinary Note'
         OnClick = mnuActDetachFromIDParentClick
       end
+      object mnuEncounter: TMenuItem
+        Caption = 'Encounte&r'
+        ShortCut = 24658
+        OnClick = cmdPCEClick
+      end
       object Z4: TMenuItem
         Caption = '-'
       end
@@ -833,6 +919,11 @@ inherited frmNotes: TfrmNotes
       ShortCut = 16453
       OnClick = cmdPCEClick
     end
+    object popNoteMemoViewCslt: TMenuItem
+      Caption = 'View Consult Details'
+      ShortCut = 24661
+      OnClick = popNoteMemoViewCsltClick
+    end
   end
   object popNoteList: TPopupMenu
     OnPopup = popNoteListPopup
@@ -926,5 +1017,31 @@ inherited frmNotes: TfrmNotes
     OnReplace = dlgReplaceTextReplace
     Left = 413
     Top = 312
+  end
+  object imgLblNotes: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = lvNotes
+      end
+      item
+        Component = tvNotes
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblNotes
+    Left = 16
+    Top = 195
+  end
+  object imgLblImages: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = lvNotes
+      end
+      item
+        Component = tvNotes
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblImages
+    Left = 16
+    Top = 235
   end
 end

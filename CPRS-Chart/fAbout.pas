@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ExtCtrls;
+  fAutoSz, StdCtrls, ExtCtrls, VA508AccessibilityManager;
 
 type
   TfrmAbout = class(TfrmAutoSz)
@@ -36,7 +36,7 @@ implementation
 
 {$R *.DFM}
 
-uses ORSystem, ORFn;
+uses VAUtils, ORFn;
 
 procedure ShowAbout;
 var

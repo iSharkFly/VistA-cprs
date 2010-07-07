@@ -60,7 +60,9 @@ procedure PrintVReports(Dest, ADevice, AHeader: string; AReport: TStringList);
 
 implementation
 
-uses uCore, rCore, Printers, clipbrd, uReports, fReports;
+uses uCore, rCore, Printers, clipbrd, uReports, fReports
+{ TODO -oRV -cWVEHR Long Age : Changed to use long age }
+, rWVEHR;
 
 var
   uTree:       TStringList;
@@ -88,7 +90,7 @@ begin
       x := Pieces(x, U, 1, 2) + U + Piece(x, U, 3) + '  (' + Piece(x, U, 4) + ')';
       Results[i] := x;
     end;
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -143,9 +145,9 @@ begin
   ExtractSection(uLabReports, '[LAB REPORT LIST]', true);
 end;
 
-procedure LoadTree;
+procedure LoadTree(Tab: String);
 begin
-  CallV('ORWRP3 EXPAND COLUMNS', [nil]);
+  CallV('ORWRP3 EXPAND COLUMNS', [Tab]);
   uTree    := TStringList.Create;
   ExtractSection(uTree, '[REPORT LIST]', false);
 end;
@@ -155,34 +157,42 @@ var
   i: Integer;
 begin
   if uTree = nil
-    then LoadTree
+    then LoadTree('REPORTS')
   else
     begin
       uTree.Clear;
-      LoadTree;
+      LoadTree('REPORTS');
     end;
-  for i := 0 to uTree.Count - 1 do Dest.Add(Pieces(uTree[i], '^', 1, 15));
+  for i := 0 to uTree.Count - 1 do Dest.Add(Pieces(uTree[i], '^', 1, 20));
 end;
 
 procedure ListLabReports(Dest: TStrings);
 var
   i: integer;
 begin
-  if uLabreports = nil then LoadLabReportLists;
-  for i := 0 to uLabReports.Count - 1 do Dest.Add(Pieces(uLabReports[i], U, 1, 10));
+  {if uLabreports = nil then LoadLabReportLists;
+  for i := 0 to uLabReports.Count - 1 do Dest.Add(Pieces(uLabReports[i], U, 1, 10)); }
+  if uTree = nil
+    then LoadTree('LABS')
+  else
+    begin
+      uTree.Clear;
+      LoadTree('LABS');
+    end;
+  for i := 0 to uTree.Count - 1 do Dest.Add(Pieces(uTree[i], '^', 1, 20));
 end;
 
 procedure ListReportDateRanges(Dest: TStrings);
 begin
   if uDateRanges = nil then LoadReportLists;
-  Dest.Assign(uDateRanges);
+  FastAssign(uDateRanges, Dest);
 end;
 
 procedure ListHealthSummaryTypes(Dest: TStrings);
 begin
   if uHSTypes = nil then LoadReportLists;
   MixedCaseList(uHSTypes);
-  Dest.Assign(uHSTypes);
+  FastAssign(uHSTypes, Dest);
 end;
 
 procedure HealthSummaryCheck(Dest: TStrings; aQualifier: string);
@@ -197,7 +207,7 @@ end;
 procedure ColumnHeaders(Dest: TStrings; AReportType: String);
 begin
   CallV('ORWRP COLUMN HEADERS',[AReportType]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure SaveColumnSizes(aColumn: String);
@@ -226,7 +236,7 @@ begin
         + U + Piece(x,U,6) + Piece(x,U,7) + U + Piece(x,U,5) +  U + '[+]' + U + Piece(x, U, 15);*)
       Results[i] := x;
     end;
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -248,7 +258,7 @@ begin
       x := Piece(x, U, 1) + U + 'i' + Piece(x, U, 2) + U + sdate + U + Piece(x, U, 3) + U + Piece(x, U, 9) + '^[+]';
       Results[i] := x;
     end;
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -266,7 +276,7 @@ begin
         x := Piece(x, U, 1) + U + 'i' + Piece(x, U, 3) + U + Piece(x, U, 3);
         Results[i] := x;
       end;
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -289,7 +299,7 @@ begin
         if Piece(Results[i], U, 6) = '+' then x := x + '^[+]';
         Results[i] := x;
       end;
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -628,7 +638,10 @@ begin
       Add(' ');
       tmpStr := Patient.Name + '   ' + Patient.SSN;
       tmpItem := tmpStr + StringOfChar(' ', 39 - Length(tmpStr)) + Encounter.LocationName;
-      tmpStr := FormatFMDateTime('mmm dd, yyyy', Patient.DOB) + ' (' + IntToStr(Patient.Age) + ')';
+{ TODO -oRV -cWVEHR Long Age : Changed to use long age }
+      //tmpStr := FormatFMDateTime('mmm dd, yyyy', Patient.DOB) + ' (' + IntToStr(Patient.Age) + ')';
+      tmpStr := FormatFMDateTime('mmm dd, yyyy', Patient.DOB) + ' (' + GetPatientBriefAge(Patient.DFN) + ')';
+{}
       tmpItem := tmpItem + StringOfChar(' ', 74 - (Length(tmpItem) + Length(tmpStr))) + tmpStr;
       Add(tmpItem);
       Add(StringOfChar('=', 74));

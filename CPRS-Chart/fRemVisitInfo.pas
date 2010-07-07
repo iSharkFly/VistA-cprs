@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, mVisitRelated, ORDtTm;
+  StdCtrls, mVisitRelated, ORDtTm,fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmRemVisitInfo = class(TForm)
+  TfrmRemVisitInfo = class(TfrmBase508Form)
     fraVisitRelated: TfraVisitRelated;
     btnOK: TButton;
     btnCancel: TButton;

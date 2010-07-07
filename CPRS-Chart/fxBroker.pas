@@ -5,10 +5,10 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, DateUtils, ORNet, ORFn, rMisc, ComCtrls, Buttons, ExtCtrls,
-  ORCtrls, ORSystem;
+  ORCtrls, ORSystem, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmBroker = class(TForm)
+  TfrmBroker = class(TfrmBase508Form)
     pnlTop: TORAutoPanel;
     lblMaxCalls: TLabel;
     txtMaxCalls: TCaptionEdit;

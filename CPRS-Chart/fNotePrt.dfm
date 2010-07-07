@@ -1,20 +1,19 @@
 inherited frmNotePrint: TfrmNotePrint
   Left = 516
   Top = 189
-  AutoScroll = False
   Caption = 'frmNotePrint'
-  ClientHeight = 308
+  ClientHeight = 306
   Position = poScreenCenter
-  OnCreate = FormCreate
+  ExplicitHeight = 340
   PixelsPerInch = 96
   TextHeight = 13
-  object lblPrintTo: TLabel
+  object lblPrintTo: TLabel [0]
     Left = 8
     Top = 269
     Width = 3
     Height = 13
   end
-  object lblNoteTitle: TMemo
+  object lblNoteTitle: TMemo [1]
     Left = 8
     Top = 8
     Width = 301
@@ -27,7 +26,7 @@ inherited frmNotePrint: TfrmNotePrint
     ReadOnly = True
     TabOrder = 4
   end
-  object grpChooseCopy: TGroupBox
+  object grpChooseCopy: TGroupBox [2]
     Left = 321
     Top = 4
     Width = 98
@@ -56,7 +55,7 @@ inherited frmNotePrint: TfrmNotePrint
       OnClick = radWorkCopyClick
     end
   end
-  object grpDevice: TGroupBox
+  object grpDevice: TGroupBox [3]
     Left = 8
     Top = 69
     Width = 411
@@ -126,7 +125,7 @@ inherited frmNotePrint: TfrmNotePrint
       CharsNeedMatch = 1
     end
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [4]
     Left = 266
     Top = 276
     Width = 72
@@ -136,7 +135,7 @@ inherited frmNotePrint: TfrmNotePrint
     TabOrder = 2
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [5]
     Left = 346
     Top = 276
     Width = 72
@@ -146,13 +145,52 @@ inherited frmNotePrint: TfrmNotePrint
     TabOrder = 3
     OnClick = cmdCancelClick
   end
-  object chkDefault: TCheckBox
+  object chkDefault: TCheckBox [6]
     Left = 8
     Top = 287
     Width = 130
     Height = 17
     Caption = 'Save as default printer'
     TabOrder = 1
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblNoteTitle'
+        'Status = stsDefault')
+      (
+        'Component = grpChooseCopy'
+        'Status = stsDefault')
+      (
+        'Component = radChartCopy'
+        'Status = stsDefault')
+      (
+        'Component = radWorkCopy'
+        'Status = stsDefault')
+      (
+        'Component = grpDevice'
+        'Status = stsDefault')
+      (
+        'Component = txtRightMargin'
+        'Status = stsDefault')
+      (
+        'Component = txtPageLength'
+        'Status = stsDefault')
+      (
+        'Component = cboDevice'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = chkDefault'
+        'Status = stsDefault')
+      (
+        'Component = frmNotePrint'
+        'Status = stsDefault'))
   end
   object dlgWinPrinter: TPrintDialog
     Left = 287

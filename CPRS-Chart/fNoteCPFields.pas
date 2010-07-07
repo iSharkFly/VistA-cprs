@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORCtrls, ORFn, ORDtTm;
+  fAutoSz, StdCtrls, ORCtrls, ORFn, ORDtTm, VA508AccessibilityManager;
 
 type
   TfrmNoteCPFields = class(TfrmAutoSz)

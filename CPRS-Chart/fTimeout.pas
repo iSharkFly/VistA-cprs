@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, ExtCtrls, StdCtrls, ORFn;
+  fAutoSz, ExtCtrls, StdCtrls, ORFn, VA508AccessibilityManager;
 
 type
   TfrmTimeout = class(TfrmAutoSz)
@@ -47,6 +47,8 @@ end;
 procedure TfrmTimeout.FormCreate(Sender: TObject);
 begin
   inherited;
+  Application.Restore;
+  Application.BringToFront;
   MessageBeep(MB_ICONASTERISK);
   FCount := User.CountDown;
   lblCount.Caption := IntToStr(FCount);

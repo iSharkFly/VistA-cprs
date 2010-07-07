@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORCtrls, ORFn;
+  StdCtrls, ExtCtrls, ORCtrls, ORFn, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmPtSelOptSave = class(TForm)
+  TfrmPtSelOptSave = class(TfrmBase508Form)
     pnlClinSave: TPanel;
     rGrpClinSave: TKeyClickRadioGroup;
     lblClinSettings: TMemo;

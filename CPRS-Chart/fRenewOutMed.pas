@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ComCtrls, ORFn, rOrders, Mask, ORCtrls, ExtCtrls;
+  fAutoSz, StdCtrls, ComCtrls, ORFn, rOrders, Mask, ORCtrls, ExtCtrls, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmRenewOutMed = class(TForm)
+  TfrmRenewOutMed = class(TfrmBase508Form)
     memOrder: TCaptionMemo;
     pnlButtons: TPanel;
     cmdOK: TButton;

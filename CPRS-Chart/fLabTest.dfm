@@ -1,21 +1,17 @@
-object frmLabTest: TfrmLabTest
+inherited frmLabTest: TfrmLabTest
   Left = 776
   Top = 338
-  Width = 285
-  Height = 308
   Caption = 'Select Lab Test for Graph'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 281
+  ClientWidth = 277
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 285
+  ExplicitHeight = 308
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlLabTest: TORAutoPanel
+  object pnlLabTest: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 277
@@ -81,6 +77,7 @@ object frmLabTest: TfrmLabTest
       ItemTipEnable = True
       ListItemsOnly = True
       LongList = True
+      LookupPiece = 0
       MaxLength = 0
       ParentShowHint = False
       Pieces = '2'
@@ -92,6 +89,7 @@ object frmLabTest: TfrmLabTest
       OnEnter = cboListEnter
       OnExit = cboListExit
       OnNeedData = cboListNeedData
+      CharsNeedMatch = 1
     end
     object cboSpecimen: TORComboBox
       Left = 8
@@ -108,6 +106,7 @@ object frmLabTest: TfrmLabTest
       ItemTipEnable = True
       ListItemsOnly = True
       LongList = True
+      LookupPiece = 0
       MaxLength = 0
       ParentShowHint = False
       Pieces = '2'
@@ -116,6 +115,28 @@ object frmLabTest: TfrmLabTest
       SynonymChars = '<>'
       TabOrder = 1
       OnNeedData = cboSpecimenNeedData
+      CharsNeedMatch = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlLabTest'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cboList'
+        'Status = stsDefault')
+      (
+        'Component = cboSpecimen'
+        'Status = stsDefault')
+      (
+        'Component = frmLabTest'
+        'Status = stsDefault'))
   end
 end

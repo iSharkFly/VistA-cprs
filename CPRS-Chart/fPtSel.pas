@@ -11,10 +11,10 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ORCtrls, ExtCtrls, ORFn, ORNet, ORDtTmRng, Gauges, Menus, ComCtrls,
-  UBAGlobals, UBACore;
+  UBAGlobals, UBACore, fBase508Form, VA508AccessibilityManager, uConst;
 
 type
-  TfrmPtSel = class(TForm)
+  TfrmPtSel = class(TfrmBase508Form)
     pnlPtSel: TORAutoPanel;
     cboPatient: TORComboBox;
     lblPatient: TLabel;
@@ -39,6 +39,7 @@ type
     N1: TMenuItem;
     RadioGroup1: TRadioGroup ;
     //RadioGroup1: TRadioGroup;
+    cmdComments: TButton;
     procedure cmdOKClick(Sender: TObject);
     procedure cmdCancelClick(Sender: TObject);
     procedure cboPatientChange(Sender: TObject);
@@ -72,11 +73,12 @@ type
     procedure ShowButts(ShowButts: Boolean);
     procedure lstvAlertsInfoTip(Sender: TObject; Item: TListItem;
       var InfoTip: String);
-    procedure FormKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
     procedure lstvAlertsKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure FormShow(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure cmdCommentsClick(Sender: TObject);
 
     //VWPT ENAHANCED PATIENT LOOKUP
     function IsOther(itemindex:Integer):Boolean;
@@ -89,6 +91,10 @@ type
     FLastPt: string;
     FsortDirection: string;
     FUserCancelled: boolean;
+    FNotificationBtnsAdjusted: Boolean;
+    FAlertsNotReady: boolean;
+    procedure WMReadyAlert(var Message: TMessage); message UM_MISC;
+    procedure ReadyAlert;
     procedure AdjustFormSize(ShowNotif: Boolean; FontSize: Integer);
     procedure ClearIDInfo;
     procedure ShowIDInfo;
@@ -98,6 +104,9 @@ type
     procedure RPLDisplay;
     procedure AlertList;
     procedure ReformatAlertDateTime;
+    procedure AdjustButtonSize(pButton:TButton);
+    procedure AdjustNotificationButtons;
+
   public
     procedure Loaded; override;
   end;
@@ -110,27 +119,27 @@ var
   IsRPL, RPLJob, DupDFN: string;                 // RPLJob stores server $J job number of RPL pt. list.
   RPLProblem: boolean;                           // Allows close of form if there's an RPL problem.
   PtStrs: TStringList;
-  SortViaKeyboard: boolean;
-  //vwpt enhancement
+
+    //vwpt enhancement
   itimson : integer = 1;
   enhanceskip : integer = 0;
   radiogrp1index : integer = 0;
+
+
 implementation
 
 {$R *.DFM}
 
-uses rCore,uCore, fDupPts, fPtSens, fPtSelDemog, fPtSelOptns, fPatientFlagMulti,
-     uOrPtf, fAlertForward, rMisc,  fFrame;
+uses rCore, uCore, fDupPts, fPtSens, fPtSelDemog, fPtSelOptns, fPatientFlagMulti,
+     uOrPtf, fAlertForward, rMisc, fFrame, fRptBox, VA508AccessibilityRouter;
+
+resourcestring
+  StrFPtSel_lstvAlerts_Co = 'C'+U+'fPtSel.lstvAlerts.Cols';
 
 const
-  TX_DGSR_ERR    = 'Unable to perform sensitive record checks';
-  TC_DGSR_ERR    = 'Error';
-  TC_DGSR_SHOW   = 'Restricted Record';
-  TC_DGSR_DENY   = 'Access Denied';
-  TX_DGSR_YESNO  = CRLF + 'Do you want to continue processing this patient record?';
   AliasString = ' -- ALIAS';
 
- //VWPT ENAHANCED PATIENT LOOKUP
+   //VWPT ENAHANCED PATIENT LOOKUP
 function TfrmPtSel.IsOther(itemindex:Integer):Boolean;
 var
    i:Integer  ;
@@ -139,9 +148,6 @@ begin
          Result := True;
          if (RadioGroup1.ItemIndex = -1) or (RadioGroup1.ItemIndex = 0) or (itimson = 0) then Result := False;
 end;
-
-
-
 
 procedure SelectPatient(ShowNotif: Boolean; FontSize: Integer; var UserCancelled: boolean);
 { displays patient selection dialog (with optional notifications), updates Patient object }
@@ -223,6 +229,15 @@ begin
     SetUserBounds2(Name+'.'+sptVert.Name,SplitterTop, t1, t2, t3);
   if SplitterTop <> 0 then
     pnlPtSel.Height := SplitterTop;
+  FNotificationBtnsAdjusted := False;
+  AdjustButtonSize(cmdSaveList);
+  AdjustButtonSize(cmdProcessInfo);
+  AdjustButtonSize(cmdProcessAll);
+  AdjustButtonSize(cmdProcess);
+  AdjustButtonSize(cmdForward);
+  AdjustButtonSize(cmdRemove);
+  AdjustButtonSize(cmdComments);
+  AdjustNotificationButtons;
 end;
 
 procedure TfrmPtSel.SetCaptionTop;
@@ -254,6 +269,10 @@ begin
     Items.Add(LLS_LINE);
     Items.Add(LLS_SPACE);
     cboPatient.InitLongList('');
+  //VWPT
+  //cboPatient.LongList := True;
+  //cboPateint.HintonItem := True;
+  //end
     RedrawActivate(cboPatient.Handle);
   end;
 end;
@@ -340,10 +359,6 @@ begin
     end;
   cboPatient.Caption := lblPatient.Caption;
   cboPatient.InitLongList('');
-  //VWPT
-  //cboPatient.LongList := True;
-  //cboPateint.HintonItem := True;
-  //end
   RedrawActivate(cboPatient.Handle);
 end;
 
@@ -385,8 +400,11 @@ procedure TfrmPtSel.cboPatientChange(Sender: TObject);
           InitLongList('');
         end;
     end;
+
 var caption:string;
-    index:integer;
+index:integer;
+
+   
 begin
   with cboPatient do
     if IsOther(integer(1))and (IsRPL <> '1')and (enhanceskip=0) and (frmPtSelOptns.IsEnhanced(Text))and (not frmPtSelOptns.IsPatientName(Text)) then
@@ -424,9 +442,8 @@ begin
            ListPtByRPLFullSSN(Items, Text)
         else
            ListPtByFullSSN(Items, Text);
-        ShowMatchingPatients;
+        ShowMatchingPatients
       end
-
     else if (not IsOther(integer(1))) and (IsRPL <> '1')and (enhanceskip=0) and (frmPtSelOptns.IsEnhanced(Text)) and (not frmPtSelOptns.IsPatientName(Text)) then
     begin
 
@@ -448,7 +465,7 @@ begin
   if Length(cboPatient.ItemID) > 0 then  //*DFN*
   begin
     ShowIDInfo;
-    ShowFlagInfo;
+    ShowFlagInfo;    
   end else
   begin
     ClearIDInfo;
@@ -456,6 +473,18 @@ begin
 end;
 
 procedure TfrmPtSel.cboPatientMouseClick(Sender: TObject);
+begin
+  if Length(cboPatient.ItemID) > 0 then   //*DFN*
+  begin
+    ShowIDInfo;
+    ShowFlagInfo;
+  end else
+  begin
+    ClearIDInfo;
+  end;
+end;
+
+procedure TfrmPtSel.cboPatientDblClick(Sender: TObject);
 begin
   // vwpt enhanced   on click or double clck set mode back to normal to a.) not allow change event
  //erroneously checked with false lookup, and b.0 immedicately put back into normal mode
@@ -470,30 +499,6 @@ begin
   //enhanceskip:=1 ;
 
 //end vwpt enhanced
-  if Length(cboPatient.ItemID) > 0 then   //*DFN*
-  begin
-    ShowIDInfo;
-    ShowFlagInfo;
-  end else
-  begin
-    ClearIDInfo;
-  end;
-end;
-
-procedure TfrmPtSel.cboPatientDblClick(Sender: TObject);
-begin
-  // vwpt enhanced   on click or double clck set mode back to normal to a.) not allow change event
-//erroneiusly checked with false lookup, and b.0 immedicately put back into normal mode
-//withut separate step needed.
-if (RadioGroup1.ItemIndex  > 0 ) then
-  begin
- // itimson :=0 ;//no check for timson change in cbopatient until after click event finished
-  RadioGroup1.ItemIndex  := 0;
-  RadioGroup1.SetFocus;
-  RadioGroup1.Refresh;
-
-end;
-//end vwpt enhanced
   if Length(cboPatient.ItemID) > 0 then cmdOKClick(Self);  //*DFN*
 end;
 
@@ -504,38 +509,40 @@ var
   NoAlias, Patient: String;
   PatientList: TStringList;
 begin
-
-NoAlias := StartFrom;
-with Sender as TORComboBox do
+  NoAlias := StartFrom;
+  with Sender as TORComboBox do
   if Items.Count > ShortCount then
-    NoAlias := Piece(Items[Items.Count-1], U, 1) + U + NoAlias;
-if pos(AliasString, NoAlias)> 0 then
-  NoAlias := Copy(NoAlias, 1, pos(AliasString, NoAlias)-1);
-PatientList := TStringList.Create;
-try
   begin
-    if (IsRPL  = '1') then // Restricted patient lists uses different feed for long list box:
-      PatientList.Assign(ReadRPLPtList(RPLJob, NoAlias, Direction))
-    else
+    NoAlias := Piece(Items[Items.Count-1], U, 1) + U + NoAlias;
+    if Direction < 0 then
+      NoAlias := Copy(NoAlias, 1, Length(NoAlias) - 1);
+  end;
+  if pos(AliasString, NoAlias) > 0 then
+    NoAlias := Copy(NoAlias, 1, pos(AliasString, NoAlias) - 1);
+  PatientList := TStringList.Create;
+  try
     begin
-      PatientList.Assign(SubSetOfPatients(NoAlias, Direction));
-      for i := 0 to PatientList.Count-1 do  // Add " - Alias" to alias names:
+      if (IsRPL  = '1') then // Restricted patient lists uses different feed for long list box:
+        FastAssign(ReadRPLPtList(RPLJob, NoAlias, Direction), PatientList)
+      else
       begin
-        Patient := PatientList[i];
-        // Piece 6 avoids display problems when mixed with "RPL" lists:
-        if (Uppercase(Piece(Patient, U, 2)) <> Uppercase(Piece(Patient, U, 6))) then
+        FastAssign(SubSetOfPatients(NoAlias, Direction), PatientList);
+        for i := 0 to PatientList.Count - 1 do  // Add " - Alias" to alias names:
         begin
-          SetPiece(Patient, U, 2, Piece(Patient, U, 2) + AliasString);
-          PatientList[i] := Patient;
+          Patient := PatientList[i];
+          // Piece 6 avoids display problems when mixed with "RPL" lists:
+          if (Uppercase(Piece(Patient, U, 2)) <> Uppercase(Piece(Patient, U, 6))) then
+          begin
+            SetPiece(Patient, U, 2, Piece(Patient, U, 2) + AliasString);
+            PatientList[i] := Patient;
+          end;
         end;
       end;
+      cboPatient.ForDataUse(PatientList);
     end;
-    cboPatient.ForDataUse(PatientList);
+  finally
+    PatientList.Free;
   end;
-finally
-  PatientList.Free;
-end;
-
 end;
 
 procedure TfrmPtSel.ClearIDInfo;
@@ -548,21 +555,22 @@ begin
   frmPtSelDemog.ShowDemog(cboPatient.ItemID);
 end;
 
+procedure TfrmPtSel.WMReadyAlert(var Message: TMessage);
+begin
+  ReadyAlert;
+  Message.Result := 0;
+end;
+
 { Command Button events: }
 
 procedure TfrmPtSel.cmdOKClick(Sender: TObject);
 { Checks for restrictions on the selected patient and sets up the Patient object. }
 const
   DLG_CANCEL = False;
-  DGSR_FAIL = -1;
-  DGSR_NONE =  0;
-  DGSR_SHOW =  1;
-  DGSR_ASK  =  2;
-  DGSR_DENY =  3;
 var
-  NewDFN, AMsg: string;  //*DFN*
-  AccessStatus: Integer;
+  NewDFN: string;  //*DFN*
   DateDied: TFMDateTime;
+  AccessStatus: integer;
 begin
 // vwpt enhanced   on click or double clck set mode back to normal to a.) not allow change event
 //erroneiusly checked with false lookup, and b.0 immedicately put back into normal mode
@@ -593,21 +601,7 @@ if not (Length(cboPatient.ItemID) > 0) then  //*DFN*
       Exit
     else
       NewDFN := DupDFN;
-  CheckSensitiveRecordAccess(NewDFN, AccessStatus, AMsg);
-  case AccessStatus of
-  DGSR_FAIL: begin
-               InfoBox(TX_DGSR_ERR, TC_DGSR_ERR, MB_OK);
-               Exit;
-             end;
-  DGSR_NONE: { Nothing - allow access to the patient. };
-  DGSR_SHOW: InfoBox(AMsg, TC_DGSR_SHOW, MB_OK);
-  DGSR_ASK:  if InfoBox(AMsg + TX_DGSR_YESNO, TC_DGSR_SHOW, MB_YESNO or MB_ICONWARNING or
-               MB_DEFBUTTON2) = IDYES then LogSensitiveRecordAccess(NewDFN) else Exit;
-  else       begin
-               InfoBox(AMsg, TC_DGSR_DENY, MB_OK);
-               Exit;
-             end;
-  end;
+  if not AllowAccessToSensitivePatient(NewDFN, AccessStatus) then exit;
   DateDied := DateOfDeath(NewDFN);
   if (DateDied > 0) and (InfoBox('This patient died ' + FormatFMDateTime('mmm dd,yyyy hh:nn', DateDied) + CRLF +
      'Do you wish to continue?', 'Deceased Patient', MB_YESNO or MB_DEFBUTTON2) = ID_NO) then
@@ -664,12 +658,34 @@ begin
   Close;
 end;
 
+procedure TfrmPtSel.cmdCommentsClick(Sender: TObject);
+var
+  tmpCmt: TStringList;
+begin
+  if FAlertsNotReady then exit;  
+  inherited;
+  tmpCmt := TStringList.Create;
+  try
+    tmpCmt.Text := lstvAlerts.Selected.SubItems[8];
+    LimitStringLength(tmpCmt, 74);
+    tmpCmt.Insert(0, StringOfChar('-', 74));
+    tmpCmt.Insert(0, lstvAlerts.Selected.SubItems[4]);
+    tmpCmt.Insert(0, lstvAlerts.Selected.SubItems[3]);
+    tmpCmt.Insert(0, lstvAlerts.Selected.SubItems[0]);
+    ReportBox(tmpCmt, 'Forwarded by: ' + lstvAlerts.Selected.SubItems[5], TRUE);
+    lstvAlerts.SetFocus;
+  finally
+    tmpCmt.Free;
+  end;
+end;
+
 procedure TfrmPtSel.cmdProcessClick(Sender: TObject);
 var
   AFollowUp, i, infocount: Integer;
   enableclose: boolean;
   ADFN, x, RecordID, XQAID: string;  //*DFN*
 begin
+  if FAlertsNotReady then exit;  
   enableclose := false;
   with lstvAlerts do
   begin
@@ -765,6 +781,7 @@ procedure TfrmPtSel.cmdProcessInfoClick(Sender: TObject);
 var
   i: integer;
 begin
+  if FAlertsNotReady then exit;  
   if lstvAlerts.Items.Count = 0 then Exit;
   if InfoBox('You are about to process all your INFORMATION alerts.' + CRLF
     + 'These alerts will not be presented to you for individual' + CRLF
@@ -786,6 +803,7 @@ procedure TfrmPtSel.cmdProcessAllClick(Sender: TObject);
 var
   i: integer;
 begin
+  if FAlertsNotReady then exit;
   for i := 0 to lstvAlerts.Items.Count-1 do
     lstvAlerts.Items[i].Selected := True;
   cmdProcessClick(Self);
@@ -802,6 +820,7 @@ var
   i: integer;
   Alert: String;
 begin
+  if FAlertsNotReady then exit;  
   try
     with lstvAlerts do
       begin
@@ -825,6 +844,7 @@ procedure TfrmPtSel.cmdRemoveClick(Sender: TObject);
 var
   i: integer;
 begin
+  if FAlertsNotReady then exit;
   with lstvAlerts do
     begin
       if SelCount <= 0 then Exit;
@@ -850,10 +870,24 @@ begin
   frmFrame.EnduringPtSelSplitterPos := pnlPtSel.Height;
  end;
 
+procedure TfrmPtSel.FormResize(Sender: TObject);
+begin
+  inherited;
+  FNotificationBtnsAdjusted := False;
+  AdjustButtonSize(cmdSaveList);
+  AdjustButtonSize(cmdProcessInfo);
+  AdjustButtonSize(cmdProcessAll);
+  AdjustButtonSize(cmdProcess);
+  AdjustButtonSize(cmdForward);
+  AdjustButtonSize(cmdComments);
+  AdjustButtonSize(cmdRemove);
+  AdjustNotificationButtons;
+end;
+
 procedure TfrmPtSel.pnlPtSelResize(Sender: TObject);
 begin
   frmPtSelDemog.Left := cboPatient.Left + cboPatient.Width + 9;
-//  frmPtSelDemog.Width := frmPtSel.CmdCancel.Left - frmPtSelDemog.Left-2;// before vwpt enhancements pnlPtSel.Width - frmPtSelDemog.Left - 2;
+  //  frmPtSelDemog.Width := frmPtSel.CmdCancel.Left - frmPtSelDemog.Left-2;// before vwpt enhancements pnlPtSel.Width - frmPtSelDemog.Left - 2;
   frmPtSelOptns.Width := cboPatient.Left-8;
 end;
 
@@ -884,6 +918,7 @@ begin
       Show;
   end;
   //end vwpt enhancements
+
   frmPtSelOptns := TfrmPtSelOptns.Create(Self);  // Was application - kcm
   with frmPtSelOptns do
   begin
@@ -914,11 +949,31 @@ frmPtSelOptns.visible := false;
 end;
 
 procedure TfrmPtSel.FormClose(Sender: TObject; var Action: TCloseAction);
+var
+  colSizes : String;
 begin
+  colSizes := '';
+  with lstvAlerts do begin
+    colSizes := IntToStr(Columns[0].Width) + ',';  //Info                 Caption
+    colSizes := colSizes + IntToStr(Columns[1].Width) + ',';  //Patient              SubItems[0]
+    colSizes := colSizes + IntToStr(Columns[2].Width) + ',';  //Location             SubItems[1]
+    colSizes := colSizes + IntToStr(Columns[3].Width) + ',';  //Urgency              SubItems[2]
+    colSizes := colSizes + IntToStr(Columns[4].Width) + ',';  //Alert Date/Time      SubItems[3]
+    colSizes := colSizes + IntToStr(Columns[5].Width) + ',';  //Message Text         SubItems[4]
+    colSizes := colSizes + IntToStr(Columns[6].Width);  //Forwarded By/When    SubItems[5]
+  end;
+  SizeHolder.SetSize(StrFPtSel_lstvAlerts_Co,colSizes);
 
 if (IsRPL = '1') then                          // Deal with restricted patient list users.
   KillRPLPtList(RPLJob);                       // Kills server global data each time.
                                                // (Global created by MakeRPLPtList in rCore.)
+end;
+
+procedure TfrmPtSel.FormCreate(Sender: TObject);
+begin
+  inherited;
+  DefaultButton := cmdOK;
+  FAlertsNotReady := FALSE;
 end;
 
 procedure TfrmPtSel.cboPatientKeyDown(Sender: TObject; var Key: Word;
@@ -1004,9 +1059,10 @@ var
   List: TStringList;
   NewItem: TListItem;
   I,J: Integer;
-  Comment: String;
+  Comment,colSizes : String;
 begin
   // Load the items
+  colSizes := '';
   lstvAlerts.Items.Clear;
   List := TStringList.Create;
   NewItem := nil;
@@ -1035,13 +1091,25 @@ begin
    end;
    with lstvAlerts do
      begin
-        Columns[0].Width := 30;          //Info                 Caption
-        Columns[1].Width := 120;         //Patient              SubItems[0]
-        Columns[2].Width := 60;          //Location             SubItems[1]
-        Columns[3].Width := 60;          //Urgency              SubItems[2]
-        Columns[4].Width := 110;         //Alert Date/Time      SubItems[3]
-        Columns[5].Width := 312;         //Message Text         SubItems[4]
-        Columns[6].Width := 210;         //Forwarded By/When    SubItems[5]
+        colSizes := SizeHolder.GetSize(StrFPtSel_lstvAlerts_Co);
+        if colSizes = '' then begin
+          Columns[0].Width := 40;          //Info                 Caption
+          Columns[1].Width := 195;         //Patient              SubItems[0]
+          Columns[2].Width := 75;          //Location             SubItems[1]
+          Columns[3].Width := 95;          //Urgency              SubItems[2]
+          Columns[4].Width := 150;         //Alert Date/Time      SubItems[3]
+          Columns[5].Width := 310;         //Message Text         SubItems[4]
+          Columns[6].Width := 290;         //Forwarded By/When    SubItems[5]
+        end else begin
+          Columns[0].Width := StrToInt(piece(colSizes,',',1));          //Info                 Caption
+          Columns[1].Width := StrToInt(piece(colSizes,',',2));         //Patient              SubItems[0]
+          Columns[2].Width := StrToInt(piece(colSizes,',',3));          //Location             SubItems[1]
+          Columns[3].Width := StrToInt(piece(colSizes,',',4));          //Urgency              SubItems[2]
+          Columns[4].Width := StrToInt(piece(colSizes,',',5));         //Alert Date/Time      SubItems[3]
+          Columns[5].Width := StrToInt(piece(colSizes,',',6));         //Message Text         SubItems[4]
+          Columns[6].Width := StrToInt(piece(colSizes,',',7));         //Forwarded By/When    SubItems[5]
+        end;
+
      //Items not displayed in Columns:     XQAID                SubItems[6]
      //                                    Remove w/o process   SubItems[7]
      //                                    Forwarding comments  SubItems[8]
@@ -1054,7 +1122,7 @@ end;
 procedure TfrmPtSel.lstvAlertsColumnClick(Sender: TObject; Column: TListColumn);
 begin
 
-  if ((FsortCol = Column.Index) and (not SortViaKeyboard)) then
+  if (FsortCol = Column.Index) then
      FsortAscending := not FsortAscending;
 
   if FsortAscending then
@@ -1068,8 +1136,6 @@ begin
     ReformatAlertDateTime //  hds7397- ge 2/6/6 sort and display date/time column correctly - as requested
   else
      lstvAlerts.AlphaSort;
-  SortViaKeyboard := false;
-
 
   //Set the Notifications sort method to last-used sort-type
   //ie., user clicked on which column header last use of CPRS?
@@ -1150,7 +1216,7 @@ begin
   end;
   if HasFlag then
   begin
-//    lstFlags.Items.Assign(FlagList);
+//    FastAssign(FlagList, lstFlags.Items);
 //    pnlPrf.Visible := True;
   end
   //else pnlPrf.Visible := False;
@@ -1172,9 +1238,13 @@ end;
 procedure TfrmPtSel.lstvAlertsSelectItem(Sender: TObject; Item: TListItem;
   Selected: Boolean);
 begin
-  if lstvAlerts.SelCount <= 0 then ShowButts(False)
-  else ShowButts(True);
-  GetBAStatus(User.DUZ,Patient.DFN);
+  if ScreenReaderSystemActive then
+  begin
+    FAlertsNotReady := TRUE;
+    PostMessage(Handle, UM_MISC, 0, 0);
+  end
+  else
+    ReadyAlert;
 end;
 
 procedure TfrmPtSel.ShowButts(ShowButts: Boolean);
@@ -1182,24 +1252,13 @@ begin
   cmdProcess.Enabled := ShowButts;
   cmdRemove.Enabled := ShowButts;
   cmdForward.Enabled := ShowButts;
+  cmdComments.Enabled := ShowButts and (lstvAlerts.SelCount = 1) and (lstvAlerts.Selected.SubItems[8] <> '');
 end;
 
 procedure TfrmPtSel.lstvAlertsInfoTip(Sender: TObject; Item: TListItem;
   var InfoTip: String);
 begin
   InfoTip := Item.SubItems[8];
-end;
-
-procedure TfrmPtSel.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
-{
-var
-  keyValue: word;
-}  
-begin{
-  keyValue := MapVirtualKey(Key,2);
-  if keyValue = VK_RETURN then
-     cmdProcessClick(Sender);
-}
 end;
 
 procedure TfrmPtSel.lstvAlertsKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
@@ -1209,9 +1268,9 @@ procedure TfrmPtSel.lstvAlertsKeyDown(Sender: TObject; var Key: Word; Shift: TSh
  Numbers in case stmnt are ASCII values for character keys.
 }
 begin
+  if FAlertsNotReady then exit;
   if lstvAlerts.Focused then
      begin
-     SortViaKeyboard := true;
      case Key of
         VK_RETURN: cmdProcessClick(Sender); //Process all selected alerts
         73,105: if (ssCtrl in Shift) then lstvAlertsColumnClick(Sender, lstvAlerts.Columns[0]); //I,i
@@ -1251,9 +1310,18 @@ begin
      'M','m': lstvAlertsColumnClick(Sender, lstvAlerts.Columns[5]);
      'F','f': lstvAlertsColumnClick(Sender, lstvAlerts.Columns[6]);
   end;
+
 end;
 
 //hds7397- ge 2/6/6 sort and display date/time column correctly - as requested
+procedure TfrmPtSel.ReadyAlert;
+begin
+  if lstvAlerts.SelCount <= 0 then ShowButts(False)
+  else ShowButts(True);
+  GetBAStatus(User.DUZ,Patient.DFN);
+  FAlertsNotReady := FALSE;
+end;
+
 procedure  TfrmPtSel.ReformatAlertDateTime;
 var
   I,J: Integer;
@@ -1286,6 +1354,35 @@ begin
   end;
 end;
 
+procedure TfrmPtSel.AdjustButtonSize(pButton:TButton);
+var
+thisButton: TButton;
+const Gap = 5;
+begin
+    thisButton := pButton;
+    if thisButton.Width < frmFrame.Canvas.TextWidth(thisButton.Caption) then      //CQ2737  GE
+    begin
+       FNotificationBtnsAdjusted := (thisButton.Width < frmFrame.Canvas.TextWidth(thisButton.Caption));
+       thisButton.Width := (frmFrame.Canvas.TextWidth(thisButton.Caption) + Gap+Gap);    //CQ2737  GE
+    end;
+    if thisButton.Height < frmFrame.Canvas.TextHeight(thisButton.Caption) then    //CQ2737  GE
+       thisButton.Height := (frmFrame.Canvas.TextHeight(thisButton.Caption) + Gap);   //CQ2737  GE
+end;
+
+procedure TfrmPtSel.AdjustNotificationButtons;
+const
+  Gap = 10; BigGap = 40;
+ // reposition buttons after resizing eliminate overlap.
+begin
+ if FNotificationBtnsAdjusted then
+ begin
+   cmdProcessAll.Left := (cmdProcessInfo.Left + cmdProcessInfo.Width + Gap);
+   cmdProcess.Left    := (cmdProcessAll.Left + cmdProcessAll.Width + Gap);
+   cmdForward.Left    := (cmdProcess.Left + cmdProcess.Width + Gap);
+   cmdComments.Left   := (cmdForward.Left + cmdForward.Width + Gap);
+   cmdRemove.Left     := (cmdComments.Left + cmdComments.Width + BigGap);
+ end;
+end;
 
 //vwpt enhanced //
 procedure TfrmPtSel.onclick1(Sender: TObject);  //click on RadioGroup1
@@ -1319,7 +1416,6 @@ if RadioGroup1.ItemIndex >0 then
 
 end;
  //end vwpt enhanced
-Initialization
-  SortViaKeyboard := false;
+
 
 end.

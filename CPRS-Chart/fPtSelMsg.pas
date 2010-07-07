@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, StdCtrls, ComCtrls;
+  ExtCtrls, StdCtrls, ComCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmPtSelMsg = class(TForm)
+  TfrmPtSelMsg = class(TfrmBase508Form)
     cmdClose: TButton;
     timClose: TTimer;
     memMessages: TRichEdit;
@@ -93,7 +93,6 @@ end;
 
 procedure TfrmPtSelMsg.FormCreate(Sender: TObject);
 begin
-  memMessages.Color := ReadOnlyColor;
   FOldActiveFormChanged := Screen.OnActiveFormChange;
   Screen.OnActiveFormChange := ActiveFormChanged;
   FOldTabChanged := frmFrame.OnTabChanged;

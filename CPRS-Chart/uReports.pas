@@ -2,7 +2,7 @@ unit uReports;
 
 interface
 
-uses sysutils, classes, ORFN;
+uses sysutils, classes, ORFN, ComCtrls, Forms, Graphics;
 
 type
 
@@ -62,6 +62,8 @@ type
     MaxDaysBack: String;         //Maximum number of Days allowed for report
     Direct     : String;         //Direct Remote Call flag
     HDR        : String;         //HDR is data source if = 1
+    FHIE       : String;         //FHIE is data source if = 1
+    FHIEONLY   : String;         //FHIEONLY if data is to only include FHIE
 end;
 
 type
@@ -87,6 +89,12 @@ function ShortDateStrToDate(shortdate: string): string ;
 function StripSpace(str:string):string;
 function MakeProcedureTreeObject(x: string): PProcTreeObj;
 function MakePrntProcTreeObject(x: string): PProcTreeObj;
+
+//procedures & functions for Report Fonts
+
+procedure ReportTextFontChange(Self, Sender: TObject);
+function CreateReportTextComponent(ParentForm: TForm): TRichEdit;
+
 
 implementation
 
@@ -115,14 +123,14 @@ begin
   FDataType := piece(AColumnData,'^',9);
   FHandle := AHandle;
   FCount := AData.Count;
-  FData.Assign(AData);
+  FastAssign(AData, FData);
 end;
 
 function MakeReportTreeObject(x: string): PReportTreeObject;
 var
   AnObject: PReportTreeObject;
 begin
-  //x=id^Name^Qualifier^HSTag;Routine^Entry^Routine^Remote^Type^Category^RPC^ifn^SortOrder^MaxDaysBack
+  //x=id^Name^Qualifier^HSTag;Routine^Entry^Routine^Remote^Type^Category^RPC^ifn^SortOrder^MaxDaysBack^Direct^HDR^FHIE
   New(AnObject);
   with AnObject^ do
     begin
@@ -139,6 +147,8 @@ begin
       MaxDaysBack     := Piece(x, U, 13);
       Direct          := Piece(x, U, 14);
       HDR             := Piece(x, U, 15);
+      FHIE            := Piece(x, U, 16);
+      FHIEONLY        := Piece(x, U, 17);
     end;
   Result := AnObject;
 end;
@@ -287,6 +297,30 @@ begin
       Associate := -1;
     end;
   Result := AnObject;
+end;
+
+procedure ReportTextFontChange(Self, Sender: TObject);
+begin
+  TFont(Sender).Size := 8;
+end;
+
+// CQ#70295
+function CreateReportTextComponent(ParentForm: TForm): TRichEdit;
+var
+  m: TMethod;
+begin
+  Result := TRichEdit.Create(ParentForm);
+  with Result do
+  begin
+    Parent := ParentForm;
+    Visible := False;
+    Width := 600;
+    Font.Name := 'Courier New';
+    Font.Size := 8;
+    m.Code := @ReportTextFontChange;
+    m.Data := ParentForm;
+    Font.OnChange := TNotifyEvent(m);
+  end;
 end;
 
 end.

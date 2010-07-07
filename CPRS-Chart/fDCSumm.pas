@@ -6,7 +6,8 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fHSplit, StdCtrls, ExtCtrls, Menus, ComCtrls, ORCtrls, ORFn, uConst, ORDtTm,
-  uPCE, ORClasses, fDrawers, rDCSumm, uDocTree, uDCSumm, uTIU, fPrintList;
+  uPCE, ORClasses, fDrawers, rDCSumm, uDocTree, uDCSumm, uTIU, fPrintList,
+  VA508AccessibilityManager, fBase508Form, VA508ImageListLabeler;
 
 type
   TfrmDCSumm = class(TfrmHSplit)
@@ -143,6 +144,8 @@ type
     mnuViewReminders: TMenuItem;
     mnuViewRemoteData: TMenuItem;
     mnuViewPostings: TMenuItem;
+    imgLblNotes: TVA508ImageListLabeler;
+    imgLblImages: TVA508ImageListLabeler;
     procedure mnuChartTabClick(Sender: TObject);
     procedure lstSummsClick(Sender: TObject);
     procedure pnlRightResize(Sender: TObject);
@@ -218,8 +221,6 @@ type
     procedure sptHorzCanResize(Sender: TObject; var NewSize: Integer; var Accept: Boolean);
     procedure popSummMemoPreviewClick(Sender: TObject);
     procedure popSummMemoInsTemplateClick(Sender: TObject);
-    procedure tvSummsAddition(Sender: TObject; Node: TTreeNode);
-    procedure tvSummsDeletion(Sender: TObject; Node: TTreeNode);
     procedure ViewInfo(Sender: TObject);
     procedure mnuViewInformationClick(Sender: TObject);
   private
@@ -272,7 +273,7 @@ type
     procedure ClearPtData; override;
     procedure DisplayPage; override;
     procedure RequestPrint; override;
-    procedure RequestMultiplePrint(AForm: TfrmPrintList); 
+    procedure RequestMultiplePrint(AForm: TfrmPrintList);
     procedure SetFontSize(NewFontSize: Integer); override;
     procedure SaveSignItem(const ItemID, ESCode: string);
     procedure LstSummsToPrint;
@@ -291,7 +292,7 @@ uses fFrame, fVisit, fEncnt, rCore, uCore, fNoteBA, fNoteBD, fSignItem, fEncount
      rPCE, Clipbrd, fNotePrt, fAddlSigners, fNoteDR, uSpell, rVitals, fTIUView,
      fTemplateEditor, rTIU, fDCSummProps, fNotesBP, fTemplateFieldEditor, uTemplates,
      fReminderDialog, dShared, rTemplates, fIconLegend, fNoteIDParents,
-      uAccessibleTreeView, uAccessibleTreeNode, fTemplateDialog;
+     fTemplateDialog, uVA508CPRSCompatibility, VA508AccessibilityRouter;
 
 const
   NA_CREATE     = 0;                             // New Summ action - create new Summ
@@ -538,26 +539,21 @@ begin
   end;
 end;
 
+{for printing multiple notes}
 procedure TfrmDCSumm.RequestMultiplePrint(AForm: TfrmPrintList);
 var
   NoteIEN: int64;
   i: integer;
 begin
   with AForm.lbIDParents do
+  for i := 0 to Items.Count - 1 do
+  if Selected[i] then
   begin
-    for i := 0 to Items.Count - 1 do
-     begin
-       if Selected[i] then
-        begin
-         NoteIEN := StrToInt64def(Piece(TStringList(Items.Objects[i])[0],U,1),0);
-         if NoteIEN > 0 then PrintNote(NoteIEN, MakeDCSummDisplayText(TStringList(Items.Objects[i])[0]), TRUE) else
-          begin
-            if ItemIEN = 0 then InfoBox(TX_NO_NOTE, TX_NOSUMM_CAP, MB_OK);
-            if ItemIEN < 0 then InfoBox(TX_NOPRT_NEW, TX_NOPRT_NEW_CAP, MB_OK);
-          end;
-        end; {if selected}
-     end; {for}
-  end {with}
+    NoteIEN := StrToInt64def(Piece(Items[i], U, 1), 0);
+    if NoteIEN > 0 then PrintNote(NoteIEN, DisplayText[i], TRUE)
+    else if NoteIEN = 0 then InfoBox(TX_NO_NOTE, TX_NOSUMM_CAP, MB_OK)
+    else InfoBox(TX_NOPRT_NEW, TX_NOPRT_NEW_CAP, MB_OK);
+  end;
 end;
 
 procedure TfrmDCSumm.SetFontSize(NewFontSize: Integer);
@@ -841,7 +837,7 @@ begin
     begin
       DocInfo := MakeXMLParamTIU(IntToStr(CreatedSumm.IEN), FEditDCSumm);
       ExecuteTemplateOrBoilerPlate(TmpBoilerPlate, FEditDCSumm.Title, ltTitle, Self, 'Title: ' + FEditDCSumm.TitleName, DocInfo);
-      memNewSumm.Lines.Assign(TmpBoilerPlate);
+      QuickCopyWith508Msg(TmpBoilerPlate, memNewSumm);
       TmpBoilerPlate.Free;
     end;
     if EnableAutosave then // Don't enable autosave until after dialog fields have been resolved
@@ -1110,6 +1106,8 @@ end;
 
 procedure TfrmDCSumm.lstSummsClick(Sender: TObject);
 { loads the text for the selected Summ or displays the editing panel for the selected Summ }
+var
+  x: string;
 begin
   inherited;
   with lstSumms do if ItemIndex = -1 then Exit
@@ -1143,7 +1141,9 @@ begin
   pnlRight.Refresh;
   memNewSumm.Repaint;
   memSumm.Repaint;
-  NotifyOtherApps(NAE_REPORT, 'TIU^' + lstSumms.ItemID);
+  x := 'TIU^' + lstSumms.ItemID;
+  SetPiece(x, U, 10, Piece(lstSumms.Items[lstSumms.ItemIndex], U, 11));
+  NotifyOtherApps(NAE_REPORT, x);
 end;
 
 procedure TfrmDCSumm.cmdNewSummClick(Sender: TObject);
@@ -1968,9 +1968,6 @@ procedure TfrmDCSumm.FormCreate(Sender: TObject);
 begin
   inherited;
   PageID := CT_DCSUMM;
-  memSumm.Color := ReadOnlyColor;
-  memPCEShow.Color := ReadOnlyColor;
-  lblNewTitle.Color := ReadOnlyColor;
   FDischargeDate := FMNow;
   EditingIndex := -1;
   FEditDCSumm.LastCosigner := 0;
@@ -1981,13 +1978,8 @@ begin
   frmDrawers.RichEditControl := memNewSumm;
   frmDrawers.Splitter := splDrawers;
   frmDrawers.DefTempPiece := 3;
-  tvSumms.Images := dmodShared.imgNotes;
-  tvSumms.StateImages := dmodShared.imgImages;
-  lvSumms.StateImages := dmodShared.imgImages;
-  lvSumms.SmallImages := dmodShared.imgNotes;
   FImageFlag := TBitmap.Create;
   FDocList := TStringList.Create;
-  TAccessibleTreeView.WrapControl(tvSumms);
 end;
 
 procedure TfrmDCSumm.mnuViewDetailClick(Sender: TObject);
@@ -2314,7 +2306,6 @@ end;
 
 procedure TfrmDCSumm.FormDestroy(Sender: TObject);
 begin
-  TAccessibleTreeView.UnwrapControl(tvSumms);
   FImageFlag.Free;
   FDocList.Free;
   KillDocTreeObjects(tvSumms);
@@ -2353,16 +2344,16 @@ begin
     if Title <= 0    then Result := True;
     if Dictator <= 0   then Result := True;
     if AdmitDateTime <= 0 then Result := True;
+    if DischargeDateTime > 0 then
+      ADateTime := DischargeDateTime
+    else
+      ADateTime := DictDateTime;
     if (DocType = TYP_ADDENDUM) then
     begin
-      if AskCosignerForDocument(Addend, Dictator) and (Cosigner <= 0) then Result := True;
+      if AskCosignerForDocument(Addend, Dictator, ADateTime) and (Cosigner <= 0) then Result := True;
     end else
     begin
       if Title > 0 then CurTitle := Title else CurTitle := DocType;
-      if DischargeDateTime > 0 then
-        ADateTime := DischargeDateTime
-      else
-        ADateTime := DictDateTime;
       if AskCosignerForTitle(CurTitle, Dictator, ADateTime) and (Cosigner <= 0) then Result := True;
     end;
   end;
@@ -2403,6 +2394,7 @@ procedure TfrmDCSumm.DoAutoSave(Suppress: integer = 1);
 var
   ErrMsg: string;
 begin
+  if fFrame.frmFrame.DLLActive = True then Exit;  
   if (EditingIndex > -1) and FChanged then
   begin
     StatusText('Autosaving note...');
@@ -2500,7 +2492,7 @@ var
   procedure AssignBoilerText;
   begin
     ExecuteTemplateOrBoilerPlate(BoilerText, FEditDCSumm.Title, ltTitle, Self, 'Title: ' + FEditDCSumm.TitleName, DocInfo);
-    memNewSumm.Lines.Assign(BoilerText);
+    QuickCopyWith508Msg(BoilerText, memNewSumm);
     FChanged := False;
   end;
 
@@ -2522,7 +2514,7 @@ begin
         0:  { do nothing } ;                         // ignore
         1: begin
              ExecuteTemplateOrBoilerPlate(BoilerText, FEditDCSumm.Title, ltTitle, Self, 'Title: ' + FEditDCSumm.TitleName, DocInfo);
-             memNewSumm.Lines.AddStrings(BoilerText);  // append
+             QuickAddWith508Msg(BoilerText, memNewSumm);  // append
            end;
         2: AssignBoilerText                          // replace
         end;
@@ -2681,7 +2673,7 @@ begin
     begin
       uChanging := True;
       Items.BeginUpdate;
-      lstSumms.Items.AddStrings(DocList);
+      FastAddStrings(DocList, lstSumms.Items);
       BuildDocumentTree(DocList, '0', Tree, nil, FCurrentContext, CT_DCSUMM);
       Items.EndUpdate;
       uChanging := False;
@@ -3232,18 +3224,6 @@ begin
   frmDrawers.mnuInsertTemplateClick(Sender);
 end;
 
-procedure TfrmDCSumm.tvSummsAddition(Sender: TObject; Node: TTreeNode);
-begin
-  inherited;
-  TAccessibleTreeNode.WrapControl(Node as TORTreeNode);
-end;
-
-procedure TfrmDCSumm.tvSummsDeletion(Sender: TObject; Node: TTreeNode);
-begin
-  TAccessibleTreeNode.UnwrapControl(Node as TORTreeNode);
-  inherited;
-end;
-
 
 {Returns True & Displays a Message if Currently No D/C Summary is Selected,
  Otherwise returns false and does not display a message.}
@@ -3279,6 +3259,7 @@ begin
 end;
 
 initialization
+  SpecifyFormIsNotADialog(TfrmDCSumm);
   uPCEEdit := TPCEData.Create;
   uPCEShow := TPCEData.Create;
 

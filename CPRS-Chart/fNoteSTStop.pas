@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, fAutoSz;
+  Dialogs, StdCtrls, fAutoSz, VA508AccessibilityManager;
 
 type
   TfrmSearchStop = class(TfrmAutoSz)

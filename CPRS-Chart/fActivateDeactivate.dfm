@@ -1,46 +1,41 @@
-object frmActivateDeactive: TfrmActivateDeactive
-  Left = 491
-  Top = 376
-  AutoScroll = False
+inherited frmActivateDeactive: TfrmActivateDeactive
+  Left = 293
+  Top = 317
   BorderIcons = []
   Caption = 'Renew Order'
   ClientHeight = 185
-  ClientWidth = 353
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientWidth = 569
   OldCreateOrder = False
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   DesignSize = (
-    353
+    569
     185)
   PixelsPerInch = 96
   TextHeight = 13
-  object TActivate: TButton
-    Left = 143
-    Top = 160
-    Width = 56
+  object TActivate: TButton [0]
+    Left = 206
+    Top = 157
+    Width = 106
     Height = 25
     Anchors = [akLeft, akTop, akRight, akBottom]
-    Caption = 'No'
+    Caption = 'DC Pending Order'
     TabOrder = 2
     OnClick = TActivateClick
   end
-  object TDeactive: TButton
-    Left = 63
-    Top = 160
-    Width = 56
+  object TDeactive: TButton [1]
+    Left = 132
+    Top = 157
+    Width = 63
     Height = 25
-    Caption = 'Yes'
+    Caption = 'DC BOTH'
     TabOrder = 1
     OnClick = TDeactiveClick
   end
-  object Memo1: TMemo
+  object Memo1: TMemo [2]
     Left = 0
     Top = 0
-    Width = 345
+    Width = 569
     Height = 145
     BorderStyle = bsNone
     Color = clBtnFace
@@ -50,13 +45,31 @@ object frmActivateDeactive: TfrmActivateDeactive
     ScrollBars = ssVertical
     TabOrder = 0
   end
-  object TCancel: TButton
-    Left = 225
-    Top = 160
-    Width = 56
+  object TCancel: TButton [3]
+    Left = 324
+    Top = 157
+    Width = 137
     Height = 25
-    Caption = 'Cancel'
+    Caption = 'Cancel-No Action Taken'
     TabOrder = 3
     OnClick = TCancelClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = TActivate'
+        'Status = stsDefault')
+      (
+        'Component = TDeactive'
+        'Status = stsDefault')
+      (
+        'Component = Memo1'
+        'Status = stsDefault')
+      (
+        'Component = TCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmActivateDeactive'
+        'Status = stsDefault'))
   end
 end

@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, ORCtrls;
+  StdCtrls, ExtCtrls, ORCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmPtSelDemog = class(TForm)
+  TfrmPtSelDemog = class(TfrmBase508Form)
     orapnlMain: TORAutoPanel;
     lblSSN: TStaticText;
     lblPtSSN: TStaticText;
@@ -40,7 +40,7 @@ var
 
 implementation
 
-uses rCore;
+uses rCore, VA508AccessibilityRouter;
 
 {$R *.DFM}
 
@@ -138,6 +138,9 @@ end;
 procedure TfrmPtSelDemog.NewWinProc(var Message: TMessage);
 const
   Gap = 4;
+  MaxFont = 10;
+  var uHeight:integer;
+
 
 begin
   if(assigned(FOldWinProc)) then FOldWinProc(Message);
@@ -161,11 +164,36 @@ begin
     else
       lblPtRoomBed.Left := lblPtLocation.Left;
   end;
+  if frmPtSelDemog.Canvas.Font.Size > MaxFont then
+  begin
+    uHeight         := frmPtSelDemog.Canvas.TextHeight(lblPtSSN.Caption)-2;
+    lblPtSSN.Top    := (lblPtName.Top + uHeight);
+    lblSSN.Top      := lblPtSSN.Top;
+    lblPtDOB.Height := uHeight;
+    lblPtDOB.Top    := (lblPtSSn.Top + uHeight);
+    lblDOB.Top      := lblPtDOB.Top;
+    lblPtSex.Height :=  uHeight;
+    lblPtSex.Top    := (lblPtDOB.Top + uHeight);
+    lblPtVet.Height :=  uHeight;
+    lblPtVet.Top    := (lblPtSex.Top + uHeight);
+    lblPtSC.Height  := uHeight;
+    lblPtSC.Top     :=  lblPtVet.Top;
+    lblLocation.Height := uHeight;
+    lblLocation.Top := ( lblPtVet.Top + uHeight);
+    lblPtLocation.Top := lblLocation.Top;
+    lblRoomBed.Height := uHeight;
+    lblRoomBed.Top    :=(lblLocation.Top + uHeight)+ 2;
+    lblPtRoomBed.Height := uHeight;
+    lblPtRoomBed.Top  := lblRoomBed.Top ;
+  end;
 end;
 
 procedure TfrmPtSelDemog.FormDestroy(Sender: TObject);
 begin
   orapnlMain.WindowProc := FOldWinProc;
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmPtSelDemog);
 
 end.

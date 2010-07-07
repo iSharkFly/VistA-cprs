@@ -1,21 +1,14 @@
-object frmPtSelOptSave: TfrmPtSelOptSave
+inherited frmPtSelOptSave: TfrmPtSelOptSave
   Left = 452
   Top = 229
   BorderStyle = bsDialog
   ClientHeight = 204
   ClientWidth = 272
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlClinSave: TPanel
+  object pnlClinSave: TPanel [0]
     Left = 0
     Top = 0
     Width = 272
@@ -72,5 +65,26 @@ object frmPtSelOptSave: TfrmPtSelOptSave
       TabOrder = 2
       OnClick = btnCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlClinSave'
+        'Status = stsDefault')
+      (
+        'Component = lblClinSettings'
+        'Status = stsDefault')
+      (
+        'Component = rGrpClinSave'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmPtSelOptSave'
+        'Status = stsDefault'))
   end
 end

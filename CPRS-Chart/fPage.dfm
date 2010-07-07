@@ -1,27 +1,27 @@
-object frmPage: TfrmPage
-  Left = 11
+inherited frmPage: TfrmPage
+  Left = 13
   Top = 236
-  Width = 648
-  Height = 388
   Caption = 'Basic Page'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 361
+  ClientWidth = 640
   OldCreateOrder = True
   OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object shpPageBottom: TShape
+  object shpPageBottom: TShape [0]
     Left = 0
-    Top = 349
+    Top = 356
     Width = 640
     Height = 5
     Align = alBottom
     Brush.Color = clBtnFace
     Pen.Style = psClear
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = frmPage'
+        'Status = stsDefault'))
   end
 end

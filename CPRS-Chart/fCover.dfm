@@ -1,5 +1,5 @@
 inherited frmCover: TfrmCover
-  Left = 206
+  Left = 256
   Top = 280
   HelpContext = 1000
   BorderIcons = []
@@ -8,18 +8,18 @@ inherited frmCover: TfrmCover
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TPanel
+  object pnlBase: TPanel [1]
     Left = 0
     Top = 0
     Width = 640
-    Height = 349
+    Height = 356
     Align = alClient
     BevelOuter = bvNone
     Constraints.MinHeight = 10
     TabOrder = 0
     object sptBottom: TSplitter
       Left = 0
-      Top = 230
+      Top = 237
       Width = 640
       Height = 5
       Cursor = crVSplit
@@ -31,7 +31,7 @@ inherited frmCover: TfrmCover
       Left = 0
       Top = 0
       Width = 640
-      Height = 230
+      Height = 237
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
@@ -267,7 +267,7 @@ inherited frmCover: TfrmCover
         Left = 0
         Top = 125
         Width = 640
-        Height = 105
+        Height = 112
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
@@ -275,7 +275,7 @@ inherited frmCover: TfrmCover
           Left = 318
           Top = 0
           Width = 5
-          Height = 105
+          Height = 112
           Constraints.MinWidth = 5
           OnCanResize = spt_3CanResize
         end
@@ -283,7 +283,7 @@ inherited frmCover: TfrmCover
           Left = 0
           Top = 0
           Width = 318
-          Height = 105
+          Height = 112
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 0
@@ -305,7 +305,7 @@ inherited frmCover: TfrmCover
             Left = 0
             Top = 13
             Width = 318
-            Height = 92
+            Height = 99
             Align = alClient
             Ctl3D = True
             ItemHeight = 13
@@ -324,7 +324,7 @@ inherited frmCover: TfrmCover
           Left = 323
           Top = 0
           Width = 317
-          Height = 105
+          Height = 112
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 1
@@ -346,7 +346,7 @@ inherited frmCover: TfrmCover
             Left = 0
             Top = 13
             Width = 317
-            Height = 92
+            Height = 99
             Align = alClient
             Ctl3D = True
             ItemHeight = 13
@@ -365,7 +365,7 @@ inherited frmCover: TfrmCover
     end
     object pnlBottom: TPanel
       Left = 0
-      Top = 235
+      Top = 242
       Width = 640
       Height = 114
       Align = alBottom
@@ -519,6 +519,87 @@ inherited frmCover: TfrmCover
         end
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = pnlNotTheBottom'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = pnl_not3'
+        'Status = stsDefault')
+      (
+        'Component = pnl_1'
+        'Status = stsDefault')
+      (
+        'Component = lst_1'
+        'Status = stsDefault')
+      (
+        'Component = pnl_2'
+        'Status = stsDefault')
+      (
+        'Component = lst_2'
+        'Status = stsDefault')
+      (
+        'Component = pnl_3'
+        'Status = stsDefault')
+      (
+        'Component = pnlFlag'
+        'Status = stsDefault')
+      (
+        'Component = lstFlag'
+        'Status = stsDefault')
+      (
+        'Component = lst_3'
+        'Status = stsDefault')
+      (
+        'Component = pnlMiddle'
+        'Status = stsDefault')
+      (
+        'Component = pnl_4'
+        'Status = stsDefault')
+      (
+        'Component = lst_4'
+        'Status = stsDefault')
+      (
+        'Component = pnl_5'
+        'Status = stsDefault')
+      (
+        'Component = lst_5'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = pnl_not8'
+        'Status = stsDefault')
+      (
+        'Component = pnl_6'
+        'Status = stsDefault')
+      (
+        'Component = lst_6'
+        'Status = stsDefault')
+      (
+        'Component = pnl_7'
+        'Status = stsDefault')
+      (
+        'Component = lst_7'
+        'Status = stsDefault')
+      (
+        'Component = pnl_8'
+        'Status = stsDefault')
+      (
+        'Component = lst_8'
+        'Status = stsDefault')
+      (
+        'Component = frmCover'
+        'Status = stsDefault'))
   end
   object timPoll: TTimer
     Enabled = False

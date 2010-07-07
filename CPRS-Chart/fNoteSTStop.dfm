@@ -1,4 +1,4 @@
-object frmSearchStop: TfrmSearchStop
+inherited frmSearchStop: TfrmSearchStop
   Left = 477
   Top = 351
   BorderIcons = []
@@ -6,19 +6,15 @@ object frmSearchStop: TfrmSearchStop
   Caption = 'Scanning Notes....'
   ClientHeight = 95
   ClientWidth = 163
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   FormStyle = fsStayOnTop
   OldCreateOrder = False
   Position = poMainFormCenter
   OnShow = FormShow
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
-  object btnSearchStop: TButton
+  object btnSearchStop: TButton [0]
     Left = 45
     Top = 64
     Width = 73
@@ -27,7 +23,7 @@ object frmSearchStop: TfrmSearchStop
     TabOrder = 1
     OnClick = btnSearchStopClick
   end
-  object lblSearchStatus: TStaticText
+  object lblSearchStatus: TStaticText [1]
     Left = 8
     Top = 32
     Width = 78
@@ -35,5 +31,17 @@ object frmSearchStop: TfrmSearchStop
     Caption = 'lblSearchStatus'
     TabOrder = 0
     TabStop = True
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = btnSearchStop'
+        'Status = stsDefault')
+      (
+        'Component = lblSearchStatus'
+        'Status = stsDefault')
+      (
+        'Component = frmSearchStop'
+        'Status = stsDefault'))
   end
 end

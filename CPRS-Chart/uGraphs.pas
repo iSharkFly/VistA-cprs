@@ -9,6 +9,8 @@ type
   TGraphSetting = class
   public
     ClearBackground: boolean;
+    DateRangeInpatient: string;
+    DateRangeOutpatient: string;
     Dates: boolean;
     FixedDateRange: boolean;
     FMStartDate: double;
@@ -33,9 +35,24 @@ type
     SortColumn: integer;
     Sources: TStrings;
     StayOnTop: boolean;
+    Turbo: boolean;
     Values: boolean;
     VerticalZoom: boolean;
     View3D: boolean;
+  end;
+
+  TGraphActivity = class
+  public
+    CurrentSetting: string;
+    DefaultInpatientDate: string;
+    DefaultOutpatientDate: string;
+    OldDFN: string;
+    PublicSetting: string;
+    PersonalSetting: string;
+    PublicEditor: boolean;
+    Status: string;
+    TurboOn: boolean;
+    Cache: boolean;
   end;
 
 const
@@ -52,6 +69,10 @@ const
   ZOOM_PERCENT = 95;
   GRAPH_FLOAT = 'F';
   GRAPH_REPORT = 'R';
+  POINT_PADDING = 0.03;              // assume a point height of 3%
+  LLS_FRONT  = '^____[';
+  LLS_BACK  = ']___________________________________________________________________________________________________________';
+
 
     // settings use single character
   SETTING_3D = 'A';
@@ -67,6 +88,7 @@ const
   SETTING_HZOOM = 'K';
   SETTING_VZOOM = 'L';
   SETTING_FIXED = 'M';
+  SETTING_TURBO = 'N';
 
   // keypress flags
   KEYPRESS_ON = 'YES';
@@ -81,15 +103,26 @@ const
   DWIDTH_YY = 18;
 
   // text messages
+  TXT_COMMENTS = '** comments';
+  TXT_COPY_DISCLAIMER = 'Note: Graphs display limited data, view details for more information.';
   TXT_DISCLAIMER = 'Due to number of items and size restrictions on your display, '
     + 'all items may not be visible.';
-  TXT_COPY_DISCLAIMER = 'Note: Graphs display limited data, view details for more information.';
-  TXT_REPORT_DISCLAIMER = 'Note: Listing displays limited data, view details for more information.';
   TXT_INFO = 'Select multiple items using Ctrl-click or Shift-click.';
+  TXT_NONNUMERICS = 'free-text values:';
+  TXT_NOGRAPHING = 'CPRS is not configured for graphing.';
   TXT_PRINTING = 'Graphs are being printed';
+  TXT_REPORT_DISCLAIMER = 'Note: Listing displays limited data, view details for more information.';
+  TXT_VIEW_DEFINITION = 'View Definition';
   TXT_WARNING = 'Warning: You are using graph settings with a Special Function.';
   TXT_WARNING_SAME_TIME = 'Warning: Items have multiple occurrences at the same time.';
   TXT_ZOOMED = 'Zoomed Date Range: ';
+
+  // views
+  VIEW_CURRENT = '-999';
+  VIEW_LABS = '-3';
+  VIEW_PERSONAL = '-1';
+  VIEW_PUBLIC = '-2';
+  VIEW_TEMPORARY = '-888';
 
   COLOR_INFO = clCream;
   COLOR_PRINTING = clMoneyGreen;    //$CCFFFF; $CCCCFF; $CCFFCC; $FFCCCC; $FFCCFF; $FFFFCC;
@@ -110,6 +143,14 @@ const
                 + #13 + 'Types are followed by a section showing your Personal Views, then Public Views.'
                 + #13 + 'Click a type and then select individual items'
                 + #13 + 'Double-click a type to select all items of this type  - <any>';
+  HINT_OTHER_SOURCE   = 'These are Views and Lab Groups of other users.'
+                + #13 + 'Use these for defining items to be displayed/saved as Views.'
+                + #13 + 'Note: Select a Person to display their views and lab groups.';
+  HINT_OTHERS         = 'Select other users to see their views or lab groups.'
+                + #13 + 'Use these for defining items to be displayed/saved as Views.';
+  HINT_BTN_DEFINITION = 'Click to display the definitions of all selections.'
+                + #13 + 'Definitions show the items that make up a view or lab group.'
+                + #13 + 'This includes views and lab groups of another user you have selected.';
   HINT_SELECTION      = 'Select specific items and move them to the right.'
                 + #13 + 'Use the arrow buttons or double click.'
                 + #13 + 'Selecting a type <any> will use all patients for that type.';
@@ -132,8 +173,6 @@ const
                 + #13 + 'items are not displayed (multiple graphs may be in use).'
                 + #13 + 'You should save any view definitions before closing this form.';
 
-
-
   // hint messages for settings
   SHINT_SOURCES     = 'This is a list of all the types of data that can be graphed.'
               + #13 + 'Check the types you wish to be selectable on the graph.'
@@ -153,6 +192,10 @@ const
               + #13 + 'Use in combination with Max Graphs in Display.';
   SHINT_MAX_ITEMS   = 'Enter the maximum number of items that can be graphed at one time.'
               + #13 + 'This setting prevents you from mistakenly selecting a large number of items.';
+  SHINT_OUTPT       = 'Select the default date range when initially opening graphs.'
+              + #13 + 'This setting is used if the patient is currently an outpatient.';
+  SHINT_INPT        = 'Select the default date range when initially opening graphs.'
+              + #13 + 'This setting is used if the patient is currently an inpatient.';
   SHINT_FUNCTIONS   = 'These functions are restricted to editors for evaluation.';
   SHINT_BTN_SHOW    = 'Click these buttons to display default settings.';
   SHINT_BTN_PER     = 'Click to display your personal settings.';
@@ -170,7 +213,6 @@ const
               + #13 + 'You should save any settings before closing this form.';
 
 function GraphSettingsInit(settings: string): TGraphSetting;
-
 
 implementation
 
@@ -206,6 +248,12 @@ begin
     FMStartDate := FM_START_DATE;
     FMStopDate := FM_STOP_DATE;
     if SortByType then SortColumn := 1 else SortColumn := 0;
+    DateRangeOutpatient := Piece(settings, '|', 9);
+    if DateRangeOutpatient = '' then DateRangeOutpatient := '8';
+    DateRangeInpatient := Piece(settings, '|', 10);
+    if DateRangeInpatient = '' then DateRangeInpatient := '8';
+    Turbo := Pos(SETTING_TURBO, OptionSettings) > 0;
+    if Piece(settings, '|', 6) = '0' then Turbo := false;  // a 0 in 6th piece shuts down turbo for everyone    
   end;
   Result := FGraphSetting;
 end;

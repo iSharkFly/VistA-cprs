@@ -1,28 +1,32 @@
 inherited frmAbout: TfrmAbout
-  Left = 311
-  Top = 55
+  Left = 61
+  Top = 137
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'About CPRS'
-  ClientHeight = 472
+  ClientHeight = 487
   ClientWidth = 337
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitLeft = 61
+  ExplicitTop = 137
+  ExplicitWidth = 345
+  ExplicitHeight = 521
   PixelsPerInch = 96
   TextHeight = 13
-  object bvlBottom: TBevel
+  object bvlBottom: TBevel [0]
     Left = 6
-    Top = 285
-    Width = 326
-    Height = 42
+    Top = 288
+    Width = 328
+    Height = 47
   end
-  object bvl508Disclaimer: TBevel
+  object bvl508Disclaimer: TBevel [1]
     Left = 6
-    Top = 337
+    Top = 338
     Width = 326
-    Height = 101
+    Height = 121
   end
-  object lblProductName: TStaticText
+  object lblProductName: TStaticText [2]
     Left = 6
     Top = 197
     Width = 79
@@ -31,7 +35,7 @@ inherited frmAbout: TfrmAbout
     TabOrder = 1
     TabStop = True
   end
-  object lblFileVersion: TStaticText
+  object lblFileVersion: TStaticText [3]
     Left = 193
     Top = 197
     Width = 65
@@ -40,7 +44,7 @@ inherited frmAbout: TfrmAbout
     TabOrder = 2
     TabStop = True
   end
-  object lblCompanyName: TStaticText
+  object lblCompanyName: TStaticText [4]
     Left = 6
     Top = 214
     Width = 86
@@ -49,7 +53,7 @@ inherited frmAbout: TfrmAbout
     TabOrder = 3
     TabStop = True
   end
-  object lblComments: TStaticText
+  object lblComments: TStaticText [5]
     Left = 193
     Top = 232
     Width = 63
@@ -58,7 +62,7 @@ inherited frmAbout: TfrmAbout
     TabOrder = 5
     TabStop = True
   end
-  object lblCRC: TStaticText
+  object lblCRC: TStaticText [6]
     Left = 6
     Top = 266
     Width = 36
@@ -67,19 +71,20 @@ inherited frmAbout: TfrmAbout
     TabOrder = 8
     TabStop = True
   end
-  object lblLegalCopyright: TMemo
+  object lblLegalCopyright: TMemo [7]
     Left = 8
-    Top = 288
+    Top = 289
     Width = 322
-    Height = 38
+    Height = 44
     BorderStyle = bsNone
     Color = clBtnFace
     Lines.Strings = (
       'lblLegalCopyright')
     ReadOnly = True
+    ScrollBars = ssVertical
     TabOrder = 9
   end
-  object lblFileDescription: TStaticText
+  object lblFileDescription: TStaticText [8]
     Left = 6
     Top = 249
     Width = 83
@@ -88,7 +93,7 @@ inherited frmAbout: TfrmAbout
     TabOrder = 6
     TabStop = True
   end
-  object lblInternalName: TStaticText
+  object lblInternalName: TStaticText [9]
     Left = 193
     Top = 249
     Width = 77
@@ -97,7 +102,7 @@ inherited frmAbout: TfrmAbout
     TabOrder = 7
     TabStop = True
   end
-  object lblOriginalFileName: TStaticText
+  object lblOriginalFileName: TStaticText [10]
     Left = 6
     Top = 232
     Width = 93
@@ -106,7 +111,7 @@ inherited frmAbout: TfrmAbout
     TabOrder = 4
     TabStop = True
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [11]
     Left = 6
     Top = 6
     Width = 325
@@ -1649,9 +1654,9 @@ inherited frmAbout: TfrmAbout
         929293939393D4CF86CFD49392D1858A7C7B7B7B7B7B}
     end
   end
-  object cmdOK: TButton
-    Left = 259
-    Top = 447
+  object cmdOK: TButton [12]
+    Left = 261
+    Top = 466
     Width = 72
     Height = 21
     Anchors = [akRight, akBottom]
@@ -1661,30 +1666,68 @@ inherited frmAbout: TfrmAbout
     ModalResult = 1
     TabOrder = 11
   end
-  object lbl508Notice: TMemo
+  object lbl508Notice: TMemo [13]
     Left = 8
-    Top = 340
-    Width = 322
-    Height = 97
+    Top = 341
+    Width = 327
+    Height = 118
     BorderStyle = bsNone
     Color = clBtnFace
     Lines.Strings = (
       'VHA'#39's Office of Information, System Design & Development staff '
+      'have made every effort during the design, development and '
       
-        'have made every effort during the design, development and testin' +
-        'g '
-      
-        'of this application to ensure full accessibility to all users in' +
-        ' '
-      
-        'compliance with Section 508 of the Rehabilitation Act of 1973, a' +
-        's '
-      'amended.  Please send any comments, questions or concerns '
-      
-        'regarding the accessibility of this application to EMAIL ADDRESS' +
-        ':  '
-      'vhaoisddhdscprs508@med.va.gov')
+        'testing of this application to ensure full accessibility to all ' +
+        'users in '
+      'compliance with Section 508 of the Rehabilitation Act of 1973, '
+      'as amended.  Please send any comments, questions or concerns '
+      'regarding the accessibility of this application to '
+      'EMAIL ADDRESS:vhaoihdisection508@va.gov')
     ReadOnly = True
+    ScrollBars = ssVertical
     TabOrder = 10
+    WantReturns = False
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblProductName'
+        'Status = stsDefault')
+      (
+        'Component = lblFileVersion'
+        'Status = stsDefault')
+      (
+        'Component = lblCompanyName'
+        'Status = stsDefault')
+      (
+        'Component = lblComments'
+        'Status = stsDefault')
+      (
+        'Component = lblCRC'
+        'Status = stsDefault')
+      (
+        'Component = lblLegalCopyright'
+        'Status = stsDefault')
+      (
+        'Component = lblFileDescription'
+        'Status = stsDefault')
+      (
+        'Component = lblInternalName'
+        'Status = stsDefault')
+      (
+        'Component = lblOriginalFileName'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = lbl508Notice'
+        'Status = stsDefault')
+      (
+        'Component = frmAbout'
+        'Status = stsDefault'))
   end
 end

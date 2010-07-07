@@ -64,6 +64,7 @@ type
    PtEnvironmental:boolean;
    PtHNC:boolean;
    PtMST:boolean;
+   PtSHAD:boolean;
    constructor Create(Alist:TStringList);
    function GetGMPDFN(dfn:string;name:String):string;
    function Today:string;
@@ -100,7 +101,7 @@ type
    ClinicList:TstringList;
    ServiceList:TStringList;
    constructor create;
-   destructor destroy; override;
+   destructor Destroy; override;
  end;
 
 {problem record}
@@ -112,13 +113,13 @@ type
    fDiagnosis:Tkeyval; {.01}
    fModDate:TKeyVal;   {.03}
    fNarrative:TKeyVal; {.05}
-   fEntDate:TKeyVal; { .08}
+   fEntDate:TKeyVal;   { .08}
    fStatus:TKeyVal;    {.12}
    fOnsetDate:TKeyVal; {.13}
    fProblem:TKeyVal;   {1.01}
    fCondition:TKeyVal;  {1.02}
-   fEntBy:TKeyVal;         {1.03}
-   fRecBy:TKeyVal;         {1.04}
+   fEntBy:TKeyVal;      {1.03}
+   fRecBy:TKeyVal;      {1.04}
    fRespProv:TKeyVal;   {1.05}
    fService:TKeyVal;     {1.06}
    fResolveDate:TKeyVal; {1.07}
@@ -131,6 +132,8 @@ type
    fPriority:TKeyVal;     {1.14}
    fHNC:TKeyVal;          {1.15}
    fMST:TKeyVal;          {1.16}
+   fCV:TKeyVal;           {1.17}  // this is not used  value is always NULL
+   fSHAD:TKeyVal;         {1.18}
    fFieldList:TstringList; {list of fields by name and class (TKeyVal or TComment)}
    fFilerObj:TstringList;
    fCmtIsXHTML: boolean;
@@ -157,6 +160,8 @@ type
    Procedure SetHNCProblem(value:Boolean);
    Function GetMSTProblem:Boolean;
    Procedure SetMSTProblem(value:Boolean);
+   Function GetSHADProblem:Boolean;
+   Procedure SetSHADProblem(value:Boolean);
    function GetStatus:String;
    procedure SetStatus(value:String);
    function GetPriority:String;
@@ -204,6 +209,7 @@ type
    property ENVProblem:Boolean read GetENVProblem write SetENVProblem;
    property HNCProblem:Boolean read GetHNCProblem write SetHNCProblem;
    property MSTProblem:Boolean read GetMSTProblem write SetMSTProblem;
+   property SHADProlem:Boolean read GetSHADProblem write SetSHADProblem;
    property Status:String read GetStatus write SetStatus;
    property Narrative:TKeyVal read fNarrative write SetNarrative;
    property Diagnosis:TKeyVal read fDiagnosis write fDiagnosis;
@@ -328,6 +334,8 @@ begin
       6: PtBID              := Alist[i];
       7: PtHNC              := (AList[i] = '1');
       8: PtMST              := (AList[i] = '1');
+     //9:CombatVet   Not tracked in Problem list
+      10: PtSHAD             := (AList[i] = '1');
     end;
 end;
 
@@ -468,6 +476,8 @@ begin
   LoadField(fPriority,'1.14','PRIORITY');
   LoadField(fHNC,'1.15','HNC');
   LoadField(fMST,'1.16','MST');
+  LoadField(fMST,'1.17','CV');   // not used at this time
+  LoadField(fSHAD,'1.18','SHD');
   LoadComments;
 end;
 
@@ -539,6 +549,8 @@ begin
   fPriority:=TKeyVal.create;
   fHNC:=TKeyVal.create;
   fMST:=TKeyVal.create;
+  fCV := TKeyVal.create;
+  fSHAD:=TKeyVal.Create;
   fComments:=TList.create;
 end;
 
@@ -876,6 +888,25 @@ begin
     end;
  end;
 
+function TProbrec.GetSHADProblem:boolean;
+begin
+    result := (fSHAD.intern ='1');
+end;
+
+procedure TProbRec.SetSHADProblem(value:boolean);
+begin
+    if value = true then
+      begin
+        fSHAD.intern := '1';
+        fSHAD.extern := 'Yes';
+      end
+    else
+      begin
+        fSHAD.intern := '0';
+        fSHAD.extern := 'No';
+      end;
+end;
+
 function TProbRec.GetStatus:String;
 begin
   result := Uppercase(fStatus.intern);
@@ -1028,7 +1059,7 @@ begin
   for i := 0 to pred(fFieldList.count) do
     begin
       fldID := fFieldList[i];                      
-      if pos(u + fldID + u, '^.01^.12^.13^1.01^1.05^1.07^1.08^1.1^1.11^1.12^1.13^1.15^1.16') > 0 then
+      if pos(u + fldID + u, '^.01^.12^.13^1.01^1.05^1.07^1.08^1.1^1.11^1.12^1.13^1.15^1.16^1.18') > 0 then
         {is a field eligible for update}
         begin
           fldVal := TKeyVal(fFieldList.objects[i]).intern;

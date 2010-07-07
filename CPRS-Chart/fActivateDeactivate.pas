@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, StrUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, fAutoSz, StdCtrls, ExtCtrls, ORCtrls,ORFn, rCore, uCore, oRNet, Math, fOrders, ORClasses, rOrders,
-  fMeds, rMeds;
+  fMeds, rMeds, VA508AccessibilityManager;
 
 type
   TfrmActivateDeactive = class(TfrmAutoSz)
@@ -19,6 +19,7 @@ type
   private
     { Private declarations }
     procedure GetOriginalOrders(OrderID: TStringList; var OriginalOrder: TORStringList);
+    procedure DCOriginalOrder(OrderID: string);
     procedure BuildForm(Str1: String);
     function PromptForm(Text: String): String;
   public
@@ -46,12 +47,12 @@ var
 begin
   with frmActivateDeactive do
      begin
-        str := 'This order ' + str1 +' is currently in a pending status. ';
-        str := str + CRLF + 'If this order is discontinued, the original order status will be changed to active, unless it is discontinued.';
+        str := 'This order is in a pending status.  If this pending order is discontinued, the original order will still be active.';
+        str := str + CRLF + CRLF + str1;
         str := str + CRLF + CRLF + 'Click:';
-        str := str + CRLF + '     "Yes" to discontinue the original order';
-        str := str + CRLF + '     "No" to change the status to active';
-        str := str + CRLF + '     "Cancel" to stop the discontinue process for this order';
+        str := str + CRLF + '     "DC BOTH" to discontinue both orders ';
+        str := str + CRLF + '     "DC Pending Order" to discontinue only the pending order and return the original order back to an active status ';
+        str := str + CRLF + '     "Cancel - No Action Taken" to stop the discontinue process ';
         Memo1.ReadOnly := False;
         Memo1.Text := str;
         Memo1.ReadOnly := True;
@@ -63,10 +64,10 @@ end;
 
 procedure TfrmActivateDeactive.fActivateDeactive(OrderID: TStringList);
 var
-i,j,Pos: integer;
+i,Pos: integer;
 tmpArr: TORStringList;
 ActDeact: string;
-AnOrder,AnOrder1: TOrder;
+AnOrder: TOrder;
 begin
   //called from order tab
   tmpArr := TORStringList.Create;
@@ -78,15 +79,8 @@ begin
           if Pos > -1 then
             begin
               ActDeact := PromptForm(AnOrder.Text);
-              if ActDeact = 'D' then
-                begin
-                  for j := 0 to forders.frmOrders.lstOrders.Items.Count-1 do
-                    begin
-                      AnOrder1 := TOrder(forders.frmOrders.lstOrders.Items.Objects[j]);
-                      if AnOrder1.ID = Piece(tmpArr.Strings[Pos],U,2) then
-                        forders.frmOrders.lstOrders.Selected[j] := True;
-                    end;
-                end;
+              if ActDeact = 'D' then AnOrder.DCOriginalOrder := True;
+              if ActDeact = 'A' then AnOrder.DCOriginalOrder := False;
               if ActDeact = 'C' then Selected[i] := False;
             end;
         end;
@@ -94,41 +88,31 @@ end;
 
 procedure TfrmActivateDeactive.fActivateDeactive(OrderID: TStringList; AList: TListBox);
 var
-i,j,Pos: integer;
+i,Pos: integer;
 tmpArr: TORStringList;
 ActDeact: String;
-AMed,AMed1: TMedListRec;
+AMed: TMedListRec;
+AnOrder: TOrder;
 begin
   //called from Med tab
   tmpArr := TORStringList.Create;
   GetOriginalOrders(OrderID,tmpArr);
-      with AList do for i := 0 to items.Count-1 do if Selected[i] then
+  AnOrder := TOrder.Create;
+     with AList do for i := 0 to items.Count-1 do if Selected[i] then
         begin
           AMed := TMedListRec(Items.Objects[i]);
+          if AMed = nil then Continue;
           Pos := tmpArr.IndexOfPiece(AMed.OrderID,U,1);
           if Pos > -1 then
             begin
               ActDeact := PromptForm(Alist.Items.Strings[i]);
               if ActDeact = 'D' then
                 begin
-                  for j := 0 to Alist.Items.Count-1 do
-                    begin
-                      AMed1 := TMedListRec(Alist.Items.Objects[j]);
-                      if AMed1.OrderID = Piece(tmpArr.Strings[Pos],U,2) then
-                        begin
-                          Alist.Selected[j] := True;
-                          break;
-                        end;
-                      //some med orders may not have an action defined tends to be renew order of orders that were renew from another
-                      //order and outpatient orders
-                      if (AMed1.OrderID = Piece(Piece(tmpArr.Strings[Pos],U,2),';',1)) then
-                        begin
-                          Alist.Selected[j] := True;
-                          break;
-                        end;
-
-                    end;
+                  AnOrder := GetOrderByIFN(Piece(tmpArr.Strings[Pos],U,1));
+                  DCOriginalOrder(AnOrder.ID);
+                  //AnOrder.DCOriginalOrder := True;
                 end;
+              if ActDeact = 'A' then AnOrder.DCOriginalOrder := False;
               if ActDeact = 'C' then Selected[i] := False;
             end;
         end;
@@ -177,6 +161,11 @@ begin
   Deact := False;
   CancelProcess := True;
   frmActivateDeactive.Close;
+end;
+
+procedure TfrmActivateDeactive.DCOriginalOrder(OrderID: string);
+begin
+ CallV('ORWDX1 DCORIG', [OrderID]);
 end;
 
 end.

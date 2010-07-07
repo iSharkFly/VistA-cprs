@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls;
+  StdCtrls, ExtCtrls, fBase508Form;
 
 type
-  TfrmLaunch = class(TForm)
+  TfrmLaunch = class(TfrmBase508Form)
     grpFontSize: TRadioGroup;
     cmdShow: TButton;
     Edit1: TEdit;

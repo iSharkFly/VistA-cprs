@@ -12,10 +12,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ORDtTm, ORFn, ExtCtrls, ComCtrls, ORDtTmRng, fAutoSz, rOptions;
+  StdCtrls, ORCtrls, ORDtTm, ORFn, ExtCtrls, ComCtrls, ORDtTmRng, fAutoSz, rOptions, fBase508Form;
 
 type
-  TfrmEncounter = class(TForm)
+  TfrmEncounter = class(TfrmBase508Form)
     cboPtProvider: TORComboBox;
     lblProvider: TLabel;
     cmdOK: TButton;

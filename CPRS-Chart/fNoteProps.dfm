@@ -1,26 +1,22 @@
-object frmNoteProperties: TfrmNoteProperties
+inherited frmNoteProperties: TfrmNoteProperties
   Left = 384
   Top = 56
-  AutoScroll = False
   BorderIcons = []
   Caption = 'Progress Note Properties'
   ClientHeight = 676
   ClientWidth = 543
-  Color = clBtnFace
   Constraints.MinWidth = 551
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnDestroy = FormDestroy
   OnResize = FormResize
   OnShow = FormShow
+  ExplicitLeft = 384
+  ExplicitTop = 56
+  ExplicitWidth = 551
+  ExplicitHeight = 710
   PixelsPerInch = 96
   TextHeight = 13
-  object lblNewTitle: TLabel
+  object lblNewTitle: TLabel [0]
     Left = 7
     Top = 14
     Width = 93
@@ -28,7 +24,7 @@ object frmNoteProperties: TfrmNoteProperties
     Alignment = taRightJustify
     Caption = 'Progress Note Title:'
   end
-  object lblDateTime: TLabel
+  object lblDateTime: TLabel [1]
     Left = 6
     Top = 138
     Width = 94
@@ -37,7 +33,7 @@ object frmNoteProperties: TfrmNoteProperties
     AutoSize = False
     Caption = 'Date/Time of Note:'
   end
-  object lblAuthor: TLabel
+  object lblAuthor: TLabel [2]
     Left = 6
     Top = 165
     Width = 94
@@ -46,7 +42,7 @@ object frmNoteProperties: TfrmNoteProperties
     AutoSize = False
     Caption = 'Author:'
   end
-  object lblCosigner: TLabel
+  object lblCosigner: TLabel [3]
     Left = 6
     Top = 192
     Width = 94
@@ -55,7 +51,7 @@ object frmNoteProperties: TfrmNoteProperties
     AutoSize = False
     Caption = 'Expected Cosigner:'
   end
-  object lblProcSummCode: TOROffsetLabel
+  object lblProcSummCode: TOROffsetLabel [4]
     Left = 371
     Top = 135
     Width = 125
@@ -66,7 +62,7 @@ object frmNoteProperties: TfrmNoteProperties
     VertOffset = 2
     WordWrap = False
   end
-  object lblProcDateTime: TOROffsetLabel
+  object lblProcDateTime: TOROffsetLabel [5]
     Left = 371
     Top = 174
     Width = 105
@@ -77,7 +73,7 @@ object frmNoteProperties: TfrmNoteProperties
     VertOffset = 2
     WordWrap = False
   end
-  object cboNewTitle: TORComboBox
+  object cboNewTitle: TORComboBox [6]
     Left = 104
     Top = 11
     Width = 347
@@ -108,7 +104,7 @@ object frmNoteProperties: TfrmNoteProperties
     OnNeedData = cboNewTitleNeedData
     CharsNeedMatch = 1
   end
-  object calNote: TORDateBox
+  object calNote: TORDateBox [7]
     Left = 104
     Top = 135
     Width = 140
@@ -119,7 +115,7 @@ object frmNoteProperties: TfrmNoteProperties
     RequireTime = True
     Caption = 'Date/Time of Note:'
   end
-  object cboAuthor: TORComboBox
+  object cboAuthor: TORComboBox [8]
     Left = 104
     Top = 162
     Width = 239
@@ -148,7 +144,7 @@ object frmNoteProperties: TfrmNoteProperties
     OnNeedData = NewPersonNeedData
     CharsNeedMatch = 1
   end
-  object cboCosigner: TORComboBox
+  object cboCosigner: TORComboBox [9]
     Left = 104
     Top = 189
     Width = 239
@@ -175,7 +171,7 @@ object frmNoteProperties: TfrmNoteProperties
     OnNeedData = cboCosignerNeedData
     CharsNeedMatch = 1
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [10]
     Left = 465
     Top = 11
     Width = 72
@@ -185,7 +181,7 @@ object frmNoteProperties: TfrmNoteProperties
     TabOrder = 9
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [11]
     Left = 465
     Top = 38
     Width = 72
@@ -195,7 +191,7 @@ object frmNoteProperties: TfrmNoteProperties
     TabOrder = 10
     OnClick = cmdCancelClick
   end
-  object cboProcSummCode: TORComboBox
+  object cboProcSummCode: TORComboBox [12]
     Left = 371
     Top = 150
     Width = 142
@@ -223,7 +219,7 @@ object frmNoteProperties: TfrmNoteProperties
     TabOrder = 4
     CharsNeedMatch = 1
   end
-  object calProcDateTime: TORDateBox
+  object calProcDateTime: TORDateBox [13]
     Left = 371
     Top = 189
     Width = 142
@@ -234,7 +230,7 @@ object frmNoteProperties: TfrmNoteProperties
     RequireTime = True
     Caption = 'Procedure Date/Time'
   end
-  object pnlSurgery: TORAutoPanel
+  object pnlSurgery: TORAutoPanel [14]
     Tag = 2
     Left = 0
     Top = 217
@@ -243,6 +239,7 @@ object frmNoteProperties: TfrmNoteProperties
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 6
+    Visible = False
     object lblSurgDate: TLabel
       Tag = 2
       Left = 2
@@ -318,7 +315,7 @@ object frmNoteProperties: TfrmNoteProperties
       TabPositions = '16,60,85'
     end
   end
-  object pnlConsults: TORAutoPanel
+  object pnlConsults: TORAutoPanel [15]
     Tag = 1
     Left = 0
     Top = 370
@@ -327,6 +324,7 @@ object frmNoteProperties: TfrmNoteProperties
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 7
+    Visible = False
     object lblConsult1: TLabel
       Tag = 1
       Left = 3
@@ -435,7 +433,7 @@ object frmNoteProperties: TfrmNoteProperties
       OnClick = btnDetailsClick
     end
   end
-  object pnlPRF: TORAutoPanel
+  object pnlPRF: TORAutoPanel [16]
     Tag = 3
     Left = 0
     Top = 523
@@ -444,6 +442,7 @@ object frmNoteProperties: TfrmNoteProperties
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 8
+    Visible = False
     object lblPRF: TLabel
       Tag = 1
       Left = 2
@@ -494,14 +493,72 @@ object frmNoteProperties: TfrmNoteProperties
         end>
       Constraints.MinHeight = 50
       HideSelection = False
-      Items.Data = {
-        5E0000000100000000000000FFFFFFFFFFFFFFFF03000000000000000857414E
-        44455245521C4F63746F6265722032302C20323030334031303A31353A32333A
-        3233115245414C4C59204C4F4E4720535455464603596573FFFFFFFFFFFF}
       ReadOnly = True
       RowSelect = True
       TabOrder = 0
       ViewStyle = vsReport
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cboNewTitle'
+        'Status = stsDefault')
+      (
+        'Component = calNote'
+        'Label = lblDateTime'
+        'Status = stsOK')
+      (
+        'Component = cboAuthor'
+        'Status = stsDefault')
+      (
+        'Component = cboCosigner'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cboProcSummCode'
+        'Status = stsDefault')
+      (
+        'Component = calProcDateTime'
+        'Property = Caption'
+        'Status = stsOK')
+      (
+        'Component = pnlSurgery'
+        'Status = stsDefault')
+      (
+        'Component = lblSurgery1'
+        'Status = stsDefault')
+      (
+        'Component = lblSurgery2'
+        'Status = stsDefault')
+      (
+        'Component = lstSurgery'
+        'Status = stsDefault')
+      (
+        'Component = pnlConsults'
+        'Status = stsDefault')
+      (
+        'Component = lstRequests'
+        'Status = stsDefault')
+      (
+        'Component = btnShowList'
+        'Status = stsDefault')
+      (
+        'Component = btnDetails'
+        'Status = stsDefault')
+      (
+        'Component = pnlPRF'
+        'Status = stsDefault')
+      (
+        'Component = lvPRF'
+        'Status = stsDefault')
+      (
+        'Component = frmNoteProperties'
+        'Status = stsDefault'))
   end
 end

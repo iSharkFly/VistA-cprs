@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, StdCtrls,
-  fPage, ExtCtrls;
+  fPage, ExtCtrls, VA508AccessibilityManager;
 
 type
   TfrmAutoResize = class(TfrmPage)
@@ -20,6 +20,8 @@ var
   frmAutoResize: TfrmAutoResize;
 
 implementation
+
+uses VA508AccessibilityRouter;
 
 {$R *.DFM}
 
@@ -92,5 +94,10 @@ begin
   end;
   FSizes.Free;
 end;
+
+
+initialization
+  SpecifyFormIsNotADialog(TfrmAutoResize);
+
 
 end.

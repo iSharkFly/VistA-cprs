@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fPage, StdCtrls, ExtCtrls;
+  fPage, StdCtrls, ExtCtrls, VA508AccessibilityManager;
 
 type
   TfrmHP = class(TfrmPage)

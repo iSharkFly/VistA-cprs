@@ -4,17 +4,17 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, StdCtrls;
+  ExtCtrls, StdCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmSplash = class(TForm)
-    Panel1: TPanel;
-    lblSplash: TStaticText;
+  TfrmSplash = class(TfrmBase508Form)
+    pnlMain: TPanel;
     lblVersion: TStaticText;
     lblCopyright: TStaticText;
-    Panel2: TPanel;
+    pnlImage: TPanel;
     Image1: TImage;
     Memo1: TMemo;
+    lblSplash: TStaticText;
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
@@ -29,12 +29,14 @@ implementation
 
 {$R *.DFM}
 
-uses ORSystem;
+uses VAUtils;
 
 procedure TfrmSplash.FormCreate(Sender: TObject);
 begin
   lblVersion.Caption := 'version ' +
                         FileVersionValue(Application.ExeName, FILE_VER_FILEVERSION);
+  lblSplash.Caption := lblSplash.Caption + ' ' + lblVersion.Caption;
+  lblSplash.Invalidate;
 end;
 
 end.

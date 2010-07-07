@@ -1,21 +1,17 @@
-object frmTIUView: TfrmTIUView
+inherited frmTIUView: TfrmTIUView
   Left = 357
   Top = 111
-  Width = 366
-  Height = 463
   BorderIcons = []
   Caption = 'List Selected Documents'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 436
+  ClientWidth = 358
   OldCreateOrder = True
   Position = poScreenCenter
+  ExplicitWidth = 366
+  ExplicitHeight = 463
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 358
@@ -161,6 +157,7 @@ object frmTIUView: TfrmTIUView
       SynonymChars = '<>'
       TabOrder = 2
       OnNeedData = cboAuthorNeedData
+      CharsNeedMatch = 1
     end
     object edMaxDocs: TCaptionEdit
       Left = 192
@@ -200,7 +197,7 @@ object frmTIUView: TfrmTIUView
         Top = 20
         Width = 142
         Height = 49
-        Caption = 'Sort Order'
+        Caption = 'Note List Sort Order'
         Items.Strings = (
           '&Ascending'
           '&Descending')
@@ -233,6 +230,7 @@ object frmTIUView: TfrmTIUView
         Sorted = False
         SynonymChars = '<>'
         TabOrder = 1
+        CharsNeedMatch = 1
       end
       object ckShowSubject: TCheckBox
         Left = 11
@@ -287,13 +285,14 @@ object frmTIUView: TfrmTIUView
         Sorted = False
         SynonymChars = '<>'
         TabOrder = 1
+        CharsNeedMatch = 1
       end
       object radTreeSort: TRadioGroup
         Left = 9
         Top = 20
         Width = 155
         Height = 49
-        Caption = 'Sort Order'
+        Caption = 'Note Tree View Sort Order'
         Items.Strings = (
           '&Chronological'
           '&Reverse chronological')
@@ -335,5 +334,71 @@ object frmTIUView: TfrmTIUView
         TabOrder = 1
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = calBeginDate'
+        'Status = stsDefault')
+      (
+        'Component = calEndDate'
+        'Status = stsDefault')
+      (
+        'Component = lstStatus'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cboAuthor'
+        'Status = stsDefault')
+      (
+        'Component = edMaxDocs'
+        'Status = stsDefault')
+      (
+        'Component = txtKeyword'
+        'Status = stsDefault')
+      (
+        'Component = grpListView'
+        'Status = stsDefault')
+      (
+        'Component = radListSort'
+        'Status = stsDefault')
+      (
+        'Component = cboSortBy'
+        'Status = stsDefault')
+      (
+        'Component = ckShowSubject'
+        'Status = stsDefault')
+      (
+        'Component = grpTreeView'
+        'Status = stsDefault')
+      (
+        'Component = cboGroupBy'
+        'Status = stsDefault')
+      (
+        'Component = radTreeSort'
+        'Status = stsDefault')
+      (
+        'Component = cmdClear'
+        'Status = stsDefault')
+      (
+        'Component = grpWhereEitherOf'
+        'Status = stsDefault')
+      (
+        'Component = ckTitle'
+        'Status = stsDefault')
+      (
+        'Component = ckSubject'
+        'Status = stsDefault')
+      (
+        'Component = frmTIUView'
+        'Status = stsDefault'))
   end
 end

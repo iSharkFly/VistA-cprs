@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORCtrls, ORFn;
+  fAutoSz, StdCtrls, ORCtrls, ORFn, VA508AccessibilityManager;
 
 type
   TfrmLkUpLocation = class(TfrmAutoSz)

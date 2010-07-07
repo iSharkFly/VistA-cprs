@@ -1,5 +1,9 @@
 program CPRSChart;
 
+
+
+
+
 uses
   ShareMem,
   Forms,
@@ -43,7 +47,7 @@ uses
   fVitals in 'fVitals.pas' {frmVitals},
   uProbs in 'uProbs.pas',
   fProbEdt in 'fProbEdt.pas' {frmdlgProb},
-  fProbflt in 'fProbFlt.pas' {frmPlVuFilt},
+  fProbFlt in 'fProbFlt.pas' {frmPlVuFilt},
   fProbCmt in 'fProbCmt.pas' {frmProbCmt},
   fNoteCslt in 'fNoteCslt.pas' {frmNoteConsult},
   fNotePrt in 'fNotePrt.pas' {frmNotePrint},
@@ -117,21 +121,8 @@ uses
   fDCSummProps in 'fDCSummProps.pas' {frmDCSummProperties},
   fHFSearch in 'Encounter\fHFSearch.pas' {frmHFSearch},
   fConsMedRslt in 'Consults\fConsMedRslt.pas' {frmConsMedRslt},
-  mVitMetric in 'Vitals\mVitMetric.pas' {fraVitMetric: TFrame},
-  mVitAll in 'Vitals\mVitAll.pas' {fraVitAll: TFrame},
-  mVitBase in 'Vitals\mVitBase.pas' {fraVitBase: TFrame},
   uVitals in 'Vitals\uVitals.pas',
   rVitals in 'Vitals\rVitals.pas',
-  mVitPulse in 'Vitals\mVitPulse.pas' {fraVitPulse: TFrame},
-  mVitResp in 'Vitals\mVitResp.pas' {fraVitResp: TFrame},
-  mVitBP in 'Vitals\mVitBP.pas' {fraVitPB: TFrame},
-  mVitTemp in 'Vitals\mVitTemp.pas' {fraVitTemp: TFrame},
-  mVitHeight in 'Vitals\mVitHeight.pas' {fraVitHeight: TFrame},
-  mVitWeight in 'Vitals\mVitWeight.pas' {fraVitWeight: TFrame},
-  mVitPain in 'Vitals\mVitPain.pas' {fraVitPain: TFrame},
-  mVitPO2 in 'Vitals\mVitPO2.pas' {fraVitPO2: TFrame},
-  mVitCVP in 'Vitals\mVitCVP.pas' {fraVitCVP: TFrame},
-  mVitCirGirth in 'Vitals\mVitCirGirth.pas' {fraVitCircum: TFrame},
   uDCSumm in 'uDCSumm.pas',
   uDocTree in 'uDocTree.pas',
   fVitalsDate in 'Vitals\fVitalsDate.pas' {frmVitalsDate},
@@ -262,11 +253,6 @@ uses
   fODChangeEvtDisp in 'Orders\fODChangeEvtDisp.pas' {frmChangeEventDisp},
   fODValidateAction in 'Orders\fODValidateAction.pas' {frmInvalidActionList},
   fODChild in 'Orders\fODChild.pas' {frmODChild},
-  uAccessibleStringGrid in 'uAccessibleStringGrid.pas' {AccessibleStringGrid: CoClass},
-  Accessibility_TLB in 'Accessibility_TLB.pas',
-  uAccessibleListBox in 'uAccessibleListBox.pas' {AccessibleListBox: CoClass},
-  uAccessibleTreeNode in 'uAccessibleTreeNode.pas' {IAccessibleTreeNode: CoClass},
-  uAccessibleTreeView in 'uAccessibleTreeView.pas' {AccessibleTreeView: CoClass},
   fDupPts in 'fDupPts.pas' {frmDupPts},
   VERGENCECONTEXTORLib_TLB in 'VERGENCECONTEXTORLib_TLB.pas',
   uOrPtf in 'uOrPtf.pas',
@@ -274,7 +260,6 @@ uses
   fFrame in 'fFrame.pas' {frmFrame},
   fAlertForward in 'fAlertForward.pas' {frmAlertForward},
   fODMedNVA in 'Orders\fODMedNVA.pas' {frmODMedNVA},
-  uAccessibleRichEdit in 'uAccessibleRichEdit.pas' {AccessibleRichEdit: CoClass},
   fPrintList in 'fPrintList.pas' {frmPrintList},
   fODChangeUnreleasedRenew in 'Orders\fODChangeUnreleasedRenew.pas' {frmODChangeUnreleasedRenew},
   UBAMessages in 'BA\UBAMessages.pas',
@@ -298,7 +283,38 @@ uses
   uGraphs in 'uGraphs.pas',
   fClinicWardMeds in 'fClinicWardMeds.pas' {frmClinicWardMeds},
   fActivateDeactivate in 'fActivateDeactivate.pas' {frmActivateDeactive},
-  uFormMonitor in 'uFormMonitor.pas';
+  uFormMonitor in 'uFormMonitor.pas',
+  fAResize in 'fAResize.pas' {frmAutoResize},
+  fODAllgy in 'Orders\fODAllgy.pas' {frmODAllergy},
+  fDeviceSelect in 'fDeviceSelect.pas' {frmDeviceSelect},
+  fLabCollTimes in 'fLabCollTimes.pas' {frmLabCollectTimes},
+  fPostings in 'fPostings.pas' {frmPostings},
+  fProbLex in 'fProbLex.pas' {frmPLLex},
+  fTIUView in 'fTIUView.pas' {frmTIUView},
+  ORClasses in '..\CPRS-Lib\ORClasses.pas',
+  ORCtrls in '..\CPRS-Lib\ORCtrls.pas',
+  ORDtTm in '..\CPRS-Lib\ORDtTm.pas' {ORfrmDtTm},
+  ORDtTmCal in '..\CPRS-Lib\ORDtTmCal.pas',
+  ORDtTmRng in '..\CPRS-Lib\ORDtTmRng.pas' {ORfrmDateRange},
+  ORFn in '..\CPRS-Lib\ORFn.pas',
+  ORNet in '..\CPRS-Lib\ORNet.pas',
+  Vawrgrid in '..\CPRS-Lib\Vawrgrid.pas',
+  XMLUtils in '..\CPRS-Lib\XMLUtils.pas',
+  fBase508Form in 'fBase508Form.pas' {frmBase508Form},
+  VAUtils in '..\VA\VAUtils.pas',
+  VA2006Utils in '..\VA\VA2006Utils.pas',
+  VAClasses in '..\VA\VAClasses.pas',
+  fPrintLocation in 'fPrintLocation.pas' {frmPrintLocation},
+  uVA508CPRSCompatibility in 'uVA508CPRSCompatibility.pas',
+  VA508AccessibilityManager in '..\VA\VA508Accessibility\VA508AccessibilityManager.pas',
+  ORCtrlsVA508Compatibility in '..\CPRS-Lib\ORCtrlsVA508Compatibility.pas',
+  VA508DelphiCompatibility in '..\VA\VA508Accessibility\VA508DelphiCompatibility.pas',
+  uDlgComponents in 'uDlgComponents.pas',
+  fGraphData in 'fGraphData.pas' {frmGraphData},
+  fGraphOthers in 'fGraphOthers.pas' {frmGraphOthers},
+  VA508AccessibilityRouter in '..\VA\VA508Accessibility\VA508AccessibilityRouter.pas',
+  fIVRoutes in 'Orders\fIVRoutes.pas' {frmIVRoutes},
+  fFindingTemplates in 'Templates\fFindingTemplates.pas' {frmFindingTemplates};
 
 {$R *.TLB}
 
@@ -307,6 +323,7 @@ uses
 begin
   if not UpdateSelf then                          // only start if not copying new version
   begin
+    if not BorlandDLLVersionOK then exit;         // Exit immediately if old or missing BORLNDMM.DLL
     RegisterCPRSTypeLibrary;                      // will halt program if /regserver or /unregserver param
     Application.Initialize;
     frmSplash := nil;

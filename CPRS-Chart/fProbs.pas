@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fHSplit, StdCtrls, ExtCtrls, Menus, ORCtrls, Buttons, uProbs,
-  Grids, Vawrgrid, ORfn, uCore, fProbEdt, uConst, ComCtrls ;
+  Grids, Vawrgrid, ORfn, uCore, fProbEdt, uConst, ComCtrls,
+  VA508AccessibilityManager, fBase508Form;
 
 type
   TfrmProblems = class(TfrmHSplit)
@@ -215,7 +216,8 @@ var
 implementation
 
 uses fFrame, fProbFlt, fProbLex, rProbs, rcover, fCover, fRptBox,
-     fProbCmt, fEncnt, fReportsPrint, fReports, rPCE, DateUtils;
+     fProbCmt, fEncnt, fReportsPrint, fReports, rPCE, DateUtils, VA2006Utils,
+     VA508AccessibilityRouter;
 
 {$R *.DFM}
 
@@ -555,7 +557,7 @@ begin
             pProviderName := Encounter.ProviderName ;
             AList := TStringList.Create;
             ProblemIFN := Piece(MString(wgProbData.ItemIndex), U, 1);
-            AList.Assign(EditLoad(ProblemIFN, pProviderID, PLPt.ptVAMC)) ;
+            FastAssign(EditLoad(ProblemIFN, pProviderID, PLPt.ptVAMC), AList) ;
             if Alist.count = 0 then
               begin
                 InfoBox('No Data on Host for problem ' + ProblemIFN, 'Information', MB_OK or MB_ICONINFORMATION);
@@ -581,7 +583,7 @@ begin
                   ProbRec.AddNewComment(Piece(cmt, U, 3));
                   ut := '';
                   If PLUser.usPrimeUser then ut := '1';
-                  AList.Assign(EditSave(ProblemIFN,pProviderID,PLPt.ptVAMC,ut,ProbRec.FilerObject)) ;
+                  FastAssign(EditSave(ProblemIFN,pProviderID,PLPt.ptVAMC,ut,ProbRec.FilerObject), AList) ;
                   LoadPatientProblems(AList,PlUser.usViewAct[1],true);
                 end ;
             finally
@@ -933,11 +935,11 @@ end;
 procedure TfrmProblems.FormCreate(Sender: TObject);
 begin
   inherited;
+  FixHeaderControlDelphi2006Bug(HeaderControl);
   FAllProblems := TStringList.Create;
   FProblemsVisible := TStringList.Create;
   FItemData := TStringList.Create;
   PageID := CT_PROBLEMS;
-  wgProbData.Color := ReadOnlyColor;
   GetFontInfo(Canvas.Handle, gFontWidth, gFontHeight);
 end;
 
@@ -945,8 +947,8 @@ procedure TfrmProblems.LoadUserParams(Alist:TstringList);
 var
   i: integer;
 begin
-  AList.Assign(InitUser(User.DUZ)) ;
-  //AList.Assign(InitUser(Encounter.Provider)) ;
+  FastAssign(InitUser(User.DUZ), AList) ;
+  //FastAssign(InitUser(Encounter.Provider), AList) ;
   PLUser := TPLUserParams.create(Alist);
   FContextString := PLUser.usDefaultContext;
   FFilterString :=  PLUser.usDefaultView + '/';
@@ -969,7 +971,7 @@ end;
 
 procedure TfrmProblems.LoadPatientParams(AList:TstringList);
 begin
-  AList.Assign(InitPt(Patient.DFN)) ;
+  FastAssign(InitPt(Patient.DFN), AList) ;
   PLPt := TPLPt.create(Alist);
 end;
 
@@ -1028,7 +1030,7 @@ begin  {Body}
       begin
         st:=status;
         if st= '' then st := 'A'; {default to active list}
-        AList.Assign(ProblemList(Patient.DFN,St)) ;
+        FastAssign(ProblemList(Patient.DFN,St), AList) ;
       end;
     if Status = 'R' then
       SetGridPieces('3,4,5,7,8,9')
@@ -1072,9 +1074,9 @@ begin  {Body}
       SetPiece(Line, U, 2, Piece(x, U, 2) + prio + ver);
       if Piece(x, U, 15) = '1' then  //problem has comments
         begin
-          CmtList.Assign(GetProblemComments(Piece(x, U, 1)));
+          FastAssign(GetProblemComments(Piece(x, U, 1)), CmtList);
           if FAllProblems.Objects[i] = nil then FAllProblems.Objects[i]:= TStringList.Create;
-          TStringList(FAllProblems.Objects[i]).Assign(CmtList);
+          FastAssign(CmtList, TStringList(FAllProblems.Objects[i]));
         end;
 
       SetPiece(Line, U, 3, Piece(x, U, 3));
@@ -1139,7 +1141,7 @@ procedure TfrmProblems.LoadUserCats(AList:TStringList);
 begin
   if not PLUser.usUseLexicon then exit; {Bail out if not to use lexicon}
   Alist.clear;
-  AList.Assign(UserProblemCategories(Encounter.Provider,Encounter.Location)) ;
+  FastAssign(UserProblemCategories(Encounter.Provider,Encounter.Location), AList) ;
   if Alist.count = 0 then
     begin
       lstCatPick.Items.Add('-1^None defined - use OTHER') ;
@@ -1147,7 +1149,7 @@ begin
       lblProblems.Visible := False ;
       exit ;
     end ;
-  lstCatPick.Items.assign(AList);
+  FastAssign(AList, lstCatPick.Items);
   lstCatPick.itemindex := 0;
   lstCatPickClick(frmProblems);
 end;
@@ -1160,10 +1162,10 @@ begin
   if lstCatPick.itemindex < 0 then exit; {bail out}
   Alist.clear;
   catien := IntToStr(lstCatPick.itemIEN);
-  AList.Assign(UserProblemList(catien)) ;
+  FastAssign(UserProblemList(catien), AList) ;
   {File 125.12, Each line contains: PROBLEM^DISPLAY TEXT^CODE^CODE IFN }
   {code ifn is derived}
-  lstProbPick.Items.assign(Alist);
+  FastAssign(Alist, lstProbPick.Items);
 end;
 
 procedure TfrmProblems.LoadProblems;
@@ -1387,7 +1389,7 @@ begin
   try
     problemIFN := Piece(Line, U, 1);
     {get the basic info - could shortcut, but try this for now}
-    AList.Assign(EditLoad(ProblemIFN,pProviderID,PLPt.ptVAMC)) ;
+    FastAssign(EditLoad(ProblemIFN, pProviderID, PLPt.ptVAMC), AList) ;
     probRec := TProbrec.create(Alist);
     probRec.PIFN := problemIFN;
     ProbRec.RespProvider.DHCPtoKeyVal(inttostr(Encounter.Provider) + u + Encounter.ProviderName);   {REV - V13}
@@ -1398,7 +1400,7 @@ begin
              {assume resolution date now with this option. user should do full edit otherwise}
              ProbRec.DateResStr := 'T';
              Probrec.DateModStr := 'T';
-             AList.Assign(ProblemUpdate(ProbRec.AltFilerObject)) ;
+             FastAssign(ProblemUpdate(ProbRec.AltFilerObject), AList) ;
            end;
       'V': begin
             if not IsActiveICDCode(ProbRec.Diagnosis.extern) then
@@ -1408,7 +1410,7 @@ begin
               end;
              Probrec.condition := 'P';
              Probrec.DateModStr := 'T';
-             AList.Assign(ProblemVerify(ProbRec.PIFN)) ;
+             FastAssign(ProblemVerify(ProbRec.PIFN), AList) ;
            end;
     end;
 
@@ -1466,7 +1468,7 @@ var
 begin
   Alist := TStringList.create;
   ProblemIFN := Piece(MString(wgProbData.ItemIndex), U, 1);
-  AList.Assign(EditLoad(ProblemIFN, pProviderID, PLPt.ptVAMC)) ;
+  FastAssign(EditLoad(ProblemIFN, pProviderID, PLPt.ptVAMC), AList) ;
   AProbRec:=TProbRec.Create(Alist); {create a problem object}
   try
     if not IsActiveICDCode(AProbRec.Diagnosis.extern) then
@@ -1481,7 +1483,7 @@ begin
       end
     else
       begin
-        Alist.Assign(ProblemReplace(ProblemIFN)) ;
+        FastAssign(ProblemReplace(ProblemIFN), Alist) ;
         if Alist[0] <> '1' then
           InfoBox('Unable to restore the problem record: ' + #13#10 + ' (' + AProbrec.PIFN + ')',
             'Information', MB_OK or MB_ICONINFORMATION)
@@ -2071,6 +2073,9 @@ begin
   inherited;
   mnuOptimizeFieldsClick(self);
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmProblems);
 
 end.
 

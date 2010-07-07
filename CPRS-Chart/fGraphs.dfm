@@ -1,26 +1,24 @@
-object frmGraphs: TfrmGraphs
-  Left = 524
-  Top = 105
+inherited frmGraphs: TfrmGraphs
+  Left = 265
+  Top = 279
   BorderIcons = []
   BorderStyle = bsNone
   Caption = 'CPRS Graphing - CPRSpatient,One'
-  ClientHeight = 412
+  ClientHeight = 400
   ClientWidth = 592
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   PopupMenu = mnuPopGraphStuff
+  Position = poDesigned
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
+  ExplicitLeft = 265
+  ExplicitTop = 279
+  ExplicitWidth = 600
+  ExplicitHeight = 427
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlHeader: TPanel
+  object pnlHeader: TPanel [0]
     Left = 0
     Top = 0
     Width = 592
@@ -54,8 +52,8 @@ object frmGraphs: TfrmGraphs
       TabOrder = 2
     end
     object chartBase: TChart
-      Left = 145
-      Top = 0
+      Left = 146
+      Top = -2
       Width = 105
       Height = 17
       AllowPanning = pmNone
@@ -75,7 +73,7 @@ object frmGraphs: TfrmGraphs
       BottomAxis.AutomaticMaximum = False
       BottomAxis.AutomaticMinimum = False
       BottomAxis.Increment = 0.000694444444444444
-      BottomAxis.Maximum = 25
+      BottomAxis.Maximum = 25.000000000000000000
       BottomAxis.Visible = False
       Legend.Alignment = laTop
       Legend.LegendStyle = lsSeries
@@ -87,11 +85,12 @@ object frmGraphs: TfrmGraphs
       Visible = False
       OnDblClick = mnuPopGraphDetailsClick
       OnMouseDown = chartBaseMouseDown
+      OnMouseUp = chartBaseMouseUp
     end
   end
-  object pnlFooter: TPanel
+  object pnlFooter: TPanel [1]
     Left = 0
-    Top = 383
+    Top = 371
     Width = 592
     Height = 29
     Align = alBottom
@@ -123,8 +122,8 @@ object frmGraphs: TfrmGraphs
       OnClick = btnChangeSettingsClick
     end
     object cboDateRange: TORComboBox
-      Left = 68
-      Top = 4
+      Left = 70
+      Top = 6
       Width = 121
       Height = 21
       Style = orcsDropDown
@@ -167,7 +166,7 @@ object frmGraphs: TfrmGraphs
       OnClick = chkDualViewsClick
     end
     object btnGraphSelections: TButton
-      Left = 284
+      Left = 288
       Top = 4
       Width = 85
       Height = 21
@@ -176,17 +175,17 @@ object frmGraphs: TfrmGraphs
       OnClick = btnGraphSelectionsClick
     end
   end
-  object pnlMain: TPanel
+  object pnlMain: TPanel [2]
     Left = 0
     Top = 21
     Width = 592
-    Height = 362
+    Height = 350
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
     object splGraphs: TSplitter
       Left = 0
-      Top = 261
+      Top = 249
       Width = 592
       Height = 3
       Cursor = crVSplit
@@ -195,13 +194,14 @@ object frmGraphs: TfrmGraphs
       Color = clBtnShadow
       ParentColor = False
       OnMoved = splGraphsMoved
+      ExplicitTop = 261
     end
     object pnlTop: TPanel
       Tag = 1
       Left = 0
       Top = 0
       Width = 592
-      Height = 261
+      Height = 249
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
@@ -209,18 +209,18 @@ object frmGraphs: TfrmGraphs
         Left = 148
         Top = 0
         Width = 2
-        Height = 261
-        Cursor = crHSplit
+        Height = 249
         AutoSnap = False
         Beveled = True
         MinSize = 15
         OnMoved = splItemsTopMoved
+        ExplicitHeight = 261
       end
       object pnlItemsTop: TPanel
         Left = 0
         Top = 0
         Width = 148
-        Height = 261
+        Height = 249
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 0
@@ -228,134 +228,162 @@ object frmGraphs: TfrmGraphs
           Left = 0
           Top = 0
           Width = 148
-          Height = 25
+          Height = 22
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 0
           DesignSize = (
             148
-            25)
+            22)
           object bvlBottomLeft: TBevel
             Left = 0
             Top = 0
             Width = 2
-            Height = 25
+            Height = 22
             Align = alLeft
+            ExplicitHeight = 25
           end
           object bvlBottomRight: TBevel
             Left = 146
             Top = 0
             Width = 2
-            Height = 25
+            Height = 22
             Align = alRight
             Visible = False
-          end
-          object lblViewsTop: TOROffsetLabel
-            Left = 2
-            Top = 0
-            Width = 28
-            Height = 25
-            Align = alLeft
-            Caption = 'View:'
-            HorzOffset = 2
-            Transparent = False
-            VertOffset = 8
-            WordWrap = False
+            ExplicitHeight = 25
           end
           object chkItemsTop: TCheckBox
             Left = 40
-            Top = 5
+            Top = 2
             Width = 105
             Height = 20
             Alignment = taLeftJustify
             Anchors = [akTop, akRight]
             Caption = 'Individual Graphs'
+            Checked = True
+            State = cbChecked
             TabOrder = 0
             OnClick = chkItemsTopClick
           end
         end
-        object lvwItemsTop: TListView
+        object pcTop: TPageControl
           Left = 0
-          Top = 46
+          Top = 22
           Width = 148
-          Height = 215
+          Height = 227
+          ActivePage = tsTopItems
           Align = alClient
-          BevelInner = bvNone
-          BevelOuter = bvNone
-          Columns = <
-            item
-              Caption = 'Item'
-              Width = 100
-            end
-            item
-              Caption = 'Type'
-              Width = 60
-            end
-            item
-              Caption = 'View'
-              Width = 40
-            end
-            item
-              Caption = 'Classification'
-            end>
-          HideSelection = False
-          MultiSelect = True
-          ReadOnly = True
-          RowSelect = True
-          ParentShowHint = False
-          ShowHint = False
-          TabOrder = 2
-          ViewStyle = vsReport
-          OnChange = lvwItemsTopChange
-          OnClick = lvwItemsTopClick
-          OnColumnClick = lvwItemsTopColumnClick
-          OnCompare = lvwItemsTopCompare
-          OnEnter = lvwItemsTopEnter
-          OnKeyDown = lvwItemsTopKeyDown
-        end
-        object pnlViewsTopSpacer: TPanel
-          Left = 0
-          Top = 25
-          Width = 148
-          Height = 21
-          Align = alTop
-          BevelOuter = bvNone
           TabOrder = 1
-          object cboViewsTop: TORComboBox
-            Left = 0
-            Top = 0
-            Width = 140
-            Height = 21
-            Style = orcsDropDown
-            Align = alClient
-            AutoSelect = True
-            Color = clWindow
-            DropDownCount = 12
-            ItemHeight = 13
-            ItemTipColor = clWindow
-            ItemTipEnable = True
-            ListItemsOnly = False
-            LongList = False
-            LookupPiece = 0
-            MaxLength = 0
-            Pieces = '2'
-            Sorted = False
-            SynonymChars = '<>'
-            TabOrder = 0
-            TabStop = True
-            OnChange = cboViewsTopChange
-            OnDropDown = cboViewsTopDropDown
-            OnDropDownClose = cboViewsTopDropDownClose
-            CharsNeedMatch = 1
+          object tsTopItems: TTabSheet
+            Caption = 'Items'
+            object lvwItemsTop: TListView
+              Left = 0
+              Top = 0
+              Width = 140
+              Height = 199
+              Align = alClient
+              BevelInner = bvNone
+              BevelOuter = bvNone
+              Columns = <
+                item
+                  Caption = 'Item'
+                  Width = 100
+                end
+                item
+                  Caption = 'Type'
+                  Width = 60
+                end
+                item
+                  Caption = 'View'
+                  Width = 40
+                end
+                item
+                  Caption = 'Classification'
+                end
+                item
+                  Caption = 'Remote Location'
+                  Width = 150
+                end>
+              HideSelection = False
+              MultiSelect = True
+              ReadOnly = True
+              RowSelect = True
+              ParentShowHint = False
+              ShowHint = False
+              TabOrder = 0
+              ViewStyle = vsReport
+              OnChange = lvwItemsTopChange
+              OnClick = lvwItemsTopClick
+              OnColumnClick = lvwItemsTopColumnClick
+              OnCompare = lvwItemsTopCompare
+              OnEnter = lvwItemsTopEnter
+              OnKeyDown = lvwItemsTopKeyDown
+            end
           end
-          object pnlViewsTopSpacerRight: TPanel
-            Left = 140
-            Top = 0
-            Width = 8
-            Height = 21
-            Align = alRight
-            BevelOuter = bvNone
-            TabOrder = 1
+          object tsTopViews: TTabSheet
+            Caption = 'Views'
+            ImageIndex = 1
+            ExplicitLeft = 0
+            ExplicitTop = 0
+            ExplicitWidth = 0
+            ExplicitHeight = 0
+            object splViewsTop: TSplitter
+              Left = 0
+              Top = 196
+              Width = 140
+              Height = 2
+              Cursor = crVSplit
+              Align = alBottom
+              OnMoved = splViewsTopMoved
+              ExplicitTop = 149
+            end
+            object lstViewsTop: TORListBox
+              Left = 0
+              Top = 0
+              Width = 140
+              Height = 196
+              Align = alClient
+              ItemHeight = 13
+              ParentShowHint = False
+              ShowHint = False
+              TabOrder = 0
+              OnEnter = lstViewsTopEnter
+              OnMouseDown = lstViewsTopMouseDown
+              ItemTipColor = clWindow
+              LongList = False
+              Pieces = '2'
+              OnChange = lstViewsTopChange
+            end
+            object memViewsTop: TRichEdit
+              Left = 0
+              Top = 198
+              Width = 140
+              Height = 1
+              Align = alBottom
+              Color = clCream
+              Font.Charset = ANSI_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Courier New'
+              Font.Style = []
+              Lines.Strings = (
+                'View Definition')
+              ParentFont = False
+              PlainText = True
+              ReadOnly = True
+              ScrollBars = ssBoth
+              TabOrder = 1
+              WantReturns = False
+              WordWrap = False
+            end
+          end
+          object tsTopCustom: TTabSheet
+            Caption = 'Custom'
+            ImageIndex = 2
+            ExplicitLeft = 0
+            ExplicitTop = 0
+            ExplicitWidth = 0
+            ExplicitHeight = 0
           end
         end
       end
@@ -364,7 +392,7 @@ object frmGraphs: TfrmGraphs
         Left = 577
         Top = 0
         Width = 15
-        Height = 261
+        Height = 249
         Align = alRight
         BevelOuter = bvNone
         TabOrder = 1
@@ -372,28 +400,28 @@ object frmGraphs: TfrmGraphs
       object pnlScrollTopBase: TPanel
         Left = 150
         Top = 0
-        Width = 427
-        Height = 261
+        Width = 426
+        Height = 249
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 2
         OnResize = pnlScrollTopBaseResize
         object pnlBlankTop: TPanel
           Left = 0
-          Top = 233
-          Width = 427
-          Height = 20
+          Top = 0
+          Width = 426
+          Height = 219
           Align = alClient
           BevelOuter = bvNone
-          TabOrder = 3
+          TabOrder = 2
           Visible = False
         end
         object scrlTop: TScrollBox
           Tag = 5
           Left = 0
-          Top = 233
-          Width = 427
-          Height = 20
+          Top = 0
+          Width = 426
+          Height = 219
           Align = alClient
           BevelInner = bvNone
           BevelOuter = bvNone
@@ -404,8 +432,8 @@ object frmGraphs: TfrmGraphs
         end
         object pnlDatelineTop: TPanel
           Left = 0
-          Top = 231
-          Width = 427
+          Top = 219
+          Width = 426
           Height = 30
           Align = alBottom
           BevelOuter = bvNone
@@ -413,7 +441,7 @@ object frmGraphs: TfrmGraphs
           object chartDatelineTop: TChart
             Left = 20
             Top = 0
-            Width = 407
+            Width = 406
             Height = 30
             AllowPanning = pmNone
             BackWall.Brush.Color = clWhite
@@ -433,7 +461,7 @@ object frmGraphs: TfrmGraphs
             BottomAxis.AutomaticMinimum = False
             BottomAxis.DateTimeFormat = 'M/d/yyyy'
             BottomAxis.Increment = 0.000694444444444444
-            BottomAxis.Maximum = 25
+            BottomAxis.Maximum = 25.000000000000000000
             Frame.Visible = False
             LeftAxis.Automatic = False
             LeftAxis.AutomaticMaximum = False
@@ -442,7 +470,7 @@ object frmGraphs: TfrmGraphs
             LeftAxis.Grid.Visible = False
             LeftAxis.Labels = False
             LeftAxis.LabelsOnAxis = False
-            LeftAxis.Maximum = 9
+            LeftAxis.Maximum = 9.000000000000000000
             LeftAxis.MinorGrid.Visible = True
             LeftAxis.RoundFirstLabel = False
             LeftAxis.Title.Caption = ' '
@@ -468,6 +496,7 @@ object frmGraphs: TfrmGraphs
             TabOrder = 0
             OnDblClick = mnuPopGraphDetailsClick
             OnMouseDown = chartBaseMouseDown
+            OnMouseUp = chartBaseMouseUp
             object serDatelineTop: TGanttSeries
               ColorEachPoint = True
               Marks.ArrowLength = 0
@@ -480,23 +509,23 @@ object frmGraphs: TfrmGraphs
               Pointer.Visible = True
               XValues.DateTime = True
               XValues.Name = 'Start'
-              XValues.Multiplier = 1
+              XValues.Multiplier = 1.000000000000000000
               XValues.Order = loAscending
               YValues.DateTime = False
               YValues.Name = 'Y'
-              YValues.Multiplier = 1
+              YValues.Multiplier = 1.000000000000000000
               YValues.Order = loNone
               StartValues.DateTime = True
               StartValues.Name = 'Start'
-              StartValues.Multiplier = 1
+              StartValues.Multiplier = 1.000000000000000000
               StartValues.Order = loAscending
               EndValues.DateTime = True
               EndValues.Name = 'End'
-              EndValues.Multiplier = 1
+              EndValues.Multiplier = 1.000000000000000000
               EndValues.Order = loNone
               NextTask.DateTime = False
               NextTask.Name = 'NextTask'
-              NextTask.Multiplier = 1
+              NextTask.Multiplier = 1.000000000000000000
               NextTask.Order = loNone
             end
           end
@@ -510,243 +539,35 @@ object frmGraphs: TfrmGraphs
             TabOrder = 1
           end
         end
-        object pnlData: TPanel
-          Left = 0
-          Top = 0
-          Width = 427
-          Height = 233
-          Align = alTop
-          Caption = 'pnlData'
-          TabOrder = 2
-          Visible = False
-          DesignSize = (
-            427
-            233)
-          object lstZoomHistory: TListBox
-            Left = 336
-            Top = 4
-            Width = 82
-            Height = 33
-            Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 13
-            TabOrder = 22
-          end
-          object lstTypes: TListBox
-            Left = 8
-            Top = 119
-            Width = 413
-            Height = 33
-            Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 13
-            TabOrder = 0
-          end
-          object lstItemsTemp: TListBox
-            Left = 8
-            Top = 4
-            Width = 73
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 1
-          end
-          object lstAllTypes: TListBox
-            Left = 254
-            Top = 4
-            Width = 82
-            Height = 33
-            Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 13
-            TabOrder = 2
-          end
-          object lstItems: TListBox
-            Left = 8
-            Top = 158
-            Width = 413
-            Height = 33
-            Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 13
-            TabOrder = 3
-          end
-          object lstData: TListBox
-            Left = 8
-            Top = 81
-            Width = 413
-            Height = 33
-            Anchors = [akLeft, akTop, akRight]
-            ItemHeight = 13
-            TabOrder = 4
-          end
-          object lstSpec2: TListBox
-            Left = 188
-            Top = 43
-            Width = 42
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 5
-          end
-          object lstSpec1: TListBox
-            Left = 143
-            Top = 43
-            Width = 42
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 6
-          end
-          object lstSpec3: TListBox
-            Left = 233
-            Top = 43
-            Width = 42
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 7
-          end
-          object lstSpec4: TListBox
-            Left = 278
-            Top = 43
-            Width = 42
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 8
-          end
-          object lstMultiSpec: TListBox
-            Left = 320
-            Top = 43
-            Width = 45
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 10
-          end
-          object lstTestSpec: TListBox
-            Left = 368
-            Top = 43
-            Width = 42
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 11
-          end
-          object lstSelCopyBottom: TListBox
-            Left = 283
-            Top = 195
-            Width = 41
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 15
-          end
-          object lstTempCheck: TListBox
-            Left = 53
-            Top = 195
-            Width = 41
-            Height = 33
-            ItemHeight = 13
-            MultiSelect = True
-            TabOrder = 18
-          end
-          object lstViews: TListBox
-            Left = 191
-            Top = 195
-            Width = 41
-            Height = 33
-            ItemHeight = 13
-            MultiSelect = True
-            TabOrder = 19
-          end
-          object lstScratchTemp: TListBox
-            Left = 53
-            Top = 43
-            Width = 42
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 20
-          end
-          object lstScratchLab: TListBox
-            Left = 98
-            Top = 43
-            Width = 42
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 21
-          end
-          object lstCheck: TListBox
-            Left = 172
-            Top = 5
-            Width = 73
-            Height = 33
-            ItemHeight = 13
-            MultiSelect = True
-            TabOrder = 13
-          end
-          object lstSelCopyTop: TListBox
-            Left = 237
-            Top = 195
-            Width = 41
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 16
-          end
-          object lstScratchSwap: TListBox
-            Left = 8
-            Top = 43
-            Width = 41
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 9
-          end
-          object lstNonNumeric: TListBox
-            Left = 90
-            Top = 4
-            Width = 79
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 12
-          end
-          object lstDrugClass: TListBox
-            Left = 8
-            Top = 195
-            Width = 41
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 14
-          end
-          object lstSelPrevTop: TListBox
-            Left = 329
-            Top = 195
-            Width = 41
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 23
-          end
-          object lstSelPrevBottom: TListBox
-            Left = 375
-            Top = 195
-            Width = 41
-            Height = 33
-            ItemHeight = 13
-            TabOrder = 24
-          end
-          object lstTemp: TListBox
-            Left = 99
-            Top = 195
-            Width = 41
-            Height = 33
-            ItemHeight = 13
-            MultiSelect = True
-            TabOrder = 17
-          end
-          object lstComp: TListBox
-            Left = 145
-            Top = 195
-            Width = 41
-            Height = 33
-            ItemHeight = 13
-            MultiSelect = True
-            TabOrder = 25
-          end
-        end
+      end
+      object memTop: TMemo
+        Left = 576
+        Top = 0
+        Width = 1
+        Height = 249
+        Align = alRight
+        BevelInner = bvNone
+        BevelOuter = bvNone
+        BorderStyle = bsNone
+        Color = clBtnFace
+        Lines.Strings = (
+          'm'
+          'e'
+          'm'
+          'T'
+          'o'
+          'p')
+        TabOrder = 3
+        Visible = False
+        OnEnter = memTopEnter
+        OnExit = memTopExit
+        OnKeyDown = memTopKeyDown
       end
     end
     object pnlBottom: TPanel
       Tag = 1
       Left = 0
-      Top = 264
+      Top = 252
       Width = 592
       Height = 98
       Align = alBottom
@@ -757,7 +578,6 @@ object frmGraphs: TfrmGraphs
         Top = 0
         Width = 2
         Height = 98
-        Cursor = crHSplit
         AutoSnap = False
         Beveled = True
         MinSize = 15
@@ -775,136 +595,163 @@ object frmGraphs: TfrmGraphs
           Left = 0
           Top = 0
           Width = 148
-          Height = 25
+          Height = 22
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 0
-          DesignSize = (
-            148
-            25)
           object bvlTopLeft: TBevel
             Left = 0
             Top = 0
             Width = 2
-            Height = 25
+            Height = 22
             Align = alLeft
+            ExplicitHeight = 25
           end
           object bvlTopRight: TBevel
             Left = 146
             Top = 0
             Width = 2
-            Height = 25
+            Height = 22
             Align = alRight
             Visible = False
-          end
-          object lblViewsBottom: TOROffsetLabel
-            Left = 2
-            Top = 0
-            Width = 28
-            Height = 25
-            Align = alLeft
-            Caption = 'View:'
-            HorzOffset = 2
-            Transparent = False
-            VertOffset = 8
-            WordWrap = False
+            ExplicitHeight = 25
           end
           object chkItemsBottom: TCheckBox
-            Left = 40
-            Top = 5
+            Left = 39
+            Top = 2
             Width = 105
             Height = 20
             Alignment = taLeftJustify
-            Anchors = [akTop, akRight]
             Caption = 'Individual Graphs'
+            Checked = True
+            State = cbChecked
             TabOrder = 0
             OnClick = chkItemsBottomClick
             OnEnter = chkItemsBottomEnter
           end
         end
-        object lvwItemsBottom: TListView
+        object pcBottom: TPageControl
           Left = 0
-          Top = 46
+          Top = 22
           Width = 148
-          Height = 52
+          Height = 76
+          ActivePage = tsBottomViews
           Align = alClient
-          BevelInner = bvNone
-          BevelOuter = bvNone
-          Columns = <
-            item
-              Caption = 'Item'
-              Width = 100
-            end
-            item
-              Caption = 'Type'
-              Width = 60
-            end
-            item
-              Caption = 'View'
-              Width = 40
-            end
-            item
-              Caption = 'Classification'
-            end>
-          HideSelection = False
-          MultiSelect = True
-          ReadOnly = True
-          RowSelect = True
-          ParentShowHint = False
-          ShowHint = False
-          TabOrder = 2
-          ViewStyle = vsReport
-          OnChange = lvwItemsBottomChange
-          OnClick = lvwItemsBottomClick
-          OnColumnClick = lvwItemsBottomColumnClick
-          OnCompare = lvwItemsBottomCompare
-          OnEnter = lvwItemsBottomEnter
-          OnKeyDown = lvwItemsTopKeyDown
-        end
-        object pnlViewsBottomSpacer: TPanel
-          Left = 0
-          Top = 25
-          Width = 148
-          Height = 21
-          Align = alTop
-          BevelOuter = bvNone
           TabOrder = 1
-          object cboViewsBottom: TORComboBox
-            Left = 0
-            Top = 0
-            Width = 140
-            Height = 21
-            Style = orcsDropDown
-            Align = alClient
-            AutoSelect = True
-            Color = clWindow
-            DropDownCount = 12
-            ItemHeight = 13
-            ItemTipColor = clWindow
-            ItemTipEnable = True
-            ListItemsOnly = False
-            LongList = False
-            LookupPiece = 0
-            MaxLength = 0
-            Pieces = '2'
-            Sorted = False
-            SynonymChars = '<>'
-            TabOrder = 0
-            TabStop = True
-            OnChange = cboViewsBottomChange
-            OnDropDown = cboViewsBottomDropDown
-            OnDropDownClose = cboViewsBottomDropDownClose
-            OnEnter = cboViewsBottomEnter
-            CharsNeedMatch = 1
+          object tsBottomItems: TTabSheet
+            Caption = 'Items'
+            ExplicitLeft = 0
+            ExplicitTop = 0
+            ExplicitWidth = 0
+            ExplicitHeight = 0
+            object lvwItemsBottom: TListView
+              Left = 0
+              Top = 0
+              Width = 140
+              Height = 48
+              Align = alClient
+              BevelInner = bvNone
+              BevelOuter = bvNone
+              Columns = <
+                item
+                  Caption = 'Item'
+                  Width = 100
+                end
+                item
+                  Caption = 'Type'
+                  Width = 60
+                end
+                item
+                  Caption = 'View'
+                  Width = 40
+                end
+                item
+                  Caption = 'Classification'
+                end
+                item
+                  Caption = 'Remote Location'
+                  Width = 150
+                end>
+              HideSelection = False
+              MultiSelect = True
+              ReadOnly = True
+              RowSelect = True
+              ParentShowHint = False
+              ShowHint = False
+              TabOrder = 0
+              ViewStyle = vsReport
+              OnChange = lvwItemsBottomChange
+              OnClick = lvwItemsBottomClick
+              OnColumnClick = lvwItemsBottomColumnClick
+              OnCompare = lvwItemsBottomCompare
+              OnEnter = lvwItemsBottomEnter
+              OnKeyDown = lvwItemsTopKeyDown
+            end
           end
-          object pnlViewsBottomSpacerRight: TPanel
-            Left = 140
-            Top = 0
-            Width = 8
-            Height = 21
-            Align = alRight
-            BevelOuter = bvNone
-            TabOrder = 1
+          object tsBottomViews: TTabSheet
+            Caption = 'Views'
+            ImageIndex = 1
+            ExplicitLeft = 0
+            ExplicitTop = 0
+            ExplicitWidth = 0
+            ExplicitHeight = 0
+            object splViewsBottom: TSplitter
+              Left = 0
+              Top = 45
+              Width = 140
+              Height = 2
+              Cursor = crVSplit
+              Align = alBottom
+              OnMoved = splViewsTopMoved
+              ExplicitTop = 25
+            end
+            object lstViewsBottom: TORListBox
+              Left = 0
+              Top = 0
+              Width = 140
+              Height = 45
+              Align = alClient
+              ItemHeight = 13
+              ParentShowHint = False
+              ShowHint = False
+              TabOrder = 0
+              OnEnter = lstViewsBottomEnter
+              OnMouseDown = lstViewsBottomMouseDown
+              ItemTipColor = clWindow
+              LongList = False
+              Pieces = '2'
+              OnChange = lstViewsBottomChange
+            end
+            object memViewsBottom: TRichEdit
+              Left = 0
+              Top = 47
+              Width = 140
+              Height = 1
+              Align = alBottom
+              Color = clCream
+              Font.Charset = ANSI_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = 'Courier New'
+              Font.Style = []
+              Lines.Strings = (
+                'View Definition')
+              ParentFont = False
+              PlainText = True
+              ReadOnly = True
+              ScrollBars = ssBoth
+              TabOrder = 1
+              WantReturns = False
+              WordWrap = False
+            end
+          end
+          object tsBottomCustom: TTabSheet
+            Caption = 'Custom'
+            ImageIndex = 2
+            ExplicitLeft = 0
+            ExplicitTop = 0
+            ExplicitWidth = 0
+            ExplicitHeight = 0
           end
         end
       end
@@ -921,7 +768,7 @@ object frmGraphs: TfrmGraphs
       object pnlScrollBottomBase: TPanel
         Left = 150
         Top = 0
-        Width = 427
+        Width = 426
         Height = 98
         Align = alClient
         BevelOuter = bvNone
@@ -929,7 +776,7 @@ object frmGraphs: TfrmGraphs
         object pnlBlankBottom: TPanel
           Left = 0
           Top = 0
-          Width = 427
+          Width = 426
           Height = 68
           Align = alClient
           BevelOuter = bvNone
@@ -939,7 +786,7 @@ object frmGraphs: TfrmGraphs
         object pnlDatelineBottom: TPanel
           Left = 0
           Top = 68
-          Width = 427
+          Width = 426
           Height = 30
           Align = alBottom
           BevelOuter = bvNone
@@ -947,7 +794,7 @@ object frmGraphs: TfrmGraphs
           object chartDatelineBottom: TChart
             Left = 20
             Top = 0
-            Width = 407
+            Width = 406
             Height = 30
             AllowPanning = pmNone
             BackWall.Brush.Color = clWhite
@@ -966,16 +813,16 @@ object frmGraphs: TfrmGraphs
             BottomAxis.AutomaticMinimum = False
             BottomAxis.DateTimeFormat = 'M/d/yyyy'
             BottomAxis.Increment = 0.000694444444444444
-            BottomAxis.Maximum = 25
+            BottomAxis.Maximum = 25.000000000000000000
             Frame.Visible = False
             LeftAxis.Automatic = False
             LeftAxis.AutomaticMaximum = False
             LeftAxis.AutomaticMinimum = False
             LeftAxis.Axis.Visible = False
-            LeftAxis.ExactDateTime = False
+            LeftAxis.Grid.Visible = False
             LeftAxis.Labels = False
             LeftAxis.LabelsOnAxis = False
-            LeftAxis.Maximum = 9
+            LeftAxis.Maximum = 9.000000000000000000
             LeftAxis.MinorGrid.Visible = True
             LeftAxis.RoundFirstLabel = False
             LeftAxis.Title.Caption = ' '
@@ -1000,6 +847,7 @@ object frmGraphs: TfrmGraphs
             TabOrder = 0
             OnDblClick = mnuPopGraphDetailsClick
             OnMouseDown = chartBaseMouseDown
+            OnMouseUp = chartBaseMouseUp
             object serDatelineBottom: TGanttSeries
               ColorEachPoint = True
               Marks.ArrowLength = 0
@@ -1012,23 +860,23 @@ object frmGraphs: TfrmGraphs
               Pointer.Visible = True
               XValues.DateTime = True
               XValues.Name = 'Start'
-              XValues.Multiplier = 1
+              XValues.Multiplier = 1.000000000000000000
               XValues.Order = loAscending
               YValues.DateTime = False
               YValues.Name = 'Y'
-              YValues.Multiplier = 1
+              YValues.Multiplier = 1.000000000000000000
               YValues.Order = loNone
               StartValues.DateTime = True
               StartValues.Name = 'Start'
-              StartValues.Multiplier = 1
+              StartValues.Multiplier = 1.000000000000000000
               StartValues.Order = loAscending
               EndValues.DateTime = True
               EndValues.Name = 'End'
-              EndValues.Multiplier = 1
+              EndValues.Multiplier = 1.000000000000000000
               EndValues.Order = loNone
               NextTask.DateTime = False
               NextTask.Name = 'NextTask'
-              NextTask.Multiplier = 1
+              NextTask.Multiplier = 1.000000000000000000
               NextTask.Order = loNone
             end
           end
@@ -1046,7 +894,7 @@ object frmGraphs: TfrmGraphs
           Tag = 5
           Left = 0
           Top = 0
-          Width = 427
+          Width = 426
           Height = 68
           Align = alClient
           BevelInner = bvNone
@@ -1056,15 +904,200 @@ object frmGraphs: TfrmGraphs
           TabOrder = 0
         end
       end
+      object memBottom: TMemo
+        Left = 576
+        Top = 0
+        Width = 1
+        Height = 98
+        Align = alRight
+        BevelInner = bvNone
+        BevelOuter = bvNone
+        BorderStyle = bsNone
+        Color = clBtnFace
+        Lines.Strings = (
+          'm'
+          'e'
+          'm'
+          'T'
+          'o'
+          'p')
+        TabOrder = 3
+        Visible = False
+        OnEnter = memBottomEnter
+        OnExit = memBottomExit
+        OnKeyDown = memBottomKeyDown
+      end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlHeader'
+        'Status = stsDefault')
+      (
+        'Component = pnlTemp'
+        'Status = stsDefault')
+      (
+        'Component = pnlInfo'
+        'Status = stsDefault')
+      (
+        'Component = chartBase'
+        'Status = stsDefault')
+      (
+        'Component = pnlFooter'
+        'Status = stsDefault')
+      (
+        'Component = btnClose'
+        'Status = stsDefault')
+      (
+        'Component = btnChangeSettings'
+        'Status = stsDefault')
+      (
+        'Component = cboDateRange'
+        'Label = lblDateRange'
+        'Status = stsOK')
+      (
+        'Component = chkDualViews'
+        'Status = stsDefault')
+      (
+        'Component = btnGraphSelections'
+        'Status = stsDefault')
+      (
+        'Component = pnlMain'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = pnlItemsTop'
+        'Status = stsDefault')
+      (
+        'Component = pnlItemsTopInfo'
+        'Status = stsDefault')
+      (
+        'Component = chkItemsTop'
+        'Status = stsDefault')
+      (
+        'Component = pnlTopRightPad'
+        'Status = stsDefault')
+      (
+        'Component = pnlScrollTopBase'
+        'Status = stsDefault')
+      (
+        'Component = pnlBlankTop'
+        'Status = stsDefault')
+      (
+        'Component = scrlTop'
+        'Status = stsDefault')
+      (
+        'Component = pnlDatelineTop'
+        'Status = stsDefault')
+      (
+        'Component = chartDatelineTop'
+        'Status = stsDefault')
+      (
+        'Component = pnlDatelineTopSpacer'
+        'Status = stsDefault')
+      (
+        'Component = memTop'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = pnlItemsBottom'
+        'Status = stsDefault')
+      (
+        'Component = pnlItemsBottomInfo'
+        'Status = stsDefault')
+      (
+        'Component = chkItemsBottom'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottomRightPad'
+        'Status = stsDefault')
+      (
+        'Component = pnlScrollBottomBase'
+        'Status = stsDefault')
+      (
+        'Component = pnlBlankBottom'
+        'Status = stsDefault')
+      (
+        'Component = pnlDatelineBottom'
+        'Status = stsDefault')
+      (
+        'Component = chartDatelineBottom'
+        'Status = stsDefault')
+      (
+        'Component = pnlDatelineBottomSpacer'
+        'Status = stsDefault')
+      (
+        'Component = scrlBottom'
+        'Status = stsDefault')
+      (
+        'Component = memBottom'
+        'Status = stsDefault')
+      (
+        'Component = frmGraphs'
+        'Status = stsDefault')
+      (
+        'Component = pcTop'
+        'Status = stsDefault')
+      (
+        'Component = tsTopItems'
+        'Status = stsDefault')
+      (
+        'Component = tsTopViews'
+        'Status = stsDefault')
+      (
+        'Component = tsTopCustom'
+        'Status = stsDefault')
+      (
+        'Component = lvwItemsTop'
+        'Status = stsDefault')
+      (
+        'Component = pcBottom'
+        'Status = stsDefault')
+      (
+        'Component = tsBottomItems'
+        'Status = stsDefault')
+      (
+        'Component = tsBottomViews'
+        'Status = stsDefault')
+      (
+        'Component = tsBottomCustom'
+        'Status = stsDefault')
+      (
+        'Component = lvwItemsBottom'
+        'Status = stsDefault')
+      (
+        'Component = lstViewsTop'
+        'Status = stsDefault')
+      (
+        'Component = lstViewsBottom'
+        'Status = stsDefault')
+      (
+        'Component = memViewsTop'
+        'Status = stsDefault')
+      (
+        'Component = memViewsBottom'
+        'Status = stsDefault'))
   end
   object mnuPopGraphStuff: TPopupMenu
     OnPopup = mnuPopGraphStuffPopup
-    Left = 4
+    Left = 30
     object mnuPopGraphDetails: TMenuItem
       Caption = 'Details...'
-      Enabled = False
       OnClick = mnuPopGraphDetailsClick
+    end
+    object mnuPopGraphValueMarks: TMenuItem
+      Caption = 'Values...'
+      Enabled = False
+      OnClick = mnuPopGraphValueMarksClick
+    end
+    object mnuPopGraphViewDefinition: TMenuItem
+      Caption = 'View Definition...'
+      OnClick = mnuPopGraphViewDefinitionClick
     end
     object mnuPopGraphDefineViews: TMenuItem
       Caption = 'Select/Define...'
@@ -1185,7 +1218,11 @@ object frmGraphs: TfrmGraphs
     object mnuPopGraphCopy: TMenuItem
       Caption = 'Copy'
       ShortCut = 16451
-      OnClick = mnuPopGraphCopyClick
+      OnClick = mnuPopGraphPrintClick
+    end
+    object mnuPopGraphExport: TMenuItem
+      Caption = 'Export Data...'
+      OnClick = mnuPopGraphExportClick
     end
     object mnuPopGraphPrint: TMenuItem
       Caption = 'Print...'
@@ -1195,28 +1232,50 @@ object frmGraphs: TfrmGraphs
       Caption = '-'
       Visible = False
     end
-    object mnumedsasgantt: TMenuItem
-      Caption = 'meds as gantt'
-      Checked = True
-      RadioItem = True
+    object mnutest: TMenuItem
+      Caption = 'testing'
+      Enabled = False
       Visible = False
-      OnClick = mnumedsasganttClick
     end
-    object mnumedsasganttvertheight: TMenuItem
-      Caption = 'meds as gantt + vert + height change'
-      RadioItem = True
+    object mnuFunctions1: TMenuItem
+      Caption = 'Functions'
+      Enabled = False
       Visible = False
-      OnClick = mnumedsasganttClick
+      object mnuInverseValues: TMenuItem
+        Caption = 'Inverse Values'
+      end
+      object mnuStandardDeviations: TMenuItem
+        Caption = 'Standard Deviations'
+      end
+    end
+    object mnuCustom: TMenuItem
+      Caption = 'Custom'
+      Enabled = False
+      Visible = False
+      OnClick = mnuCustomClick
+    end
+    object mnuMHasNumeric1: TMenuItem
+      Caption = 'MH as Numeric'
+      Enabled = False
+      Visible = False
+      OnClick = mnuMHasNumeric1Click
+    end
+    object mnuGraphData: TMenuItem
+      Caption = 'Show Graph Data...'
+      Enabled = False
+      Visible = False
+      OnClick = mnuGraphDataClick
     end
     object mnuPopGraphToday: TMenuItem
       Caption = 'Reset Today...'
+      Enabled = False
       Visible = False
       OnClick = mnuPopGraphTodayClick
     end
-    object testcount1: TMenuItem
+    object mnuTestCount: TMenuItem
       Caption = 'test count'
+      Enabled = False
       Visible = False
-      OnClick = testcount1Click
     end
   end
   object calDateRange: TORDateRangeDlg
@@ -1226,18 +1285,18 @@ object frmGraphs: TfrmGraphs
     LabelStop = 'End Date'
     RequireTime = False
     Format = 'mmm d,yy@hh:nn'
-    Left = 32
+    Left = 59
   end
   object dlgDate: TORDateTimeDlg
-    FMDateTime = 3040806
+    FMDateTime = 3040806.000000000000000000
     DateOnly = True
     RequireTime = False
-    Left = 57
+    Left = 88
   end
   object timHintPause: TTimer
     Enabled = False
     Interval = 100
     OnTimer = timHintPauseTimer
-    Left = 83
+    Left = 117
   end
 end

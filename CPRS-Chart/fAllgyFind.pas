@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORFn, ORCtrls, ComCtrls, ImgList;
+  fAutoSz, StdCtrls, ORFn, ORCtrls, ComCtrls, ImgList, VA508AccessibilityManager,
+  VA508ImageListLabeler;
 
 type
   TfrmAllgyFind = class(TfrmAutoSz)
@@ -20,6 +21,7 @@ type
     imTree: TImageList;
     lblDetail: TLabel;
     lblSearchCaption: TLabel;
+    imgLblAllgyFindTree: TVA508ImageListLabeler;
     procedure cmdSearchClick(Sender: TObject);
     procedure cmdCancelClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -132,7 +134,7 @@ begin
   AList := TStringList.Create;
   try
     if tvAgent.Items <> nil then tvAgent.Items.Clear;
-    AList.Assign(SearchForAllergies(UpperCase(txtSearch.Text)));
+    FastAssign(SearchForAllergies(UpperCase(txtSearch.Text)), AList);
     uFileCount := 0;
     for i := 0 to AList.Count - 1 do
       if Piece(AList[i], U, 5) = 'TOP' then uFileCount := uFileCount + 1;
@@ -203,7 +205,7 @@ end;
 
 procedure TfrmAllgyFind.cmdOKClick(Sender: TObject);
 var
-  x: string;
+  x, AGlobal: string;
   tmpList: TStringList;
   OKtoContinue: boolean ;
 begin
@@ -271,7 +273,10 @@ begin
     begin
       FAllergy := TORTreeNode(tvAgent.Selected).StringData;
       x := Piece(FAllergy, U, 2);
-      x := Trim(Piece(x, '<', 1));
+      AGlobal := Piece(FAllergy, U, 3);
+      if ((Pos('GMRD', AGlobal) > 0) or (Pos('PSDRUG', AGlobal) > 0)) and (Pos('<', x) > 0) then
+        //x := Trim(Piece(x, '<', 1));
+        x := Copy(x, 1, Length(Piece(x, '<', 1)) - 1);
       SetPiece(FAllergy, U, 2, x);
       Close;
     end;

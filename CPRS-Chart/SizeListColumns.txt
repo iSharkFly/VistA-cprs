@@ -1,0 +1,4 @@
+frmMeds.hdrMedsIn=42,320,80,80,80
+frmMeds.hdrMedsNonVA=42,320,80,80
+frmMeds.hdrMedsOut=42,320,80,80,80,40
+frmOrders.hdrOrders=0,62,375,124,124,34,16,16,16,25

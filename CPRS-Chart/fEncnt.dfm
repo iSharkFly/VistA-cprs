@@ -1,18 +1,12 @@
-object frmEncounter: TfrmEncounter
+inherited frmEncounter: TfrmEncounter
   Left = 481
   Top = 242
-  Width = 470
-  Height = 450
   Anchors = [akTop]
   BorderIcons = [biSystemMenu]
   Caption = 'Provider & Location for Current Activities'
-  Color = clBtnFace
+  ClientHeight = 423
+  ClientWidth = 462
   Constraints.MinWidth = 470
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   Scaled = False
@@ -21,12 +15,14 @@ object frmEncounter: TfrmEncounter
   OnDestroy = FormDestroy
   OnResize = FormResize
   OnShow = FormShow
+  ExplicitWidth = 470
+  ExplicitHeight = 450
   DesignSize = (
     462
-    416)
+    423)
   PixelsPerInch = 96
   TextHeight = 13
-  object lblInstruct: TLabel
+  object lblInstruct: TLabel [0]
     Left = 6
     Top = 6
     Width = 253
@@ -38,7 +34,7 @@ object frmEncounter: TfrmEncounter
     Visible = False
     WordWrap = True
   end
-  object lblLocation: TLabel
+  object lblLocation: TLabel [1]
     Tag = 9
     Left = 6
     Top = 140
@@ -48,14 +44,14 @@ object frmEncounter: TfrmEncounter
     Caption = 'Encounter Location'
     Constraints.MinHeight = 12
   end
-  object lblProvider: TLabel
+  object lblProvider: TLabel [2]
     Left = 6
     Top = 6
     Width = 91
     Height = 13
     Caption = 'Encounter Provider'
   end
-  object cboPtProvider: TORComboBox
+  object cboPtProvider: TORComboBox [3]
     Left = 6
     Top = 20
     Width = 331
@@ -81,7 +77,7 @@ object frmEncounter: TfrmEncounter
     OnNeedData = cboPtProviderNeedData
     CharsNeedMatch = 1
   end
-  object cmdDateRange: TButton
+  object cmdDateRange: TButton [4]
     Tag = 9
     Left = 266
     Top = 153
@@ -94,7 +90,7 @@ object frmEncounter: TfrmEncounter
     TabOrder = 2
     OnClick = cmdDateRangeClick
   end
-  object txtLocation: TCaptionEdit
+  object txtLocation: TCaptionEdit [5]
     Tag = 9
     Left = 6
     Top = 154
@@ -109,7 +105,7 @@ object frmEncounter: TfrmEncounter
     Text = '< Select a location from the tabs below.... >'
     Caption = 'Encounter Location'
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [6]
     Left = 341
     Top = 45
     Width = 84
@@ -122,7 +118,7 @@ object frmEncounter: TfrmEncounter
     TabOrder = 4
     OnClick = cmdCancelClick
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [7]
     Left = 340
     Top = 20
     Width = 84
@@ -135,7 +131,7 @@ object frmEncounter: TfrmEncounter
     TabOrder = 3
     OnClick = cmdOKClick
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [8]
     Left = 0
     Top = 179
     Width = 460
@@ -157,8 +153,13 @@ object frmEncounter: TfrmEncounter
       RaggedRight = True
       TabOrder = 0
       OnChange = pgeVisitChange
+      OnMouseDown = pgeVisitMouseDown
       object tabClinic: TTabSheet
         Caption = 'Clinic Appointments'
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object lstClinic: TORListBox
           Left = 0
           Top = 20
@@ -204,6 +205,10 @@ object frmEncounter: TfrmEncounter
       end
       object tabAdmit: TTabSheet
         Caption = 'Hospital Admissions'
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object lstAdmit: TORListBox
           Left = 0
           Top = 17
@@ -240,6 +245,10 @@ object frmEncounter: TfrmEncounter
       end
       object tabNewVisit: TTabSheet
         Caption = 'New Visit'
+        ExplicitLeft = 0
+        ExplicitTop = 0
+        ExplicitWidth = 0
+        ExplicitHeight = 0
         object lblVisitDate: TLabel
           Left = 220
           Top = 4
@@ -311,6 +320,63 @@ object frmEncounter: TfrmEncounter
         end
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cboPtProvider'
+        'Status = stsDefault')
+      (
+        'Component = cmdDateRange'
+        'Status = stsDefault')
+      (
+        'Component = txtLocation'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = pgeVisit'
+        'Status = stsDefault')
+      (
+        'Component = tabClinic'
+        'Status = stsDefault')
+      (
+        'Component = lstClinic'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = tabAdmit'
+        'Status = stsDefault')
+      (
+        'Component = lstAdmit'
+        'Status = stsDefault')
+      (
+        'Component = Panel3'
+        'Status = stsDefault')
+      (
+        'Component = tabNewVisit'
+        'Status = stsDefault')
+      (
+        'Component = calVisitDate'
+        'Status = stsDefault')
+      (
+        'Component = ckbHistorical'
+        'Status = stsDefault')
+      (
+        'Component = cboNewVisit'
+        'Status = stsDefault')
+      (
+        'Component = frmEncounter'
+        'Status = stsDefault'))
   end
   object dlgDateRange: TORDateRangeDlg
     DateOnly = True

@@ -2,7 +2,13 @@ unit rReminders;
 
 interface
 uses
-  Windows,Classes, SysUtils, TRPCB, ORNet, ORFn;
+  Windows,Classes, SysUtils, TRPCB, ORNet, ORFn, fMHTest, StrUtils;
+
+type
+  TMHdllFound = record
+  DllCheck: boolean;
+  DllFound: boolean;
+end;
 
 procedure GetCurrentReminders;
 procedure GetOtherReminders(Dest: TStrings);
@@ -20,7 +26,7 @@ procedure GetDialogStatus(AList: TStringList);
 function GetRemindersActive: boolean;
 function GetProgressNoteHeader: string;
 function LoadMentalHealthTest(TestName: string): TStrings;
-procedure MentalHealthTestResults(var AText: string; const DlgIEN: integer; const TestName:
+procedure MentalHealthTestResults(var AText: string; const DlgIEN: string; const TestName:
                                   string; const AProvider: Int64; const Answers: string);
 procedure SaveMentalHealthTest(const TestName: string; ADate: TFMDateTime;
                                const AProvider: Int64; const Answers: string);
@@ -40,6 +46,10 @@ procedure SetCoverSheetLevelData(ALevel, AClass: string; Data: TStrings);
 function GetCategoryItems(CatIEN: integer): TStrings;
 function GetAllRemindersAndCategories: TStrings;
 function VerifyMentalHealthTestComplete(TestName, Answers: string): String;
+function MHDLLFound: boolean;
+function UsedMHDllRPC: boolean;
+procedure PopulateMHdll;
+procedure GetMHResultText(var AText: string; ResultsGroups, Scores: TStringList);
 
 
 implementation
@@ -53,6 +63,7 @@ var
   uRemInsertAtCursor: integer = -1;
   uNewCoverSheetListActive: integer = -1;
   uCanEditAllCoverSheetLists: integer = -1;
+  MHDLL: TMHDllFound;
 
 procedure GetCurrentReminders;
 begin
@@ -62,7 +73,7 @@ end;
 procedure GetOtherReminders(Dest: TStrings);
 begin
   CallV('ORQQPXRM REMINDER CATEGORIES', [Patient.DFN, Encounter.Location]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure EvaluateReminders(RemList: TStringList);
@@ -169,7 +180,7 @@ begin
     for i := 0 to AList.Count-1 do
       Param[0].Mult[AList[i]] := '';
     CallBroker;
-    AList.Assign(Results);
+    FastAssign(Results, AList);
   end;
 end;
 
@@ -190,7 +201,7 @@ begin
   Result := RPCBrokerV.Results;
 end;
 
-procedure MentalHealthTestResults(var AText: string; const DlgIEN: integer; const TestName:
+procedure MentalHealthTestResults(var AText: string; const DlgIEN: string; const TestName:
                                   string; const AProvider: Int64; const Answers: string);
 var
   i, R: integer;
@@ -202,7 +213,7 @@ begin
     ClearParameters := True;
     RemoteProcedure := 'ORQQPXRM MENTAL HEALTH RESULTS';
     Param[0].PType := literal;
-    Param[0].Value := IntToStr(DlgIEN);
+    Param[0].Value := DlgIEN;
     Param[1].PType := list;
     Param[1].Mult['"DFN"'] := Patient.DFN;
     Param[1].Mult['"CODE"'] := TestName;
@@ -429,6 +440,97 @@ begin
       end;
 end;
 
+function MHDLLFound: boolean;
+begin
+  if MHDll.DllCheck = false then
+     begin
+       MHDll.DllCheck := True;
+       MHDLL.DllFound := CheckforMHDll;
+     end;
+  Result := MHDLL.DllFound;
+end;
+
+function UsedMHDllRPC: boolean;
+begin
+  Result := sCallV('ORQQPXRM MHDLLDMS',[]) = '1';
+end;
+
+procedure PopulateMHdll;
+begin
+  if MHDll.DllCheck = false then
+    begin
+      MHDll.DllCheck := True;
+      MHDll.DllFound := CheckforMHDll;
+    end;
+end;
+
+procedure GetMHResultText(var AText: string; ResultsGroups, Scores: TStringList);
+var
+i, j: integer;
+tmp, info: string;
+tempInfo: TStringList;
+begin
+ //AGP for some reason in some account passing two arrays in the RPC was
+ //not working had to convert back to the old method for the RPC for now
+ with RPCBrokerV do
+  begin
+    ClearParameters := True;
+    RemoteProcedure := 'ORQQPXRM MHDLL';
+    Param[0].PType := literal;
+    Param[0].Value := PATIENT.DFN;  //*DFN*
+    Param[1].PType := list;
+    j := 0;
+    for i := 0 to ResultsGroups.Count-1 do
+      begin
+        j := j + 1;
+        Param[1].Mult['"RESULTS",'+ InttoStr(j)]:=ResultsGroups.Strings[i];
+      end;
+    j := 0;
+    for i := 0 to Scores.Count-1 do
+      begin
+        j := j + 1;
+        Param[1].Mult['"SCORES",'+ InttoStr(j)]:=Scores.Strings[i];
+      end;
+  end;
+  CallBroker;
+  //CallV('ORQQPXRM MHDLL',[ResultsGroups, Scores, Patient.DFN]);
+  AText := '';
+  info := '';
+  for i := 0 to RPCBrokerV.Results.Count - 1 do
+    begin
+      tmp := RPCBrokerV.Results[i];
+      if pos('[INFOTEXT]',tmp)>0 then
+        begin
+           if info <> '' then info := info + ' ' + Copy(tmp,11,(Length(tmp)-1))
+           else info := Copy(tmp,11,(Length(tmp)-1));
+        end
+      else
+      begin
+        if(AText <> '') then
+        begin
+          if(copy(AText, length(AText), 1) = '.') then
+            AText := AText;
+          AText := AText + ' ';
+        end;
+        AText := AText + Trim(tmp);
+      end;
+  end;
+  if info <> '' then
+    begin
+      if pos(U, info) > 0 then
+        begin
+          tempInfo := TStringList.Create;
+          PiecestoList(info,'^',tempInfo);
+          info := '';
+          for i := 0 to tempInfo.Count -1 do
+            begin
+              if info = '' then info := tempInfo.Strings[i]
+              else info := info + CRLF + tempInfo.Strings[i];
+            end;
+        end;
+      InfoBox(info,'Attention Needed',MB_OK);
+    end;
+end;
 initialization
 
 finalization

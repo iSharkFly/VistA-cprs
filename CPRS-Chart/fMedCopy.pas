@@ -5,23 +5,23 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ORDtTm, ORCtrls, ORFn, rOrders, uCore, rCore, mEvntDelay, fAutoSz,
-  ExtCtrls, UConst;
+  ExtCtrls, UConst, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmMedCopy = class(TForm)
-    Panel1: TPanel;
-    lblPtInfo: TLabel;
-    Panel2: TPanel;
+  TfrmMedCopy = class(TfrmBase508Form)
+    pnlTop: TPanel;
+    lblPtInfo: TVA508StaticText;
+    pnlInpatient: TPanel;
     lblInstruction: TStaticText;
     Image1: TImage;
-    Label1: TStaticText;
-    Panel3: TPanel;
-    GroupBox2: TGroupBox;
+    lblInstruction2: TStaticText;
+    pnlMiddle: TPanel;
+    gboxMain: TGroupBox;
     radDelayed: TRadioButton;
     radRelease: TRadioButton;
     cmdOK: TButton;
     cmdCancel: TButton;
-    Panel4: TPanel;
+    pnlBottom: TPanel;
     fraEvntDelayList: TfraEvntDelayList;
     procedure cmdOKClick(Sender: TObject);
     procedure cmdCancelClick(Sender: TObject);                         
@@ -38,6 +38,7 @@ type
   private
     FDelayEvent: TOrderDelayEvent;
     FOKPressed: Boolean;
+    procedure AdjustFormSize;
   public
     { Public declarations }
   end;
@@ -50,7 +51,7 @@ var
 implementation
 {$R *.DFM}
 
-uses  fODBase, fOrdersTS, fOrders;
+uses  fODBase, fOrdersTS, fOrders, VAUtils;
 
 const
   TX_SEL_DATE = 'An effective date (approximate) must be selected for discharge orders.';
@@ -112,6 +113,7 @@ begin
       frmMedCopy.radRelease.Enabled := False;
     end;
     ResizeAnchoredFormToFont(frmMedCopy);
+    frmMedCopy.AdjustFormSize;
     CurrTS := Piece(GetCurrentSpec(Patient.DFN),'^',1);
     if Length(CurrTS)>0 then
       SpeCap := #13 + '  The current treating specialty is ' + CurrTS
@@ -126,6 +128,7 @@ begin
       else
         frmMedCopy.lblPtInfo.Caption := Patient.Name + ' currently is an outpatient.' + SpeCap;
     end;
+    frmMedCopy.AdjustFormSize;
     frmMedCopy.fraEvntDelayList.EvntLimit := LimitEvent;
     if Pos('transfer',RadCap)>0 then
       frmMedCopy.Caption := 'Transfer Medication Orders';
@@ -133,8 +136,8 @@ begin
     frmMedCopy.radDelayed.Caption := TX_DELAYED1 + RadCap + TX_DELAYED2;
     if LimitEvent='D' then
     begin
-      frmMedCopy.Panel2.Visible := False;
-      frmMedCopy.Height := frmMedCopy.Panel1.Height + frmMedCopy.GroupBox2.Height;
+      frmMedCopy.pnlInpatient.Visible := False;
+      frmMedCopy.AdjustFormSize;
     end;
     frmMedCopy.ShowModal;
     if (frmMedCopy.FOKPressed) and (frmMedCopy.radRelease.Checked) then
@@ -222,14 +225,8 @@ begin
   FDelayEvent.EventIFN  := 0;
   radRelease.Checked := True;
   if not Patient.Inpatient then
-    panel2.Visible := False;
-  if not radDelayed.Checked then
-  begin
-    if not panel2.Visible then
-      Height := Height - fraEvntDelayList.Height - panel2.Height
-    else
-      Height := Height - fraEvntDelayList.Height;
-  end;
+    pnlInpatient.Visible := False;
+  AdjustFormSize;
 end;
 
 procedure TfrmMedCopy.cmdOKClick(Sender: TObject);
@@ -260,6 +257,27 @@ begin
   Close;
 end;
 
+procedure TfrmMedCopy.AdjustFormSize;
+var
+  y: integer;
+begin
+  y := lblPtInfo.Height + 8; // allow for font changes
+  if pnlInpatient.Visible then
+  begin
+    lblInstruction2.top := lblInstruction.Height; // allow for font change
+    pnlInpatient.Height := lblInstruction2.top + lblInstruction2.Height;
+    inc(y,pnlInpatient.Height);
+  end;
+  pnlTop.Height := y;
+  inc(y, pnlMiddle.Height);
+  if fraEvntDelayList.Visible then
+  begin
+    inc(y, fraEvntDelayList.Height);
+  end;
+  VertScrollBar.Range := y;
+  ClientHeight := y;
+end;
+
 procedure TfrmMedCopy.cmdCancelClick(Sender: TObject);
 begin
   inherited;
@@ -277,20 +295,20 @@ begin
   fraEvntDelayList.DisplayEvntDelayList;
   if fraEvntDelayList.mlstEvents.Items.Count < 1 then
   begin
-    ShowMessage(WarningMSG);
+    ShowMsg(WarningMSG);
     radRelease.Checked := True;
   end else
   begin
-    Height := Height + fraEvntDelayList.Height;
     fraEvntDelayList.Visible := True;
   end;
+  AdjustFormSize;
 end;
 
 procedure TfrmMedCopy.radReleaseClick(Sender: TObject);
 begin
   inherited;
   fraEvntDelayList.Visible := False;
-  Height := Height - fraEvntDelayList.Height;
+  AdjustFormSize;
 end;
 
 procedure TfrmMedCopy.fraEvntDelayListcboEvntListChange(Sender: TObject);
@@ -325,6 +343,7 @@ end;
 procedure TfrmMedCopy.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
+  inherited;
   if Key = VK_RETURN then
     cmdOKClick(Self);
 end;

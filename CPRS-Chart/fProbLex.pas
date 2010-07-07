@@ -5,10 +5,10 @@ interface
 uses
   SysUtils, WinTypes, WinProcs, Messages, Classes, Graphics, Controls,
   Forms, Dialogs, ORFn, uProbs, StdCtrls, Buttons, ExtCtrls, ORctrls, uConst,
-  fAutoSz, uInit;
+  fAutoSz, uInit, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmPLLex = class(TForm)
+  TfrmPLLex = class(TfrmBase508Form)
     Label1: TLabel;
     bbCan: TBitBtn;
     bbOK: TBitBtn;
@@ -182,13 +182,13 @@ try
  if (v<>'') and (lbLex.itemindex<1) then
   begin
    ProblemList.clear;
-   {Alist.Assign(ProblemLexiconSearch(v)) ;}
-   Alist.Assign(OldProblemLexiconSearch(v, 100)) ;
+   {FastAssign(ProblemLexiconSearch(v), Alist) ;}
+   FastAssign(OldProblemLexiconSearch(v, 100), Alist) ;
   end;
  if Alist.count > 0 then
     begin
-     lbLex.Items.assign(Alist);
-     ProblemList.assign(Alist);
+     FastAssign(Alist, lbLex.Items);
+     FastAssign(Alist, ProblemList);
      Max:=ProblemList[pred(ProblemList.count)]; {get max number found}
      ProblemList.delete(pred(ProblemList.count)); {shed max# found}
      SetLexList(V);

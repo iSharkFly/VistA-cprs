@@ -4,10 +4,24 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ExtCtrls, ComCtrls, ImgList, ORFn, Menus;
+  StdCtrls, ORCtrls, ExtCtrls, ComCtrls, ImgList, ORFn, Menus, fBase508Form,
+  VA508AccessibilityManager, VA508ImageListLabeler;
 
 type
-  TfrmReminderTree = class(TForm)
+  TtvRem508Manager = class(TVA508ComponentManager)
+  private
+    function getDueDate(sData : String): String;
+    function getLastOcc(sData : String): String;
+    function getPriority(sData : String): String;
+    function getName(sData : String): String;
+    function getImgText(Node : TORTreeNode): String;
+  public
+    constructor Create; override;
+    function GetValue(Component: TWinControl): string; override;
+    function GetItem(Component: TWinControl): TObject; override;
+  end;
+
+  TfrmReminderTree = class(TfrmBase508Form)
     pnlTop: TPanel;
     tvRem: TORTreeView;
     hcRem: THeaderControl;
@@ -23,6 +37,7 @@ type
     memEvalCat: TMenuItem;
     mnuCoverSheet: TMenuItem;
     mnuExit: TMenuItem;
+    imgLblReminders: TVA508ImageListLabeler;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure tvRemExpanded(Sender: TObject; Node: TTreeNode);
@@ -48,10 +63,9 @@ type
     procedure memEvalCatClick(Sender: TObject);
     procedure mnuCoverSheetClick(Sender: TObject);
     procedure tvRemNodeCaptioning(Sender: TObject; var Caption: String);
-    procedure tvRemAddition(Sender: TObject; Node: TTreeNode);
-    procedure tvRemDeletion(Sender: TObject; Node: TTreeNode);
     procedure mnuExitClick(Sender: TObject);
   private
+    tvRem508Manager : TtvRem508Manager;
     FLinking: boolean;
     FSortOrder: integer;
     FSortAssending: boolean;
@@ -92,7 +106,7 @@ const
 implementation
 
 uses uReminders, dShared, uConst, fReminderDialog, fNotes, rMisc,
-     rReminders, fRemCoverSheet, uAccessibleTreeView, uAccessibleTreeNode;
+     rReminders, fRemCoverSheet, VA2006Utils;
 
 {$R *.DFM}
 
@@ -119,6 +133,7 @@ end;
                                                               
 procedure TfrmReminderTree.FormCreate(Sender: TObject);
 begin
+  FixHeaderControlDelphi2006Bug(hcRem);
   memView := TORMenuItem.Create(mmMain);
   memView.Caption := '&View';
   memView.Add(TORMenuItem.Create(memView));
@@ -134,7 +149,8 @@ begin
   SetFontSize(MainFontSize);
   SetReminderFormBounds(Self, 0, 0, Self.Width, Self.Height,
                         RemTreeDlgLeft, RemTreeDlgTop, RemTreeDlgWidth, RemTreeDlgHeight);
-  TAccessibleTreeView.WrapControl(tvRem);
+  tvRem508Manager := TtvRem508Manager.Create;
+  amgrMain.ComponentManager[tvRem] := tvRem508Manager;
 end;
 
 procedure TfrmReminderTree.LinkTopControls(FromTree: boolean);
@@ -255,7 +271,7 @@ begin
     begin
       sl := TStringList.Create;
       try
-        sl.Assign(lbRem.Items);
+        sl.Assign(lbRem.Items); // Must use regualr assign, FastAssign doesn't copy objects.
         while(assigned(Node) and (Node.Level > lvl)) do
         begin
           i := sl.IndexOfObject(Node);
@@ -624,7 +640,6 @@ end;
 
 procedure TfrmReminderTree.FormDestroy(Sender: TObject);
 begin
-  TAccessibleTreeView.UnwrapControl(tvRem);
   frmReminderTree := nil;
   ProcessedReminders.Notifier.RemoveNotify(ProcessedRemindersChanged);
 //  RemoveNotifyWhenProcessingReminderChanges(PositionToReminder);
@@ -703,19 +718,69 @@ begin
     end;
 end;
 
-procedure TfrmReminderTree.tvRemAddition(Sender: TObject; Node: TTreeNode);
-begin
-  TAccessibleTreeNode.WrapControl(Node as TORTreeNode);
-end;
-
-procedure TfrmReminderTree.tvRemDeletion(Sender: TObject; Node: TTreeNode);
-begin
-  TAccessibleTreeNode.UnwrapControl(Node as TORTreeNode);
-end;
-
 procedure TfrmReminderTree.mnuExitClick(Sender: TObject);
 begin
   Close;
 end;
+
+{ TGrdLab508Manager }
+
+constructor TtvRem508Manager.Create;
+begin
+  inherited Create([mtValue, mtItemChange]);
+end;
+
+function TtvRem508Manager.getDueDate(sData: String): String;
+begin
+  Result := Piece(sData,U,3);
+  if Result <> '' then
+    Result := ' Due Date: ' + FormatFMDateTimeStr('mm/dd/yyyy',Result);
+end;
+
+function TtvRem508Manager.getImgText(Node: TORTreeNode): String;
+begin
+  Result := '';
+  if Node.ImageIndex > -1 then
+    Result := frmReminderTree.imgLblReminders.RemoteLabeler.Labels.Items[Node.ImageIndex].Caption + ' ';
+end;
+
+function TtvRem508Manager.GetItem(Component: TWinControl): TObject;
+var
+  tv : TORTreeView;
+begin
+  tv := TORTreeView(Component);
+  Result :=  tv.Selected;
+end;
+
+function TtvRem508Manager.getLastOcc(sData: String): String;
+begin
+  Result := Piece(sData,U,4);
+  if Result <> '' then
+    Result := ' Last Occurrence: ' + FormatFMDateTimeStr('mm/dd/yyyy',Result);
+end;
+
+function TtvRem508Manager.getName(sData: String): String;
+begin
+  Result := Piece(sData,U,2);
+end;
+
+function TtvRem508Manager.getPriority(sData: String): String;
+begin
+  Result := Piece(sData,U,5);
+  if Result = '2' then
+    Result := '';
+  if Result <> '' then
+    Result := ' Priority: ' + Result;
+end;
+
+function TtvRem508Manager.GetValue(Component: TWinControl): string;
+var
+    Node: TORTreeNode;
+begin
+  Node := TORTreeNode(TORTreeView(Component).Selected);
+  Result := getImgText(Node) + getName(Node.StringData) + getDueDate(Node.StringData) +
+            getLastOcc(Node.StringData) + getPriority(Node.StringData);
+end;
+
 
 end.

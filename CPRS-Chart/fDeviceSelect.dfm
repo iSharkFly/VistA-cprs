@@ -1,29 +1,17 @@
-object frmDeviceSelect: TfrmDeviceSelect
+inherited frmDeviceSelect: TfrmDeviceSelect
   Left = 378
   Top = 340
-  AutoScroll = False
   Caption = 'Orders Print Device Selection'
   ClientHeight = 235
   ClientWidth = 415
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = True
   Position = poScreenCenter
   OnClose = FormClose
-  OnShow = FormShow
+  OnCreate = FormCreate
+  ExplicitWidth = 423
+  ExplicitHeight = 262
   PixelsPerInch = 96
   TextHeight = 13
-  object lblPrintTo: TLabel
-    Left = 8
-    Top = 276
-    Width = 3
-    Height = 13
-  end
-  object grpDevice: TGroupBox
+  object grpDevice: TGroupBox [0]
     Left = 0
     Top = 0
     Width = 415
@@ -58,6 +46,7 @@ object frmDeviceSelect: TfrmDeviceSelect
       TabOrder = 0
       OnChange = cboDeviceChange
       OnNeedData = cboDeviceNeedData
+      CharsNeedMatch = 1
     end
     object pnlGBBottom: TPanel
       Left = 2
@@ -103,7 +92,7 @@ object frmDeviceSelect: TfrmDeviceSelect
       end
     end
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 194
     Width = 415
@@ -139,5 +128,38 @@ object frmDeviceSelect: TfrmDeviceSelect
       Caption = 'Save as user'#39's default printer'
       TabOrder = 2
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = grpDevice'
+        'Status = stsDefault')
+      (
+        'Component = cboDevice'
+        'Status = stsDefault')
+      (
+        'Component = pnlGBBottom'
+        'Status = stsDefault')
+      (
+        'Component = txtRightMargin'
+        'Status = stsDefault')
+      (
+        'Component = txtPageLength'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = chkDefault'
+        'Status = stsDefault')
+      (
+        'Component = frmDeviceSelect'
+        'Status = stsDefault'))
   end
 end

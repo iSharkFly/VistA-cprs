@@ -103,7 +103,6 @@ procedure ListDateRangeClinic(Dest: TStrings);
 
 { General calls }
 
-function GetProgramFilesPath: String;
 function ExternalName(IEN: Int64; FileNumber: Double): string;
 function PersonHasKey(APerson: Int64; const AKey: string): Boolean;
 function GlobalRefForFile(const FileID: string): string;
@@ -117,6 +116,7 @@ function GetDefaultPrinter(DUZ: Int64; Location: integer): string;
 
 function GetUserInfo: TUserInfo;
 function GetUserParam(const AParamName: string): string;
+procedure GetUserListParam(Dest: TStrings; const AParamName: string);
 function HasSecurityKey(const KeyName: string): Boolean;
 function HasMenuOptionAccess(const OptionName: string): Boolean;
 function ValidESCode(const ACode: string): Boolean;
@@ -151,6 +151,8 @@ procedure ListTeamAll(Dest: TStrings);
 procedure ListWardAll(Dest: TStrings);
 procedure ListProviderTop(Dest: TStrings);
 function SubSetOfProviders(const StartFrom: string; Direction: Integer): TStrings;
+function SubSetOfCosigners(const StartFrom: string; Direction: Integer; Date: TFMDateTime;
+  ADocType: integer; ATitle: integer): TStrings;
 procedure ListClinicTop(Dest: TStrings);
 function SubSetOfClinics(const StartFrom: string; Direction: Integer): TStrings;
 function GetDfltSort: string;
@@ -209,23 +211,19 @@ function SubSetOfUsersWithClass(const StartFrom: string; Direction: Integer; Dat
 { Remote Data Access calls }
 function HasRemoteData(const DFN: string; var ALocations: TStringList): Boolean;
 function CheckHL7TCPLink: Boolean;
-function UseVistaWeb: Boolean;
 function GetVistaWebAddress(value: string): string;
-procedure ChangeVistaWebParam(value: string);
 
 implementation
 
 uses Hash, uCore, ShlObj, Windows;
 
 var
-  uFMToday: TFMDateTime;                         // Today's date in Fileman format.
   uPtListDfltSort: string = '';                  // Current user's patient selection list default sort order.
 
 { private calls }
 
 function FormatSSN(const x: string): string;
- {places the dashes in a social security number }
-
+{ places the dashes in a social security number }
 //vwpt code 4/17/0  see below
 var
 
@@ -266,8 +264,7 @@ end;
 function FMToday: TFMDateTime;
 { return the current date in Fileman format }
 begin
-  if uFMToday = 0 then uFMToday := Int(FMNow);
-  Result := uFMToday;
+  Result := Int(FMNow);
 end;
 
 function FMNow: TFMDateTime;
@@ -317,7 +314,7 @@ procedure ListDateRangeClinic(Dest: TStrings);
 { returns date ranges for displaying clinic appointments in patient lookup }
 begin
   CallV('ORWPT CLINRNG', [nil]);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 function DfltDateRangeClinic;
@@ -327,17 +324,6 @@ begin
 end;
 
 { General calls }
-
-function GetProgramFilesPath: String;
-Const
-  CSIDL_PROGRAM_FILES = $0026;
-var
-  Path: array[0..Max_Path] of Char;
-begin
-  Path := '';
-  SHGetSpecialFolderPath(0,Path,CSIDL_PROGRAM_FILES,false);
-  Result := Path;
-end;
 
 function ExternalName(IEN: Int64; FileNumber: Double): string;
 { returns the external name of the IEN within a file }
@@ -440,6 +426,19 @@ begin
   Result := sCallV('ORWU PARAM', [AParamName]);
 end;
 
+procedure GetUserListParam(Dest: TStrings; const AParamName: string);
+var
+  tmplst: TStringList;
+begin
+  tmplst := TStringList.Create;
+  try
+    tCallV(tmplst, 'ORWU PARAMS', [AParamName]);
+    FastAssign(tmplst, Dest);
+  finally
+    tmplst.Free;
+  end;
+end;
+
 function HasSecurityKey(const KeyName: string): Boolean;
 { returns true if the currently logged in user has a given security key }
 var
@@ -471,7 +470,7 @@ begin
   try
     //UpdateUnsignedOrderAlerts(Patient.DFN);      //moved to AFTER signature and DC actions
     tCallV(tmplst, 'ORWORB FASTUSER', [nil]);
-    Dest.Assign(tmplst);
+    FastAssign(tmplst, Dest);
   finally
     tmplst.Free;
   end;
@@ -592,7 +591,7 @@ procedure ListSpecialtyAll(Dest: TStrings);
 begin
   CallV('ORQPT SPECIALTIES', [nil]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListTeamAll(Dest: TStrings);
@@ -600,7 +599,7 @@ procedure ListTeamAll(Dest: TStrings);
 begin
   CallV('ORQPT TEAMS', [nil]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListWardAll(Dest: TStrings);
@@ -608,7 +607,7 @@ procedure ListWardAll(Dest: TStrings);
 begin
   CallV('ORQPT WARDS', [nil]);
   //MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListProviderTop(Dest: TStrings);
@@ -622,6 +621,20 @@ function SubSetOfProviders(const StartFrom: string; Direction: Integer): TString
 begin
   CallV('ORWU NEWPERS', [StartFrom, Direction, 'PROVIDER']);
 //  MixedCaseList(RPCBrokerV.Results);
+  Result := RPCBrokerV.Results;
+end;
+
+function SubSetOfCosigners(const StartFrom: string; Direction: Integer; Date: TFMDateTime;
+  ADocType: integer; ATitle: integer): TStrings;
+{ returns a pointer to a list of cosigners (for use in a long list box) -  The return value is
+  a pointer to RPCBrokerV.Results, so the data must be used BEFORE the next broker call! }
+begin
+  if ATitle > 0 then ADocType := 0;
+  // CQ #17218 - Correcting order of parameters for this call
+  //  CallV('ORWU2 COSIGNER', [StartFrom, Direction, Date, ATitle, ADocType]);
+  CallV('ORWU2 COSIGNER', [StartFrom, Direction, Date, ADocType, ATitle]);
+
+  //  MixedCaseList(RPCBrokerV.Results);
   Result := RPCBrokerV.Results;
 end;
 
@@ -725,7 +738,7 @@ begin
       end;
     end;
     MixedCaseList(tmplst);
-    Dest.Assign(tmplst);
+    FastAssign(tmplst, Dest);
   finally
     tmplst.Free;
   end;
@@ -737,7 +750,7 @@ begin
   CallV('ORQPT PROVIDER PATIENTS', [ProviderIEN]);
   SortByPiece(TStringList(RPCBrokerV.Results), U, 2);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListPtByTeam(Dest: TStrings; TeamIEN: Integer);
@@ -746,7 +759,7 @@ begin
   CallV('ORQPT TEAM PATIENTS', [TeamIEN]);
   SortByPiece(TStringList(RPCBrokerV.Results), U, 2);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListPtBySpecialty(Dest: TStrings; SpecialtyIEN: Integer);
@@ -755,7 +768,7 @@ begin
   CallV('ORQPT SPECIALTY PATIENTS', [SpecialtyIEN]);
   SortByPiece(TStringList(RPCBrokerV.Results), U, 2);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListPtByClinic(Dest: TStrings; ClinicIEN: Integer; FirstDt, LastDt: string); //TFMDateTime);
@@ -783,7 +796,7 @@ begin
       Results[i] := x;
     end;
     MixedCaseList(Results);
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -799,7 +812,7 @@ begin
   else
     SortByPiece(TStringList(RPCBrokerV.Results), U, 2);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 // VWPT ADDITIONS FOR ENHANCED PATIENT LOOKUP
@@ -831,6 +844,7 @@ end;
 
 
 //END VWPT ADDITIONS
+
 procedure ListPtByLast5(Dest: TStrings; const Last5: string);
 var
   i: Integer;
@@ -850,7 +864,7 @@ begin
     Results[i] := x;
   end;
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListPtByRPLLast5(Dest: TStrings; const Last5: string);
@@ -872,7 +886,7 @@ begin
     Results[i] := x;
   end;
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListPtByFullSSN(Dest: TStrings; const FullSSN: string);
@@ -901,7 +915,7 @@ begin
     Results[i] := x;
   end;
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListPtByRPLFullSSN(Dest: TStrings; const FullSSN: string);
@@ -930,7 +944,7 @@ begin
     Results[i] := x;
   end;
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 procedure ListPtTop(Dest: TStrings);
@@ -938,7 +952,7 @@ procedure ListPtTop(Dest: TStrings);
 begin
   CallV('ORWPT TOP', [nil]);
   MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, Dest);
 end;
 
 function SubSetOfPatients(const StartFrom: string; Direction: Integer): TStrings;
@@ -1044,9 +1058,8 @@ begin
 end;
 
 function GetPtIDInfo(const DFN: string): TPtIDInfo;  //*DFN*
-{ returns the identifiers displayed upon patient selection
 //VWPT ADD HRN   ,ALT HRN (FUTURE)
-  Pieces: SSN[1]^DOB[2]^SEX[3]^VET[4]^SC%[5]^WARD[6]^RM-BED[7]^NAME[8]^HRN[9]^ALTHRN[10] }
+//  Pieces: SSN[1]^DOB[2]^SEX[3]^VET[4]^SC%[5]^WARD[6]^RM-BED[7]^NAME[8]^HRN[9]^ALTHRN[10] }
  // Pieces: SSN[1]^DOB[2]^SEX[3]^VET[4]^SC%[5]^WARD[6]^RM-BED[7]^NAME[8] }
 var
   x: string;
@@ -1124,7 +1137,7 @@ procedure SelectPatient(const DFN: string; var PtSelect: TPtSelect);   //*DFN*
   Pieces: NAME[1]^SEX[2]^DOB[3]^SSN[4]^LOCIEN[5]^LOCNAME[6]^ROOMBED[7]^CWAD[8]^SENSITIVE[9]^
   //VWPT add HRN and ALTERNATE HRN used with PID hl7 segments
   ADMITTIME[10]^CONVERTED[11]^SVCONN[12]^SC%[13]^ICN[14]^Age[15]^TreatSpec[16]^HRN[17]^AltHRN[18] }
-//  BEFORE THIS VWPT WAS         ADMITTIME[10]^CONVERTED[11]^SVCONN[12]^SC%[13]^ICN[14]^Age[15]^TreatSpec[16] }
+ //  BEFORE THIS VWPT WAS         ADMITTIME[10]^CONVERTED[11]^SVCONN[12]^SC%[13]^ICN[14]^Age[15]^TreatSpec[16] }
 var
   x: string;
 begin
@@ -1147,7 +1160,6 @@ begin
     AdmitTime := MakeFMDateTime(Piece(x, U, 10));
     ServiceConnected := Piece(x, U, 12) = '1';
     SCPercent := StrToIntDef(Piece(x, U, 13), 0);
-
     //VWPT ADD HRN   AltHRN (future)
     HRN := Piece(x, U, 17);
     AltHRN := Piece(x, U, 18);
@@ -1228,7 +1240,7 @@ begin
     InvertStringList(TStringList(Results));
     MixedCaseList(Results);
     SetListFMDateTime('mmm dd,yyyy hh:nn', TStringList(Results), U, 2);
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
   (*
   CallV('ORWPT APPTLST', [DFN]);
@@ -1244,7 +1256,7 @@ begin
       SetPiece(x, U, 5, ATime);
       Results[i] := x;
     end;
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
   *)
 end;
@@ -1266,7 +1278,7 @@ begin
       SetPiece(x, U, 5, ATime);
       Results[i] := x;
     end;
-    Dest.Assign(Results);
+    FastAssign(Results, Dest);
   end;
 end;
 
@@ -1300,7 +1312,7 @@ end;
 function HasRemoteData(const DFN: string; var ALocations: TStringList): Boolean;
 begin
   CallV('ORWCIRN FACLIST', [DFN]);
-  ALocations.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, ALocations);
   Result := not (Piece(RPCBrokerV.Results[0], U, 1) = '-1');
 
 //   '-1^NO DFN'
@@ -1319,29 +1331,15 @@ function CheckHL7TCPLink: Boolean;
    Result := RPCBrokerV.Results[0] = '1';
  end;
 
-function UseVistaWeb: Boolean;
- begin;
-   CallV('ORWCIRN VISTAWEB',[nil]);
-   result := RPCBrokerV.Results[0] = '1';
- end;
-
 function GetVistaWebAddress(value: string): string;
 begin
   CallV('ORWCIRN WEBADDR', [value]);
   result := RPCBrokerV.Results[0];
 end;
 
-procedure ChangeVistaWebParam(value: string);
-  begin
-    CallV('ORWCIRN WEBCH',[value]);
-  end;
-
 function GetDefaultPrinter(DUZ: Int64; Location: integer): string;
 begin
   Result := sCallV('ORWRP GET DEFAULT PRINTER', [DUZ, Location]) ;
 end;
-
-initialization
-  uFMToday := 0;
 
 end.

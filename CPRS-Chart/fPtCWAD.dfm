@@ -1,17 +1,18 @@
 inherited frmPtCWAD: TfrmPtCWAD
   Left = 245
   Top = 268
-  Width = 443
-  Height = 302
   BorderIcons = [biSystemMenu]
   Caption = 'Patient Postings'
-  KeyPreview = True
+  ClientHeight = 275
+  ClientWidth = 435
   Position = poScreenCenter
   OnCreate = FormCreate
   OnKeyUp = FormKeyUp
+  ExplicitWidth = 443
+  ExplicitHeight = 302
   PixelsPerInch = 96
   TextHeight = 13
-  object lblNotes: TOROffsetLabel
+  object lblNotes: TOROffsetLabel [0]
     Left = 0
     Top = 127
     Width = 435
@@ -23,7 +24,7 @@ inherited frmPtCWAD: TfrmPtCWAD
     VertOffset = 6
     WordWrap = False
   end
-  object lblAllergies: TOROffsetLabel
+  object lblAllergies: TOROffsetLabel [1]
     Left = 0
     Top = 0
     Width = 435
@@ -37,7 +38,7 @@ inherited frmPtCWAD: TfrmPtCWAD
     VertOffset = 6
     WordWrap = False
   end
-  object lstAllergies: TORListBox
+  object lstAllergies: TORListBox [2]
     Left = 0
     Top = 21
     Width = 435
@@ -54,7 +55,7 @@ inherited frmPtCWAD: TfrmPtCWAD
     Pieces = '2,3,4'
     TabPositions = '30,45'
   end
-  object lstNotes: TORListBox
+  object lstNotes: TORListBox [3]
     Left = 0
     Top = 151
     Width = 435
@@ -71,7 +72,7 @@ inherited frmPtCWAD: TfrmPtCWAD
     Pieces = '2,3'
     TabPositions = '20'
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [4]
     Left = 0
     Top = 248
     Width = 435
@@ -93,5 +94,23 @@ inherited frmPtCWAD: TfrmPtCWAD
       TabOrder = 0
       OnClick = btnCloseClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lstAllergies'
+        'Status = stsDefault')
+      (
+        'Component = lstNotes'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnClose'
+        'Status = stsDefault')
+      (
+        'Component = frmPtCWAD'
+        'Status = stsDefault'))
   end
 end

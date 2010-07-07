@@ -1,18 +1,21 @@
 inherited frmRenewOutMed: TfrmRenewOutMed
   Left = 334
   Top = 436
-  Width = 364
-  Height = 227
   Caption = 'Change Refills for Outpatient Medication'
+  ClientHeight = 200
+  ClientWidth = 356
+  OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 364
+  ExplicitHeight = 227
   PixelsPerInch = 96
   TextHeight = 13
-  object memOrder: TCaptionMemo
+  object memOrder: TCaptionMemo [0]
     Left = 0
     Top = 0
     Width = 356
-    Height = 88
+    Height = 95
     Align = alClient
     Color = clBtnFace
     ReadOnly = True
@@ -20,9 +23,9 @@ inherited frmRenewOutMed: TfrmRenewOutMed
     TabOrder = 0
     Caption = 'Order'
   end
-  object pnlButtons: TPanel
+  object pnlButtons: TPanel [1]
     Left = 0
-    Top = 152
+    Top = 159
     Width = 356
     Height = 41
     Align = alBottom
@@ -54,9 +57,9 @@ inherited frmRenewOutMed: TfrmRenewOutMed
       OnClick = cmdCancelClick
     end
   end
-  object pnlMiddle: TPanel
+  object pnlMiddle: TPanel [2]
     Left = 0
-    Top = 88
+    Top = 95
     Width = 356
     Height = 64
     Align = alBottom
@@ -107,5 +110,32 @@ inherited frmRenewOutMed: TfrmRenewOutMed
       TabOrder = 1
       Caption = 'Refills'
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memOrder'
+        'Status = stsDefault')
+      (
+        'Component = pnlButtons'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = pnlMiddle'
+        'Status = stsDefault')
+      (
+        'Component = cboPickup'
+        'Status = stsDefault')
+      (
+        'Component = txtRefills'
+        'Status = stsDefault')
+      (
+        'Component = frmRenewOutMed'
+        'Status = stsDefault'))
   end
 end

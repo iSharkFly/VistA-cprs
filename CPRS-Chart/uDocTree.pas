@@ -83,7 +83,7 @@ begin
   AList := TStringList.Create;
   SrcList := TStringList.Create;
   try
-    SrcList.Assign(Source);
+    FastAssign(Source, SrcList);
     with SrcList do
       begin
         if (Count = 0) then
@@ -249,19 +249,20 @@ var
   var
     LookingForAddenda: boolean;
   begin
+    if not assigned(Node) then exit;
     LookingForAddenda := (Pos('ADDENDUM', UpperCase(CurrentContext.Keyword)) > 0);
     with ANode do
       begin
         Bold := True;
-        if Parent <> nil then
+        if assigned(Parent) then
           begin
             if (ImageIndex <> IMG_ADDENDUM) or ((ImageIndex = IMG_ADDENDUM) and LookingForAddenda) then
               Parent.Expand(False);
-            if Parent.Parent <> nil then
+            if assigned(Parent.Parent) then
               begin
                 if (Parent.ImageIndex <> IMG_ADDENDUM) or ((Parent.ImageIndex = IMG_ADDENDUM) and LookingForAddenda) then
                   Parent.Parent.Expand(False);
-                if Parent.Parent.Parent <> nil then
+                if assigned(Parent.Parent.Parent) then
                   if (Parent.Parent.ImageIndex <> IMG_ADDENDUM) or ((Parent.Parent.ImageIndex = IMG_ADDENDUM) and LookingForAddenda) then
                     Parent.Parent.Parent.Expand(False);
               end;

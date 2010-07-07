@@ -12,17 +12,16 @@ unit CPRSChart_TLB;
 // ************************************************************************ //
 
 // PASTLWTR : 1.2
-// File generated on 2/4/2008 6:51:03 PM from Type Library described below.
+// File generated on 6/26/2010 8:43:12 PM from Type Library described below.
 
 // ************************************************************************  //
-// Type Lib: C:\Program Files\Borland\Delphi7\Projects\OR_SRC_CREATION FILE 12 06 06 OR_3_270\WV_Release_CPRS_OFFICIAL\CPRS-Chart\CPRSChart.tlb (1)
+// Type Lib: P:\vista\CPRS-WV_OFFICIAL_RELEASE-27\WVEHR-v27Delphi2006\CPRS-chart\CPRSChart.tlb (1)
 // LIBID: {0A4A6086-6504-11D5-82DE-00C04F72C274}
 // LCID: 0
 // Helpfile: 
 // HelpString: CPRSChart Library
 // DepndLst: 
 //   (1) v2.0 stdole, (C:\WINDOWS\system32\stdole2.tlb)
-//   (2) v1.1 Accessibility, (C:\WINDOWS\system32\oleacc.dll)
 // ************************************************************************ //
 {$TYPEDADDRESS OFF} // Unit must be compiled without type-checked pointers. 
 {$WARN SYMBOL_PLATFORM OFF}
@@ -30,7 +29,7 @@ unit CPRSChart_TLB;
 {$VARPROPSETTER ON}
 interface
 
-uses Windows, Accessibility_TLB, ActiveX, Classes, Graphics, StdVCL, Variants;
+uses Windows, ActiveX, Classes, Graphics, StdVCL, Variants;
   
 
 // *********************************************************************//
@@ -50,16 +49,6 @@ const
   IID_ICPRSBroker: TGUID = '{63DC619B-6BE0-11D5-82E6-00C04F72C274}';
   IID_ICPRSState: TGUID = '{63DC619E-6BE0-11D5-82E6-00C04F72C274}';
   IID_ICPRSExtension: TGUID = '{63DC61C4-6BE0-11D5-82E6-00C04F72C274}';
-  IID_IAccessibleStringGrid: TGUID = '{EFD768F7-59C0-48D9-889E-49EDF75488A6}';
-  CLASS_AccessibleStringGrid: TGUID = '{25CDBD92-C72E-47B0-9E75-9457B603000C}';
-  IID_IAccessibleListBox: TGUID = '{4B6A88F7-DCFE-4992-B5FC-565FDCB3829B}';
-  CLASS_AccessibleListBox: TGUID = '{758002E7-7012-4FAB-BD84-40D372694719}';
-  IID_IAccessibleTreeNode: TGUID = '{5974D1D8-0F49-45E5-AEFE-674A61F8771A}';
-  CLASS_AccessibleTreeNode: TGUID = '{3AD21DCA-2298-487A-8197-59B8D586C244}';
-  IID_IAccessibleTreeView: TGUID = '{06AA97AB-6D67-425C-B794-15FB8C62F870}';
-  CLASS_AccessibleTreeView: TGUID = '{507AD9F0-9ED6-4BCD-A3AB-DBA72153F14D}';
-  IID_IAccessibleRichEdit: TGUID = '{F2C380A5-C3DD-4AE8-81ED-C08C59E92962}';
-  CLASS_AccessibleRichEdit: TGUID = '{DC61493C-51FE-49A4-8749-8464A00D5CFC}';
 
 // *********************************************************************//
 // Declaration of Enumerations defined in Type Library                    
@@ -84,27 +73,6 @@ type
   ICPRSStateDisp = dispinterface;
   ICPRSExtension = interface;
   ICPRSExtensionDisp = dispinterface;
-  IAccessibleStringGrid = interface;
-  IAccessibleStringGridDisp = dispinterface;
-  IAccessibleListBox = interface;
-  IAccessibleListBoxDisp = dispinterface;
-  IAccessibleTreeNode = interface;
-  IAccessibleTreeNodeDisp = dispinterface;
-  IAccessibleTreeView = interface;
-  IAccessibleTreeViewDisp = dispinterface;
-  IAccessibleRichEdit = interface;
-  IAccessibleRichEditDisp = dispinterface;
-
-// *********************************************************************//
-// Declaration of CoClasses defined in Type Library                       
-// (NOTE: Here we map each CoClass to its Default Interface)              
-// *********************************************************************//
-  AccessibleStringGrid = IAccessibleStringGrid;
-  AccessibleListBox = IAccessibleListBox;
-  AccessibleTreeNode = IAccessibleTreeNode;
-  AccessibleTreeView = IAccessibleTreeView;
-  AccessibleRichEdit = IAccessibleRichEdit;
-
 
 // *********************************************************************//
 // Interface: ICPRSBroker
@@ -226,208 +194,8 @@ type
                      var Data1: WideString; var Data2: WideString): WordBool; dispid 1;
   end;
 
-// *********************************************************************//
-// Interface: IAccessibleStringGrid
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {EFD768F7-59C0-48D9-889E-49EDF75488A6}
-// *********************************************************************//
-  IAccessibleStringGrid = interface(IDispatch)
-    ['{EFD768F7-59C0-48D9-889E-49EDF75488A6}']
-  end;
-
-// *********************************************************************//
-// DispIntf:  IAccessibleStringGridDisp
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {EFD768F7-59C0-48D9-889E-49EDF75488A6}
-// *********************************************************************//
-  IAccessibleStringGridDisp = dispinterface
-    ['{EFD768F7-59C0-48D9-889E-49EDF75488A6}']
-  end;
-
-// *********************************************************************//
-// Interface: IAccessibleListBox
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {4B6A88F7-DCFE-4992-B5FC-565FDCB3829B}
-// *********************************************************************//
-  IAccessibleListBox = interface(IDispatch)
-    ['{4B6A88F7-DCFE-4992-B5FC-565FDCB3829B}']
-  end;
-
-// *********************************************************************//
-// DispIntf:  IAccessibleListBoxDisp
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {4B6A88F7-DCFE-4992-B5FC-565FDCB3829B}
-// *********************************************************************//
-  IAccessibleListBoxDisp = dispinterface
-    ['{4B6A88F7-DCFE-4992-B5FC-565FDCB3829B}']
-  end;
-
-// *********************************************************************//
-// Interface: IAccessibleTreeNode
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {5974D1D8-0F49-45E5-AEFE-674A61F8771A}
-// *********************************************************************//
-  IAccessibleTreeNode = interface(IDispatch)
-    ['{5974D1D8-0F49-45E5-AEFE-674A61F8771A}']
-  end;
-
-// *********************************************************************//
-// DispIntf:  IAccessibleTreeNodeDisp
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {5974D1D8-0F49-45E5-AEFE-674A61F8771A}
-// *********************************************************************//
-  IAccessibleTreeNodeDisp = dispinterface
-    ['{5974D1D8-0F49-45E5-AEFE-674A61F8771A}']
-  end;
-
-// *********************************************************************//
-// Interface: IAccessibleTreeView
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {06AA97AB-6D67-425C-B794-15FB8C62F870}
-// *********************************************************************//
-  IAccessibleTreeView = interface(IDispatch)
-    ['{06AA97AB-6D67-425C-B794-15FB8C62F870}']
-  end;
-
-// *********************************************************************//
-// DispIntf:  IAccessibleTreeViewDisp
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {06AA97AB-6D67-425C-B794-15FB8C62F870}
-// *********************************************************************//
-  IAccessibleTreeViewDisp = dispinterface
-    ['{06AA97AB-6D67-425C-B794-15FB8C62F870}']
-  end;
-
-// *********************************************************************//
-// Interface: IAccessibleRichEdit
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {F2C380A5-C3DD-4AE8-81ED-C08C59E92962}
-// *********************************************************************//
-  IAccessibleRichEdit = interface(IDispatch)
-    ['{F2C380A5-C3DD-4AE8-81ED-C08C59E92962}']
-  end;
-
-// *********************************************************************//
-// DispIntf:  IAccessibleRichEditDisp
-// Flags:     (4416) Dual OleAutomation Dispatchable
-// GUID:      {F2C380A5-C3DD-4AE8-81ED-C08C59E92962}
-// *********************************************************************//
-  IAccessibleRichEditDisp = dispinterface
-    ['{F2C380A5-C3DD-4AE8-81ED-C08C59E92962}']
-  end;
-
-// *********************************************************************//
-// The Class CoAccessibleStringGrid provides a Create and CreateRemote method to          
-// create instances of the default interface IAccessibleStringGrid exposed by              
-// the CoClass AccessibleStringGrid. The functions are intended to be used by             
-// clients wishing to automate the CoClass objects exposed by the         
-// server of this typelibrary.                                            
-// *********************************************************************//
-  CoAccessibleStringGrid = class
-    class function Create: IAccessibleStringGrid;
-    class function CreateRemote(const MachineName: string): IAccessibleStringGrid;
-  end;
-
-// *********************************************************************//
-// The Class CoAccessibleListBox provides a Create and CreateRemote method to          
-// create instances of the default interface IAccessibleListBox exposed by              
-// the CoClass AccessibleListBox. The functions are intended to be used by             
-// clients wishing to automate the CoClass objects exposed by the         
-// server of this typelibrary.                                            
-// *********************************************************************//
-  CoAccessibleListBox = class
-    class function Create: IAccessibleListBox;
-    class function CreateRemote(const MachineName: string): IAccessibleListBox;
-  end;
-
-// *********************************************************************//
-// The Class CoAccessibleTreeNode provides a Create and CreateRemote method to          
-// create instances of the default interface IAccessibleTreeNode exposed by              
-// the CoClass AccessibleTreeNode. The functions are intended to be used by             
-// clients wishing to automate the CoClass objects exposed by the         
-// server of this typelibrary.                                            
-// *********************************************************************//
-  CoAccessibleTreeNode = class
-    class function Create: IAccessibleTreeNode;
-    class function CreateRemote(const MachineName: string): IAccessibleTreeNode;
-  end;
-
-// *********************************************************************//
-// The Class CoAccessibleTreeView provides a Create and CreateRemote method to          
-// create instances of the default interface IAccessibleTreeView exposed by              
-// the CoClass AccessibleTreeView. The functions are intended to be used by             
-// clients wishing to automate the CoClass objects exposed by the         
-// server of this typelibrary.                                            
-// *********************************************************************//
-  CoAccessibleTreeView = class
-    class function Create: IAccessibleTreeView;
-    class function CreateRemote(const MachineName: string): IAccessibleTreeView;
-  end;
-
-// *********************************************************************//
-// The Class CoAccessibleRichEdit provides a Create and CreateRemote method to          
-// create instances of the default interface IAccessibleRichEdit exposed by              
-// the CoClass AccessibleRichEdit. The functions are intended to be used by             
-// clients wishing to automate the CoClass objects exposed by the         
-// server of this typelibrary.                                            
-// *********************************************************************//
-  CoAccessibleRichEdit = class
-    class function Create: IAccessibleRichEdit;
-    class function CreateRemote(const MachineName: string): IAccessibleRichEdit;
-  end;
-
 implementation
 
 uses ComObj;
-
-class function CoAccessibleStringGrid.Create: IAccessibleStringGrid;
-begin
-  Result := CreateComObject(CLASS_AccessibleStringGrid) as IAccessibleStringGrid;
-end;
-
-class function CoAccessibleStringGrid.CreateRemote(const MachineName: string): IAccessibleStringGrid;
-begin
-  Result := CreateRemoteComObject(MachineName, CLASS_AccessibleStringGrid) as IAccessibleStringGrid;
-end;
-
-class function CoAccessibleListBox.Create: IAccessibleListBox;
-begin
-  Result := CreateComObject(CLASS_AccessibleListBox) as IAccessibleListBox;
-end;
-
-class function CoAccessibleListBox.CreateRemote(const MachineName: string): IAccessibleListBox;
-begin
-  Result := CreateRemoteComObject(MachineName, CLASS_AccessibleListBox) as IAccessibleListBox;
-end;
-
-class function CoAccessibleTreeNode.Create: IAccessibleTreeNode;
-begin
-  Result := CreateComObject(CLASS_AccessibleTreeNode) as IAccessibleTreeNode;
-end;
-
-class function CoAccessibleTreeNode.CreateRemote(const MachineName: string): IAccessibleTreeNode;
-begin
-  Result := CreateRemoteComObject(MachineName, CLASS_AccessibleTreeNode) as IAccessibleTreeNode;
-end;
-
-class function CoAccessibleTreeView.Create: IAccessibleTreeView;
-begin
-  Result := CreateComObject(CLASS_AccessibleTreeView) as IAccessibleTreeView;
-end;
-
-class function CoAccessibleTreeView.CreateRemote(const MachineName: string): IAccessibleTreeView;
-begin
-  Result := CreateRemoteComObject(MachineName, CLASS_AccessibleTreeView) as IAccessibleTreeView;
-end;
-
-class function CoAccessibleRichEdit.Create: IAccessibleRichEdit;
-begin
-  Result := CreateComObject(CLASS_AccessibleRichEdit) as IAccessibleRichEdit;
-end;
-
-class function CoAccessibleRichEdit.CreateRemote(const MachineName: string): IAccessibleRichEdit;
-begin
-  Result := CreateRemoteComObject(MachineName, CLASS_AccessibleRichEdit) as IAccessibleRichEdit;
-end;
 
 end.

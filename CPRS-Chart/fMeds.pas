@@ -7,7 +7,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fPage, StdCtrls, Menus, ORCtrls, ORFn, ExtCtrls, ComCtrls, rOrders, uConst,
-  rMeds, ORNet;
+  rMeds, ORNet, fBase508Form, VA508AccessibilityManager;
 
 type
   TChildOD = class
@@ -82,6 +82,12 @@ type
     mnuViewRemoteData: TMenuItem;
     mnuViewPostings: TMenuItem;
     mnuOptimizeFields: TMenuItem;
+    SortbyStatusthenLocation1: TMenuItem;
+    SortbyClinicOrderthenStatusthenStopDate1: TMenuItem;
+    SortbyDrugalphabeticallystatusactivestatusrecentexpired1: TMenuItem;
+    N3: TMenuItem;
+    pnlView: TPanel;
+    txtView: TVA508StaticText;
     procedure mnuChartTabClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -135,7 +141,7 @@ type
       Shift: TShiftState; X, Y: Integer);
     procedure hdrMedsInMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    //procedure ActivateDeactiveRenew(AListBox: TListBox);
+    procedure ActivateDeactiveRenew(AListBox: TListBox);
     procedure ViewInfo(Sender: TObject);
     procedure mnuViewInformationClick(Sender: TObject);
     procedure mnuOptimizeFieldsClick(Sender: TObject);
@@ -145,6 +151,11 @@ type
       Section: THeaderSection);
     procedure hdrMedsInSectionClick(HeaderControl: THeaderControl;
       Section: THeaderSection);
+    procedure SortbyStatusthenLocation1Click(Sender: TObject);
+    procedure SortbyClinicOrderthenStatusthenStopDate1Click(
+      Sender: TObject);
+    procedure SortbyDrugalphabeticallystatusactivestatusrecentexpired1Click(
+      Sender: TObject);
   private
     FIterating: Boolean;
     FActionOnMedsTab: Boolean;
@@ -158,6 +169,7 @@ type
     uPharmacyOrdersOut: TStringList;
     uNonVAOrdersOut:  TStringList;
     ChildODList: TStringList;
+    FSortView: integer;
     function ListSelected(const ErrMsg: string): TListBox;
     procedure ValidateSelected(AListBox: TListBox; const AnAction, WarningMsg, WarningTitle: string);
     procedure MakeSelectedList(AListBox: TListBox; AList: TList; ActName: String = '');
@@ -169,8 +181,12 @@ type
     function GetHeader(Control: TWinControl): THeaderControl;
     function GetMedList(Control: TWinControl): TList;
     function GetPharmacyOrders(Control: TWinControl): TStringList;
-    function PatientStatusChanged: boolean;
+    //function PatientStatusChanged: boolean;
     procedure ClearChildODList;
+    procedure SetViewCaption(Caption : String);
+    procedure lstMedsInRightClickHandler(var Msg: TMessage; var Handled: Boolean);
+    procedure lstMedsNonVARightClickHandler(var Msg: TMessage; var Handled: Boolean);
+    procedure lstMedsOutRightClickHandler(var Msg: TMessage; var Handled: Boolean);
   public
     procedure RefreshMedLists;
     procedure ClearPtData; override;
@@ -183,6 +199,7 @@ type
     procedure SetSectionWidths(Sender: TObject);
     function GetTotalSectionsWidth(Sender: TObject) : integer;
     function CheckMedStatus(ActiveList: TListBox): boolean;
+    property SortView: integer read FSortView write FSortView;
   end;
 
 type
@@ -222,7 +239,8 @@ implementation
 
 uses uCore, rCore, fFrame, fRptBox, uOrders, fODBase, fOrdersDC, fOrdersHold,
      fOrdersRenew, fOMNavA, fOrdersRefill, fMedCopy, fOrders, fODChild, rODBase, 
-     StrUtils, fActivateDeactivate;
+     StrUtils, fActivateDeactivate, VA2006Utils, VA508AccessibilityRouter,
+  VAUtils;
 
 {$R *.DFM}
 
@@ -531,9 +549,10 @@ var
   x: string;
 begin
   inherited;
+  FixHeaderControlDelphi2006Bug(hdrMedsIn);
+  FixHeaderControlDelphi2006Bug(hdrMedsOut);
+  FixHeaderControlDelphi2006Bug(hdrMedsNonVA);
   PageID := CT_MEDS;
-  lstMedsIn.Color := ReadOnlyColor;
-  lstMedsOut.Color := ReadOnlyColor;
   uMedListIn  := TList.Create;
   uMedListOut := TList.Create;
   uMedListNonVA := TList.Create;
@@ -597,11 +616,17 @@ begin
      hdrMedsOut.Refresh;
      end;
   //end CQ9622
+  AddMessageHandler(lstMedsIn, lstMedsInRightClickHandler);
+  AddMessageHandler(lstMedsNonVA, lstMedsNonVARightClickHandler);
+  AddMessageHandler(lstMedsOut, lstMedsOutRightClickHandler);
 end;
 
 procedure TfrmMeds.FormDestroy(Sender: TObject);
 begin
   inherited;
+  RemoveMessageHandler(lstMedsOut, lstMedsOutRightClickHandler);
+  RemoveMessageHandler(lstMedsNonVA, lstMedsNonVARightClickHandler);
+  RemoveMessageHandler(lstMedsIn, lstMedsInRightClickHandler);
   ClearChildODList;
   ClearMedList(uMedListIn);
   ClearMedList(uMedListOut);
@@ -640,7 +665,7 @@ begin
       AnID := Piece(Strings[i], U, 1);
       if AnID <> '' then
         begin
-          tmpList.Assign(DetailMedLM(AnID));
+          FastAssign(DetailMedLM(AnID), tmpList);
         end;
       AnOrder := Piece(Strings[i], U, 2);
       if AnOrder <> '' then
@@ -648,7 +673,7 @@ begin
           tmpList.Add('');
           tmpList.Add(StringOfChar('=', 74));
           tmpList.Add('');
-          tmpList.AddStrings(MedAdminHistory(AnOrder));
+          FastAddStrings(MedAdminHistory(AnOrder), tmpList);
         end;
       if CheckOrderGroup(AnOrder)=1 then  // if it's UD group
       begin
@@ -664,7 +689,7 @@ begin
           tmpList.Delete(idx);
       end;
       if tmpList.Count > 0 then ReportBox(tmpList, ATitle, True);
-      if frmFrame.CCOWDrivedChange then   
+      if (frmFrame.TimedOut) or (frmFrame.CCOWDrivedChange) then Exit; //code added to correct access violation on timeout
         Exit;
     end;
     FIterating := False;
@@ -703,14 +728,41 @@ end;
 
 procedure TfrmMeds.RefreshMedLists;
 var
-  i: Integer;
+  i,view: Integer;
   AMed: TMedListRec;
 begin
   lstMedsIn.Clear;
   lstMedsOut.Clear;
   lstMedsNonVA.Clear;
   StatusText('Retrieving active medications...');
-  LoadActiveMedLists(uMedListIn, uMedListOut, uMedListNonVA);
+  view := self.FSortView;
+  //AGP Fix for CQ 10410 added view arguement to control Meds Tab sort criteria
+  LoadActiveMedLists(uMedListIn, uMedListOut, uMedListNonVA, view);
+  if view <> self.FSortView then
+    begin
+      self.FSortView := view;
+      if view = 1 then
+        begin
+          self.SortbyStatusthenLocation1.Checked := True;
+          SetViewCaption(SortbyStatusthenLocation1.Caption);
+          self.SortbyClinicOrderthenStatusthenStopDate1.Checked := False;
+          self.SortbyDrugalphabeticallystatusactivestatusrecentexpired1.checked := false;
+        end
+      else if view = 2 then
+        begin
+          self.SortbyStatusthenLocation1.Checked := False;
+          self.SortbyClinicOrderthenStatusthenStopDate1.Checked := True;
+          SetViewCaption(SortbyClinicOrderthenStatusthenStopDate1.Caption);
+          self.SortbyDrugalphabeticallystatusactivestatusrecentexpired1.Checked := false;
+        end
+      else if view = 3 then
+        begin
+          self.SortbyStatusthenLocation1.Checked := False;
+          self.SortbyClinicOrderthenStatusthenStopDate1.Checked := false;
+          self.SortbyDrugalphabeticallystatusactivestatusrecentexpired1.Checked := true;
+          SetViewCaption(SortbyDrugalphabeticallystatusactivestatusrecentexpired1.Caption);
+        end
+    end;
   uPharmacyOrdersIn.Clear;
   uPharmacyOrdersOut.Clear;
   uNonVAOrdersOut.Clear;
@@ -734,7 +786,7 @@ begin
     uPharmacyOrdersOut.Add(AMed.PharmID + U + AMed.OrderID);
     lstMedsOut.Items.AddObject(GetPlainText(lstMedsOut, i), AMed);
   end;
- 
+
         StatusText('');
 end;
 
@@ -768,12 +820,12 @@ begin
   result := AMed.Instruct;
   // replace pharmacy text with order text if this is a change
   if CharAt(AnAction, 1) = 'X' then result := Piece(AnAction, U, 3);
-  if AMed.IVFluid then Indent := Pos(#10 + 'in ', result) else Indent := Pos(#13, result);
+  if AMed.IVFluid then Indent := Pos(CRLF + 'in ', result) else Indent := Pos(#13, result);
   if Indent > 0 then
   begin
     if AMed.IVFluid then
     begin
-      Detail := Copy(result, Indent + 1, Length(result));
+      Detail := Copy(result, Indent + Length(CRLF), Length(result));
       result := Copy(result, 1, Indent - 1);
     end else
     begin
@@ -927,10 +979,10 @@ begin
               Canvas.Brush.Color := clHighlight;
               Canvas.Font.Color := clHighlightText;
               //Canvas.FillRect(ARect);
-              Canvas.Font.Color := clWhite;
+              Canvas.Font.Color := Get508CompliantColor(clWhite);
            end;
-        if (ColorToRGB(clWindowText) = ColorToRGB(clBlack)) and (Canvas.Font.Color <> clWhite) then
-          Canvas.Font.Color := clBlue;
+        if (Canvas.Font.Color <> Get508CompliantColor(clWhite)) then
+          Canvas.Font.Color := Get508CompliantColor(clBlue);
         if (Length(Piece(AnAction,'^',4)) > 0) then
           AMed.Location := Piece(AnAction,'^',4);
       end;
@@ -980,11 +1032,21 @@ var
 begin
   inherited;
   
-  if PatientStatusChanged then exit;
+  //if PatientStatusChanged then exit;
   with lstMedsOut do for i := 0 to Items.Count -1 do
     Selected[i] := false;
   with lstMedsNonVA do for i := 0 to Items.Count - 1 do
     Selected[i] := FALSE;
+end;
+
+procedure TfrmMeds.lstMedsInRightClickHandler(var Msg: TMessage;
+  var Handled: Boolean);
+begin
+  if Msg.Msg = WM_RBUTTONUP then
+  begin
+    lstMedsIn.RightClickSelect := (lstMedsIn.SelCount < 1);
+    lstMedsInClick(lstMedsIn);
+  end;
 end;
 
 procedure TfrmMeds.lstMedsOutClick(Sender: TObject);
@@ -993,11 +1055,21 @@ var
 begin
   inherited;
  
-  if PatientStatusChanged then exit;
+  //if PatientStatusChanged then exit;
   with lstMedsIn do for i := 0 to Items.Count -1 do
     Selected[i] := false;
   with lstMedsNonVA do for i := 0 to Items.Count -1 do
     Selected[i] := false;
+end;
+
+procedure TfrmMeds.lstMedsOutRightClickHandler(var Msg: TMessage;
+  var Handled: Boolean);
+begin
+  if Msg.Msg = WM_RBUTTONUP then
+  begin
+    lstMedsOut.RightClickSelect := (lstMedsOut.SelCount < 1);
+    lstMedsOutClick(lstMedsOut);
+  end;
 end;
 
 procedure TfrmMeds.hdrMedsOutSectionResize(HeaderControl: THeaderControl; Section: THeaderSection);
@@ -1034,7 +1106,7 @@ end;
 procedure TfrmMeds.mnuActClick(Sender: TObject);
 begin
   inherited;
-  if PatientStatusChanged then exit;
+  //if PatientStatusChanged then exit;
   if lstMedsOut.SelCount > 0 then
   begin
     mnuActTransfer.Caption := 'Transfer to Inpatient...';
@@ -1070,10 +1142,11 @@ begin
     if AuthorizedUser and EncounterPresent and LockedForOrdering then
     begin
       ValidateSelected(ActiveList, OA_DC, TX_NO_DC, TC_NO_DC);
-      //ActivateDeactiveRenew(ActiveList); AGP 26.53 TURN OFF UNTIL FINAL DECISION CAN BE MADE
+      ActivateDeactiveRenew(ActiveList); //AGP 26.53 TURN OFF UNTIL FINAL DECISION CAN BE MADE
       MakeSelectedList(ActiveList, SelectedList);
       if ExecuteDCOrders(SelectedList,DelEvt) then
       begin
+        if frmFrame.TimedOut = true then  exit;
         ResetSelectedForList(ActiveList);
         SynchListToOrders(ActiveList, SelectedList);
       end;
@@ -1107,13 +1180,14 @@ begin
       MakeSelectedList(ActiveList, SelectedList);
       if ExecuteHoldOrders(SelectedList) then
       begin
+        if frmFrame.TimedOut = true then  exit;
         AddSelectedToChanges(SelectedList);
         ResetSelectedForList(ActiveList);
         SynchListToOrders(ActiveList, SelectedList);
       end;
     end;
   finally
-    ActiveList.SetFocus;
+    if frmFrame.TimedOut = false then ActiveList.SetFocus;
     FIterating := False;
     SelectedList.Free;
     UnlockIfAble;
@@ -1151,13 +1225,14 @@ begin
       end;
       if ExecuteRenewOrders(SelectedList) then
       begin
+        if frmFrame.TimedOut = true then  exit;
         AddSelectedToChanges(SelectedList);
         ResetSelectedForList(ActiveList);
         SynchListToOrders(ActiveList, SelectedList);
       end;
    end;
   finally
-    ActiveList.SetFocus;
+    if frmFrame.TimedOut = false then ActiveList.SetFocus;
     FIterating := False;
     SelectedList.Free;
     UnlockIfAble;
@@ -1192,6 +1267,7 @@ begin
     with SelectedList do for i := 0 to Count - 1 do ChangeIFNList.Add(TOrder(Items[i]).ID);
     if not ShowMsgOn(ChangeIFNList.Count = 0, TX_NOSEL, TC_NOSEL)
       then ChangeOrders(ChangeIFNList, DelayEvent);
+    if frmFrame.TimedOut = true then  exit;
     SynchListToOrders(ActiveList, SelectedList);    // rehighlights
     Activelist.SetFocus;
   finally
@@ -1224,7 +1300,7 @@ begin
   CheckAuthForMeds(AuthErr);
   if (Length(AuthErr)>0) then
   begin
-    ShowMessage(AuthErr);
+    ShowMsg(AuthErr);
     if not EncounterPresent then Exit;
   end;
   if not FActionOnMedsTab then
@@ -1240,6 +1316,7 @@ begin
   TempEvent := DelayEvent;
   DoesDestEvtOccur := False;
   ActiveList := ListSelected(TX_NOSEL);
+  if not assigned(ActiveList) then exit;  
   if CheckMedStatus(ActiveList) = True then Exit;
   if ActiveList = nil then Exit;
   NewOrderCreated := False;
@@ -1342,6 +1419,7 @@ begin
           end;
       end;
     end;
+    if frmFrame.TimedOut = true then  exit;
     SynchListToOrders(ActiveList, SelectedList);    // rehighlights
     if IsTransferAction then
        IsTransferAction := False;
@@ -1351,7 +1429,7 @@ begin
       XfInToOutNow := False;
     frmOrders.PtEvtCompleted(TempEvent.PtEventIFN,TempEvent.EventName,True);
   finally
-    ActiveList.SetFocus;
+    if frmFrame.TimedOut = false then  ActiveList.SetFocus;
     FActionOnMedsTab := False;
     uAutoAC := False;
     SelectedList.Free;
@@ -1410,12 +1488,13 @@ begin
       MakeSelectedList(ActiveList, SelectedList);
       if ExecuteRefillOrders(SelectedList) then
       begin
+        if frmFrame.TimedOut = true then  exit;
         ResetSelectedForList(ActiveList);
         SynchListToOrders(ActiveList, SelectedList);
       end;
     end;
   finally
-    ActiveList.SetFocus;
+    if frmFrame.TimedOut = false then ActiveList.SetFocus;
     FIterating := False;
     SelectedList.Free;
     UnlockIfAble;
@@ -1538,13 +1617,13 @@ end;
 procedure TfrmMeds.popMedPopup(Sender: TObject);
 begin
   inherited;
-  if PatientStatusChanged then exit;
+  //if PatientStatusChanged then exit;
 end;
 
 procedure TfrmMeds.mnuViewClick(Sender: TObject);
 begin
   inherited;
-  if PatientStatusChanged then exit;  
+  //if PatientStatusChanged then exit;
 end;
 
 procedure TfrmMeds.lstMedsNonVAClick(Sender: TObject);
@@ -1552,7 +1631,7 @@ var
  i: integer;
 begin
   inherited;
-  if PatientStatusChanged then exit;  
+  //if PatientStatusChanged then exit;
   with lstMedsIn do for i := 0 to Items.Count -1 do
      Selected[i] := false;
   with lstMedsOut do for i := 0 to Items.Count -1 do
@@ -1569,6 +1648,16 @@ procedure TfrmMeds.lstMedsNonVAExit(Sender: TObject);
 begin
   inherited;
    if not FIterating then ResetSelectedForList(TListBox(Sender));
+end;
+
+procedure TfrmMeds.lstMedsNonVARightClickHandler(var Msg: TMessage;
+  var Handled: Boolean);
+begin
+  if Msg.Msg = WM_RBUTTONUP then
+  begin
+    lstMedsNonVA.RightClickSelect := (lstMedsNonVA.SelCount < 1);
+    lstMedsNonVAClick(lstMedsNonVA);
+  end;
 end;
 
 procedure TfrmMeds.hdrMedsNonVASectionResize(HeaderControl: THeaderControl; Section: THeaderSection);
@@ -1724,7 +1813,7 @@ begin
 
 end;
 
-function TfrmMeds.PatientStatusChanged: boolean;
+{function TfrmMeds.PatientStatusChanged: boolean;
 const
 
   msgTxt1 = 'Patient status was changed from ';
@@ -1751,7 +1840,7 @@ begin
     frmFrame.mnuFileRefreshClick(Application);
     Result := True;
   end;
-end;
+end;}
 
 function TfrmMeds.GetTotalSectionsWidth(Sender: TObject) : integer;
 //CQ7586
@@ -1791,6 +1880,11 @@ begin
   if (Sender as THeaderControl).Name = 'hdrMedsNonVA' then
      for i := 0 to hdrMedsNonVA.Sections.Count - 1 do
         OrigNonVASecWidths[i] := hdrMedsNonVA.Sections[i].Width;
+end;
+
+procedure TfrmMeds.SetViewCaption(Caption: String);
+begin
+  txtView.Caption := StringReplace(Caption,'&','',[rfReplaceAll]);
 end;
 
 procedure TfrmMeds.hdrMedsOutMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
@@ -1945,7 +2039,7 @@ begin
      end;
 end;
 
-(*procedure TfrmMeds.ActivateDeactiveRenew(AListBox: TListBox);
+procedure TfrmMeds.ActivateDeactiveRenew(AListBox: TListBox);
 var
   i: Integer;
   CurID: string;
@@ -1962,7 +2056,7 @@ begin
         tmpArr.Add(curID);
       end;
     if tmpArr <> nil then frmActivateDeactive.fActivateDeactive(tmpArr, AListBox);
-end; *)
+end;
 
 procedure TfrmMeds.ViewInfo(Sender: TObject);
 begin
@@ -2050,6 +2144,44 @@ begin
   //if Section = hdrMedsIn.Sections[1] then
     mnuOptimizeFieldsClick(self);
 end;
+
+procedure TfrmMeds.SortbyStatusthenLocation1Click(Sender: TObject);
+begin
+  inherited;
+  self.FSortView := 1;
+  self.SortbyStatusthenLocation1.Checked := True;
+  SetViewCaption(SortbyStatusthenLocation1.Caption);
+  self.SortbyClinicOrderthenStatusthenStopDate1.Checked := False;
+  self.SortbyDrugalphabeticallystatusactivestatusrecentexpired1.Checked := false;
+  self.RefreshMedLists;
+end;
+
+procedure TfrmMeds.SortbyClinicOrderthenStatusthenStopDate1Click(
+  Sender: TObject);
+begin
+  inherited;
+  self.FSortView := 2;
+  self.SortbyStatusthenLocation1.Checked := False;
+  self.SortbyClinicOrderthenStatusthenStopDate1.Checked := True;
+  SetViewCaption(SortbyClinicOrderthenStatusthenStopDate1.Caption);
+  self.SortbyDrugalphabeticallystatusactivestatusrecentexpired1.Checked := false;
+  self.RefreshMedLists;
+end;
+
+procedure TfrmMeds.SortbyDrugalphabeticallystatusactivestatusrecentexpired1Click(
+  Sender: TObject);
+begin
+  inherited;
+  self.FSortView := 3;
+  self.SortbyStatusthenLocation1.Checked := False;
+  self.SortbyClinicOrderthenStatusthenStopDate1.Checked := false;
+  self.SortbyDrugalphabeticallystatusactivestatusrecentexpired1.Checked := true;
+  SetViewCaption(SortbyDrugalphabeticallystatusactivestatusrecentexpired1.Caption);
+  self.RefreshMedLists;
+end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmMeds);
 
 end.
 

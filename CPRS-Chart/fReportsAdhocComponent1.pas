@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, StdCtrls, Grids, ORCtrls, ORfn, Buttons, fAutoSz;
+  ExtCtrls, StdCtrls, Grids, ORCtrls, ORfn, Buttons, fAutoSz,
+  VA508AccessibilityManager;
 
 type
   TfrmReportsAdhocComponent1 = class(TfrmAutoSz)
@@ -472,7 +473,7 @@ begin
           If uCompSubs.Count > 0 then
             begin
               ORListBox1.Clear;
-              ORListBox1.Items.Assign(uCompSubs);
+              FastAssign(uCompSubs, ORListBox1.Items);
               for i := 0 to uCompSubs.Count-1 do
                 uComponents.Add(IntToStr(uCurrentComponent) + '^' + uFile +
                   '^' + uCompSubs[i]);

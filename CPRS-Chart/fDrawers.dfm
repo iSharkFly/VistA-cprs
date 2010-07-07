@@ -1,25 +1,21 @@
-object frmDrawers: TfrmDrawers
-  Left = 634
-  Top = 437
+inherited frmDrawers: TfrmDrawers
+  Left = 285
+  Top = 335
   BorderStyle = bsNone
   Caption = 'frmDrawers'
   ClientHeight = 365
   ClientWidth = 189
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
-  OldCreateOrder = False
   OnCanResize = FormCanResize
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
+  ExplicitLeft = 285
+  ExplicitTop = 335
+  ExplicitWidth = 197
+  ExplicitHeight = 399
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlRemindersButton: TKeyClickPanel
+  object pnlRemindersButton: TKeyClickPanel [0]
     Left = 0
     Top = 193
     Width = 189
@@ -37,6 +33,7 @@ object frmDrawers: TfrmDrawers
       Top = 0
       Width = 189
       Height = 22
+      Align = alClient
       AllowAllUp = True
       GroupIndex = 1
       Caption = 'Reminders'
@@ -56,11 +53,10 @@ object frmDrawers: TfrmDrawers
       NumGlyphs = 4
       Spacing = 2
       OnClick = sbRemindersClick
-      Align = alClient
       OnResize = sbResize
     end
   end
-  object pnlEncounterButton: TKeyClickPanel
+  object pnlEncounterButton: TKeyClickPanel [1]
     Left = 0
     Top = 107
     Width = 189
@@ -78,6 +74,7 @@ object frmDrawers: TfrmDrawers
       Top = 0
       Width = 189
       Height = 22
+      Align = alClient
       AllowAllUp = True
       GroupIndex = 1
       Caption = 'Encounter'
@@ -97,11 +94,10 @@ object frmDrawers: TfrmDrawers
       NumGlyphs = 4
       Spacing = 2
       OnClick = sbEncounterClick
-      Align = alClient
       OnResize = sbResize
     end
   end
-  object pnlTemplatesButton: TKeyClickPanel
+  object pnlTemplatesButton: TKeyClickPanel [2]
     Left = 0
     Top = 0
     Width = 189
@@ -119,6 +115,7 @@ object frmDrawers: TfrmDrawers
       Top = 0
       Width = 189
       Height = 22
+      Align = alClient
       AllowAllUp = True
       GroupIndex = 1
       Caption = 'Templates'
@@ -139,11 +136,11 @@ object frmDrawers: TfrmDrawers
       PopupMenu = popTemplates
       Spacing = 2
       OnClick = sbTemplatesClick
-      Align = alClient
       OnResize = sbResize
+      ExplicitTop = -6
     end
   end
-  object pnlOrdersButton: TKeyClickPanel
+  object pnlOrdersButton: TKeyClickPanel [3]
     Left = 0
     Top = 279
     Width = 189
@@ -161,6 +158,7 @@ object frmDrawers: TfrmDrawers
       Top = 0
       Width = 189
       Height = 22
+      Align = alClient
       AllowAllUp = True
       GroupIndex = 1
       Caption = 'Orders'
@@ -180,11 +178,10 @@ object frmDrawers: TfrmDrawers
       NumGlyphs = 4
       Spacing = 11
       OnClick = sbOrdersClick
-      Align = alClient
       OnResize = sbResize
     end
   end
-  object lbOrders: TORListBox
+  object lbOrders: TORListBox [4]
     Left = 0
     Top = 301
     Width = 189
@@ -201,7 +198,7 @@ object frmDrawers: TfrmDrawers
     ItemTipColor = clWindow
     LongList = False
   end
-  object lbEncounter: TORListBox
+  object lbEncounter: TORListBox [5]
     Left = 0
     Top = 129
     Width = 189
@@ -218,7 +215,7 @@ object frmDrawers: TfrmDrawers
     ItemTipColor = clWindow
     LongList = False
   end
-  object pnlTemplates: TPanel
+  object pnlTemplates: TPanel [6]
     Left = 0
     Top = 22
     Width = 189
@@ -313,7 +310,7 @@ object frmDrawers: TfrmDrawers
       end
     end
   end
-  object tvReminders: TORTreeView
+  object tvReminders: TORTreeView [7]
     Left = 0
     Top = 215
     Width = 189
@@ -327,15 +324,63 @@ object frmDrawers: TfrmDrawers
     RightClickSelect = True
     StateImages = dmodShared.imgReminders
     TabOrder = 5
-    OnAddition = tvRemindersAddition
     OnCollapsed = tvRemindersCurListChanged
-    OnDeletion = tvRemindersDeletion
     OnExpanded = tvRemindersCurListChanged
     OnKeyDown = tvRemindersKeyDown
     OnMouseUp = tvRemindersMouseUp
     Caption = 'Reminders'
     NodePiece = 0
     OnNodeCaptioning = tvRemindersNodeCaptioning
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Left = 72
+    Top = 72
+    Data = (
+      (
+        'Component = pnlRemindersButton'
+        'Status = stsDefault')
+      (
+        'Component = pnlEncounterButton'
+        'Status = stsDefault')
+      (
+        'Component = pnlTemplatesButton'
+        'Status = stsDefault')
+      (
+        'Component = pnlOrdersButton'
+        'Status = stsDefault')
+      (
+        'Component = lbOrders'
+        'Status = stsDefault')
+      (
+        'Component = lbEncounter'
+        'Status = stsDefault')
+      (
+        'Component = pnlTemplates'
+        'Status = stsDefault')
+      (
+        'Component = tvTemplates'
+        'Status = stsDefault')
+      (
+        'Component = pnlTemplateSearch'
+        'Status = stsDefault')
+      (
+        'Component = btnFind'
+        'Status = stsDefault')
+      (
+        'Component = edtSearch'
+        'Status = stsDefault')
+      (
+        'Component = cbMatchCase'
+        'Status = stsDefault')
+      (
+        'Component = cbWholeWords'
+        'Status = stsDefault')
+      (
+        'Component = tvReminders'
+        'Status = stsDefault')
+      (
+        'Component = frmDrawers'
+        'Status = stsDefault'))
   end
   object popTemplates: TPopupMenu
     OnPopup = popTemplatesPopup
@@ -407,5 +452,41 @@ object frmDrawers: TfrmDrawers
       Caption = 'Template Icon Legend'
       OnClick = mnuViewTemplateIconLegendClick
     end
+  end
+  object fldAccessTemplates: TVA508ComponentAccessibility
+    Component = pnlTemplatesButton
+    OnStateQuery = fldAccessTemplatesStateQuery
+    OnInstructionsQuery = fldAccessTemplatesInstructionsQuery
+    ComponentName = 'Drawer'
+    Left = 104
+    Top = 72
+  end
+  object fldAccessReminders: TVA508ComponentAccessibility
+    Component = pnlRemindersButton
+    OnStateQuery = fldAccessRemindersStateQuery
+    OnInstructionsQuery = fldAccessRemindersInstructionsQuery
+    ComponentName = 'Drawer'
+    Left = 128
+    Top = 232
+  end
+  object imgLblReminders: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvReminders
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblReminders
+    Left = 96
+    Top = 232
+  end
+  object imgLblTemplates: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvTemplates
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblHealthFactorLabels
+    Left = 136
+    Top = 72
   end
 end

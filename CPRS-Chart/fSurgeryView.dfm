@@ -1,21 +1,17 @@
-object frmSurgeryView: TfrmSurgeryView
+inherited frmSurgeryView: TfrmSurgeryView
   Left = 333
   Top = 256
-  Width = 366
-  Height = 229
   BorderIcons = []
   Caption = 'List Selected Cases'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 202
+  ClientWidth = 358
   OldCreateOrder = True
   Position = poScreenCenter
+  ExplicitWidth = 366
+  ExplicitHeight = 229
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 358
@@ -131,11 +127,13 @@ object frmSurgeryView: TfrmSurgeryView
         ItemTipEnable = True
         ListItemsOnly = True
         LongList = False
+        LookupPiece = 0
         MaxLength = 0
         Pieces = '2'
         Sorted = False
         SynonymChars = '<>'
         TabOrder = 1
+        CharsNeedMatch = 1
       end
       object radTreeSort: TRadioGroup
         Left = 9
@@ -158,5 +156,41 @@ object frmSurgeryView: TfrmSurgeryView
       TabOrder = 4
       OnClick = cmdClearClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = calBeginDate'
+        'Status = stsDefault')
+      (
+        'Component = calEndDate'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = edMaxDocs'
+        'Status = stsDefault')
+      (
+        'Component = grpTreeView'
+        'Status = stsDefault')
+      (
+        'Component = cboGroupBy'
+        'Status = stsDefault')
+      (
+        'Component = radTreeSort'
+        'Status = stsDefault')
+      (
+        'Component = cmdClear'
+        'Status = stsDefault')
+      (
+        'Component = frmSurgeryView'
+        'Status = stsDefault'))
   end
 end

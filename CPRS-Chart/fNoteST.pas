@@ -9,7 +9,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, ORCtrls, StdCtrls, ORFn, uTIU, fAutoSz;
+  ExtCtrls, ORCtrls, StdCtrls, ORFn, uTIU, fAutoSz, VA508AccessibilityManager;
 
 type
   TfrmNotesSearchText = class(TfrmAutoSz)

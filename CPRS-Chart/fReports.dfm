@@ -1,28 +1,39 @@
 inherited frmReports: TfrmReports
-  Left = 456
-  Top = 200
-  Width = 725
-  Height = 654
+  Left = 356
+  Top = 69
   HelpContext = 9000
   Caption = 'Reports Page'
+  ClientHeight = 627
+  ClientWidth = 717
   HelpFile = 'qnoback'
   OnDestroy = FormDestroy
   OnShow = FormShow
+  ExplicitLeft = 356
+  ExplicitTop = 69
+  ExplicitWidth = 725
+  ExplicitHeight = 654
   PixelsPerInch = 96
   TextHeight = 13
   inherited shpPageBottom: TShape
     Top = 617
     Width = 717
     Height = 10
+    ExplicitTop = 617
+    ExplicitWidth = 717
+    ExplicitHeight = 10
   end
   inherited sptHorz: TSplitter
     Left = 119
     Height = 617
     OnMoved = sptHorzMoved
+    ExplicitLeft = 119
+    ExplicitHeight = 617
   end
   inherited pnlLeft: TPanel
     Width = 119
     Height = 617
+    ExplicitWidth = 119
+    ExplicitHeight = 617
     object Splitter1: TSplitter
       Left = 0
       Top = 259
@@ -103,6 +114,7 @@ inherited frmReports: TfrmReports
         Caption = 'Headings'
         Transparent = True
         Visible = False
+        ExplicitWidth = 45
       end
       object lstHeaders: TORListBox
         Left = 0
@@ -269,6 +281,9 @@ inherited frmReports: TfrmReports
     Left = 123
     Width = 594
     Height = 617
+    ExplicitLeft = 123
+    ExplicitWidth = 594
+    ExplicitHeight = 617
     object sptHorzRight: TSplitter
       Left = 0
       Top = 177
@@ -287,17 +302,6 @@ inherited frmReports: TfrmReports
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 0
-      object lblTitle: TOROffsetLabel
-        Left = 0
-        Top = 17
-        Width = 594
-        Height = 25
-        Align = alTop
-        HorzOffset = 3
-        Transparent = True
-        VertOffset = 6
-        WordWrap = False
-      end
       object lblProcTypeMsg: TOROffsetLabel
         Left = 0
         Top = 0
@@ -308,10 +312,11 @@ inherited frmReports: TfrmReports
         Transparent = False
         VertOffset = 2
         WordWrap = False
+        ExplicitWidth = 529
       end
       object TabControl1: TTabControl
         Left = 0
-        Top = 42
+        Top = 40
         Width = 594
         Height = 20
         Align = alTop
@@ -328,6 +333,38 @@ inherited frmReports: TfrmReports
         TabStop = False
         Visible = False
         OnChange = TabControl1Change
+      end
+      object pnlTopRtLabel: TPanel
+        Left = 0
+        Top = 17
+        Width = 594
+        Height = 23
+        Align = alTop
+        TabOrder = 1
+        object lblTitle: TOROffsetLabel
+          Left = 1
+          Top = 1
+          Width = 495
+          Height = 21
+          Align = alClient
+          HorzOffset = 3
+          Transparent = True
+          VertOffset = 6
+          WordWrap = False
+          ExplicitWidth = 312
+          ExplicitHeight = 26
+        end
+        object chkMaxFreq: TCheckBox
+          Left = 496
+          Top = 1
+          Width = 97
+          Height = 21
+          Align = alRight
+          Caption = 'Max/Site OFF'
+          TabOrder = 0
+          Visible = False
+          OnClick = chkMaxFreqClick
+        end
       end
     end
     object pnlRightBottom: TPanel
@@ -384,6 +421,7 @@ inherited frmReports: TfrmReports
         Font.Height = -12
         Font.Name = 'Courier New'
         Font.Style = []
+        Constraints.MinHeight = 20
         ParentFont = False
         PlainText = True
         PopupMenu = PopupMenu1
@@ -401,6 +439,8 @@ inherited frmReports: TfrmReports
       Width = 594
       Height = 120
       Align = alTop
+      Constraints.MaxHeight = 700
+      Constraints.MinHeight = 50
       TabOrder = 1
       Visible = False
       object lvReports: TCaptionListView
@@ -427,6 +467,87 @@ inherited frmReports: TfrmReports
         OnSelectItem = lvReportsSelectItem
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlLefTop'
+        'Status = stsDefault')
+      (
+        'Component = tvReports'
+        'Status = stsDefault')
+      (
+        'Component = pnlLeftBottom'
+        'Status = stsDefault')
+      (
+        'Component = lstHeaders'
+        'Status = stsDefault')
+      (
+        'Component = lstQualifier'
+        'Status = stsDefault')
+      (
+        'Component = pnlViews'
+        'Status = stsDefault')
+      (
+        'Component = pnlTopViews'
+        'Status = stsDefault')
+      (
+        'Component = chkDualViews'
+        'Status = stsDefault')
+      (
+        'Component = btnGraphSelections'
+        'Status = stsDefault')
+      (
+        'Component = btnChangeView'
+        'Status = stsDefault')
+      (
+        'Component = lstDateRange'
+        'Status = stsDefault')
+      (
+        'Component = pnlProcedures'
+        'Status = stsDefault')
+      (
+        'Component = tvProcedures'
+        'Status = stsDefault')
+      (
+        'Component = pnlRightTop'
+        'Status = stsDefault')
+      (
+        'Component = TabControl1'
+        'Status = stsDefault')
+      (
+        'Component = pnlRightBottom'
+        'Status = stsDefault')
+      (
+        'Component = WebBrowser1'
+        'Status = stsDefault')
+      (
+        'Component = Memo1'
+        'Status = stsDefault')
+      (
+        'Component = memText'
+        'Status = stsDefault')
+      (
+        'Component = pnlRightMiddle'
+        'Status = stsDefault')
+      (
+        'Component = lvReports'
+        'Status = stsDefault')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = pnlRight'
+        'Status = stsDefault')
+      (
+        'Component = frmReports'
+        'Status = stsDefault')
+      (
+        'Component = pnlTopRtLabel'
+        'Status = stsDefault')
+      (
+        'Component = chkMaxFreq'
+        'Status = stsDefault'))
   end
   object PopupMenu1: TPopupMenu
     OnPopup = PopupMenu1Popup
@@ -501,5 +622,15 @@ inherited frmReports: TfrmReports
       ShortCut = 16449
       OnClick = SelectAll1Click
     end
+  end
+  object imgLblImages: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = lvReports
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblImages
+    Left = 40
+    Top = 200
   end
 end

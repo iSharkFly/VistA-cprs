@@ -1,22 +1,17 @@
-object frmRemCoverPreview: TfrmRemCoverPreview
+inherited frmRemCoverPreview: TfrmRemCoverPreview
   Left = 214
   Top = 107
-  Width = 263
-  Height = 410
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'Cover Sheet Reminders'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
+  ClientHeight = 383
+  ClientWidth = 255
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 263
+  ExplicitHeight = 410
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBtns: TPanel
+  object pnlBtns: TPanel [0]
     Left = 0
     Top = 354
     Width = 255
@@ -24,6 +19,9 @@ object frmRemCoverPreview: TfrmRemCoverPreview
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
+    DesignSize = (
+      255
+      29)
     object btnOK: TButton
       Left = 179
       Top = 3
@@ -37,7 +35,7 @@ object frmRemCoverPreview: TfrmRemCoverPreview
       TabOrder = 0
     end
   end
-  object lvMain: TListView
+  object lvMain: TListView [1]
     Left = 0
     Top = 0
     Width = 255
@@ -60,5 +58,20 @@ object frmRemCoverPreview: TfrmRemCoverPreview
     ViewStyle = vsReport
     OnColumnClick = lvMainColumnClick
     OnCompare = lvMainCompare
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBtns'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = lvMain'
+        'Status = stsDefault')
+      (
+        'Component = frmRemCoverPreview'
+        'Status = stsDefault'))
   end
 end

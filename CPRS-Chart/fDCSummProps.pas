@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORDtTm, ORCtrls, ExtCtrls, uConst, rTIU, rDCSumm, uDocTree, uDCSumm, uTIU;
+  StdCtrls, ORDtTm, ORCtrls, ExtCtrls, uConst, rTIU, rDCSumm, uDocTree, uDCSumm,
+  uTIU, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmDCSummProperties = class(TForm)
+  TfrmDCSummProperties = class(TfrmBase508Form)
     bvlConsult: TBevel;
     pnlFields: TORAutoPanel;
     lblNewTitle: TLabel;
@@ -54,6 +55,7 @@ type
     procedure lstAdmissionsChange(Sender: TObject);
     procedure cboNewTitleDblClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure cboNewTitleChange(Sender: TObject);
   private
     FCosignIEN: Int64;      // store cosigner that was passed in
     FCosignName: string;    // store cosigner that was passed in
@@ -135,7 +137,7 @@ begin
           Height := Height - pnlTranscription.Height;
           Top := Top  - pnlTranscription.Height;
         end;
-      Height := Height - pnlAdmissions.Height - pnlLabels.Height;
+//      Height := Height - pnlAdmissions.Height - pnlLabels.Height;
       if ASumm.DocType <> TYP_ADDENDUM then
         begin
           cboNewTitle.InitLongList('');
@@ -148,15 +150,13 @@ begin
         then cboNewTitle.SetExactByIEN(ASumm.Title, ASumm.TitleName);
       cboAuthor.InitLongList(ASumm.DictatorName);
       if ASumm.Dictator > 0 then cboAuthor.SelectByIEN(ASumm.Dictator);
-      cboUrgency.Items.Assign(LoadDCUrgencies);
+      FastAssign(LoadDCUrgencies, cboUrgency.Items);
       cboUrgency.SelectByID('R');
       if Asumm.Attending = 0 then
         begin
           ASumm.Attending  := FLastCosigner;
           ASumm.AttendingName := FLastCosignerName;
         end;
-      cboAttending.InitLongList(ASumm.AttendingName);
-      if ASumm.Attending > 0 then cboAttending.SelectByIEN(ASumm.Attending);
       calSumm.FMDateTime := ASumm.DictDateTime;
       if FShowAdmissions then ShowAdmissionList;
       FAddend     := ASumm.Addend;
@@ -164,6 +164,8 @@ begin
       FLastCosigner     := ASumm.LastCosigner;
       FLastCosignerName := ASumm.LastCosignerName;
       FEditIEN    := 0;
+      cboAttending.InitLongList(ASumm.AttendingName);
+      if ASumm.Attending > 0 then cboAttending.SelectByIEN(ASumm.Attending);
       // restrict edit of title if addendum
       if FDocType = TYP_ADDENDUM then
       begin
@@ -211,7 +213,7 @@ begin
               x := GetTIUListItem(FEditIEN);
               ListBoxItem := x;
               if Lines = nil then Lines := TStringList.Create;
-              Lines.Assign(EditLines);
+              FastAssign(EditLines, Lines);
             end
           else
             begin
@@ -319,7 +321,7 @@ begin
   SetCosignerRequired;
   if FShowAdmissions and (not pnlAdmissions.Visible) then
     begin
-      Height := Height + pnlAdmissions.Height + pnlLabels.Height;
+//      Height := Height + pnlAdmissions.Height + pnlLabels.Height;
       pnlAdmissions.Visible := True;
       pnlLabels.Visible := True;
     end;
@@ -341,9 +343,20 @@ end;
 
 procedure TfrmDCSummProperties.cboAttendingNeedData(Sender: TObject; const StartFrom: String;
   Direction, InsertAt: Integer);
-begin   // changed in v15.2, per BRX-1100-10981
+var TitleIEN: Int64;
+begin
 //  (Sender as TORComboBox).ForDataUse(SubSetOfPersons(StartFrom, Direction));
-  (Sender as TORComboBox).ForDataUse(SubSetOfProviders(StartFrom, Direction));
+
+// CQ#11666
+//  (Sender as TORComboBox).ForDataUse(SubSetOfCosigners(StartFrom, Direction,
+//        FMToday, cboNewTitle.ItemIEN, FDocType));
+
+// CQ #17218 - Updated to properly filter co-signers - JCS
+  TitleIEN := cboNewTitle.ItemIEN;
+  if TitleIEN = 0 then TitleIEN := FDocType;
+
+  (Sender as TORComboBox).ForDataUse(SubSetOfCosigners(StartFrom, Direction,
+        FMToday, TitleIEN, 0));
 end;
 
 procedure TfrmDCSummProperties.cboAuthorEnter(Sender: TObject);
@@ -366,8 +379,16 @@ procedure TfrmDCSummProperties.cboAttendingExit(Sender: TObject);
 { make sure FCosign fields stay up to date in case SetCosigner gets called again }
 begin
   with cboAttending do if Text = '' then ItemIndex := -1;
-  FCosignIEN := cboAttending.ItemIEN;
-  FCosignName := Piece(cboAttending.Items[cboAttending.ItemIndex], U, 2);
+  if cboAttending.ItemIndex < 0 then
+  begin
+    FCosignIEN := 0;
+    FCosignName := '';
+  end
+  else
+  begin
+    FCosignIEN := cboAttending.ItemIEN;
+    FCosignName := Piece(cboAttending.Items[cboAttending.ItemIndex], U, 2);
+  end;
 end;
 
 { Command Button events }
@@ -389,9 +410,18 @@ begin
   if calSumm.IsValid and (calSumm.FMDateTime > FMNow)    then ErrMsg := ErrMsg + TX_NO_FUTURE;
   if cboAttending.Visible and (cboAttending.ItemIEN = 0)   then ErrMsg := ErrMsg + TX_REQ_COSIGNER;
   //if cboAttending.ItemIEN = User.DUZ                      then ErrMsg := TX_COS_SELF;
-  if (cboAttending.ItemIEN > 0) and not IsUserAProvider(cboAttending.ItemIEN, FMNow) then
-  //if (cboAttending.ItemIEN > 0) and not CanCosign(cboNewTitle.ItemIEN, FDocType, cboAttending.ItemIEN) then
-    ErrMsg := cboAttending.Text + TX_COS_AUTH;
+
+// --------------------------------- REPLACED THIS BLOCK IN V27.37-----------------------------------------------
+/// if (cboAttending.ItemIEN > 0) and not IsUserAProvider(cboAttending.ItemIEN, FMNow) then
+//  //if (cboAttending.ItemIEN > 0) and not CanCosign(cboNewTitle.ItemIEN, FDocType, cboAttending.ItemIEN) then
+//   ErrMsg := cboAttending.Text + TX_COS_AUTH;
+// ------------------------------------ NEW CODE FOLLOWS --------------------------------------------------------
+  if (cboAttending.ItemIEN > 0) then
+     if ((not IsUserAUSRProvider(cboAttending.ItemIEN, FMNow)) or
+        (not CanCosign(cboNewTitle.ItemIEN, FDocType, cboAttending.ItemIEN, calSumm.FMDateTime))) then
+     ErrMsg := cboAttending.Text + TX_COS_AUTH;
+// -----------------------------------END OF NEW REPLACEMENT CODE -----------------------------------------------
+
   if pnlAdmissions.Visible then
   with lstAdmissions do
   begin
@@ -472,7 +502,7 @@ begin
         if AnEditSumm.Title > 0 then cboNewTitle.SelectByIEN(AnEditSumm.Title);
         cboAuthor.InitLongList(AnEditSumm.DictatorName);
         if AnEditSumm.Dictator > 0 then cboAuthor.SelectByIEN(AnEditSumm.Dictator);
-        cboUrgency.Items.Assign(LoadDCUrgencies);
+        FastAssign(LoadDCUrgencies, cboUrgency.Items);
         cboUrgency.SelectByID('R');
         cboAttending.InitLongList(AnEditSumm.AttendingName);
         if AnEditSumm.Attending > 0 then cboAttending.SelectByIEN(AnEditSumm.Attending);
@@ -506,6 +536,30 @@ begin
       cboAttending.ItemIndex := -1;
       calSumm.FMDateTime := FMNow;*)
     end;
+end;
+
+procedure TfrmDCSummProperties.cboNewTitleChange(Sender: TObject);
+var
+  IEN: Int64;
+  name: string;
+  Index: Integer;
+
+begin
+  inherited;
+  index := cboAttending.ItemIndex;
+  if index >= 0 then
+  begin
+    IEN := cboAttending.ItemIEN;
+    name := cboAttending.DisplayText[index];
+  end
+  else
+  begin
+    name := '';
+    IEN := 0;
+  end;
+  cboAttending.InitLongList(name);
+  if index >= 0 then
+    cboAttending.SelectByIEN(IEN);
 end;
 
 procedure TfrmDCSummProperties.cboNewTitleDblClick(Sender: TObject);

@@ -65,7 +65,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, fAutoSz,StdCtrls, ORFn, ORCtrls, rvitals, ORDtTm;
+  ExtCtrls, fAutoSz,StdCtrls, ORFn, ORCtrls, rvitals, ORDtTm,
+  VA508AccessibilityManager;
 
 
 type
@@ -159,7 +160,7 @@ implementation
 {$R *.DFM}
 
 uses UCore, rCore, rPCE, fPCELex, fPCEOther, fVitals,fVisit, fFrame, fEncnt,
-  uVitals;
+  uVitals, VAUtils;
 
 var
   uVitalOld:     TStringlist;
@@ -464,7 +465,7 @@ begin
   StoreMessage := ValAndStoreVitals(UVitalNew);
   if (Storemessage <> 'True') then
   begin
-    showmessage(storemessage);
+    ShowMsg(storemessage);
     exit;
   end;
   close();

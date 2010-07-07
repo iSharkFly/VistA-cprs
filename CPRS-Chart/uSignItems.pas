@@ -10,7 +10,7 @@ uses
 
 type
   TSigItemType = (siServiceConnected, siAgentOrange, siIonizingRadiation,
-                  siEnvironmentalContaminants, siMST, siHeadNeckCancer, siCombatVeteran);
+                  siEnvironmentalContaminants, siMST, siHeadNeckCancer, siCombatVeteran, siSHAD);
 
   TSigItemTagInfo =  record
     SigType: TSigItemType;
@@ -32,8 +32,6 @@ type
     FAllCatCheck: boolean;
     FcbX: array[TSigItemType] of integer;
     function TagInfo(ASigType: TSigItemType; AIndex: integer): TSigItemTagInfo;
-    //function ItemToTag(Info: TSigItemTagInfo): integer;
-    //function TagToItem(ATag: integer): TSigItemTagInfo;
     procedure cbClicked(Sender: TObject);
     procedure cbEnter(Sender: TObject);
     procedure cbExit(Sender: TObject);
@@ -41,7 +39,7 @@ type
     procedure CopyCBValues(FromIndex, ToIndex: integer);
     function  FindCBValues(ATag: integer): TORCheckBox;
     function  GetTempCkBxState(Index: integer; CBValue:TSigItemType): string;
-    
+
   protected
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   public
@@ -61,18 +59,20 @@ type
     function FindCB(ATag: integer): TORCheckBox; //BAPHII 1.3.1
     procedure CopyCB(FromIndex, ToIndex: integer); //BAPHII 1.3.1
     procedure SetSigItems(Sender: TObject; sourceOrderID: string); //BAPHII 1.3.1
-    //procedure SetSigItems(Sender: TObject; itemsList: TStringList; sourceOrderID: string); //BAPHII 1.3.1
     function ItemToTag(Info: TSigItemTagInfo): integer; //CQ5074
     function TagToItem(ATag: integer): TSigItemTagInfo; //CQ5074
+
   end;
 
 function SigItems: TSigItems;
 function SigItemHeight: integer;
+function  GetAllBtnLeftPos: integer;
 
 const
+  SIG_ITEM_VERTICAL_PAD = 2;
 
-  TC_Order_Error = 'All Service Connection and/or Rated Disabilities questions must be answered.';
-
+  TC_Order_Error = 'All Service Connection and/or Rated Disabilities questions must be answered, '+#13+
+                   'and at least one diagnosis selected for each order that requires a diagnosis.';
 
   TX_Order_Error = 'All Service Connection and/or Rated Disabilities questions must be answered, '+#13+
                    'and at least one diagnosis selected for each order that requires a diagnosis.';
@@ -85,11 +85,12 @@ const
 var
   uSigItems: TSigItems = nil; //BAPHII 1.3.1
 
+
 implementation
 
 uses
   ORFn, ORNet, uConst, TRPCB, rOrders, rPCE, fOrdersSign, fReview,UBAGlobals,
-  uCore ;
+  uCore , VAUtils;
 
 type
   ItemStatus = (isNA, isChecked, isUnchecked, isUnknown);
@@ -100,10 +101,11 @@ const
         { siServiceConnected          } (('SC',  'Service Connected Condition'),
         { siAgentOrange               }  ('AO',  'Agent Orange Exposure'),
         { siIonizingRadiation         }  ('IR',  'Ionizing Radiation Exposure'),
-        { siEnvironmentalContaminants }  ('EC',  'Environmental Contaminants'),
+        { siEnvironmentalContaminants }  ('SWAC','Southwest Asia Conditions'),
         { siMST                       }  ('MST', 'MST'), //'Military Sexual Trauma'
         { siHeadNeckCancer            }  ('HNC', 'Head and/or Neck Cancer'),
-        { siCombatVeteran             }  ('CV',  'Combat Veteran Related'));
+        { siCombatVeteran             }  ('CV',  'Combat Veteran Related'),
+        { siSHAD                      }  ('SHD', 'Shipboard Hazard and Defense'));
 
   SigItemDisplayOrder: array[TSigItemType] of TSigItemType =
      (  siServiceConnected,
@@ -111,8 +113,9 @@ const
         siAgentOrange,
         siIonizingRadiation,
         siEnvironmentalContaminants,
+        siSHAD,
         siMST,
-        siHeadNeckCancer );
+        siHeadNeckCancer);
 
   StsChar: array[ItemStatus] of char =
            { isNA        } ('N',
@@ -122,7 +125,7 @@ const
 
   ColIdx = 30000;
   AllIdx = 31000;
-  NA_FLAGS = 'NNNNNNN';
+  NA_FLAGS = 'NNNNNNNN';
 
 var
   uSingletonFlag: boolean = FALSE;
@@ -131,6 +134,7 @@ var
   tempCkBx: TORCheckBox;
   thisOrderID: string;
   thisChangeItem: TChangeItem;
+  AllBtnLeft: integer;
 
 
 function TSigItems.GetSigItems : TORStringList;
@@ -174,9 +178,6 @@ begin
 end;
 
 procedure TSigItems.SetSigItems(Sender: TObject; sourceOrderID: string);
-{
- BAPHII 1.3.1
-}
 var
   i: integer;
 begin
@@ -211,8 +212,14 @@ end;
 
 function SigItemHeight: integer;
 begin
-  Result := MainFontHeight + 2;
+  Result := MainFontHeight + 2 + SIG_ITEM_VERTICAL_PAD;
 end;
+
+function  GetAllBtnLeftPos: integer;
+ begin
+  Result := uSignItems.AllBtnLeft;
+ end;
+
 
 { TSigItems }
 {
@@ -263,7 +270,6 @@ end;
 procedure TSigItems.Remove(ItemType: integer; const ID: string);
 var
   idx: integer;
-
 begin
   if ItemType = CH_ORD then
   begin
@@ -276,7 +282,6 @@ end;
 procedure TSigItems.ResetOrders; // Resets ListBox positions, to avoid old data messing things up
 var
   i: integer;
-
 begin
   for i := 0 to FItems.Count-1 do
     FItems.SetStrPiece(i, 2, '-1');
@@ -333,13 +338,14 @@ var
   ownr: TComponent;
   FirstValidItem: TSigItemType;
   x, y, MaxX, i, btnW, btnH, j, dx, ht, idx, dgrp: integer;
-  s, id, Code, cType, Flags: string;
+  s, id, Code, cType, Flags,OrderStatus,CVFlag,ChangedFlags: string;
+
   StsCode: char;
   sx, si: TSigItemType;
   sts, StsIdx: ItemStatus;
   StsUsed: array[TSigItemType] of boolean;
   AResponses : TResponses;
-  UFlags: string;
+  UFlags,HoldFlags: string;
   thisCB: TORCheckBox;
   cpFlags: string;
   
@@ -348,7 +354,7 @@ var
   thisTagInfo: TSigItemTagInfo;
 
   function CreateCB(AParent: TWinControl): TORCheckBox;
-     begin
+  begin
      Result := TORCheckBox.Create(ownr);
      Result.Parent := AParent;
      Result.Height := cbHeight;
@@ -358,8 +364,9 @@ var
      Result.OnClick := cbClicked;
      Result.OnEnter := cbEnter;
      Result.OnExit := cbExit;
+     UpdateColorsFor508Compliance(Result);
      Fcb.Add(Result);
-     end;
+  end;
 
 begin
   Result := FALSE;
@@ -392,11 +399,8 @@ try
 
        if idx > 0 then
           begin
-         if  BILLING_AWARE then
-              rpcGetSC4Orders // get SC/EIC information for all CIDC TYPE orders
-          else
-             GetCoPay4Orders;   // enforces existing NON CIDC CO-PAY rules
-             for i := 0 to RPCBrokerV.Results.Count-1 do
+            rpcGetSC4Orders;
+            for i := 0 to RPCBrokerV.Results.Count-1 do
                begin
                   s := RPCBrokerV.Results[i];
                 {Begin BillingAware}
@@ -404,19 +408,18 @@ try
                 begin
                   if (CharAt(piece(s,';',2),1) <> '1') then
                     s := piece(s,U,1);
-                end;
-                 id := piece(s,U,1);
-                 idx := FItems.IndexOfPiece(id);
+                end;  {End BillingAware }
+                id := piece(s,U,1);
+                idx := FItems.IndexOfPiece(id);
 
-                 if idx >= 0 then
-                    begin
+                if idx >= 0 then
+                begin
                     FItems.SetStrPiece(idx, 3, '1'); // Mark as read from RPC
                     j := 2;
                     Flags := BaseFlags;
-
-                       repeat
+                     repeat
                          Code := piece(s,U,j);
-
+                         if Code = 'EC' then Code := 'SWAC';  // CQ:15431  ; resolve issue of displaying SWAC vs EC.
                          if Code <> '' then
                             begin
                             cType := piece(Code, ';', 1);
@@ -448,7 +451,6 @@ try
                      FItems.SetStrPiece(idx, 4, Flags);
                       // new code  if deleted order and ba on then
                       // reset appropriate tf flags to "?".
-
 
                      if BILLING_AWARE then
                         begin
@@ -488,6 +490,7 @@ try
              end; //if idx > 0
 
     FStsCount := 0;
+    AllBtnLeft := 0;
 
     for si := low(TSigItemType) to high(TSigItemType) do
       StsUsed[si] := FALSE;
@@ -499,17 +502,18 @@ try
          if (piece(s,u,2) <> '-1') and (piece(s,u,3) = '1') then
             begin
              s := piece(s, u, 4); // SC/EI
-             // code added 01/17/2006 - check dc'd nurse orders, originals where requiring CIDC if assigned to patient.
+            // code added 01/17/2006 - check dc'd nurse orders,
+            // originals where requiring CIDC if assigned to patient.
              if (BILLING_AWARE) and (not UBACore.IsOrderBillable(Piece(s,U,1))) then
                s :=  NA_FLAGS;
 
             for si := low(TSigItemType) to high(TSigItemType) do
               if (not StsUsed[si]) and (s[ord(si)+1] <> StsChar[isNA]) then
-                begin
+              begin
                 StsUsed[si] := TRUE;
                 inc(FStsCount);
                 if FStsCount >= FlagCount then break;
-                end;
+              end;
             end;
 
          if FStsCount >= FlagCount then
@@ -536,11 +540,11 @@ try
          btnW := 0;
 
          for si := low(TSigItemType) to high(TSigItemType) do
-            begin
+         begin
             j := lb.Canvas.TextWidth(SigItemDesc[si, sdShort]);
             if btnW < j then
              btnW := j;
-            end;
+         end;
 
          inc(btnW, 8);
          btnH := ResizeHeight( BaseFont, MainFont, 21);
@@ -548,13 +552,13 @@ try
          dx := (btnW - cbWidth) div 2;
 
          for si := high(TSigItemType) downto low(TSigItemType) do
-            begin
+         begin
             FcbX[si] := x - btnW + dx;
             dec(x, btnW + btnGap);
-            end;
+         end;
          
          if FStsCount > 1 then
-           begin
+         begin
            FAllCatCheck := FALSE;
            btn := TButton.Create(ownr);
            btn.Parent := prnt;
@@ -563,16 +567,18 @@ try
            btn.Caption := AllTxt;
            btn.OnClick := cbClicked;
            btn.Left := FcbX[TSigItemType(0)] + lb.Left - dx + 2 - (FcbX[TSigItemType(1)] - FcbX[TSigItemType(0)]);
+           AllBtnLeft := btn.left;
            btn.Top := lb.Top - btn.height - 2;
            btn.Tag := AllIdx;
            btn.ShowHint := TRUE;
            btn.Hint := 'Set All Related Entries';
            btn.TabOrder := lb.TabOrder;
+           UpdateColorsFor508Compliance(btn);
            Fcb.Add(btn);
-           end;
+         end;
 
          for sx := low(TSigItemType) to high(TSigItemType) do
-            begin
+         begin                                                // print buttons on header of columns ie SC,AO,IR, etc....
             si := SigItemDisplayOrder[sx];
             FAllCheck[si] := TRUE;
             btn := TButton.Create(ownr);
@@ -589,8 +595,9 @@ try
             btn.Enabled := StsUsed[si];
             //tab order before listbox but after previous buttons.
             btn.TabOrder := lb.TabOrder;
+            UpdateColorsFor508Compliance(btn);
             Fcb.Add(btn);
-            end;
+         end;
 
             FValidGap := ((FcbX[succ(TSigItemType(0))] - FcbX[TSigItemType(0)] - cbWidth) div 2) + 1;
             FLastValidX := FcbX[FirstValidItem] - FValidGap;
@@ -598,7 +605,7 @@ try
             
             try
               ht := SigItemHeight;
-              FDy := ((ht - cbHeight) div 2);
+              FDy := ((ht - cbHeight) div 2)+1;
               y := lb.TopIndex;
               FOldDrawItemEvent := TExposedListBox(lb).OnDrawItem;
               Flb := lb;
@@ -607,27 +614,27 @@ try
 
               for i := 0 to FItems.Count-1 do
                   begin
-                  s := FItems[i];
-                  
+                    s := FItems[i];
+                    orderStatus := (Piece(s,u,1));
                   if piece(s,u,3) = '1' then
                      begin
-                     idx := StrToIntDef(piece(s,U,2),-1);
+                       idx := StrToIntDef(piece(s,U,2),-1);
 
                      if idx >= 0 then
-                        begin
+                     begin
                         Flags := piece(s,u,4);
-                                                 //loop thru treatment factors
+                          //loop thru treatment factors
                         for sx := low(TSigItemType) to high(TSigItemType) do
                            begin
-                           si := SigItemDisplayOrder[sx];
-                           StsCode := Flags[ord(si)+1];
-                           StsIdx := isNA;
+                             si := SigItemDisplayOrder[sx];
+                             StsCode := Flags[ord(si)+1];
+                             StsIdx := isNA;
 
                            for sts := low(ItemStatus) to high(ItemStatus) do
                               if StsCode = StsChar[sts] then
                                  begin
-                                 StsIdx := sts;
-                                 Break;
+                                   StsIdx := sts;
+                                   Break;
                                  end;
 
                              if (StsIdx <> isNA) then
@@ -652,17 +659,12 @@ try
                                         cb.Caption := itemText + cb.Hint;  //CQ3301/3302 - gives JAWS a caption to read
                                      end;
                                  //end CQ3301/3302
-
-                               //PATCH: Added OR_3_215v26_70 11/07/2007 jb
-                                 	// GWOT - CV Default to Yes.
-	                                if ( (si = siCombatVeteran) and (StsIdx = isUnKnown) ) then
-	                                 begin
-                                   		StsIdx := isChecked;
-                                      Flags[7] := 'C';                  // HD200866 default as Combat Related - GWOT mandated Change
-                                      FItems.SetStrPiece(i, 4, Flags);  // HD200866 default as Combat Related - GWOT mandated Change
-                                   end;
-                              //End Patch
-
+                                  if ( (si = siCombatVeteran) and (StsIdx = isUnKnown) ) then
+                                  begin
+                                     StsIdx := isChecked;
+                                     Flags[7] := 'C';                  // HD200866 default as Combat Related - GWOT mandated Change
+                                     FItems.SetStrPiece(i, 4, Flags);  // HD200866 default as Combat Related - GWOT mandated Change
+                                  end;
                                  case StsIdx of
                                    isChecked:   cb.State := cbChecked;
                                    isUnchecked: cb.State := cbUnchecked;
@@ -690,7 +692,7 @@ try
   except
   on ERangeError do
   begin
-     ShowMessage('ERangeError in UpdateListBox' + s);
+     ShowMsg('ERangeError in UpdateListBox' + s);
   raise;
   end;
   end;
@@ -801,64 +803,68 @@ var
   DrawGrid: boolean;
 
 begin
-        DrawGrid := (Index < flb.Items.Count);
-        if DrawGrid and (trim(Flb.Items[Index]) = '') and
-                        (Index = (flb.Items.Count - 1)) then
-          DrawGrid := FALSE;
-        if DrawGrid then
-          dec(Rect.Bottom);
-        OldRect := Rect;
+  DrawGrid := (Index < flb.Items.Count);
+  if DrawGrid and (trim(Flb.Items[Index]) = '') and
+                  (Index = (flb.Items.Count - 1)) then
+    DrawGrid := FALSE;
+  if DrawGrid then
+    dec(Rect.Bottom);
+  OldRect := Rect;
 
-        Rect.Right := FlastValidX - 4;
-      {Begin BillingAware}
-        if  BILLING_AWARE then Rect.Right := FLastValidX - 55;
-      {End BillingAware}
+  Rect.Right := FlastValidX - 4;
+{Begin BillingAware}
+  if  BILLING_AWARE then Rect.Right := FLastValidX - 55;
+{End BillingAware}
 
-        if assigned(FOldDrawItemEvent) then
-          FOldDrawItemEvent(Control, Index, Rect, State)
-        else
-           begin
-           Flb.Canvas.FillRect(Rect);
-           if Index < flb.Items.Count then
-             Flb.Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top, FilteredString(Flb.Items[Index]));
-           end;
+  if assigned(FOldDrawItemEvent) then
+  begin
+    inc(Rect.Bottom);
+    FOldDrawItemEvent(Control, Index, Rect, State);
+    dec(Rect.Bottom);
+  end
+  else
+     begin
+     Flb.Canvas.FillRect(Rect);
+     if Index < flb.Items.Count then
+       Flb.Canvas.TextRect(Rect, Rect.Left + 2, Rect.Top, FilteredString(Flb.Items[Index]));
+     end;
 
-        if DrawGrid then
-           begin
-             Flb.Canvas.Pen.Color := clBtnFace;
-             Flb.Canvas.MoveTo(Rect.Left, Rect.Bottom);
-             Flb.Canvas.LineTo(OldRect.RIght, Rect.Bottom);
-           end;
+  if DrawGrid then
+     begin
+       Flb.Canvas.Pen.Color := Get508CompliantColor(clSilver);
+       Flb.Canvas.MoveTo(Rect.Left, Rect.Bottom);
+       Flb.Canvas.LineTo(OldRect.RIght, Rect.Bottom);
+     end;
 
-        if  BILLING_AWARE then OldRect.Left := Rect.Right + 90
-        else OldRect.Left := Rect.Right;
+  if  BILLING_AWARE then OldRect.Left := Rect.Right + 90
+  else OldRect.Left := Rect.Right;
 
-       //// SC Column
-        Flb.Canvas.FillRect(OldRect);
-        for i := 0 to Fcb.Count-1 do
-           begin
-             cb := TORCheckBox(Fcb[i]);
+ //// SC Column
+ ///
+  Flb.Canvas.FillRect(OldRect);
+  for i := 0 to Fcb.Count-1 do
+     begin
+       cb := TORCheckBox(Fcb[i]);
 
-             if TagToItem(cb.Tag).Index = Index then
-                begin
-                  cb.Invalidate;
-                  cb.Top := Rect.Top + FDy;
-                end;
-           end;
-
-        // EI Columns
-        if DrawGrid then
-        begin
-          for si := low(TSigItemType) to high(TSigItemType) do
+       if TagToItem(cb.Tag).Index = Index then
           begin
-            if FcbX[si] > FLastValidX then
-            begin
-              Flb.Canvas.MoveTo(FcbX[si] - FValidGap, Rect.Top);
-              Flb.Canvas.LineTo(FcbX[si] - FValidGap, Rect.Bottom);
-            end;
+            cb.Invalidate;
+            cb.Top := Rect.Top + FDy;
           end;
-        end; 
+     end;
 
+  // EI Columns
+  if DrawGrid then
+  begin
+    for si := low(TSigItemType) to high(TSigItemType) do
+    begin
+      if FcbX[si] > FLastValidX then
+      begin
+        Flb.Canvas.MoveTo(FcbX[si] - FValidGap, Rect.Top);
+        Flb.Canvas.LineTo(FcbX[si] - FValidGap, Rect.Bottom);
+      end;
+    end;
+  end;
 end;
 
 procedure TSigItems.Notification(AComponent: TComponent;
@@ -912,7 +918,7 @@ begin
        begin
           BAOrderList := TStringList.Create;
           BAOrderList.Clear;
-    end;
+       end;
 {End BillingAware}
   end;
 
@@ -998,7 +1004,7 @@ begin
      begin
         Index := StrToInt(Piece(FactorsOut.Strings[y],U,1));
         CopyCBValues(Index,Index);
-        end;
+     end;
 end;
 
 
@@ -1028,8 +1034,7 @@ begin
              ToCB.State := tempCkBx.State;// FromCB.State;
           end;
        end; //for
-
-end;
+  end;
 
 function TSigItems.FindCBValues(ATag: integer):TORCheckBox;
 var
@@ -1070,7 +1075,7 @@ begin
   except
      on EAccessViolation do
         begin
-        {$ifdef debug}ShowMessage('EAccessViolation in uSignItems.GetTempCkBxState()');{$endif}
+        {$ifdef debug}Show508Message('EAccessViolation in uSignItems.GetTempCkBxState()');{$endif}
         raise;
         end;
   end;
@@ -1082,6 +1087,7 @@ initialization
   FlagCount := ord(high(TSigItemType)) - ord(low(TSigItemType)) + 1;
   BaseFlags := StringOfChar(StsChar[isNA], FlagCount);
   thisChangeItem := TChangeItem.Create; //CQ3301/3302
+  AllBtnLeft := 0;
 
 finalization
   FreeAndNil(uSigItems);

@@ -1,27 +1,22 @@
-object frmPtSelMsg: TfrmPtSelMsg
+inherited frmPtSelMsg: TfrmPtSelMsg
   Left = 375
   Top = 421
-  Width = 375
-  Height = 174
   Caption = 'Patient Lookup Messages'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 147
+  ClientWidth = 367
   FormStyle = fsStayOnTop
-  OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  ExplicitWidth = 375
+  ExplicitHeight = 174
   DesignSize = (
     367
-    140)
+    147)
   PixelsPerInch = 96
   TextHeight = 13
-  object cmdClose: TButton
+  object cmdClose: TButton [0]
     Left = 158
     Top = 114
     Width = 60
@@ -33,7 +28,7 @@ object frmPtSelMsg: TfrmPtSelMsg
     TabOrder = 0
     OnClick = cmdCloseClick
   end
-  object memMessages: TRichEdit
+  object memMessages: TRichEdit [1]
     Left = 0
     Top = 0
     Width = 367
@@ -44,6 +39,18 @@ object frmPtSelMsg: TfrmPtSelMsg
     ScrollBars = ssVertical
     TabOrder = 1
     WantReturns = False
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cmdClose'
+        'Status = stsDefault')
+      (
+        'Component = memMessages'
+        'Status = stsDefault')
+      (
+        'Component = frmPtSelMsg'
+        'Status = stsDefault'))
   end
   object timClose: TTimer
     OnTimer = timCloseTimer

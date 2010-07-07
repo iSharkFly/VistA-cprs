@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ORDtTm, ORCtrls, ExtCtrls, rTIU, uConst, uTIU, ORFn, ORNet,
-  ComCtrls, Buttons;
+  ComCtrls, Buttons, fBase508Form, VA508AccessibilityManager;
 
 type
   {This object holds a List of Actions as Returned VIA the RPCBroker}
@@ -27,7 +27,7 @@ type
     destructor Destroy(); override;
   end;
 
-  TfrmNoteProperties = class(TForm)
+  TfrmNoteProperties = class(TfrmBase508Form)
     lblNewTitle: TLabel;
     cboNewTitle: TORComboBox;
     lblDateTime: TLabel;
@@ -91,6 +91,7 @@ type
     procedure btnDetailsClick(Sender: TObject);
     procedure lstRequestsChange(Sender: TObject);
   private
+    FIsNewNote : Boolean;     // Is set at the begining of the function: ExecuteNoteProperties
     FCosignIEN: Int64;      // store cosigner that was passed in
     FCosignName: string;    // store cosigner that was passed in
     FDocType: Integer;      // store document type that was passed in
@@ -140,7 +141,7 @@ implementation
 
 {$R *.DFM}
 
-uses uCore, rCore, rConsults, uConsults, rSurgery, uAccessibleListBox, fRptBox;
+uses uCore, rCore, rConsults, uConsults, rSurgery, fRptBox;
 
 { Initial values in ANote
 
@@ -211,6 +212,7 @@ var
   frmNoteProperties: TfrmNoteProperties;
 begin
   frmNoteProperties := TfrmNoteProperties.Create(Application);
+  frmNoteProperties.FIsNewNote := ANote.IsNewNote;
   uConsultsList := TStringList.Create;
   try
     ResizeAnchoredFormToFont(frmNoteProperties);
@@ -336,12 +338,7 @@ begin
         uShowUnresolvedOnly := not uShowUnresolvedOnly;
         FormatRequestList;
       end ;
-      TAccessibleListBox.WrapControl(cboNewTitle);
-      try
-        Result := ShowModal = idOK;                // display the form
-      finally
-        TAccessibleListBox.UnwrapControl(cboNewTitle);
-      end;
+      Result := ShowModal = idOK;                // display the form
       if Result then with ANote do
       begin
         if FDocType <> TYP_ADDENDUM then
@@ -398,10 +395,16 @@ begin
                               PkgPtr := PKG_SURGERY;
                               PkgRef := IntToStr(PkgIEN) + ';' + PkgPtr;
                             end
-                          else if pnlPRF.Visible then //PRF
+                          else if (pnlPRF.Visible) and (lvPRF.ItemIndex >= 0) then //PRF
                             begin
                               PRF_IEN := FPRFActions.GetPRF_IEN(lvPRF.ItemIndex);
                               ActionIEN := FPRFActions.GetActionIEN(lvPRF.ItemIndex);
+                            end
+                          else
+                            begin
+                              PkgIEN := 0;
+                              PkgPtr := '';
+                              PkgRef := '';
                             end;
                         end;
         end;
@@ -439,7 +442,7 @@ procedure TfrmNoteProperties.SetCosignerRequired(DoSetup: boolean);
 begin
   if FDocType = TYP_ADDENDUM then
   begin
-    lblCosigner.Visible := AskCosignerForDocument(FAddend, cboAuthor.ItemIEN)
+    lblCosigner.Visible := AskCosignerForDocument(FAddend, cboAuthor.ItemIEN, calNote.FMDateTime)
   end else
   begin
     if cboNewTitle.ItemIEN = 0
@@ -497,7 +500,7 @@ begin
     else
     begin
       lblConsult2.Caption := ALL_CONSULTS;
-      lstRequests.Items.Assign(uConsultsList);
+      FastAssign(uConsultsList, lstRequests.Items);
     end;
     lblConsult1.Visible := (cboNewTitle.ItemIndex > -1);
     lstRequests.SelectByIEN(SavedIEN);
@@ -695,9 +698,9 @@ begin
             ErrMsg := ErrMsg + TX_REQ_SURGCASE
           else if (pnlPRF.Visible) then
           begin
-            if (lvPRF.ItemIndex < 0) then
-              ErrMsg := ErrMsg + TX_REQ_PRF_ACTION
-            else if FPRFActions.SelActionHasNote(lvPRF.ItemIndex) then
+            if (lvPRF.ItemIndex < 0) and (FIsNewNote) then
+              ErrMsg := ErrMsg + TX_REQ_PRF_ACTION;
+            if (lvPRF.ItemIndex >= 0) and (FPRFActions.SelActionHasNote(lvPRF.ItemIndex)) then
               ErrMsg := ErrMsg + TX_REQ_PRF_NOTE;
           end;
         end;
@@ -868,7 +871,7 @@ end;
 procedure TPRFActions.Load(TitleIEN : Int64; DFN : String);
 begin
   CallV('TIU GET PRF ACTIONS', [TitleIEN,DFN]);
-  FPRFActionList.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, FPRFActionList);
 end;
 
 function TPRFActions.SelActionHasNote(lstIndex: integer): boolean;

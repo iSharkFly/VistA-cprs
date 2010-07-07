@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, Buttons, ORCtrls, StdCtrls;
+  ExtCtrls, Buttons, ORCtrls, StdCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmLabTestGroups = class(TForm)
+  TfrmLabTestGroups = class(TfrmBase508Form)
     pnlLabTestGroups: TORAutoPanel;
     cmdOK: TButton;
     cmdCancel: TButton;
@@ -33,7 +33,7 @@ type
     cmdDelete: TButton;
     cmdAdd: TButton;
     cmdAddTest: TButton;
-    lblDefine: TLabel;
+    lblDefine: TVA508StaticText;
     lblTestGroup: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure cboTestsNeedData(Sender: TObject; const StartFrom: string;
@@ -49,7 +49,6 @@ type
     procedure cboSpecimenNeedData(Sender: TObject; const StartFrom: string;
       Direction, InsertAt: Integer);
     procedure cboUsersClick(Sender: TObject);
-    procedure lstTestGroupsClick(Sender: TObject);
     procedure cmdReplaceClick(Sender: TObject);
     procedure cmdAddClick(Sender: TObject);
     procedure cmdDeleteClick(Sender: TObject);
@@ -63,6 +62,7 @@ type
     procedure pnlDownButtonExit(Sender: TObject);
     procedure pnlUpButtonResize(Sender: TObject);
     procedure pnlDownButtonResize(Sender: TObject);
+    procedure lstTestGroupsChange(Sender: TObject);
   private
     { Private declarations }
     procedure AddTests(tests: TStrings);
@@ -75,7 +75,7 @@ procedure SelectTestGroups(FontSize: Integer);
 
 implementation
 
-uses fLabs, ORFn, rLabs, uCore;
+uses fLabs, ORFn, rLabs, uCore, VAUtils, VA508AccessibilityRouter;
 
 {$R *.DFM}
 
@@ -106,7 +106,7 @@ begin
         Width := cmdAddTest.Width div 2 + 10;
         AutoSize := True;
       end;
-      lstList.Items.Assign(frmLabs.lstTests.Items);
+      FastAssign(frmLabs.lstTests.Items, lstList.Items);
       if lstList.Items.Count > 0 then lstList.ItemIndex := 0;
       lstListClick(frmLabTestGroups);
       ShowModal;
@@ -162,10 +162,10 @@ end;
 procedure TfrmLabTestGroups.cmdOKClick(Sender: TObject);
 begin
   if lstList.Items.Count = 0 then
-    ShowMessage('No tests were selected.')
+    ShowMsg('No tests were selected.')
   else
   begin
-    frmLabs.lstTests.Items.Assign(lstList.Items);
+    FastAssign(lstList.Items, frmLabs.lstTests.Items);
     frmLabs.lblSpecimen.Caption := cboSpecimen.Items[cboSpecimen.ItemIndex];
     Close;
   end;
@@ -205,6 +205,8 @@ begin
     lstList.Items[lstList.ItemIndex] := templine;
     lstList.ItemIndex := newindex;
     lstListClick(self);
+    if ScreenReaderSystemActive then
+      GetScreenReader.Speak('Test Moved Up');
   end;
 end;
 
@@ -220,6 +222,8 @@ begin
     lstList.Items[lstList.ItemIndex] := templine;
     lstList.ItemIndex := newindex;
     lstListClick(self);
+    if ScreenReaderSystemActive then
+      GetScreenReader.Speak('Test Moved Down');
   end;
 end;
 
@@ -260,7 +264,7 @@ end;
 
 procedure TfrmLabTestGroups.cboUsersClick(Sender: TObject);
 begin
-  lstTestGroups.Items.Assign(TestGroups(cboUsers.ItemIEN));
+  FastAssign(TestGroups(cboUsers.ItemIEN), lstTestGroups.Items);
   TestGroupEnable;
 end;
 
@@ -289,9 +293,12 @@ begin
   lstListClick(self);
 end;
 
-procedure TfrmLabTestGroups.lstTestGroupsClick(Sender: TObject);
+procedure TfrmLabTestGroups.lstTestGroupsChange(Sender: TObject);
 begin
-  AddTests(ATestGroup(lstTestGroups.ItemIEN, cboUsers.ItemIEN));
+  if lstTestGroups.ItemIEN > 0 then
+  begin
+    AddTests(ATestGroup(lstTestGroups.ItemIEN, cboUsers.ItemIEN));
+  end;
 end;
 
 procedure TfrmLabTestGroups.TestGroupEnable;
@@ -312,8 +319,13 @@ begin
   for i := 0 to lstList.Items.Count -1 do
     text := text + lstList.DisplayText[i] + #13 + '  ';
   if InfoBox(text,'Confirmation', MB_YESNO or MB_ICONQUESTION) = IDYES then
-    UTGReplace(lstList.Items, lstTestGroups.ItemIEN); //ShowMessage('Replace'); //Replace
+  begin
+    UTGReplace(lstList.Items, lstTestGroups.ItemIEN); //Show508Message('Replace'); //Replace
+    if ScreenReaderSystemActive then
+      GetScreenReader.Speak('test group replaced');
+  end;
   cboUsersClick(self);
+  lstTestGroups.SetFocus;  
 end;
 
 procedure TfrmLabTestGroups.cmdAddClick(Sender: TObject);
@@ -327,6 +339,8 @@ begin
   if InfoBox(text,'Confirmation', MB_YESNO or MB_ICONQUESTION) = IDYES then
   begin
     UTGAdd(lstList.Items);
+    if ScreenReaderSystemActive then
+      GetScreenReader.Speak('New test group created');
     cboUsers.InitLongList(User.Name);
     for i := 0 to cboUsers.Items.Count - 1 do
       if StrToInt64Def(Piece(cboUsers.Items[i], '^', 1), 0) = User.DUZ then
@@ -336,6 +350,7 @@ begin
       end;
   end;
   if cboUsers.ItemIndex > -1 then cboUsersClick(self);
+  lstTestGroups.SetFocus;  
 end;
 
 procedure TfrmLabTestGroups.cmdDeleteClick(Sender: TObject);
@@ -348,6 +363,8 @@ begin
   if InfoBox(text,'Confirmation', MB_YESNO or MB_ICONQUESTION) = IDYES then
   begin
     UTGDelete(lstTestGroups.ItemIEN);
+    if ScreenReaderSystemActive then
+      GetScreenReader.Speak('Test group deleted');
     cboUsers.Text := '';
     lstTestGroups.Clear;
     cboUsers.InitLongList(User.Name);
@@ -359,6 +376,7 @@ begin
       end;
   end;
   if cboUsers.ItemIndex > -1 then cboUsersClick(self);
+  lstTestGroups.SetFocus;
 end;
 
 procedure TfrmLabTestGroups.cboTestsChange(Sender: TObject);
@@ -383,7 +401,7 @@ end;
 
 procedure TfrmLabTestGroups.pnlUpButtonEnter(Sender: TObject);
 begin
-  pnlUpButton.BevelOuter := bvRaised;
+  pnlUpButton.BevelOuter := bvLowered;
 end;
 
 procedure TfrmLabTestGroups.pnlUpButtonExit(Sender: TObject);
@@ -393,7 +411,7 @@ end;
 
 procedure TfrmLabTestGroups.pnlDownButtonEnter(Sender: TObject);
 begin
-  pnlDownButton.BevelOuter := bvRaised;
+  pnlDownButton.BevelOuter := bvLowered;
 end;
 
 procedure TfrmLabTestGroups.pnlDownButtonExit(Sender: TObject);

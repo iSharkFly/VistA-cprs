@@ -1,17 +1,11 @@
-object frmPLLex: TfrmPLLex
+inherited frmPLLex: TfrmPLLex
   Left = 239
   Top = 88
-  Width = 433
-  Height = 301
   Caption = 'Problem List  Lexicon Search'
-  Color = clBtnFace
+  ClientHeight = 274
+  ClientWidth = 425
   Constraints.MinHeight = 200
   Constraints.MinWidth = 433
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   OnClose = FormClose
@@ -22,14 +16,14 @@ object frmPLLex: TfrmPLLex
     274)
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TLabel [0]
     Left = 12
     Top = 7
     Width = 101
     Height = 13
     Caption = 'Enter Term to Search'
   end
-  object bbCan: TBitBtn
+  object bbCan: TBitBtn [1]
     Left = 230
     Top = 215
     Width = 89
@@ -43,7 +37,7 @@ object frmPLLex: TfrmPLLex
     OnClick = bbCanClick
     NumGlyphs = 2
   end
-  object bbOK: TBitBtn
+  object bbOK: TBitBtn [2]
     Left = 322
     Top = 215
     Width = 89
@@ -56,7 +50,7 @@ object frmPLLex: TfrmPLLex
     OnClick = bbOKClick
     NumGlyphs = 2
   end
-  object Panel1: TPanel
+  object Panel1: TPanel [3]
     Left = 0
     Top = 245
     Width = 425
@@ -81,7 +75,7 @@ object frmPLLex: TfrmPLLex
       Height = 13
     end
   end
-  object ebLex: TCaptionEdit
+  object ebLex: TCaptionEdit [4]
     Left = 12
     Top = 27
     Width = 321
@@ -92,7 +86,7 @@ object frmPLLex: TfrmPLLex
     OnKeyPress = ebLexKeyPress
     Caption = 'Enter Term to Search'
   end
-  object lbLex: TORListBox
+  object lbLex: TORListBox [5]
     Left = 12
     Top = 63
     Width = 401
@@ -109,7 +103,7 @@ object frmPLLex: TfrmPLLex
     LongList = False
     Pieces = '2'
   end
-  object bbSearch: TBitBtn
+  object bbSearch: TBitBtn [6]
     Left = 340
     Top = 27
     Width = 73
@@ -121,5 +115,29 @@ object frmPLLex: TfrmPLLex
     TabOrder = 1
     OnClick = bbSearchClick
     NumGlyphs = 2
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = bbCan'
+        'Status = stsDefault')
+      (
+        'Component = bbOK'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = ebLex'
+        'Status = stsDefault')
+      (
+        'Component = lbLex'
+        'Status = stsDefault')
+      (
+        'Component = bbSearch'
+        'Status = stsDefault')
+      (
+        'Component = frmPLLex'
+        'Status = stsDefault'))
   end
 end

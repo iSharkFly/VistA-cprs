@@ -34,7 +34,7 @@ begin
   CallV('ORPRF HASFLG',[PTDFN]);
   if RPCBrokerV.Results.Count > 0 then
   begin
-    FlagList.Assign(RPCBrokerV.Results);
+    FastAssign(RPCBrokerV.Results, FlagList);
     HasFlag := True;
   end;
 end;
@@ -66,7 +66,7 @@ procedure GetActiveFlg(FlagInfo: TStrings; const PTDFN, FlagRecordID: string);
 begin
   CallV('ORPRF GETFLG', [PTDFN,FlagRecordID]);
   if RPCBrokerV.Results.Count > 0 then
-    FlagInfo.Assign(RPCBrokerV.Results);
+    FastAssign(RPCBrokerV.Results, FlagInfo);
 end;
 
 procedure ClearFlag;

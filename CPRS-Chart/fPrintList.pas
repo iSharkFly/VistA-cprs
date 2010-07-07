@@ -4,7 +4,7 @@ interface
 
 uses
  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, fAutoSz, StdCtrls, ORCtrls, fConsult513Prt;
+  Dialogs, fAutoSz, StdCtrls, ORCtrls, fConsult513Prt, VA508AccessibilityManager;
 
 type
   TfrmPrintList = class(TfrmAutoSz)
@@ -65,7 +65,7 @@ var
   i, AnImg: integer;
   x: string;
   tmpList: TStringList;
-  strObj: TStringList;
+  //strObj: TStringList;
 begin
   HLDPageID := PageID;
   frmPrintList := TfrmPrintList.Create(Application);
@@ -80,9 +80,10 @@ begin
                          IMG_IDPAR_ADDENDA_SHUT, IMG_IDPAR_ADDENDA_OPEN] then
           begin
             x := TORTreeNode(ATree.Items.Item[i]).Stringdata;
-                strObj := TStringList.Create;
-                strObj.Insert(0,x);
-                tmpList.AddObject(x, strObj)  // notes and dc/summs & Consults
+            tmpList.Add(x);
+            //strObj := TStringList.Create;
+            //strObj.Insert(0,x);
+            //tmpList.AddObject(x, strObj)  // notes and dc/summs & Consults
           end; {if}
       end; {for}
 
@@ -96,7 +97,7 @@ begin
            for i := 0 to tmpList.Count - 1 do
              begin
                x := tmpList[i];
-               tmpList[i] := (MakeNoteDisplayText(x));
+               tmpList[i] := Piece(x, U, 1) + U + (MakeNoteDisplayText(x));
              end;
            frmPrintList.lblListName.Caption := 'Select Notes to be printed.';
          end;
@@ -107,7 +108,7 @@ begin
            for i := 0 to tmpList.Count - 1 do
              begin
                x := tmpList[i];
-               tmpList[i] := (MakeConsultDisplayText(x));
+               tmpList[i] := Piece(x, U, 1) + U + (MakeConsultDisplayText(x));
              end;
            frmPrintList.lblListName.Caption := 'Select Consults to be printed.';
          end;
@@ -118,13 +119,13 @@ begin
            for i := 0 to tmpList.Count - 1 do
              begin
                x := tmpList[i];
-               tmpList[i] := (MakeNoteDisplayText(x));
+               tmpList[i] := Piece(x, U, 1) + U + (MakeNoteDisplayText(x));
              end;
            frmPrintList.lblListName.Caption := 'Select Discharge Summaries to be printed.';
          end;
       end; //case
 
-    frmPrintList.lbIDParents.Items.Assign(tmpList);
+    FastAssign(tmpList, frmPrintList.lbIDParents.Items);
     frmPrintList.ShowModal;
     Result := frmPrintList.FParentNode;
   finally

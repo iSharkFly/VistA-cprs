@@ -1,22 +1,18 @@
-object frmPtDemo: TfrmPtDemo
+inherited frmPtDemo: TfrmPtDemo
   Left = 248
   Top = 283
-  Width = 590
-  Height = 300
   BorderIcons = [biSystemMenu]
   Caption = 'Patient Inquiry'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 271
+  ClientWidth = 580
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 588
+  ExplicitHeight = 305
   PixelsPerInch = 96
   TextHeight = 13
-  object lblFontTest: TLabel
+  object lblFontTest: TLabel [0]
     Left = 264
     Top = 148
     Width = 77
@@ -30,11 +26,11 @@ object frmPtDemo: TfrmPtDemo
     ParentFont = False
     Visible = False
   end
-  object memPtDemo: TRichEdit
+  object memPtDemo: TRichEdit [1]
     Left = 0
     Top = 0
-    Width = 582
-    Height = 236
+    Width = 580
+    Height = 234
     Align = alClient
     Color = clCream
     Font.Charset = ANSI_CHARSET
@@ -54,10 +50,10 @@ object frmPtDemo: TfrmPtDemo
     WantReturns = False
     WordWrap = False
   end
-  object pnlTop: TORAutoPanel
+  object pnlTop: TORAutoPanel [2]
     Left = 0
-    Top = 236
-    Width = 582
+    Top = 234
+    Width = 580
     Height = 37
     Align = alBottom
     BevelOuter = bvNone
@@ -91,6 +87,27 @@ object frmPtDemo: TfrmPtDemo
       TabOrder = 1
       OnClick = cmdPrintClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = memPtDemo'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = cmdNewPt'
+        'Status = stsDefault')
+      (
+        'Component = cmdClose'
+        'Status = stsDefault')
+      (
+        'Component = cmdPrint'
+        'Status = stsDefault')
+      (
+        'Component = frmPtDemo'
+        'Status = stsDefault'))
   end
   object dlgPrintReport: TPrintDialog
     Left = 265

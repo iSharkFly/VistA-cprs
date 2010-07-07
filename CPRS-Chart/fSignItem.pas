@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORFn, rCore, Hash, ORCtrls;
+  StdCtrls, ORFn, rCore, Hash, ORCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmSignItem = class(TForm)
+  TfrmSignItem = class(TfrmBase508Form)
     txtESCode: TCaptionEdit;
     lblESCode: TLabel;
     cmdOK: TButton;

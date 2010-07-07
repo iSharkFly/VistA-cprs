@@ -5,13 +5,14 @@ interface
 uses
   SysUtils, windows, Messages, Classes, Graphics, Controls,
   Forms, Dialogs, StdCtrls, Buttons, ExtCtrls, Grids,
-  ORCtrls, Vawrgrid, uCore, Menus, uConst;
+  ORCtrls, Vawrgrid, uCore, Menus, uConst, fBase508Form,
+  VA508AccessibilityManager;
 
 const
   SOC_QUIT = 1;        { close single dialog }
 
 type
-  TfrmdlgProb = class(TForm)
+  TfrmdlgProb = class(TfrmBase508Form)
     Label1: TLabel;
     Label5: TLabel;
     edResDate: TCaptionEdit;
@@ -42,6 +43,7 @@ type
     ckENV: TCheckBox;
     ckHNC: TCheckBox;
     ckMST: TCheckBox;
+    ckSHAD: TCheckBox;
     ckVerify: TCheckBox;
     edRecDate: TCaptionEdit;
     cbServ: TORComboBox;
@@ -127,7 +129,8 @@ implementation
 
 {$R *.DFM}
 
-uses ORFn, uProbs, fProbs, rProbs, fCover, rCover, rCore, fProbCmt, fProbLex, rPCE, uInit  ;
+uses ORFn, uProbs, fProbs, rProbs, fCover, rCover, rCore, fProbCmt, fProbLex, rPCE, uInit  ,
+     VA508AccessibilityRouter;
 
 type
   TDialogItem = class { for loading edits & quick orders }
@@ -246,6 +249,7 @@ begin
         ckENV.enabled        := false;
         ckHNC.enabled        := false;
         ckMST.enabled        := false;
+        ckSHAD.enabled       := false;
         if Reason = 'R' then bbFile.caption := 'Remove';
       end;
     edProb.Caption := lblact.Caption;
@@ -259,8 +263,7 @@ begin
     if Reason <> 'A' then
       begin {edit,remove or display existing problem}
         problemIFN := Piece(subjProb, u, 1);
-        //AList.Assign(EditLoad(ProblemIFN,pProviderID,PLPt.ptVAMC)) ;
-        AList.Assign(EditLoad(ProblemIFN,User.DUZ,PLPt.ptVAMC)) ;   //V17.5   RV
+        FastAssign(EditLoad(ProblemIFN, User.DUZ, PLPt.ptVAMC), AList) ;   //V17.5   RV
       end
     else {new  problem}
       SetDefaultProb(Alist, subjProb);
@@ -311,11 +314,13 @@ begin
           ckENV.enabled := PtEnvironmental ;
           ckHNC.enabled := PtHNC ;
           ckMST.enabled := PtMST ;
+          ckSHAD.Enabled := PtSHAD;
           ckAO.checked  := Probrec.AOProblem and PtAgentOrange;
           ckRAD.checked := Probrec.RADProblem and PtRadiation;
           ckENV.checked := Probrec.ENVProblem and PtEnvironmental;
           ckHNC.checked := Probrec.HNCProblem and PtHNC;
           ckMST.checked := Probrec.MSTProblem and PtMST;
+          ckSHAD.Checked := Probrec.SHADProlem and PtSHAD;
         end ;
     cbProv.InitLongList(ProbRec.RespProvider.extern) ;
     if (ProbRec.RespProvider.intern <> '') and (StrToInt64Def(ProbRec.RespProvider.intern, 0) > 0) then
@@ -510,6 +515,7 @@ begin
     if ckENV.enabled then ProbRec.ENVProblem  := ckENV.Checked;
     if ckHNC.enabled then ProbRec.HNCProblem  := ckHNC.Checked;
     if ckMST.enabled then ProbRec.MSTProblem  := ckMST.Checked;
+    if ckSHAD.Enabled then ProbRec.SHADProlem := ckSHAD.Checked;
     if cbProv.itemindex = -1 then {Get provider}
       begin
         Probrec.respProvider.intern := '0';
@@ -538,20 +544,18 @@ begin
         begin
           ut := '';
           if PLUser.usPrimeUser then ut := '1';
-          //AList.Assign(EditSave(ProblemIFN,pProviderID,PLPt.ptVAMC,ut,ProbRec.FilerObject)) ;
-          AList.Assign(EditSave(ProblemIFN,User.DUZ,PLPt.ptVAMC,ut,ProbRec.FilerObject)) ;    //V17.5  RV
+          FastAssign(EditSave(ProblemIFN, User.DUZ, PLPt.ptVAMC, ut, ProbRec.FilerObject), AList) ;    //V17.5  RV
         end;
       'A','a':  {new problem}
-         AList.Assign(AddSave(PLPt.GetGMPDFN(Patient.DFN, Patient.Name),
-           pProviderID,PLPt.ptVAMC,ProbRec.FilerObject)) ;  //*DFN*
+         FastAssign(AddSave(PLPt.GetGMPDFN(Patient.DFN, Patient.Name),
+           pProviderID, PLPt.ptVAMC, ProbRec.FilerObject), AList) ;  //*DFN*
       'R','r': {remove problem}
          begin
            remcom := '';
            if Probrec.commentcount > 0 then
              if TComment(Probrec.comments[pred(probrec.commentcount)]).IsNew then
                remcom := TComment(Probrec.comments[pred(probrec.commentcount)]).Narrative;
-           AList.Assign(ProblemDelete(ProbRec.PIFN,User.DUZ,PLPt.ptVAMC,remcom)) ;    //changed in v14
-           //AList.Assign(ProblemDelete(ProbRec.PIFN,Encounter.Provider,PLPt.ptVAMC,remcom)) ;
+           FastAssign(ProblemDelete(ProbRec.PIFN, User.DUZ, PLPt.ptVAMC, remcom), AList) ;    //changed in v14
          end
     else exit;
     end; {case}
@@ -714,7 +718,8 @@ begin  {BODY }
   alist.add('NEW' + v + '1.11' + v + '0' + u + 'NO'); {AO}
   alist.add('NEW' + v + '1.12' + v + '0' + u + 'NO'); {RAD}
   alist.add('NEW' + v + '1.13' + v + '0' + u + 'NO'); {ENV}
-  alist.add('NEW' + v + '1.14' + v + '');
+  alist.add('NEW' + v + '1.14' + v + '0' + u + 'NO'); {SHD}
+  alist.add('NEW' + v + '1.15' + v + '');
 end;
 
 
@@ -807,7 +812,7 @@ begin
     begin
       alist := TstringList.create;
       try
-        AList.Assign(ProviderList('',25,V,V)) ;
+        FastAssign(ProviderList('', 25, V, V), AList) ;
         if alist.count > 0 then
           begin
             if cbProv.items.count + 25 > 100 then
@@ -830,8 +835,8 @@ begin
   v := uppercase(cbLoc.text);
   alist := TstringList.create;
   try
-    AList.Assign(ClinicSearch(' ')) ;
-    if alist.count > 0 then cbLoc.Items.assign(Alist);
+    FastAssign(ClinicSearch(' '), AList) ;
+    if alist.count > 0 then FastAssign(Alist, cbLoc.Items);
   finally
     alist.free;
   end;
@@ -1001,5 +1006,8 @@ procedure TfrmdlgProb.cbServNeedData(Sender: TObject; const StartFrom: String;
 begin
   cbServ.ForDataUse(ServiceSearch(StartFrom, Direction));
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmdlgProb);
 
 end.

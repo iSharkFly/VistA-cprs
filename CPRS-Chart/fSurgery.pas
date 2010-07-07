@@ -6,7 +6,8 @@ uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   fHSplit, StdCtrls, ExtCtrls, Menus, ComCtrls, ORCtrls, ORFn, uConst, ORDtTm,
   uPCE, ORClasses, fDrawers, ImgList, fSurgeryView, rSurgery, uSurgery,
-  uCaseTree, uTIU;
+  uCaseTree, uTIU, fBase508Form, VA508AccessibilityManager,
+  VA508ImageListLabeler;
 
 type
   TfrmSurgery = class(TfrmHSplit)
@@ -140,6 +141,8 @@ type
     mnuViewReminders: TMenuItem;
     mnuViewRemoteData: TMenuItem;
     mnuViewPostings: TMenuItem;
+    imgLblImages: TVA508ImageListLabeler;
+    imgLblSurgery: TVA508ImageListLabeler;
     procedure mnuChartTabClick(Sender: TObject);
     procedure pnlRightResize(Sender: TObject);
     procedure cmdNewNoteClick(Sender: TObject);
@@ -203,8 +206,6 @@ type
     procedure sptHorzCanResize(Sender: TObject; var NewSize: Integer; var Accept: Boolean);
     procedure popNoteMemoPreviewClick(Sender: TObject);
     procedure popNoteMemoInsTemplateClick(Sender: TObject);
-    procedure tvSurgeryAddition(Sender: TObject; Node: TTreeNode);
-    procedure tvSurgeryDeletion(Sender: TObject; Node: TTreeNode);
     procedure ViewInfo(Sender: TObject);
     procedure mnuViewInformationClick(Sender: TObject);
   private
@@ -272,8 +273,7 @@ uses fFrame, fVisit, fEncnt, rCore, uCore, fNoteBA, fNoteBD, fSignItem, fEncount
      rPCE, Clipbrd, fNoteCslt, fNotePrt, rVitals, fAddlSigners, fNoteDR, fConsults, uSpell,
      fTIUView, fTemplateEditor, uReminders, fReminderDialog, uOrders, rConsults, fReminderTree,
      fNoteProps, fNotesBP, fTemplateFieldEditor, uTemplates, dShared, rTemplates,
-     FIconLegend, fPCEEdit, rTIU, fRptBox, uAccessibleTreeView,
-     uAccessibleTreeNode, fTemplateDialog;
+     FIconLegend, fPCEEdit, rTIU, fRptBox, fTemplateDialog, VA508AccessibilityRouter;
 
 const
   CT_SURGERY  = 11;                             // chart tab - surgery
@@ -461,9 +461,6 @@ procedure TfrmSurgery.FormCreate(Sender: TObject);
 begin
   inherited;
   PageID := CT_SURGERY;
-  memSurgery.Color := ReadOnlyColor;
-  memPCEShow.Color := ReadOnlyColor;
-  lblNewTitle.Color := ReadOnlyColor;
   EditingIndex := -1;
   FEditNote.LastCosigner := 0;
   FEditNote.LastCosignerName := '';
@@ -474,11 +471,8 @@ begin
   frmDrawers.NewNoteButton := cmdNewNote;
   frmDrawers.Splitter := splDrawers;
   frmDrawers.DefTempPiece := 1;
-  tvSurgery.Images := dmodShared.imgSurgery;
-  tvSurgery.StateImages := dmodShared.imgImages;
   FImageFlag := TBitmap.Create;
   FCaseList := TStringList.Create;
-  TAccessibleTreeView.WrapControl(tvSurgery);
 end;
 
 procedure TfrmSurgery.pnlRightResize(Sender: TObject);
@@ -531,7 +525,6 @@ end;
 
 procedure TfrmSurgery.FormDestroy(Sender: TObject);
 begin
-  TAccessibleTreeView.UnwrapControl(tvSurgery);
   FCaseList.Free;
   FImageFlag.Free;
   KillCaseTreeObjects(tvSurgery);
@@ -839,7 +832,7 @@ begin
     if DateTime <= 0 then Result := True;
     if (DocType = TYP_ADDENDUM) then
     begin
-      if AskCosignerForDocument(Addend, Author) and (Cosigner <= 0) then Result := True;
+      if AskCosignerForDocument(Addend, Author, DateTime) and (Cosigner <= 0) then Result := True;
     end else
     begin
       if Title > 0 then CurTitle := Title else CurTitle := DocType;
@@ -1002,7 +995,7 @@ begin
     begin
       DocInfo := MakeXMLParamTIU(IntToStr(CreatedNote.IEN), FEditNote);
       ExecuteTemplateOrBoilerPlate(TmpBoilerPlate, FEditNote.Title, ltTitle, Self, 'Title: ' + FEditNote.TitleName, DocInfo);
-      memNewNote.Lines.Assign(TmpBoilerPlate);
+      QuickCopy(TmpBoilerPlate, memNewNote);
       TmpBoilerPlate.Free;
     end;
     if EnableAutosave then // Don't enable autosave until after dialog fields have been resolved
@@ -1283,7 +1276,7 @@ var
   procedure AssignBoilerText;
   begin
     ExecuteTemplateOrBoilerPlate(BoilerText, FEditNote.Title, ltTitle, Self, 'Title: ' + FEditNote.TitleName, DocInfo);
-    memNewNote.Lines.Assign(BoilerText);
+    QuickCopy(BoilerText, memNewNote);
     FChanged := False;
   end;
 
@@ -1304,7 +1297,7 @@ begin
         0:  { do nothing } ;                         // ignore
         1: begin
              ExecuteTemplateOrBoilerPlate(BoilerText, FEditNote.Title, ltTitle, Self, 'Title: ' + FEditNote.TitleName, DocInfo);
-             memNewNote.Lines.AddStrings(BoilerText);  // append
+             QuickAdd(BoilerText, memNewNote);  // append
            end;
         2: AssignBoilerText;                         // replace
         end;
@@ -1386,6 +1379,7 @@ procedure TfrmSurgery.DoAutoSave(Suppress: integer = 1);
 var
   ErrMsg: string;
 begin
+  if fFrame.frmFrame.DLLActive = true then Exit;  
   if (EditingIndex > -1) and FChanged then
   begin
     StatusText('Autosaving note...');
@@ -2366,6 +2360,7 @@ procedure TfrmSurgery.tvSurgeryChange(Sender: TObject;
 var
   x: string;
   IsTIUDocument: boolean;
+  //MsgString, HasImages: string;
   //ShowReport: boolean;
 begin
   if uChanging then Exit;
@@ -2396,6 +2391,13 @@ begin
               lblTitle.Caption := MakeSurgeryCaseDisplayText(x);
               lblTitle.Hint := lblTitle.Caption;
               //LoadOpTop(memSurgery.Lines, StrToIntDef(Piece(x, U, 1), 0), PCaseTreeObject(Selected.Data)^.IsNonORProc, ShowReport);
+              //--------------------------------------------------------------------------------------------------------
+              //  DON'T DO THIS UNTIL SURGERY API IS CHANGED - OTHERWISE WILL GIVE FALSE '0' COUNT FOR EVERY CASE  (RV)
+(*              MsgString := 'SUR^' + Piece(x, U, 1);
+              HasImages := BOOLCHAR[PCaseTreeObject(Selected.Data)^.ImageCount > 0];
+              SetPiece(MsgString, U, 10, HasImages);
+              NotifyOtherApps(NAE_REPORT, 'SUR^' + MsgString);*)
+              //--------------------------------------------------------------------------------------------------------
               NotifyOtherApps(NAE_REPORT, 'SUR^' + Piece(x, U, 1));
               lstNotes.ItemIndex := -1;
             end
@@ -2559,6 +2561,8 @@ end;
 
 procedure TfrmSurgery.lstNotesClick(Sender: TObject);
 { loads the text for the selected note or displays the editing panel for the selected note }
+var
+  x: string;
 begin
   inherited;
   with lstNotes do if ItemIndex = -1 then Exit
@@ -2593,7 +2597,9 @@ begin
   pnlRight.Refresh;
   memNewNote.Repaint;
   memSurgery.Repaint;
-  NotifyOtherApps(NAE_REPORT, 'TIU^' + lstNotes.ItemID);
+  x := 'TIU^' + lstNotes.ItemID;
+  SetPiece(x, U, 10, Piece(lstNotes.Items[lstNotes.ItemIndex], U, 11));
+  NotifyOtherApps(NAE_REPORT, x);
 end;
 
 procedure TfrmSurgery.EnableDisableMenus(IsTIUDocument: boolean);
@@ -2667,18 +2673,6 @@ begin
   frmDrawers.mnuInsertTemplateClick(Sender);
 end;
 
-procedure TfrmSurgery.tvSurgeryAddition(Sender: TObject; Node: TTreeNode);
-begin
-  inherited;
-  TAccessibleTreeNode.WrapControl(Node as TORTreeNode);
-end;
-
-procedure TfrmSurgery.tvSurgeryDeletion(Sender: TObject; Node: TTreeNode);
-begin
-  TAccessibleTreeNode.UnwrapControl(Node as TORTreeNode);
-  inherited;
-end;
-
 procedure TfrmSurgery.ViewInfo(Sender: TObject);
 begin
   inherited;
@@ -2700,6 +2694,7 @@ begin
 end;
 
 initialization
+  SpecifyFormIsNotADialog(TfrmSurgery);
   uPCEEdit := TPCEData.Create;
   uPCEShow := TPCEData.Create;
 

@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, StdCtrls, ExtCtrls;
+  ComCtrls, StdCtrls, ExtCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmRemCoverPreview = class(TForm)
+  TfrmRemCoverPreview = class(TfrmBase508Form)
     pnlBtns: TPanel;
     btnOK: TButton;
     lvMain: TListView;

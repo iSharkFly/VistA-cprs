@@ -1,25 +1,19 @@
-object frmVit: TfrmVit
+inherited frmVit: TfrmVit
   Left = 451
   Top = 208
-  Width = 499
-  Height = 361
   Caption = 'frmVit'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = True
+  ClientHeight = 334
+  ClientWidth = 491
   Position = poScreenCenter
   OnActivate = FormActivate
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   OnKeyPress = FormKeyPress
   OnShow = FormShow
+  ExplicitWidth = 499
+  ExplicitHeight = 361
   PixelsPerInch = 96
   TextHeight = 13
-  object cmdOK: TButton
+  object cmdOK: TButton [0]
     Left = 319
     Top = 276
     Width = 75
@@ -28,7 +22,7 @@ object frmVit: TfrmVit
     TabOrder = 1
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [1]
     Left = 406
     Top = 276
     Width = 75
@@ -38,7 +32,7 @@ object frmVit: TfrmVit
     TabOrder = 2
     OnClick = cmdCancelClick
   end
-  object pnlmain: TPanel
+  object pnlmain: TPanel [2]
     Left = 8
     Top = 24
     Width = 473
@@ -448,6 +442,7 @@ object frmVit: TfrmVit
       ItemTipEnable = True
       ListItemsOnly = True
       LongList = False
+      LookupPiece = 0
       MaxLength = 0
       Pieces = '1,2'
       Sorted = False
@@ -455,6 +450,127 @@ object frmVit: TfrmVit
       TabOrder = 10
       OnEnter = SetVitPointer
       OnKeyPress = FormKeyPress
+      CharsNeedMatch = 1
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = pnlmain'
+        'Status = stsDefault')
+      (
+        'Component = lblDate'
+        'Status = stsDefault')
+      (
+        'Component = lblDateBP'
+        'Status = stsDefault')
+      (
+        'Component = lblDateTemp'
+        'Status = stsDefault')
+      (
+        'Component = lblDateResp'
+        'Status = stsDefault')
+      (
+        'Component = lblDatePulse'
+        'Status = stsDefault')
+      (
+        'Component = lblDateHeight'
+        'Status = stsDefault')
+      (
+        'Component = lblDateWeight'
+        'Status = stsDefault')
+      (
+        'Component = lblLstMeas'
+        'Status = stsDefault')
+      (
+        'Component = lbllastBP'
+        'Status = stsDefault')
+      (
+        'Component = lblLastTemp'
+        'Status = stsDefault')
+      (
+        'Component = lblLastResp'
+        'Status = stsDefault')
+      (
+        'Component = lblLastPulse'
+        'Status = stsDefault')
+      (
+        'Component = lblLastHeight'
+        'Status = stsDefault')
+      (
+        'Component = lblLastWeight'
+        'Status = stsDefault')
+      (
+        'Component = lblVital'
+        'Status = stsDefault')
+      (
+        'Component = lblVitBP'
+        'Status = stsDefault')
+      (
+        'Component = lnlVitTemp'
+        'Status = stsDefault')
+      (
+        'Component = lblVitResp'
+        'Status = stsDefault')
+      (
+        'Component = lblVitPulse'
+        'Status = stsDefault')
+      (
+        'Component = lblVitHeight'
+        'Status = stsDefault')
+      (
+        'Component = lblVitWeight'
+        'Status = stsDefault')
+      (
+        'Component = lblDatePain'
+        'Status = stsDefault')
+      (
+        'Component = lblLastPain'
+        'Status = stsDefault')
+      (
+        'Component = lblVitPain'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasBP'
+        'Status = stsDefault')
+      (
+        'Component = cboTemp'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasTemp'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasResp'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasPulse'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasHt'
+        'Status = stsDefault')
+      (
+        'Component = cboHeight'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasWt'
+        'Status = stsDefault')
+      (
+        'Component = cboWeight'
+        'Status = stsDefault')
+      (
+        'Component = txtMeasDate'
+        'Status = stsDefault')
+      (
+        'Component = cboPain'
+        'Status = stsDefault')
+      (
+        'Component = frmVit'
+        'Status = stsDefault'))
   end
 end

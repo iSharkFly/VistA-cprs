@@ -5,7 +5,8 @@ interface
 uses
   SysUtils, WinTypes, WinProcs, Messages, Classes, Graphics, Controls,
   Forms, Dialogs, StdCtrls, ORCtrls, ORfn, ExtCtrls, ComCtrls, uConst,
-  Menus, ORDtTm, Buttons, fODBase, fAutoSz, fOMAction, rODAllergy;
+  Menus, ORDtTm, Buttons, fODBase, fAutoSz, fOMAction, rODAllergy,
+  VA508AccessibilityManager;
 
 type
   TfrmARTAllergy = class(TfrmOMAction)
@@ -136,6 +137,7 @@ const
   TX_NO_FUTURE_DATES  = 'Reaction dates in the future are not allowed.';
   TX_BAD_OBS_DATE     = 'Observation date must be in the format m/d/y or m/y or y, or T-d.';
   TX_MISSING_OBS_DATE = 'Observation date is required for observed reactions.';
+  TX_MISSING_OBS_HIST = 'You must select either OBSERVED or HISTORICAL for this reaction.';
   TX_BAD_VER_DATE     = 'Verify date must be in the format m/d/y or m/y or y, or T-d.';
   TX_BAD_ORIG_DATE    = 'Origination date must be in the format m/d/y or m/y or y, or T-d.';
   TX_NO_FUTURE_ORIG_DATES  = 'An origination date in the future is not allowed.';
@@ -283,7 +285,7 @@ begin
   Defaults    := TStringList.Create;
   StatusText('Loading Default Values');
   uUserCanVerify := FALSE;  //HasSecurityKey('GMRA-ALLERGY VERIFY');
-  Defaults.Assign(ODForAllergies);  
+  FastAssign(ODForAllergies, Defaults);
   StatusText('Initializing Long List');
   ExtractItems(cboSymptoms.Items, Defaults, 'Top Ten');
   cboSymptoms.InsertSeparator;
@@ -321,9 +323,14 @@ begin
   ExtractItems(cboSeverity.Items, Defaults, 'Severity');
   ExtractItems(cboNatureOfReaction.Items, Defaults, 'Nature of Reaction');
   lstAllergy.Items.Add('-1^Click button to search ---->');
-  grpObsHist.ItemIndex := 1;
+  grpObsHist.ItemIndex := -1;         // CQ 11775 - v27.10 - RV (was '1')
   calObservedDate.Text := '';
   cboSeverity.ItemIndex := -1;
+  cboSeverity.Visible := False;
+  lblSeverity.Visible := False;
+  btnSevHelp.Visible := False;
+  calObservedDate.Visible := False;
+  lblObservedDate.Visible := False;
   cboSymptoms.ItemIndex := -1;
   memComments.Clear;
   cmdPrevCmts.Visible := (uEditing and (OldRec.Comments <> nil) and (OldRec.Comments.Text <> ''));
@@ -400,7 +407,7 @@ begin
       lstAllergySelect(Self);
       cboAllergyType.SelectByID(Piece(AllergyType, U, 1));
       cboNatureOfReaction.SelectByID(Piece(NatureOfReaction, U, 1));
-      lstSelectedSymptoms.Items.Assign(SignsSymptoms);
+      FastAssign(SignsSymptoms, lstSelectedSymptoms.Items);
       calOriginated.FMDateTime := Originated;
       cboOriginator.InitLongList(OriginatorName);
       cboOriginator.SelectByIEN(Originator);
@@ -449,6 +456,8 @@ begin
       if lstAllergy.Items.Count = 0 then SetError(TX_NO_ALLERGY)
       else if (Length(lstAllergy.DisplayText[0]) = 0) or
          (Piece(lstAllergy.Items[0], U, 1) = '-1') then SetError(TX_NO_ALLERGY);
+      if (grpObsHist.ItemIndex = -1) then
+        SetError(TX_MISSING_OBS_HIST);
       if (grpObsHist.ItemIndex = 0) then
         begin
           if (lstSelectedSymptoms.Items.Count = 0)   then SetError(TX_NO_SYMPTOMS);
@@ -558,7 +567,7 @@ procedure TfrmARTAllergy.ControlChange(Sender: TObject);
 var
   MyFMNow: TFMDateTime;
   i: integer;
-  SourceGlobalRoot: string;
+  SourceGlobalRoot, x: string;
 begin
   inherited;
   if Changing then Exit;
@@ -582,7 +591,7 @@ begin
             begin
               DateEnteredInError := MyFMNow;                               {***}
               UserEnteringInError := User.DUZ;
-              with memErrCmts do if GetTextLen > 0 then ErrorComments.Assign(Lines);
+              with memErrCmts do if GetTextLen > 0 then QuickCopy(memErrCmts, ErrorComments);
             end;
         end
       else
@@ -592,7 +601,12 @@ begin
               SourceGlobalRoot := Piece(Piece(Items[0], U, 3), ',', 1) + ',';
               if Pos('PSDRUG', SourceGlobalRoot) > 0 then
                 SourceGlobalRoot := Piece(SourceGlobalRoot, '"', 1);
-              CausativeAgent := Trim(Piece(DisplayText[0], '<', 1)) + U + Piece(Items[0], U, 1) + ';' + SourceGlobalRoot;
+              x := Piece(Items[0], U, 2);
+              if ((Pos('GMRD', SourceGlobalRoot) > 0) or (Pos('PSDRUG', SourceGlobalRoot) > 0))
+                  and (Pos('<', x) > 0) then
+                    x := Copy(x, 1, Length(Piece(x, '<', 1)) - 1);
+                    //x := Trim(Piece(x, '<', 1));
+              CausativeAgent := x + U + Piece(Items[0], U, 1) + ';' + SourceGlobalRoot;
               with cboAllergyType do
                 if ItemID <> '' then
                   AllergyType := ItemID + U + Text;
@@ -644,7 +658,7 @@ begin
                   Severity := '';
               with memComments do
                 if GetTextLen > 0 then
-                  NewComments.Assign(Lines);
+                  QuickCopy(memComments, NewComments);
             end;
     end;
 end;
@@ -676,9 +690,9 @@ begin
   inherited;
   AStringList := TStringList.Create;
   try
-    AStringList.Assign(memComments.Lines);
+    QuickCopy(memComments, AStringList);
     LimitStringLength(AStringList, 74);
-    memComments.Lines.Assign(AstringList);
+    QuickCopy(AstringList, memComments);
     ControlChange(Self);
   finally
     AStringList.Free;

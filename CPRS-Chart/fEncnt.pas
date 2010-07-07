@@ -12,10 +12,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ORDtTm, ORFn, ExtCtrls, ComCtrls, ORDtTmRng, fAutoSz, rOptions;
+  StdCtrls, ORCtrls, ORDtTm, ORFn, ExtCtrls, ComCtrls, ORDtTmRng, fAutoSz, rOptions, fBase508Form,
+  VA508AccessibilityManager, fFrame;
 
 type
-  TfrmEncounter = class(TForm)
+  TfrmEncounter = class(TfrmBase508Form)
     cboPtProvider: TORComboBox;
     lblProvider: TLabel;
     cmdOK: TButton;
@@ -61,6 +62,8 @@ type
     procedure lstClinicChange(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure pgeVisitMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
     CLINIC_TXT : String;
     FFilter: Int64;
@@ -81,6 +84,7 @@ type
     procedure AppShowHint(var HintStr: string; var CanShow: Boolean;
                           var HintInfo: THintInfo);
     procedure SetVisitCat;
+    function AllowAutoFocusChange: Boolean;
   public
     { Public declarations }
   end;
@@ -93,7 +97,8 @@ implementation
 
 {$R *.DFM}
 
-uses rCore, uCore, uConst, fReview, uPCE, rPCE;
+uses rCore, uCore, uConst, fReview, uPCE, rPCE, VA508AccessibilityRouter,
+  VAUtils;
 
 const
   TC_MISSING = 'Incomplete Encounter Information';
@@ -154,6 +159,8 @@ begin
       if OKPressed then
       begin
         CanChange := True;
+       // if (fframe.frmFrame.DoNotChangeEncWindow = true) and (encounter.Location <> frmEncounter.FLocation) then
+       //    fframe.frmFrame.DoNotChangeEncWindow := false;
         if (PersonFilter <> NPF_SUPPRESS) and
            (((Encounter.Provider =  User.DUZ) and (FProvider <> User.DUZ)) or
             ((Encounter.Provider <> User.DUZ) and (FProvider =  User.DUZ)))
@@ -248,12 +255,14 @@ begin
   if (pgeVisit.ActivePage = tabClinic) and (lstClinic.Items.Count = 0) then
   begin
     ListApptAll(lstClinic.Items, Patient.DFN, FFromDate, FThruDate);
-    ActiveControl := lstClinic;
+    if AllowAutoFocusChange then
+      ActiveControl := lstClinic;
   end;
   if (pgeVisit.ActivePage = tabAdmit)    and (lstAdmit.Items.Count = 0) then
   begin
     ListAdmitAll(lstAdmit.Items, Patient.DFN);
-    ActiveControl := lstAdmit;
+    if AllowAutoFocusChange then
+      ActiveControl := lstAdmit;
   end;
   if pgeVisit.ActivePage = tabNewVisit then
   begin
@@ -275,22 +284,32 @@ begin
         FFromSelf := True;
         with calVisitDate do if FDateTime <> 0 then FMDateTime := FDateTime else Text := 'NOW';
         FFromSelf := False;
-        ActiveControl := cboNewVisit;
+        if AllowAutoFocusChange then
+          ActiveControl := cboNewVisit;
       end
       else if FVisitCategory = 'E' then
       begin
         ckbHistorical.Checked := True;
-        ActiveControl := cboNewVisit;
+        if AllowAutoFocusChange then
+          ActiveControl := cboNewVisit;
       end
       else
       begin
         cboNewVisit.InitLongList('');
-        //ActiveControl := cboPtProvider;
       end;
-      //ckbHistorical.Checked := FVisitCategory = 'E';
-      //ActiveControl := cboNewVisit;
     end; {if cboNewVisit}
   end; {if pgeVisit.ActivePage}
+  if ScreenReaderSystemActive then
+    ActiveControl := pgeVisit;
+end;
+
+procedure TfrmEncounter.pgeVisitMouseDown(Sender: TObject;
+  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
+begin
+  inherited;
+  if pgeVisit.ActivePage = tabNewVisit then
+    if cboNewVisit.CanFocus then
+      cboNewVisit.SetFocus;
 end;
 
 procedure TfrmEncounter.cboNewVisitNeedData(Sender: TObject; const StartFrom: string;
@@ -456,6 +475,17 @@ begin
   FStandAlone := (FVisitCategory = 'A');
 end;
 
+function TfrmEncounter.AllowAutoFocusChange: Boolean;
+begin
+  if ScreenReaderSystemActive or
+     Boolean(Hi(GetKeyState(VK_TAB))) or
+     Boolean(Hi(GetKeyState(VK_LEFT))) or
+     Boolean(Hi(GetKeyState(VK_RIGHT))) then
+    Result := FALSE
+  else
+    Result := TRUE;
+end;
+
 procedure TfrmEncounter.FormClose(Sender: TObject;
   var Action: TCloseAction);
 begin
@@ -535,6 +565,9 @@ begin
   cmdOK.Top := cmdCancel.Top - cmdOK.Height - 1;
   cmdCancel.Top := cmdOK.Top + cmdOK.Height + 1;
   //end CQ7118
+  if Not User.IsProvider then
+    if cboPtProvider.CanFocus then
+      cboPtProvider.SetFocus;
 end;
 
 end.

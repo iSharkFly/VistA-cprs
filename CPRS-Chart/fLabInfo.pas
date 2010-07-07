@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ExtCtrls, fAutoSz, ORFn, ORCtrls;
+  StdCtrls, ExtCtrls, fAutoSz, ORFn, ORCtrls, VA508AccessibilityManager;
 
 type
   TfrmLabInfo = class(TfrmAutoSz)
@@ -71,7 +71,7 @@ end;
 procedure TfrmLabInfo.cboTestsClick(Sender: TObject);
 begin
   inherited;
-  memInfo.Lines.Assign(TestInfo(cboTests.Items[cboTests.ItemIndex]));
+  FastAssign(TestInfo(cboTests.Items[cboTests.ItemIndex]), memInfo.Lines);
 end;
 
 end.

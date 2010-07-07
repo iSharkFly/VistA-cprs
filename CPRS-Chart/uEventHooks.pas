@@ -22,7 +22,7 @@ function COMObjectActive: boolean;
 implementation
 
 uses
-  Trpcb, rEventHooks;
+  Trpcb, rEventHooks, VAUtils;
 
 type
   ICPRSBrokerInitializer = interface(ICPRSBroker)
@@ -460,7 +460,7 @@ begin
         FErrors := TStringList.Create;
       if FErrors.IndexOf(ObjIEN) < 0 then
         FErrors.Add(ObjIEN);
-      ShowMessage(err);
+      ShowMsg(err);
     end;
   end;
 end;

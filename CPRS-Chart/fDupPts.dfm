@@ -1,34 +1,25 @@
-object frmDupPts: TfrmDupPts
+inherited frmDupPts: TfrmDupPts
   Left = 160
   Top = 190
-  Width = 471
-  Height = 214
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   Caption = 'Similar Patients'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
-  OldCreateOrder = False
+  ClientHeight = 187
+  ClientWidth = 463
   Position = poScreenCenter
   OnCreate = FormCreate
-  OnKeyDown = FormKeyDown
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlDupPts: TPanel
+  object pnlDupPts: TPanel [0]
     Left = 0
     Top = 0
     Width = 463
-    Height = 184
+    Height = 187
     Align = alClient
     TabOrder = 0
     DesignSize = (
       463
-      184)
+      187)
     object lblSelDupPts: TLabel
       Left = 6
       Top = 3
@@ -93,5 +84,26 @@ object frmDupPts: TfrmDupPts
         TabPositions = '33,57'
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlDupPts'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = pnlSelDupPt'
+        'Status = stsDefault')
+      (
+        'Component = lboSelPt'
+        'Status = stsDefault')
+      (
+        'Component = frmDupPts'
+        'Status = stsDefault'))
   end
 end

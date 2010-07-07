@@ -1,23 +1,21 @@
-object frmSplash: TfrmSplash
+inherited frmSplash: TfrmSplash
   Left = 260
   Top = 126
   BorderIcons = []
   BorderStyle = bsNone
-  Caption = 'frmSplash'
+  Caption = 'CPRS Splash Screen'
   ClientHeight = 412
   ClientWidth = 386
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitLeft = 260
+  ExplicitTop = 126
+  ExplicitWidth = 394
+  ExplicitHeight = 446
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
+  object pnlMain: TPanel [0]
     Left = 0
     Top = 0
     Width = 386
@@ -27,28 +25,12 @@ object frmSplash: TfrmSplash
     BevelWidth = 3
     BorderWidth = 210
     Font.Charset = DEFAULT_CHARSET
-    Font.Color = clGray
+    Font.Color = clGrayText
     Font.Height = -11
     Font.Name = 'MS Sans Serif'
     Font.Style = []
     ParentFont = False
-    TabOrder = 0
-    object lblSplash: TStaticText
-      Left = 40
-      Top = 214
-      Width = 300
-      Height = 16
-      Alignment = taCenter
-      AutoSize = False
-      Caption = 'Computerized Patient Record System'
-      Font.Charset = ANSI_CHARSET
-      Font.Color = clGray
-      Font.Height = -15
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ParentFont = False
-      TabOrder = 0
-    end
+    TabOrder = 1
     object lblVersion: TStaticText
       Left = 40
       Top = 230
@@ -58,30 +40,30 @@ object frmSplash: TfrmSplash
       AutoSize = False
       Caption = 'version main'
       Font.Charset = ANSI_CHARSET
-      Font.Color = clGray
+      Font.Color = clGrayText
       Font.Height = -12
       Font.Name = 'MS Sans Serif'
       Font.Style = []
       ParentFont = False
-      TabOrder = 1
+      TabOrder = 0
     end
     object lblCopyright: TStaticText
-      Left = 44
-      Top = 245
+      Left = 43
+      Top = 249
       Width = 300
       Height = 13
       Alignment = taCenter
       AutoSize = False
       Caption = 'VOE VWPT Enhanced Patient Lookup - Alpha Version 1.6b'
       Font.Charset = ANSI_CHARSET
-      Font.Color = clGray
+      Font.Color = clGrayText
       Font.Height = -12
       Font.Name = 'MS Sans Serif'
       Font.Style = []
       ParentFont = False
       TabOrder = 2
     end
-    object Panel2: TPanel
+    object pnlImage: TPanel
       Left = 40
       Top = 40
       Width = 306
@@ -89,7 +71,7 @@ object frmSplash: TfrmSplash
       BevelInner = bvLowered
       BevelOuter = bvNone
       BevelWidth = 3
-      Caption = 'Panel2'
+      Caption = 'pnlImage'
       TabOrder = 3
       object Image1: TImage
         Left = 3
@@ -1633,7 +1615,7 @@ object frmSplash: TfrmSplash
       BorderStyle = bsNone
       Color = clBtnFace
       Font.Charset = DEFAULT_CHARSET
-      Font.Color = clGray
+      Font.Color = clGrayText
       Font.Height = -11
       Font.Name = 'MS Sans Serif'
       Font.Style = []
@@ -1652,9 +1634,53 @@ object frmSplash: TfrmSplash
         
           'regarding the accessibility of this application to EMAIL ADDRESS' +
           ': '
-        'vhaoisddhdscprs508@med.va.gov')
+        'vhaoihdisection508@va.gov')
       ParentFont = False
-      TabOrder = 4
+      ReadOnly = True
+      TabOrder = 1
     end
+  end
+  object lblSplash: TStaticText [1]
+    Left = 62
+    Top = 212
+    Width = 261
+    Height = 18
+    AutoSize = False
+    Caption = 'Computerized Patient Record System'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clGrayText
+    Font.Height = -15
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 0
+    TabStop = True
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Left = 8
+    Top = 8
+    Data = (
+      (
+        'Component = pnlMain'
+        'Status = stsDefault')
+      (
+        'Component = lblVersion'
+        'Status = stsDefault')
+      (
+        'Component = lblCopyright'
+        'Status = stsDefault')
+      (
+        'Component = pnlImage'
+        'Status = stsDefault')
+      (
+        'Component = Memo1'
+        'Text =  '
+        'Status = stsOK')
+      (
+        'Component = frmSplash'
+        'Status = stsDefault')
+      (
+        'Component = lblSplash'
+        'Status = stsDefault'))
   end
 end

@@ -8,16 +8,18 @@ inherited frmEffectDate: TfrmEffectDate
   ClientWidth = 254
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
-  object Label2: TLabel
+  object Label2: TLabel [0]
     Left = 68
     Top = 48
     Width = 68
     Height = 13
     Caption = 'Effective Date'
   end
-  object Label3: TStaticText
+  object Label3: TStaticText [1]
     Left = 8
     Top = 8
     Width = 244
@@ -25,7 +27,7 @@ inherited frmEffectDate: TfrmEffectDate
     Caption = 'Enter the date this discharge will become effective.'
     TabOrder = 3
   end
-  object Label4: TStaticText
+  object Label4: TStaticText [2]
     Left = 8
     Top = 22
     Width = 224
@@ -33,7 +35,7 @@ inherited frmEffectDate: TfrmEffectDate
     Caption = '(This aids pharmacy in preparing prescriptions.)'
     TabOrder = 4
   end
-  object calEffective: TORDateBox
+  object calEffective: TORDateBox [3]
     Left = 68
     Top = 62
     Width = 120
@@ -44,7 +46,7 @@ inherited frmEffectDate: TfrmEffectDate
     RequireTime = False
     Caption = 'Effective Date'
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [4]
     Left = 51
     Top = 95
     Width = 72
@@ -54,7 +56,7 @@ inherited frmEffectDate: TfrmEffectDate
     TabOrder = 1
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [5]
     Left = 133
     Top = 95
     Width = 72
@@ -63,5 +65,26 @@ inherited frmEffectDate: TfrmEffectDate
     Caption = 'Cancel'
     TabOrder = 2
     OnClick = cmdCancelClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Label3'
+        'Status = stsDefault')
+      (
+        'Component = Label4'
+        'Status = stsDefault')
+      (
+        'Component = calEffective'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmEffectDate'
+        'Status = stsDefault'))
   end
 end

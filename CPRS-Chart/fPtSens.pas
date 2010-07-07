@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, StdCtrls, Buttons;
+  ExtCtrls, StdCtrls, Buttons, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmPtSens = class(TForm)
+  TfrmPtSens = class(TfrmBase508Form)
     imgWarning: TImage;
     memWarning: TMemo;
     cmdYes: TButton;

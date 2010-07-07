@@ -1,37 +1,33 @@
-object frmReportsAdhocComponent1: TfrmReportsAdhocComponent1
+inherited frmReportsAdhocComponent1: TfrmReportsAdhocComponent1
   Left = 229
   Top = 195
-  Width = 641
-  Height = 479
   BorderIcons = [biSystemMenu]
   Caption = 'ADHOC Health Summary'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 452
+  ClientWidth = 633
   OldCreateOrder = False
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
-  object Splitter1: TSplitter
+  object Splitter1: TSplitter [0]
     Left = 185
     Top = 0
     Width = 5
-    Height = 394
-    Cursor = crHSplit
+    Height = 401
     Beveled = True
     OnCanResize = Splitter1CanResize
+    ExplicitHeight = 394
   end
-  object ORComboBox1: TORComboBox
+  object ORComboBox1: TORComboBox [1]
     Left = 0
     Top = 0
     Width = 185
-    Height = 394
+    Height = 401
     Style = orcsSimple
     Align = alLeft
     AutoSelect = True
@@ -52,14 +48,16 @@ object frmReportsAdhocComponent1: TfrmReportsAdhocComponent1
     OnDblClick = btnAddComponentClick
     OnKeyDown = ORComboBox1KeyDown
     CharsNeedMatch = 1
+    ExplicitHeight = 394
   end
-  object Panel2: TPanel
+  object Panel2: TPanel [2]
     Left = 0
-    Top = 394
+    Top = 401
     Width = 633
     Height = 51
     Align = alBottom
     TabOrder = 2
+    ExplicitTop = 394
     DesignSize = (
       633
       51)
@@ -120,21 +118,22 @@ object frmReportsAdhocComponent1: TfrmReportsAdhocComponent1
       end
     end
   end
-  object Panel3: TPanel
+  object Panel3: TPanel [3]
     Left = 190
     Top = 0
     Width = 443
-    Height = 394
+    Height = 401
     Align = alClient
     TabOrder = 1
+    ExplicitHeight = 394
     object Splitter4: TSplitter
       Left = 219
       Top = 25
       Width = 5
-      Height = 368
-      Cursor = crHSplit
+      Height = 375
       Beveled = True
       OnCanResize = Splitter4CanResize
+      ExplicitHeight = 368
     end
     object Panel1: TPanel
       Left = 1
@@ -150,7 +149,7 @@ object frmReportsAdhocComponent1: TfrmReportsAdhocComponent1
       Left = 26
       Top = 25
       Width = 193
-      Height = 368
+      Height = 375
       Align = alLeft
       DragMode = dmAutomatic
       ItemHeight = 13
@@ -166,15 +165,17 @@ object frmReportsAdhocComponent1: TfrmReportsAdhocComponent1
       ItemTipColor = clWindow
       LongList = False
       Pieces = '2'
+      ExplicitHeight = 368
     end
     object Panel6: TPanel
       Left = 1
       Top = 25
       Width = 25
-      Height = 368
+      Height = 375
       Align = alLeft
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitHeight = 368
       object btnRemoveComponent: TButton
         Left = 4
         Top = 30
@@ -207,10 +208,11 @@ object frmReportsAdhocComponent1: TfrmReportsAdhocComponent1
       Left = 224
       Top = 25
       Width = 218
-      Height = 368
+      Height = 375
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 3
+      ExplicitHeight = 368
       object lblHeaderName: TLabel
         Left = 30
         Top = 8
@@ -455,6 +457,93 @@ object frmReportsAdhocComponent1: TfrmReportsAdhocComponent1
         OnClick = btnEditSubitemsClick
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = ORComboBox1'
+        'Status = stsDefault')
+      (
+        'Component = Panel2'
+        'Status = stsDefault')
+      (
+        'Component = btnCancelMain'
+        'Status = stsDefault')
+      (
+        'Component = btnOKMain'
+        'Status = stsDefault')
+      (
+        'Component = GroupBox1'
+        'Status = stsDefault')
+      (
+        'Component = rbtnHeader'
+        'Status = stsDefault')
+      (
+        'Component = rbtnAbbrev'
+        'Status = stsDefault')
+      (
+        'Component = rbtnName'
+        'Status = stsDefault')
+      (
+        'Component = Panel3'
+        'Status = stsDefault')
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = ORListBox2'
+        'Status = stsDefault')
+      (
+        'Component = Panel6'
+        'Status = stsDefault')
+      (
+        'Component = btnRemoveComponent'
+        'Status = stsDefault')
+      (
+        'Component = btnRemoveAllComponents'
+        'Status = stsDefault')
+      (
+        'Component = btnAddComponent'
+        'Status = stsDefault')
+      (
+        'Component = Panel7'
+        'Status = stsDefault')
+      (
+        'Component = pnl5Button'
+        'Status = stsDefault')
+      (
+        'Component = pnl6Button'
+        'Status = stsDefault')
+      (
+        'Component = edtHeaderName'
+        'Status = stsDefault')
+      (
+        'Component = edtOccuranceLimit'
+        'Status = stsDefault')
+      (
+        'Component = cboTimeLimit'
+        'Status = stsDefault')
+      (
+        'Component = gpbDisplay'
+        'Status = stsDefault')
+      (
+        'Component = ckbHospitalLocation'
+        'Status = stsDefault')
+      (
+        'Component = ckbProviderNarrative'
+        'Status = stsDefault')
+      (
+        'Component = cboICD'
+        'Status = stsDefault')
+      (
+        'Component = ORListBox1'
+        'Status = stsDefault')
+      (
+        'Component = btnEditSubitems'
+        'Status = stsDefault')
+      (
+        'Component = frmReportsAdhocComponent1'
+        'Status = stsDefault'))
   end
   object Timer1: TTimer
     Enabled = False

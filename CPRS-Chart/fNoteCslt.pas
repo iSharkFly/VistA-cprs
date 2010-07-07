@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, StdCtrls, ORCtrls, ORFn;
+  fAutoSz, StdCtrls, ORCtrls, ORFn, VA508AccessibilityManager;
 
 type
   TfrmNoteConsult = class(TfrmAutoSz)
@@ -54,7 +54,7 @@ begin
     if AConsultList.Count > 0 then
     begin
       ResizeFormToFont(TForm(frmNoteConsult));
-      frmNoteConsult.lstRequests.Items.Assign(AConsultList);
+      FastAssign(AConsultList, frmNoteConsult.lstRequests.Items);
       frmNoteConsult.ShowModal;
       Result := frmNoteConsult.FSelectedRequest;
     end

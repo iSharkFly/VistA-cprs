@@ -1,46 +1,41 @@
-object frmGraphSettings: TfrmGraphSettings
+inherited frmGraphSettings: TfrmGraphSettings
   Left = 109
   Top = 60
   BorderIcons = [biSystemMenu, biHelp]
   BorderStyle = bsDialog
   Caption = 'Graph Settings'
-  ClientHeight = 304
+  ClientHeight = 318
   ClientWidth = 438
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
+  ExplicitWidth = 444
+  ExplicitHeight = 343
   DesignSize = (
     438
-    304)
+    318)
   PixelsPerInch = 96
   TextHeight = 13
-  object lblMinGraphHeight: TLabel
+  object lblMinGraphHeight: TLabel [0]
     Left = 311
-    Top = 60
+    Top = 51
     Width = 110
     Height = 13
     Caption = 'Minimum Graph Height:'
     ParentShowHint = False
     ShowHint = False
   end
-  object lblMaxGraphs: TLabel
+  object lblMaxGraphs: TLabel [1]
     Left = 311
-    Top = 4
+    Top = 7
     Width = 108
     Height = 13
     Caption = 'Max Graphs in Display:'
     ParentShowHint = False
     ShowHint = False
   end
-  object lblOptions: TLabel
+  object lblOptions: TLabel [2]
     Left = 179
     Top = 4
     Width = 39
@@ -49,13 +44,13 @@ object frmGraphSettings: TfrmGraphSettings
     ParentShowHint = False
     ShowHint = False
   end
-  object bvlBase: TBevel
+  object bvlBase: TBevel [3]
     Left = 13
-    Top = 271
+    Top = 287
     Width = 412
     Height = 2
   end
-  object lblSources: TLabel
+  object lblSources: TLabel [4]
     Left = 16
     Top = 4
     Width = 91
@@ -64,18 +59,19 @@ object frmGraphSettings: TfrmGraphSettings
     ParentShowHint = False
     ShowHint = False
   end
-  object lblConversions: TLabel
-    Left = 311
-    Top = 162
+  object lblConversions: TLabel [5]
+    Left = 215
+    Top = 284
     Width = 46
     Height = 13
     Caption = 'Functions'
     ParentShowHint = False
     ShowHint = False
+    Visible = False
   end
-  object lblMaxSelect: TLabel
+  object lblMaxSelect: TLabel [6]
     Left = 311
-    Top = 115
+    Top = 93
     Width = 96
     Height = 13
     Caption = 'Max Items to Select:'
@@ -83,9 +79,9 @@ object frmGraphSettings: TfrmGraphSettings
     ShowHint = False
     WordWrap = True
   end
-  object lblShow: TLabel
+  object lblShow: TLabel [7]
     Left = 196
-    Top = 217
+    Top = 233
     Width = 72
     Height = 13
     Alignment = taRightJustify
@@ -93,9 +89,9 @@ object frmGraphSettings: TfrmGraphSettings
     ParentShowHint = False
     ShowHint = False
   end
-  object lblSave: TLabel
+  object lblSave: TLabel [8]
     Left = 189
-    Top = 249
+    Top = 265
     Width = 79
     Height = 13
     Alignment = taRightJustify
@@ -103,15 +99,15 @@ object frmGraphSettings: TfrmGraphSettings
     ParentShowHint = False
     ShowHint = False
   end
-  object bvlDefaults: TBevel
+  object bvlDefaults: TBevel [9]
     Left = 176
-    Top = 205
+    Top = 221
     Width = 248
     Height = 2
   end
-  object lblOptionsInfo: TLabel
+  object lblOptionsInfo: TLabel [10]
     Left = 13
-    Top = 281
+    Top = 297
     Width = 275
     Height = 13
     Caption = 'Settings saved as your defaults are applied to new graphs.'
@@ -119,40 +115,60 @@ object frmGraphSettings: TfrmGraphSettings
     ShowHint = False
     WordWrap = True
   end
-  object lblMaxGraphsRef: TLabel
+  object lblMaxGraphsRef: TLabel [11]
     Left = 374
-    Top = 20
+    Top = 23
     Width = 57
     Height = 17
     AutoSize = False
     ParentShowHint = False
     ShowHint = False
   end
-  object lblMinGraphHeightRef: TLabel
+  object lblMinGraphHeightRef: TLabel [12]
     Left = 374
-    Top = 80
+    Top = 69
     Width = 57
     Height = 17
     AutoSize = False
     ParentShowHint = False
     ShowHint = False
   end
-  object lblMaxSelectRef: TLabel
+  object lblMaxSelectRef: TLabel [13]
     Left = 374
-    Top = 133
+    Top = 114
     Width = 57
     Height = 17
     AutoSize = False
     ParentShowHint = False
     ShowHint = False
   end
-  object bvlMid: TBevel
+  object bvlMid: TBevel [14]
     Left = 176
-    Top = 239
+    Top = 255
     Width = 248
     Height = 2
   end
-  object lstATypes: TListBox
+  object lblOutpatient: TLabel [15]
+    Left = 311
+    Top = 135
+    Width = 115
+    Height = 13
+    Caption = 'Outpatient Date Default:'
+    ParentShowHint = False
+    ShowHint = False
+    WordWrap = True
+  end
+  object lblInpatient: TLabel [16]
+    Left = 311
+    Top = 178
+    Width = 107
+    Height = 13
+    Caption = 'Inpatient Date Default:'
+    ParentShowHint = False
+    ShowHint = False
+    WordWrap = True
+  end
+  object lstATypes: TListBox [17]
     Left = 253
     Top = 3
     Width = 45
@@ -162,7 +178,7 @@ object frmGraphSettings: TfrmGraphSettings
     TabOrder = 17
     Visible = False
   end
-  object lstSourcesCopy: TListBox
+  object lstSourcesCopy: TListBox [18]
     Left = 123
     Top = 4
     Width = 45
@@ -172,11 +188,11 @@ object frmGraphSettings: TfrmGraphSettings
     TabOrder = 16
     Visible = False
   end
-  object chklstOptions: TCheckListBox
-    Left = 179
-    Top = 20
+  object chklstOptions: TCheckListBox [19]
+    Left = 174
+    Top = 23
     Width = 120
-    Height = 179
+    Height = 192
     OnClickCheck = chklstOptionsClickCheck
     ItemHeight = 13
     ParentShowHint = False
@@ -184,9 +200,9 @@ object frmGraphSettings: TfrmGraphSettings
     Sorted = True
     TabOrder = 1
   end
-  object txtMinGraphHeight: TEdit
+  object txtMinGraphHeight: TEdit [20]
     Left = 311
-    Top = 78
+    Top = 67
     Width = 41
     Height = 21
     ParentShowHint = False
@@ -197,9 +213,9 @@ object frmGraphSettings: TfrmGraphSettings
     OnExit = txtMinGraphHeightExit
     OnKeyPress = txtMinGraphHeightKeyPress
   end
-  object txtMaxGraphs: TEdit
+  object txtMaxGraphs: TEdit [21]
     Left = 311
-    Top = 20
+    Top = 23
     Width = 41
     Height = 21
     ParentShowHint = False
@@ -210,9 +226,9 @@ object frmGraphSettings: TfrmGraphSettings
     OnExit = txtMaxGraphsExit
     OnKeyPress = txtMaxGraphsKeyPress
   end
-  object spnMinGraphHeight: TUpDown
+  object spnMinGraphHeight: TUpDown [22]
     Left = 352
-    Top = 78
+    Top = 67
     Width = 15
     Height = 21
     Associate = txtMinGraphHeight
@@ -222,12 +238,11 @@ object frmGraphSettings: TfrmGraphSettings
     Position = 90
     ShowHint = False
     TabOrder = 5
-    Wrap = False
     OnClick = spnMinGraphHeightClick
   end
-  object spnMaxGraphs: TUpDown
+  object spnMaxGraphs: TUpDown [23]
     Left = 352
-    Top = 20
+    Top = 23
     Width = 15
     Height = 21
     Associate = txtMaxGraphs
@@ -237,12 +252,11 @@ object frmGraphSettings: TfrmGraphSettings
     Position = 5
     ShowHint = False
     TabOrder = 3
-    Wrap = False
     OnClick = spnMaxGraphsClick
   end
-  object btnClose: TButton
+  object btnClose: TButton [24]
     Left = 350
-    Top = 279
+    Top = 295
     Width = 75
     Height = 21
     Cancel = True
@@ -252,20 +266,20 @@ object frmGraphSettings: TfrmGraphSettings
     TabOrder = 15
     OnClick = btnCloseClick
   end
-  object lstSources: TCheckListBox
-    Left = 16
-    Top = 20
+  object lstSources: TCheckListBox [25]
+    Left = 17
+    Top = 23
     Width = 153
-    Height = 216
+    Height = 229
     ItemHeight = 13
     ParentShowHint = False
     ShowHint = False
     Sorted = True
     TabOrder = 0
   end
-  object btnAll: TButton
+  object btnAll: TButton [26]
     Left = 18
-    Top = 245
+    Top = 261
     Width = 65
     Height = 21
     Caption = 'All'
@@ -274,9 +288,9 @@ object frmGraphSettings: TfrmGraphSettings
     TabOrder = 9
     OnClick = btnAllClick
   end
-  object brnClear: TButton
+  object brnClear: TButton [27]
     Left = 103
-    Top = 245
+    Top = 261
     Width = 65
     Height = 21
     Cancel = True
@@ -286,9 +300,9 @@ object frmGraphSettings: TfrmGraphSettings
     TabOrder = 10
     OnClick = btnAllClick
   end
-  object btnPersonal: TButton
+  object btnPersonal: TButton [28]
     Left = 277
-    Top = 213
+    Top = 229
     Width = 65
     Height = 21
     Cancel = True
@@ -296,9 +310,9 @@ object frmGraphSettings: TfrmGraphSettings
     TabOrder = 11
     OnClick = btnPublicClick
   end
-  object cboConversions: TORComboBox
-    Left = 311
-    Top = 178
+  object cboConversions: TORComboBox [29]
+    Left = 228
+    Top = 295
     Width = 116
     Height = 21
     Style = orcsDropDown
@@ -321,11 +335,12 @@ object frmGraphSettings: TfrmGraphSettings
     Sorted = False
     SynonymChars = '<>'
     TabOrder = 8
+    Visible = False
     CharsNeedMatch = 1
   end
-  object txtMaxSelect: TEdit
+  object txtMaxSelect: TEdit [30]
     Left = 311
-    Top = 131
+    Top = 108
     Width = 41
     Height = 21
     ParentShowHint = False
@@ -336,9 +351,9 @@ object frmGraphSettings: TfrmGraphSettings
     OnExit = txtMaxSelectExit
     OnKeyPress = txtMaxSelectKeyPress
   end
-  object spnMaxSelect: TUpDown
+  object spnMaxSelect: TUpDown [31]
     Left = 352
-    Top = 131
+    Top = 108
     Width = 15
     Height = 21
     Associate = txtMaxSelect
@@ -348,12 +363,11 @@ object frmGraphSettings: TfrmGraphSettings
     Position = 100
     ShowHint = False
     TabOrder = 7
-    Wrap = False
     OnClick = spnMaxSelectClick
   end
-  object btnPublic: TButton
+  object btnPublic: TButton [32]
     Left = 360
-    Top = 213
+    Top = 229
     Width = 65
     Height = 21
     Cancel = True
@@ -363,9 +377,9 @@ object frmGraphSettings: TfrmGraphSettings
     TabOrder = 12
     OnClick = btnPublicClick
   end
-  object btnPersonalSave: TButton
+  object btnPersonalSave: TButton [33]
     Left = 277
-    Top = 245
+    Top = 261
     Width = 65
     Height = 21
     Cancel = True
@@ -375,9 +389,9 @@ object frmGraphSettings: TfrmGraphSettings
     TabOrder = 13
     OnClick = SaveClick
   end
-  object btnPublicSave: TButton
+  object btnPublicSave: TButton [34]
     Left = 360
-    Top = 245
+    Top = 261
     Width = 65
     Height = 21
     Cancel = True
@@ -387,9 +401,9 @@ object frmGraphSettings: TfrmGraphSettings
     TabOrder = 14
     OnClick = SaveClick
   end
-  object lstOptions: TListBox
-    Left = 368
-    Top = 160
+  object lstOptions: TListBox [35]
+    Left = 287
+    Top = 295
     Width = 57
     Height = 17
     ItemHeight = 13
@@ -410,5 +424,130 @@ object frmGraphSettings: TfrmGraphSettings
     Sorted = True
     TabOrder = 18
     Visible = False
+  end
+  object cboDateRangeOutpatient: TORComboBox [36]
+    Left = 311
+    Top = 149
+    Width = 115
+    Height = 21
+    Style = orcsDropDown
+    AutoSelect = True
+    Color = clWindow
+    DropDownCount = 9
+    ItemHeight = 13
+    ItemTipColor = clWindow
+    ItemTipEnable = True
+    ListItemsOnly = False
+    LongList = False
+    LookupPiece = 0
+    MaxLength = 0
+    Pieces = '2'
+    Sorted = False
+    SynonymChars = '<>'
+    TabOrder = 19
+    TabStop = True
+    CharsNeedMatch = 1
+  end
+  object cboDateRangeInpatient: TORComboBox [37]
+    Left = 311
+    Top = 194
+    Width = 115
+    Height = 21
+    Style = orcsDropDown
+    AutoSelect = True
+    Color = clWindow
+    DropDownCount = 9
+    Items.Strings = (
+      'S^Date Range...'
+      '1^Today'
+      '2^One Week'
+      '3^Two Weeks'
+      '4^One Month'
+      '5^Six Months'
+      '6^One Year'
+      '7^Two Years'
+      '8^All Results')
+    ItemHeight = 13
+    ItemTipColor = clWindow
+    ItemTipEnable = True
+    ListItemsOnly = False
+    LongList = False
+    LookupPiece = 0
+    MaxLength = 0
+    Pieces = '2'
+    Sorted = False
+    SynonymChars = '<>'
+    TabOrder = 20
+    TabStop = True
+    CharsNeedMatch = 1
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lstATypes'
+        'Status = stsDefault')
+      (
+        'Component = lstSourcesCopy'
+        'Status = stsDefault')
+      (
+        'Component = chklstOptions'
+        'Status = stsDefault')
+      (
+        'Component = txtMinGraphHeight'
+        'Status = stsDefault')
+      (
+        'Component = txtMaxGraphs'
+        'Status = stsDefault')
+      (
+        'Component = spnMinGraphHeight'
+        'Status = stsDefault')
+      (
+        'Component = spnMaxGraphs'
+        'Status = stsDefault')
+      (
+        'Component = btnClose'
+        'Status = stsDefault')
+      (
+        'Component = lstSources'
+        'Status = stsDefault')
+      (
+        'Component = btnAll'
+        'Status = stsDefault')
+      (
+        'Component = brnClear'
+        'Status = stsDefault')
+      (
+        'Component = btnPersonal'
+        'Status = stsDefault')
+      (
+        'Component = cboConversions'
+        'Status = stsDefault')
+      (
+        'Component = txtMaxSelect'
+        'Status = stsDefault')
+      (
+        'Component = spnMaxSelect'
+        'Status = stsDefault')
+      (
+        'Component = btnPublic'
+        'Status = stsDefault')
+      (
+        'Component = btnPersonalSave'
+        'Status = stsDefault')
+      (
+        'Component = btnPublicSave'
+        'Status = stsDefault')
+      (
+        'Component = lstOptions'
+        'Status = stsDefault')
+      (
+        'Component = frmGraphSettings'
+        'Status = stsDefault')
+      (
+        'Component = cboDateRangeOutpatient'
+        'Status = stsDefault')
+      (
+        'Component = cboDateRangeInpatient'
+        'Status = stsDefault'))
   end
 end

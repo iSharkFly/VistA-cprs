@@ -4,7 +4,9 @@ object fraEvntDelayList: TfraEvntDelayList
   Width = 366
   Height = 216
   Anchors = []
+  AutoScroll = True
   TabOrder = 0
+  TabStop = True
   object pnlDate: TPanel
     Left = 261
     Top = 0
@@ -17,7 +19,7 @@ object fraEvntDelayList: TfraEvntDelayList
     object lblEffective: TLabel
       Left = 4
       Top = 32
-      Width = 71
+      Width = 73
       Height = 13
       Caption = 'Effective Date:'
     end
@@ -50,6 +52,7 @@ object fraEvntDelayList: TfraEvntDelayList
       Height = 13
       Align = alTop
       Caption = 'Event Delay List:'
+      ExplicitWidth = 81
     end
     object mlstEvents: TORListBox
       Left = 1
@@ -75,10 +78,10 @@ object fraEvntDelayList: TfraEvntDelayList
       Top = 14
       Width = 259
       Height = 21
+      Align = alTop
       TabOrder = 1
       OnChange = edtSearchChange
       OnKeyDown = edtSearchKeyDown
-      Align = alTop
     end
   end
 end

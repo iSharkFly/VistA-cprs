@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, ORCtrls, StdCtrls, ORFn, ORDtTm;
+  fAutoSz, ORCtrls, StdCtrls, ORFn, ORDtTm, VA508AccessibilityManager;
 
 type
   TfrmDateRange = class(TfrmAutoSz)

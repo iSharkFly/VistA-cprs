@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, ORCtrls, ORDtTm, ORFn, StdCtrls, rCore, uCore;
+  ExtCtrls, ORCtrls, ORDtTm, ORFn, StdCtrls, rCore, uCore, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmVisit = class(TForm)
+  TfrmVisit = class(TfrmBase508Form)
     pnlBase: TORAutoPanel;
     lblInstruct: TStaticText;
     radAppt: TRadioButton;

@@ -1,48 +1,46 @@
-object frmRemCoverSheet: TfrmRemCoverSheet
-  Left = 325
-  Top = 213
+inherited frmRemCoverSheet: TfrmRemCoverSheet
+  Left = 313
+  Top = 150
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 
     'Clinical Reminders and Reminder Categories Displayed on Cover Sh' +
     'eet'
-  ClientHeight = 453
-  ClientWidth = 632
-  Color = clBtnFace
+  ClientHeight = 563
+  ClientWidth = 773
   Constraints.MinWidth = 462
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
+  OnCreate = FormCreate
   OnDestroy = FormDestroy
+  ExplicitWidth = 779
+  ExplicitHeight = 588
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBottom: TORAutoPanel
+  object pnlBottom: TORAutoPanel [0]
     Left = 0
-    Top = 250
-    Width = 632
-    Height = 178
+    Top = 276
+    Width = 773
+    Height = 252
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 3
     DesignSize = (
-      632
-      178)
+      773
+      252)
     object lblSeq: TLabel
-      Left = 554
-      Top = 79
-      Width = 29
-      Height = 13
+      Left = 694
+      Top = 92
+      Width = 52
+      Height = 26
       Anchors = [akLeft, akBottom]
-      Caption = 'Seq #'
+      Caption = 'Sequence Number'
+      WordWrap = True
+      ExplicitTop = 96
     end
     object lblEdit: TLabel
       Left = 0
       Top = 0
-      Width = 632
+      Width = 773
       Height = 13
       Align = alTop
       Alignment = taCenter
@@ -53,13 +51,14 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       Font.Style = [fsBold]
       ParentFont = False
       Layout = tlCenter
+      ExplicitWidth = 5
     end
     object sbUp: TBitBtn
-      Left = 554
-      Top = 20
+      Left = 680
+      Top = 29
       Width = 21
       Height = 21
-      Hint = 'Move Shared Template Up'
+      Hint = 'Move Reminder Up List'
       Anchors = [akLeft, akBottom]
       ParentShowHint = False
       ShowHint = True
@@ -81,11 +80,11 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       NumGlyphs = 2
     end
     object sbDown: TBitBtn
-      Left = 554
-      Top = 46
+      Left = 680
+      Top = 56
       Width = 21
       Height = 21
-      Hint = 'Move Shared Template Down'
+      Hint = 'Move Reminder Down List'
       Anchors = [akLeft, akBottom]
       ParentShowHint = False
       ShowHint = True
@@ -107,12 +106,18 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       NumGlyphs = 2
     end
     object btnAdd: TBitBtn
-      Left = 554
-      Top = 99
-      Width = 75
+      Left = 680
+      Top = 165
+      Width = 90
       Height = 23
+      Hint = 
+        'Adds a Reminder to the Coversheet at the selected level.  It wil' +
+        'l also remove the lock of a Reminder (leaves Reminder on Coversh' +
+        'eet) set at the same level as currently selected.'
       Anchors = [akLeft, akBottom]
       Caption = 'Add'
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 5
       OnClick = btnAddClick
       Glyph.Data = {
@@ -127,12 +132,17 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       Margin = 2
     end
     object btnRemove: TBitBtn
-      Left = 554
-      Top = 125
-      Width = 75
+      Left = 680
+      Top = 194
+      Width = 90
       Height = 23
+      Hint = 
+        'Removes Reminders from the Coversheet display.  Will not remove ' +
+        'Reminders which are locked at a higher level.'
       Anchors = [akLeft, akBottom]
       Caption = 'Remove'
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 6
       OnClick = btnRemoveClick
       Glyph.Data = {
@@ -147,29 +157,42 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       Margin = 2
     end
     object btnLock: TBitBtn
-      Left = 554
-      Top = 151
-      Width = 75
+      Left = 680
+      Top = 223
+      Width = 90
       Height = 23
+      Hint = 
+        'Adds Reminder to the Coversheet display.  It also Locks the Remi' +
+        'nder so it can not be removed from the Coversheet display at a l' +
+        'ower level.  For example, if a Reminder is locked at the User Cl' +
+        'ass level, then it can not be removed from the Coversheet at the' +
+        ' User level.'
       Anchors = [akLeft, akBottom]
-      Caption = 'Lock'
+      Caption = 'Add && Lock'
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 7
       OnClick = btnLockClick
       Glyph.Data = {
-        F6000000424DF600000000000000760000002800000010000000100000000100
-        0400000000008000000000000000000000001000000000000000000000000000
-        8000008000000080800080000000800080008080000080808000C0C0C0000000
-        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333330000033
-        3333333008888800333333077870787703333088887078888033307778808877
-        7033308888000888803330777700077770333088888888888033330000000000
-        0333333080333080333333308033308033333330803330803333333778000877
-        3333333308888803333333333000003333333333333333333333}
+        76010000424D7601000000000000760000002800000020000000100000000100
+        04000000000000010000120B0000120B00001000000000000000000000000000
+        800000800000008080008000000080008000808000007F7F7F00BFBFBF000000
+        FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF00333333000003
+        333333333F777773FF333333008888800333333377333F3773F3333077870787
+        7033333733337F33373F3308888707888803337F33337F33337F330777880887
+        7703337F33337FF3337F3308888000888803337F333777F3337F330777700077
+        7703337F33377733337F33088888888888033373FFFFFFFFFF73333000000000
+        00333337777777777733333308033308033333337F7F337F7F33333308033308
+        033333337F7F337F7F33333308033308033333337F73FF737F33333377800087
+        7333333373F77733733333333088888033333333373FFFF73333333333000003
+        3333333333777773333333333333333333333333333333333333}
       Margin = 2
+      NumGlyphs = 2
     end
     object edtSeq: TCaptionEdit
-      Left = 587
-      Top = 75
-      Width = 27
+      Left = 694
+      Top = 122
+      Width = 38
       Height = 21
       Anchors = [akLeft, akBottom]
       TabOrder = 3
@@ -179,56 +202,55 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       Caption = 'Sequence Number'
     end
     object udSeq: TUpDown
-      Left = 614
-      Top = 75
+      Left = 732
+      Top = 122
       Width = 15
       Height = 21
       Anchors = [akLeft, akBottom]
       Associate = edtSeq
-      Min = 0
       Max = 999
       Position = 1
       TabOrder = 4
-      Wrap = False
       OnChangingEx = udSeqChangingEx
     end
     object pnlInfo: TPanel
       Left = 0
       Top = 13
-      Width = 551
-      Height = 165
+      Width = 674
+      Height = 239
       Align = alLeft
       BevelOuter = bvNone
       TabOrder = 0
       object splMain: TSplitter
-        Left = 245
+        Left = 332
         Top = 0
-        Width = 3
-        Height = 165
-        Cursor = crHSplit
+        Height = 239
         Beveled = True
+        ExplicitLeft = 245
+        ExplicitHeight = 165
       end
       object pnlTree: TPanel
         Left = 0
         Top = 0
-        Width = 245
-        Height = 165
+        Width = 332
+        Height = 239
         Align = alLeft
         BevelOuter = bvNone
         TabOrder = 0
         object lblTree: TLabel
           Left = 0
           Top = 0
-          Width = 245
+          Width = 332
           Height = 13
           Align = alTop
           Caption = '  Available Reminders && Categories'
+          ExplicitWidth = 164
         end
         object tvAll: TORTreeView
           Left = 0
           Top = 13
-          Width = 245
-          Height = 152
+          Width = 332
+          Height = 226
           Align = alClient
           HideSelection = False
           Images = imgMain
@@ -247,29 +269,29 @@ object frmRemCoverSheet: TfrmRemCoverSheet
         end
       end
       object pnlCover: TPanel
-        Left = 248
+        Left = 335
         Top = 0
-        Width = 303
-        Height = 165
+        Width = 339
+        Height = 239
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
         object lvCover: TCaptionListView
           Left = 23
           Top = 0
-          Width = 280
-          Height = 165
+          Width = 316
+          Height = 239
           Align = alClient
           Columns = <
             item
               Caption = 'Reminders'
               Tag = 1
-              Width = 225
+              Width = 255
             end
             item
-              Caption = 'Seq'
+              Caption = 'Sequence'
               Tag = 2
-              Width = 35
+              Width = 40
             end>
           HideSelection = False
           ReadOnly = True
@@ -277,7 +299,7 @@ object frmRemCoverSheet: TfrmRemCoverSheet
           SmallImages = imgMain
           SortType = stData
           StateImages = imgMain
-          TabOrder = 0
+          TabOrder = 1
           ViewStyle = vsReport
           OnChange = lvCoverChange
           OnColumnClick = lvCoverColumnClick
@@ -290,16 +312,16 @@ object frmRemCoverSheet: TfrmRemCoverSheet
           Left = 0
           Top = 0
           Width = 23
-          Height = 165
+          Height = 239
           Align = alLeft
           BevelOuter = bvNone
-          TabOrder = 1
+          TabOrder = 0
           object sbCopyRight: TBitBtn
             Left = 1
             Top = 42
             Width = 21
             Height = 21
-            Hint = 'Copy Shared Template into Personal Template List'
+            Hint = 'Copy Reminder into Reminder List'
             ParentShowHint = False
             ShowHint = True
             TabOrder = 0
@@ -325,7 +347,7 @@ object frmRemCoverSheet: TfrmRemCoverSheet
             Top = 100
             Width = 21
             Height = 21
-            Hint = 'Copy Personal Template into Shared Template List'
+            Hint = 'Remove Reminder from Reminder List'
             ParentShowHint = False
             ShowHint = True
             TabOrder = 1
@@ -349,10 +371,10 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       end
     end
   end
-  object pnlUser: TPanel
+  object pnlUser: TPanel [1]
     Left = 0
-    Top = 140
-    Width = 632
+    Top = 182
+    Width = 773
     Height = 26
     Align = alBottom
     BevelOuter = bvNone
@@ -389,77 +411,31 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       OnDropDownClose = cbxDropDownClose
       OnKeyDown = cbxDivisionKeyDown
       OnNeedData = cbxLocationNeedData
+      CharsNeedMatch = 1
     end
   end
-  object pnlMiddle: TPanel
+  object pnlMiddle: TPanel [2]
     Left = 0
     Top = 0
-    Width = 632
-    Height = 140
+    Width = 773
+    Height = 182
     Align = alClient
     BevelOuter = bvNone
     Constraints.MinHeight = 124
     TabOrder = 0
-    object lblView: TLabel
-      Left = 0
+    object pnlRight: TPanel
+      Left = 599
       Top = 0
-      Width = 632
-      Height = 13
-      Align = alTop
-      Alignment = taCenter
-      Caption = 'Cover Sheet Reminders (Cumulative List)'
+      Width = 174
+      Height = 182
+      Align = alRight
+      BevelOuter = bvNone
       Font.Charset = DEFAULT_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
       Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
+      Font.Style = []
       ParentFont = False
-    end
-    object lvView: TCaptionListView
-      Left = 0
-      Top = 13
-      Width = 458
-      Height = 127
-      Align = alClient
-      Columns = <
-        item
-          Caption = 'Reminder'
-          Tag = 1
-          Width = 180
-        end
-        item
-          Caption = 'Seq'
-          Tag = 2
-          Width = 35
-        end
-        item
-          Caption = 'Level'
-          Tag = 3
-          Width = 64
-        end
-        item
-          Tag = 4
-          Width = 159
-        end>
-      ReadOnly = True
-      RowSelect = True
-      SmallImages = imgMain
-      SortType = stData
-      StateImages = imgMain
-      TabOrder = 0
-      ViewStyle = vsReport
-      OnClick = lvViewClick
-      OnColumnClick = lvViewColumnClick
-      OnCompare = lvViewCompare
-      Caption = 'Cover Sheet Reminders (Cumulative List)'
-    end
-    object pnlRight: TPanel
-      Left = 458
-      Top = 13
-      Width = 174
-      Height = 127
-      Align = alRight
-      BevelOuter = bvNone
       TabOrder = 1
       object lblLegend: TLabel
         Left = 0
@@ -469,6 +445,13 @@ object frmRemCoverSheet: TfrmRemCoverSheet
         Align = alTop
         Alignment = taCenter
         Caption = 'Icon Legend'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
+        ExplicitWidth = 72
       end
       inline mlgnCat: TfraImgText
         Left = 0
@@ -476,7 +459,16 @@ object frmRemCoverSheet: TfrmRemCoverSheet
         Width = 174
         Height = 20
         Align = alTop
-        TabOrder = 0
+        AutoScroll = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 1
+        ExplicitTop = 13
+        ExplicitWidth = 174
         inherited img: TImage
           Top = 0
           Width = 30
@@ -495,11 +487,15 @@ object frmRemCoverSheet: TfrmRemCoverSheet
             DD00DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD00DDDDDDDDDDDDDDDDDDDDDDDDDDDD
             DD00}
           Transparent = True
+          ExplicitTop = 0
+          ExplicitWidth = 30
         end
         inherited lblText: TLabel
           Left = 40
-          Width = 90
+          Width = 93
           Caption = 'Reminder Category'
+          ExplicitLeft = 40
+          ExplicitWidth = 93
         end
       end
       inline mlgnRem: TfraImgText
@@ -508,7 +504,16 @@ object frmRemCoverSheet: TfrmRemCoverSheet
         Width = 174
         Height = 20
         Align = alTop
-        TabOrder = 1
+        AutoScroll = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 2
+        ExplicitTop = 33
+        ExplicitWidth = 174
         inherited img: TImage
           Left = 12
           Picture.Data = {
@@ -521,22 +526,36 @@ object frmRemCoverSheet: TfrmRemCoverSheet
             0708BB0098F0F8900BB800000999990000080887000000087708088887707888
             8708B078800B008870B808700BBBBB007808880BB0B0B0BB088880BB08B0B80B
             B088}
+          ExplicitLeft = 12
         end
         inherited lblText: TLabel
           Left = 40
           Width = 45
           Caption = 'Reminder'
+          ExplicitLeft = 40
+          ExplicitWidth = 45
         end
       end
       inline mlgnAdd: TfraImgText
         Left = 0
         Top = 53
         Width = 174
-        Height = 20
+        Height = 47
         Align = alTop
-        TabOrder = 2
+        AutoScroll = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 3
+        ExplicitTop = 53
+        ExplicitWidth = 174
+        ExplicitHeight = 47
         inherited img: TImage
           Left = 12
+          Top = 6
           Picture.Data = {
             07544269746D6170F6000000424DF60000000000000076000000280000001000
             0000100000000100040000000000800000000000000000000000100000000000
@@ -548,22 +567,44 @@ object frmRemCoverSheet: TfrmRemCoverSheet
             3333333333300333333333333333333333333333333333333333333333333333
             3333}
           Transparent = True
+          ExplicitLeft = 12
+          ExplicitTop = 6
         end
         inherited lblText: TLabel
           Left = 40
-          Width = 93
-          Caption = 'Add to Cover Sheet'
+          Width = 82
+          Height = 39
+          Hint = 
+            'Reminder will be displayed on the Coversheet for the level ident' +
+            'ified.'
+          Caption = 'Add to Cover Sheet (Removes Lock)'
+          ParentShowHint = False
+          ShowHint = True
+          WordWrap = True
+          ExplicitLeft = 40
+          ExplicitWidth = 82
+          ExplicitHeight = 39
         end
       end
       inline mlgnRemove: TfraImgText
         Left = 0
-        Top = 73
+        Top = 100
         Width = 174
         Height = 20
         Align = alTop
-        TabOrder = 3
+        AutoScroll = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 4
+        ExplicitTop = 100
+        ExplicitWidth = 174
         inherited img: TImage
           Left = 12
+          Top = 1
           Picture.Data = {
             07544269746D6170F6000000424DF60000000000000076000000280000001000
             0000100000000100040000000000800000000000000000000000100000000000
@@ -575,22 +616,44 @@ object frmRemCoverSheet: TfrmRemCoverSheet
             3333333333333333333333333333333333333333333333333333333333333333
             3333}
           Transparent = True
+          ExplicitLeft = 12
+          ExplicitTop = 1
         end
         inherited lblText: TLabel
           Left = 40
-          Width = 128
+          Top = 1
+          Width = 129
+          Hint = 
+            'Reminder will not be displayed on the Coversheet for the level i' +
+            'dentified.'
           Caption = 'Remove From Cover Sheet'
+          ParentShowHint = False
+          ShowHint = True
+          ExplicitLeft = 40
+          ExplicitTop = 1
+          ExplicitWidth = 129
         end
       end
       inline mlgnLock: TfraImgText
         Left = 0
-        Top = 93
+        Top = 120
         Width = 174
-        Height = 20
+        Height = 41
         Align = alTop
-        TabOrder = 4
+        AutoScroll = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 5
+        ExplicitTop = 120
+        ExplicitWidth = 174
+        ExplicitHeight = 41
         inherited img: TImage
           Left = 12
+          Top = 4
           Picture.Data = {
             07544269746D6170F6000000424DF60000000000000076000000280000001000
             0000100000000100040000000000800000000000000000000000100000000000
@@ -602,55 +665,132 @@ object frmRemCoverSheet: TfrmRemCoverSheet
             3333333778000877333333330888880333333333300000333333333333333333
             3333}
           Transparent = True
+          ExplicitLeft = 12
+          ExplicitTop = 4
         end
         inherited lblText: TLabel
           Left = 40
-          Width = 128
-          Caption = 'Lock (can not be removed)'
+          Top = 0
+          Width = 82
+          Height = 39
+          Caption = 'Lock (can not be removed from lower level)'
+          ParentShowHint = False
+          ShowHint = True
+          WordWrap = True
+          ExplicitLeft = 40
+          ExplicitTop = 0
+          ExplicitWidth = 82
+          ExplicitHeight = 39
         end
       end
       object btnView: TButton
-        Left = 12
-        Top = 119
+        Left = 10
+        Top = 163
         Width = 155
         Height = 21
         Caption = 'View Cover Sheet Reminders'
-        TabOrder = 5
+        TabOrder = 0
         OnClick = btnViewClick
       end
     end
+    object pnlTopLeft: TPanel
+      Left = 0
+      Top = 0
+      Width = 599
+      Height = 182
+      Align = alClient
+      BevelOuter = bvNone
+      TabOrder = 0
+      object lblView: TLabel
+        Left = 0
+        Top = 0
+        Width = 599
+        Height = 13
+        Align = alTop
+        Alignment = taCenter
+        Caption = 'Cover Sheet Reminders (Cumulative List)'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
+        ExplicitWidth = 232
+      end
+      object lvView: TCaptionListView
+        Left = 0
+        Top = 13
+        Width = 599
+        Height = 154
+        Align = alClient
+        Columns = <
+          item
+            Caption = 'Reminder'
+            Tag = 1
+            Width = 320
+          end
+          item
+            Caption = 'Sequence'
+            Tag = 2
+            Width = 40
+          end
+          item
+            Caption = 'Level'
+            Tag = 3
+            Width = 64
+          end
+          item
+            Tag = 4
+            Width = 154
+          end>
+        ReadOnly = True
+        RowSelect = True
+        SmallImages = imgMain
+        SortType = stData
+        StateImages = imgMain
+        TabOrder = 0
+        ViewStyle = vsReport
+        OnChange = lvViewChange
+        OnColumnClick = lvViewColumnClick
+        OnCompare = lvViewCompare
+        OnSelectItem = lvViewSelectItem
+        Caption = 'Cover Sheet Reminders (Cumulative List)'
+      end
+      object lblCAC: TVA508StaticText
+        Name = 'lblCAC'
+        Left = 0
+        Top = 167
+        Width = 599
+        Height = 15
+        Align = alBottom
+        Alignment = taCenter
+        Caption = 'Select Cover Sheet Parameter Level to Display / Edit'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 1
+        ShowAccelChar = True
+      end
+    end
   end
-  object pnlCAC: TORAutoPanel
+  object pnlCAC: TORAutoPanel [3]
     Left = 0
-    Top = 166
-    Width = 632
-    Height = 84
+    Top = 208
+    Width = 773
+    Height = 68
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 2
     DesignSize = (
-      632
-      84)
-    object lblCAC: TStaticText
-      Left = 0
-      Top = 0
-      Width = 632
-      Height = 17
-      Align = alTop
-      Alignment = taCenter
-      Caption = 'Select Cover Sheet Parameter Level to Display / Edit'
-      Font.Charset = DEFAULT_CHARSET
-      Font.Color = clWindowText
-      Font.Height = -11
-      Font.Name = 'MS Sans Serif'
-      Font.Style = [fsBold]
-      ParentFont = False
-      TabOrder = 11
-    end
+      773
+      68)
     object cbSystem: TORCheckBox
       Tag = 1
       Left = 8
-      Top = 20
+      Top = 4
       Width = 53
       Height = 16
       Anchors = [akLeft, akBottom]
@@ -664,7 +804,7 @@ object frmRemCoverSheet: TfrmRemCoverSheet
     object cbDivision: TORCheckBox
       Tag = 2
       Left = 8
-      Top = 42
+      Top = 26
       Width = 59
       Height = 16
       Anchors = [akLeft, akBottom]
@@ -678,7 +818,7 @@ object frmRemCoverSheet: TfrmRemCoverSheet
     object cbService: TORCheckBox
       Tag = 3
       Left = 8
-      Top = 64
+      Top = 48
       Width = 58
       Height = 16
       Anchors = [akLeft, akBottom]
@@ -692,8 +832,8 @@ object frmRemCoverSheet: TfrmRemCoverSheet
     object cbxService: TORComboBox
       Tag = 3
       Left = 72
-      Top = 62
-      Width = 194
+      Top = 46
+      Width = 243
       Height = 21
       Anchors = [akLeft, akBottom]
       Style = orcsDropDown
@@ -716,12 +856,13 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       OnDropDownClose = cbxDropDownClose
       OnKeyDown = cbxDivisionKeyDown
       OnNeedData = cbxServiceNeedData
+      CharsNeedMatch = 1
     end
     object cbxDivision: TORComboBox
       Tag = 2
       Left = 72
-      Top = 40
-      Width = 194
+      Top = 24
+      Width = 243
       Height = 21
       Anchors = [akLeft, akBottom]
       Style = orcsDropDown
@@ -743,11 +884,12 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       OnChange = cbxDivisionChange
       OnDropDownClose = cbxDropDownClose
       OnKeyDown = cbxDivisionKeyDown
+      CharsNeedMatch = 1
     end
     object cbLocation: TORCheckBox
       Tag = 4
-      Left = 279
-      Top = 20
+      Left = 353
+      Top = 4
       Width = 63
       Height = 16
       Anchors = [akLeft, akBottom]
@@ -760,8 +902,8 @@ object frmRemCoverSheet: TfrmRemCoverSheet
     end
     object cbUserClass: TORCheckBox
       Tag = 5
-      Left = 279
-      Top = 42
+      Left = 353
+      Top = 26
       Width = 72
       Height = 16
       Anchors = [akLeft, akBottom]
@@ -774,8 +916,8 @@ object frmRemCoverSheet: TfrmRemCoverSheet
     end
     object cbUser: TORCheckBox
       Tag = 6
-      Left = 279
-      Top = 64
+      Left = 353
+      Top = 48
       Width = 44
       Height = 16
       Anchors = [akLeft, akBottom]
@@ -788,9 +930,9 @@ object frmRemCoverSheet: TfrmRemCoverSheet
     end
     object cbxUser: TORComboBox
       Tag = 6
-      Left = 356
-      Top = 62
-      Width = 194
+      Left = 431
+      Top = 46
+      Width = 243
       Height = 21
       Anchors = [akLeft, akBottom]
       Style = orcsDropDown
@@ -813,12 +955,13 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       OnDropDownClose = cbxDropDownClose
       OnKeyDown = cbxDivisionKeyDown
       OnNeedData = cbxUserNeedData
+      CharsNeedMatch = 1
     end
     object cbxClass: TORComboBox
       Tag = 5
-      Left = 356
-      Top = 40
-      Width = 194
+      Left = 431
+      Top = 24
+      Width = 243
       Height = 21
       Anchors = [akLeft, akBottom]
       Style = orcsDropDown
@@ -841,12 +984,13 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       OnDropDownClose = cbxDropDownClose
       OnKeyDown = cbxDivisionKeyDown
       OnNeedData = cbxClassNeedData
+      CharsNeedMatch = 1
     end
     object cbxLocation: TORComboBox
       Tag = 4
-      Left = 356
-      Top = 18
-      Width = 194
+      Left = 431
+      Top = 2
+      Width = 243
       Height = 21
       Anchors = [akLeft, akBottom]
       Style = orcsDropDown
@@ -869,24 +1013,25 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       OnDropDownClose = cbxDropDownClose
       OnKeyDown = cbxDivisionKeyDown
       OnNeedData = cbxLocationNeedData
+      CharsNeedMatch = 1
     end
   end
-  object pnlBtns: TPanel
+  object pnlBtns: TPanel [4]
     Left = 0
-    Top = 428
-    Width = 632
-    Height = 25
+    Top = 528
+    Width = 773
+    Height = 35
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 4
     DesignSize = (
-      632
-      25)
+      773
+      35)
     object btnOK: TButton
-      Left = 394
-      Top = 3
-      Width = 75
-      Height = 21
+      Left = 488
+      Top = 6
+      Width = 90
+      Height = 23
       Anchors = [akTop, akRight]
       Caption = 'OK'
       ModalResult = 1
@@ -894,10 +1039,10 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       OnClick = btnOKClick
     end
     object btnCancel: TButton
-      Left = 474
-      Top = 3
-      Width = 75
-      Height = 21
+      Left = 584
+      Top = 6
+      Width = 90
+      Height = 23
       Anchors = [akTop, akRight]
       Cancel = True
       Caption = 'Cancel'
@@ -905,16 +1050,170 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       TabOrder = 1
     end
     object btnApply: TButton
-      Left = 554
-      Top = 3
-      Width = 75
-      Height = 21
+      Left = 680
+      Top = 6
+      Width = 90
+      Height = 23
       Anchors = [akTop, akRight]
       Caption = 'Apply'
       Enabled = False
       TabOrder = 2
       OnClick = btnApplyClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Left = 56
+    Top = 56
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = sbUp'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = sbDown'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = btnAdd'
+        'Status = stsDefault')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = btnLock'
+        'Status = stsDefault')
+      (
+        'Component = edtSeq'
+        'Label = lblSeq'
+        'Status = stsOK')
+      (
+        'Component = udSeq'
+        'Status = stsDefault')
+      (
+        'Component = pnlInfo'
+        'Status = stsDefault')
+      (
+        'Component = pnlTree'
+        'Status = stsDefault')
+      (
+        'Component = tvAll'
+        'Label = lblTree'
+        'Status = stsOK')
+      (
+        'Component = pnlCover'
+        'Status = stsDefault')
+      (
+        'Component = lvCover'
+        'Text = Remove Reminders'
+        'Status = stsOK')
+      (
+        'Component = pblMoveBtns'
+        'Status = stsDefault')
+      (
+        'Component = sbCopyRight'
+        'Status = stsDefault')
+      (
+        'Component = sbCopyLeft'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = pnlUser'
+        'Status = stsDefault')
+      (
+        'Component = cbxUserLoc'
+        'Status = stsDefault')
+      (
+        'Component = pnlMiddle'
+        'Status = stsDefault')
+      (
+        'Component = pnlRight'
+        'Status = stsDefault')
+      (
+        'Component = mlgnCat'
+        'Status = stsDefault')
+      (
+        'Component = mlgnRem'
+        'Status = stsDefault')
+      (
+        'Component = mlgnAdd'
+        'Status = stsDefault')
+      (
+        'Component = mlgnRemove'
+        'Status = stsDefault')
+      (
+        'Component = mlgnLock'
+        'Status = stsDefault')
+      (
+        'Component = btnView'
+        'Status = stsDefault')
+      (
+        'Component = pnlCAC'
+        'Status = stsDefault')
+      (
+        'Component = cbSystem'
+        'Status = stsDefault')
+      (
+        'Component = cbDivision'
+        'Status = stsDefault')
+      (
+        'Component = cbService'
+        'Status = stsDefault')
+      (
+        'Component = cbxService'
+        'Text = Service:'
+        'Status = stsOK')
+      (
+        'Component = cbxDivision'
+        'Text = Division:'
+        'Status = stsOK')
+      (
+        'Component = cbLocation'
+        'Status = stsDefault')
+      (
+        'Component = cbUserClass'
+        'Status = stsDefault')
+      (
+        'Component = cbUser'
+        'Status = stsDefault')
+      (
+        'Component = cbxUser'
+        'Text = User:'
+        'Status = stsOK')
+      (
+        'Component = cbxClass'
+        'Text = User Class:'
+        'Status = stsOK')
+      (
+        'Component = cbxLocation'
+        'Text = Location:'
+        'Status = stsOK')
+      (
+        'Component = pnlBtns'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnApply'
+        'Status = stsDefault')
+      (
+        'Component = frmRemCoverSheet'
+        'Status = stsDefault')
+      (
+        'Component = pnlTopLeft'
+        'Status = stsDefault')
+      (
+        'Component = lvView'
+        'Status = stsDefault')
+      (
+        'Component = lblCAC'
+        'Status = stsDefault'))
   end
   object imgMain: TImageList
     BkColor = clWhite
@@ -923,7 +1222,7 @@ object frmRemCoverSheet: TfrmRemCoverSheet
     Top = 56
     Bitmap = {
       494C010106000900040010001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
-      0000000000003600000028000000400000003000000001001000000000000018
+      0000000000003600000028000000400000003000000001002000000000000030
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -988,135 +1287,327 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F00000000
-      000000000000FF7FFF7FFF7FFF7FFF7FFF7F0000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F0000000018631863
-      18631863186300000000FF7FFF7FFF7FFF7F0000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F00001042104218631042
-      000010421863104210420000FF7FFF7FFF7F0000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F000018631863186318631042
-      0000104218631863186318630000FF7FFF7F0000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F000010421042104218631863
-      0000186318631042104210420000FF7FFF7F0000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F000018631863186318630000
-      0000000018631863186318630000FF7FFF7F0000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F000010421042104210420000
-      0000000010421042104210420000FF7FFF7F0000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7F0000000000000000
-      000000000000000000000000FF7FFF7FFF7FFF7F000018631863186318631863
-      1863186318631863186318630000FF7FFF7F0000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7F0000000000000000
-      000000000000000000000000FF7FFF7FFF7FFF7FFF7F00000000000000000000
-      000000000000000000000000FF7FFF7FFF7F0000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F000018630000FF7F
-      FF7FFF7F000018630000FF7FFF7FFF7FFF7F0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F000018630000FF7F
-      FF7FFF7F000018630000FF7FFF7FFF7FFF7F0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F000018630000FF7F
-      FF7FFF7F000018630000FF7FFF7FFF7FFF7F0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F1042104218630000
-      00000000186310421042FF7FFF7FFF7FFF7F0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F000018631863
-      1863186318630000FF7FFF7FFF7FFF7FFF7F0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F00000000
-      000000000000FF7FFF7FFF7FFF7FFF7FFF7F0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F0000000000000000000000000000
-      0000000000000000000000000000000000000000000000000000000000000000
-      000000000000000000000000000000000000FF7F000000000040FF7F00000000
-      000000000000FF7F004000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F0040000000000000007C
-      0000007C0000000000000040FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F00000000007CFF7FFF7F
-      0000FF7FFF7F007C00000000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F10420000007CFF7F0000FF7F
-      FF7FFF7F0000FF7F007C00001042FF7FFF7FFF7FFF7FFF7F0000000000000000
-      000000000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      00000000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F0000007C007CFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7F007C007C0000FF7FFF7FFF7FFF7F0000E07FFF7FE07FFF7F
-      E07FFF7FE07FFF7FE07F0000FF7FFF7FFF7FFF7FFF7F00000000000000000000
-      00000000000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      00000000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F0000007C0000FF7F00000000
-      0000FF7FFF7F00000000007C0000FF7FFF7FFF7FFF7F0000FF7FE07FFF7FE07F
-      FF7FE07FFF7FE07FFF7F0000FF7FFF7FFF7FFF7F00000000E07F1863E07F1863
-      E07F1863E07F1863E07F0000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      00000000FF7FFF7FFF7FFF7FFF7FFF7FFF7FE07F0000007C007CFF7FFF7FFF7F
-      0000FF7FFF7FFF7F007C007C0000E07FFF7FFF7FFF7F0000E07FFF7FE07FFF7F
-      E07FFF7FE07FFF7FE07F0000FF7FFF7FFF7FFF7F0000FF7F0000E07F1863E07F
-      1863E07F1863E07F1863E07F0000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      00000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F000010420000007CFF7F0000FF7F
-      0000FF7F0000FF7F007C000010420000FF7FFF7FFF7F0000FF7FE07FFF7FE07F
-      FF7FE07FFF7FE07FFF7F0000FF7FFF7FFF7FFF7F0000E07FFF7F0000E07F1863
-      E07F1863E07F1863E07F1863E07F0000FF7FFF7FFF7FFF7F0000000000000000
-      000000000000000000000000FF7FFF7FFF7FE07FE07F00000000007CFF7FFF7F
-      0000FF7FFF7F007C00000000E07FE07FFF7FFF7FFF7F0000E07FFF7FE07FFF7F
-      E07FFF7FE07FFF7FE07F0000FF7FFF7FFF7FFF7F0000FF7FE07FFF7F00000000
-      00000000000000000000000000000000FF7FFF7FFF7FFF7F0000000000000000
-      000000000000000000000000FF7FFF7FFF7F00000000000000000000007C007C
-      007C007C007C00000000000000000000FF7FFF7FFF7F0000FF7FE07FFF7FE07F
-      FF7FE07FFF7FE07FFF7F0000FF7FFF7FFF7FFF7F0000E07FFF7FE07FFF7FE07F
-      FF7FE07FFF7FE07F0000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      00000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F0000FF7FFF7F1042000000000000
-      0000000000000000FF7F104210420000FF7FFF7FFF7F00000000000000000000
-      00000000000000000000FF7FFF7FFF7FFF7FFF7F0000FF7FE07FFF7FE07FFF7F
-      E07FFF7FE07FFF7F0000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      00000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F0000FF7FFF7FFF7FFF7F10421042
-      00001042FF7FFF7FFF7FFF7F10420000FF7FFF7FFF7FFF7F0000FF7FE07FFF7F
-      E07F0000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F0000E07FFF7FE07FFF7FE07F
-      FF7F000000000000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      00000000FF7FFF7FFF7FFF7FFF7FFF7FFF7FE07F00001042FF7FFF7F00000000
-      E07F00000000FF7FFF7F10420000E07FFF7FFF7FFF7FFF7FEF3D000000000000
-      0000EF3DFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F0000E07FFF7FE07FFF7F
-      0000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      00000000FF7FFF7FFF7FFF7FFF7FFF7FFF7F0000FF7F104200000000E07FE07F
-      E07FE07FE07F000000001042FF7F0000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F10420000000000000000
-      1042FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F0000E07FE07F0000E07F
-      0000E07F0000E07FE07F0000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F0000E07FE07F0000FF7FE07F
-      0000E07FFF7F0000E07FE07F0000FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F
-      FF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7FFF7F424D3E000000000000003E000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF000000000000000000000000000000000000000000FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
+      000000000000C6C6C600C6C6C600C6C6C600C6C6C600C6C6C600000000000000
+      0000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00000000008484
+      840084848400C6C6C600848484000000000084848400C6C6C600848484008484
+      840000000000FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000C6C6C600C6C6
+      C600C6C6C600C6C6C600848484000000000084848400C6C6C600C6C6C600C6C6
+      C600C6C6C60000000000FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000848484008484
+      840084848400C6C6C600C6C6C60000000000C6C6C600C6C6C600848484008484
+      84008484840000000000FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000C6C6C600C6C6
+      C600C6C6C600C6C6C600000000000000000000000000C6C6C600C6C6C600C6C6
+      C600C6C6C60000000000FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000848484008484
+      8400848484008484840000000000000000000000000084848400848484008484
+      84008484840000000000FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000C6C6C600C6C6
+      C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6C600C6C6
+      C600C6C6C60000000000FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
+      0000C6C6C60000000000FFFFFF00FFFFFF00FFFFFF0000000000C6C6C6000000
+      0000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
+      0000C6C6C60000000000FFFFFF00FFFFFF00FFFFFF0000000000C6C6C6000000
+      0000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
+      0000C6C6C60000000000FFFFFF00FFFFFF00FFFFFF0000000000C6C6C6000000
+      0000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF008484
+      840084848400C6C6C600000000000000000000000000C6C6C600848484008484
+      8400FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF0000000000C6C6C600C6C6C600C6C6C600C6C6C600C6C6C60000000000FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF000000000000000000000000000000000000000000FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000000000000000000000000000FFFFFF0000000000000000000000
+      8400FFFFFF000000000000000000000000000000000000000000FFFFFF000000
+      84000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00000084000000
+      000000000000000000000000FF00000000000000FF0000000000000000000000
+      000000008400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00000000000000
+      00000000FF00FFFFFF00FFFFFF0000000000FFFFFF00FFFFFF000000FF000000
+      000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0084848400000000000000
+      FF00FFFFFF0000000000FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF000000
+      FF000000000084848400FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00000000000000FF000000
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
+      FF000000FF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000FF
+      FF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FF
+      FF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00000000000000FF000000
+      0000FFFFFF00000000000000000000000000FFFFFF00FFFFFF00000000000000
+      00000000FF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000FFFF
+      FF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFF
+      FF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00000000000000000000FF
+      FF00C6C6C60000FFFF00C6C6C60000FFFF00C6C6C60000FFFF00C6C6C60000FF
+      FF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000FFFF00000000000000FF000000
+      FF00FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF00FFFFFF00FFFFFF000000
+      FF000000FF000000000000FFFF00FFFFFF00FFFFFF00FFFFFF000000000000FF
+      FF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FF
+      FF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF000000
+      000000FFFF00C6C6C60000FFFF00C6C6C60000FFFF00C6C6C60000FFFF00C6C6
+      C60000FFFF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000084848400000000000000
+      FF00FFFFFF0000000000FFFFFF0000000000FFFFFF0000000000FFFFFF000000
+      FF00000000008484840000000000FFFFFF00FFFFFF00FFFFFF0000000000FFFF
+      FF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFF
+      FF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000FFFF00FFFF
+      FF000000000000FFFF00C6C6C60000FFFF00C6C6C60000FFFF00C6C6C60000FF
+      FF00C6C6C60000FFFF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000FFFFFF00FFFFFF00FFFFFF0000FFFF0000FFFF00000000000000
+      00000000FF00FFFFFF00FFFFFF0000000000FFFFFF00FFFFFF000000FF000000
+      00000000000000FFFF0000FFFF00FFFFFF00FFFFFF00FFFFFF000000000000FF
+      FF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FF
+      FF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF0000FF
+      FF00FFFFFF000000000000000000000000000000000000000000000000000000
+      0000000000000000000000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      000000000000FFFFFF00FFFFFF00FFFFFF000000000000000000000000000000
+      0000000000000000FF000000FF000000FF000000FF000000FF00000000000000
+      0000000000000000000000000000FFFFFF00FFFFFF00FFFFFF0000000000FFFF
+      FF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFF
+      FF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000FFFF00FFFF
+      FF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF000000
+      0000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF00FFFFFF008484
+      840000000000000000000000000000000000000000000000000000000000FFFF
+      FF00848484008484840000000000FFFFFF00FFFFFF00FFFFFF00000000000000
+      0000000000000000000000000000000000000000000000000000000000000000
+      0000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF0000FF
+      FF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF0000FFFF00FFFFFF000000
+      0000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF0084848400848484000000000084848400FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF008484840000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF000000
+      0000FFFFFF0000FFFF00FFFFFF0000FFFF0000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000FFFF00FFFF
+      FF0000FFFF00FFFFFF0000FFFF00FFFFFF00000000000000000000000000FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000FFFF000000000084848400FFFF
+      FF00FFFFFF00000000000000000000FFFF000000000000000000FFFFFF00FFFF
+      FF00848484000000000000FFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF007B7B
+      7B00000000000000000000000000000000007B7B7B00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000FF
+      FF00FFFFFF0000FFFF00FFFFFF0000000000FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF000000000000000000FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF0000000000FFFFFF00848484000000
+      00000000000000FFFF0000FFFF0000FFFF0000FFFF0000FFFF00000000000000
+      000084848400FFFFFF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00848484000000
+      000000000000000000000000000084848400FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000FF
+      FF0000FFFF000000000000FFFF000000000000FFFF000000000000FFFF0000FF
+      FF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF000000000000FFFF0000FF
+      FF0000000000FFFFFF0000FFFF000000000000FFFF00FFFFFF000000000000FF
+      FF0000FFFF0000000000FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00FFFF
+      FF00FFFFFF00FFFFFF00FFFFFF00FFFFFF00424D3E000000000000003E000000
       2800000040000000300000000100010000000000800100000000000000000000
       000000000000000000000000FFFFFF0000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -1132,5 +1623,99 @@ object frmRemCoverSheet: TfrmRemCoverSheet
       6011C00FAAAFFE7F7879EA7F951FFE7F1831E07FCAFFFE7F4005FFFFC0FFFFFF
       C007FFFFFFFFFFFF8443FFFFFFFFFFFF00000000000000000000000000000000
       000000000000}
+  end
+  object imgLblRemCoverSheet: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvAll
+      end
+      item
+        Component = lvCover
+      end>
+    ImageList = imgMain
+    Labels = <
+      item
+        Caption = 'Reminder'
+        ImageIndex = 0
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Category'
+        ImageIndex = 1
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Category'
+        ImageIndex = 2
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Add'
+        ImageIndex = 3
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Remove'
+        ImageIndex = 4
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Lock'
+        ImageIndex = 5
+        OverlayIndex = -1
+      end>
+    Left = 16
+    Top = 96
+  end
+  object compAccessCopyRight: TVA508ComponentAccessibility
+    Component = sbCopyRight
+    OnCaptionQuery = compAccessCopyRightCaptionQuery
+    Left = 368
+    Top = 320
+  end
+  object compAccessCopyLeft: TVA508ComponentAccessibility
+    Component = sbCopyLeft
+    OnCaptionQuery = compAccessCopyLeftCaptionQuery
+    Left = 368
+    Top = 376
+  end
+  object VA508ImageListLabeler1: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = lvView
+      end>
+    ImageList = imgMain
+    Labels = <
+      item
+        ImageIndex = 0
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Category'
+        ImageIndex = 1
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Category'
+        ImageIndex = 2
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Add'
+        ImageIndex = 3
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Remove'
+        ImageIndex = 4
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Lock'
+        ImageIndex = 5
+        OverlayIndex = -1
+      end>
+    Left = 56
+    Top = 96
   end
 end

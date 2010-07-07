@@ -1,21 +1,14 @@
-object frmDefaultEvent: TfrmDefaultEvent
+inherited frmDefaultEvent: TfrmDefaultEvent
   Left = 311
   Top = 193
   BorderStyle = bsSingle
   Caption = 'Set/Change Default Release Event'
   ClientHeight = 317
   ClientWidth = 394
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlTop: TPanel
+  object pnlTop: TPanel [0]
     Left = 0
     Top = 0
     Width = 394
@@ -25,8 +18,8 @@ object frmDefaultEvent: TfrmDefaultEvent
     object lblCaption: TLabel
       Left = 1
       Top = 1
-      Width = 392
-      Height = 23
+      Width = 363
+      Height = 13
       Align = alClient
       Caption = 
         ' Select an event from the following list as your personal defaul' +
@@ -34,7 +27,7 @@ object frmDefaultEvent: TfrmDefaultEvent
       WordWrap = True
     end
   end
-  object cboEvents: TORComboBox
+  object cboEvents: TORComboBox [1]
     Left = 0
     Top = 25
     Width = 394
@@ -52,6 +45,7 @@ object frmDefaultEvent: TfrmDefaultEvent
     ItemTipEnable = True
     ListItemsOnly = True
     LongList = False
+    LookupPiece = 0
     MaxLength = 0
     ParentShowHint = False
     Pieces = '9'
@@ -60,8 +54,9 @@ object frmDefaultEvent: TfrmDefaultEvent
     SynonymChars = '<>'
     TabOrder = 1
     CheckEntireLine = True
+    CharsNeedMatch = 1
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [2]
     Left = 0
     Top = 286
     Width = 394
@@ -87,5 +82,26 @@ object frmDefaultEvent: TfrmDefaultEvent
       TabOrder = 1
       OnClick = btnCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = cboEvents'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmDefaultEvent'
+        'Status = stsDefault'))
   end
 end

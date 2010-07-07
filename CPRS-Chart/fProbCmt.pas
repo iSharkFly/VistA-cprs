@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ORCtrls, StdCtrls, Buttons;
+  ORCtrls, StdCtrls, Buttons, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmProbCmt = class(TForm)
+  TfrmProbCmt = class(TfrmBase508Form)
     edComment: TCaptionEdit;
     bbOK: TBitBtn;
     bbCancel: TBitBtn;

@@ -1,45 +1,43 @@
-object frmMedCopy: TfrmMedCopy
+inherited frmMedCopy: TfrmMedCopy
   Left = 157
   Top = 62
-  Width = 493
-  Height = 428
   Caption = 'Copy Medication Orders'
-  Color = clBtnFace
+  ClientHeight = 401
+  ClientWidth = 485
   Constraints.MinHeight = 150
   Constraints.MinWidth = 240
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   OnCreate = FormCreate
-  OnKeyDown = FormKeyDown
+  ExplicitWidth = 493
+  ExplicitHeight = 428
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
+  object pnlTop: TPanel [0]
     Left = 0
     Top = 0
     Width = 485
-    Height = 75
+    Height = 80
     Align = alTop
     AutoSize = True
-    TabOrder = 1
-    object lblPtInfo: TLabel
+    TabOrder = 0
+    object lblPtInfo: TVA508StaticText
+      Name = 'lblPtInfo'
       Left = 1
       Top = 1
-      Width = 483
+      Width = 464
       Height = 40
-      Align = alTop
+      Alignment = taLeftJustify
+      AutoSize = True
       Constraints.MinHeight = 40
-      Layout = tlCenter
+      TabOrder = 1
+      ShowAccelChar = True
     end
-    object Panel2: TPanel
+    object pnlInpatient: TPanel
       Left = 1
-      Top = 41
+      Top = 46
       Width = 483
       Height = 33
-      Align = alTop
+      Align = alBottom
       AutoSize = True
       TabOrder = 0
       object Image1: TImage
@@ -69,17 +67,17 @@ object frmMedCopy: TfrmMedCopy
       object lblInstruction: TStaticText
         Left = 30
         Top = 1
-        Width = 441
+        Width = 337
         Height = 17
         Caption = 
           '  Use Admit: if patient is newly admitted to the hospital or nur' +
           'sing home.'
         TabOrder = 0
       end
-      object Label1: TStaticText
+      object lblInstruction2: TStaticText
         Left = 30
         Top = 15
-        Width = 455
+        Width = 371
         Height = 17
         Caption = 
           '  Use Transfer: if inpatient will move from one ward or treating' +
@@ -88,23 +86,20 @@ object frmMedCopy: TfrmMedCopy
       end
     end
   end
-  object Panel3: TPanel
+  object pnlMiddle: TPanel [1]
     Left = 0
-    Top = 75
+    Top = 80
     Width = 485
     Height = 65
     Align = alTop
-    TabOrder = 0
-    object GroupBox2: TGroupBox
+    TabOrder = 1
+    object gboxMain: TGroupBox
       Left = 1
       Top = 1
       Width = 483
       Height = 63
       Align = alClient
       TabOrder = 0
-      DesignSize = (
-        483
-        63)
       object radDelayed: TRadioButton
         Left = 20
         Top = 37
@@ -127,10 +122,9 @@ object frmMedCopy: TfrmMedCopy
       end
       object cmdOK: TButton
         Left = 365
-        Top = 15
+        Top = 14
         Width = 72
         Height = 19
-        Anchors = [akTop, akRight]
         Caption = 'OK'
         Constraints.MaxWidth = 73
         Default = True
@@ -139,10 +133,9 @@ object frmMedCopy: TfrmMedCopy
       end
       object cmdCancel: TButton
         Left = 365
-        Top = 37
+        Top = 38
         Width = 72
         Height = 19
-        Anchors = [akTop, akRight]
         Cancel = True
         Caption = 'Cancel'
         Constraints.MaxWidth = 73
@@ -151,43 +144,121 @@ object frmMedCopy: TfrmMedCopy
       end
     end
   end
-  object Panel4: TPanel
+  object pnlBottom: TPanel [2]
     Left = 0
-    Top = 140
+    Top = 145
     Width = 485
-    Height = 261
+    Height = 256
     Align = alClient
     TabOrder = 2
     inline fraEvntDelayList: TfraEvntDelayList
       Left = 1
       Top = 1
       Width = 483
-      Height = 259
-      Align = alClient
+      Height = 254
+      Align = alBottom
+      AutoScroll = True
       TabOrder = 0
+      TabStop = True
       Visible = False
+      ExplicitLeft = 1
+      ExplicitTop = 1
+      ExplicitWidth = 483
+      ExplicitHeight = 254
       inherited pnlDate: TPanel
         Left = 378
-        Height = 259
+        Height = 254
+        ExplicitLeft = 378
+        ExplicitHeight = 254
         inherited lblEffective: TLabel
           Left = 446
+          Width = 71
+          ExplicitLeft = 446
+          ExplicitWidth = 71
         end
         inherited orDateBox: TORDateBox
           Left = 446
+          ExplicitLeft = 446
         end
       end
       inherited pnlList: TPanel
         Width = 378
-        Height = 259
+        Height = 254
+        ExplicitWidth = 378
+        ExplicitHeight = 254
+        inherited lblEvntDelayList: TLabel
+          Width = 376
+          ExplicitWidth = 80
+        end
         inherited mlstEvents: TORListBox
           Width = 376
-          Height = 236
+          Height = 218
           OnDblClick = cmdOKClick
+          ExplicitWidth = 376
+          ExplicitHeight = 218
         end
         inherited edtSearch: TCaptionEdit
           Width = 376
+          ExplicitWidth = 376
         end
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = pnlInpatient'
+        'Status = stsDefault')
+      (
+        'Component = lblInstruction'
+        'Status = stsDefault')
+      (
+        'Component = lblInstruction2'
+        'Status = stsDefault')
+      (
+        'Component = pnlMiddle'
+        'Status = stsDefault')
+      (
+        'Component = gboxMain'
+        'Status = stsDefault')
+      (
+        'Component = radDelayed'
+        'Status = stsDefault')
+      (
+        'Component = radRelease'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList.pnlDate'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList.orDateBox'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList.pnlList'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList.mlstEvents'
+        'Status = stsDefault')
+      (
+        'Component = fraEvntDelayList.edtSearch'
+        'Status = stsDefault')
+      (
+        'Component = frmMedCopy'
+        'Status = stsDefault'))
   end
 end

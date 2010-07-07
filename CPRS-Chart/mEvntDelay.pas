@@ -47,7 +47,7 @@ implementation
 {$R *.DFM}
 
 uses
-  rOrders, fOrders, fOrdersTS, fMedCopy, fOrdersCopy;
+  rOrders, fOrders, fOrdersTS, fMedCopy, fOrdersCopy, VA508AccessibilityRouter;
 
 { TfraEvntDelayList }
 const
@@ -62,7 +62,8 @@ const
 
 constructor TfraEvntDelayList.Create(AOwner: TComponent);
 begin
-  inherited;
+  inherited Create(AOwner);
+  TabStop := FALSE;
   FDisableWarning   := False;
   FMatchedCancel    := False;
   FIsForCpXfer      := False;
@@ -309,5 +310,8 @@ begin
     if i > 1 then edtSearch.SelStart := i;
   end
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfraEvntDelayList);
 
 end.

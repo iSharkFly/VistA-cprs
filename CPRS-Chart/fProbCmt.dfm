@@ -1,20 +1,16 @@
-object frmProbCmt: TfrmProbCmt
+inherited frmProbCmt: TfrmProbCmt
   Left = 205
   Top = 220
-  Width = 411
-  Height = 128
   Caption = 'Annotate a problem'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 101
+  ClientWidth = 403
   OldCreateOrder = True
   Position = poScreenCenter
+  ExplicitWidth = 411
+  ExplicitHeight = 128
   PixelsPerInch = 96
   TextHeight = 13
-  object lblComment: TOROffsetLabel
+  object lblComment: TOROffsetLabel [0]
     Left = 9
     Top = 10
     Width = 209
@@ -25,7 +21,7 @@ object frmProbCmt: TfrmProbCmt
     VertOffset = 2
     WordWrap = False
   end
-  object edComment: TCaptionEdit
+  object edComment: TCaptionEdit [1]
     Left = 11
     Top = 30
     Width = 386
@@ -34,7 +30,7 @@ object frmProbCmt: TfrmProbCmt
     TabOrder = 0
     Caption = 'Enter a new comment (up to 60 characters)'
   end
-  object bbOK: TBitBtn
+  object bbOK: TBitBtn [2]
     Left = 115
     Top = 60
     Width = 75
@@ -45,7 +41,7 @@ object frmProbCmt: TfrmProbCmt
     TabOrder = 1
     OnClick = bbOKClick
   end
-  object bbCancel: TBitBtn
+  object bbCancel: TBitBtn [3]
     Left = 200
     Top = 60
     Width = 75
@@ -56,5 +52,20 @@ object frmProbCmt: TfrmProbCmt
     TabOrder = 2
     OnClick = bbCancelClick
     NumGlyphs = 2
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = edComment'
+        'Status = stsDefault')
+      (
+        'Component = bbOK'
+        'Status = stsDefault')
+      (
+        'Component = bbCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmProbCmt'
+        'Status = stsDefault'))
   end
 end

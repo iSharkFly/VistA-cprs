@@ -1,21 +1,17 @@
-object frmNotesByAuthor: TfrmNotesByAuthor
+inherited frmNotesByAuthor: TfrmNotesByAuthor
   Left = 473
   Top = 272
-  Width = 316
-  Height = 232
   BorderIcons = []
   Caption = 'List Signed Notes by Author'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 205
+  ClientWidth = 308
   OldCreateOrder = True
   Position = poScreenCenter
+  ExplicitWidth = 316
+  ExplicitHeight = 232
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 308
@@ -56,12 +52,14 @@ object frmNotesByAuthor: TfrmNotesByAuthor
       ItemTipEnable = True
       ListItemsOnly = False
       LongList = True
+      LookupPiece = 0
       MaxLength = 0
       Pieces = '2'
       Sorted = False
       SynonymChars = '<>'
       TabOrder = 0
       OnNeedData = cboAuthorNeedData
+      CharsNeedMatch = 1
     end
     object cmdOK: TButton
       Left = 228
@@ -83,5 +81,26 @@ object frmNotesByAuthor: TfrmNotesByAuthor
       TabOrder = 3
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = radSort'
+        'Status = stsDefault')
+      (
+        'Component = cboAuthor'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmNotesByAuthor'
+        'Status = stsDefault'))
   end
 end

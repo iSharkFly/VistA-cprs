@@ -3,10 +3,11 @@ unit fAddlSigners;
 interface
 
 uses Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls, 
-  Buttons, ORCtrls, ORfn, ExtCtrls, FNoteProps,Dialogs;
+  Buttons, ORCtrls, ORfn, ExtCtrls, FNoteProps, Dialogs, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmAddlSigners = class(TForm)
+  TfrmAddlSigners = class(TfrmBase508Form)
     cmdOK: TButton;
     cmdCancel: TButton;
     cboSrcList: TORComboBox;
@@ -14,7 +15,7 @@ type
     SrcLabel: TLabel;
     DstLabel: TLabel;
     pnlBase: TPanel;
-    cmdRemove: TButton;
+    btnRemoveSigners: TButton;
     lblAuthor: TOROffsetLabel;
     cboCosigner: TORComboBox;
     lblCosigner: TOROffsetLabel;
@@ -22,22 +23,27 @@ type
     pnlAdditional: TORAutoPanel;
     pnlButtons: TORAutoPanel;
     pnlTop: TORAutoPanel;
+    btnAddSigners: TButton;
+    btnRemoveAllSigners: TButton;
+    procedure btnAddSignersClick(Sender: TObject);
     procedure NewPersonNeedData(Sender: TObject; const StartFrom: String;
       Direction, InsertAt: Integer);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdCancelClick(Sender: TObject);
     procedure cboSrcListMouseClick(Sender: TObject);
-    procedure cmdRemoveClick(Sender: TObject);
+    procedure btnRemoveSignersClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure cboCosignerChange(Sender: TObject);
-    procedure DstListClick(Sender: TObject);
     procedure cboSrcListKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure cboCosignerNeedData(Sender: TObject; const StartFrom: String;
       Direction, InsertAt: Integer);
     procedure cboCosignerExit(Sender: TObject);
     procedure cboSrcListClick(Sender: TObject);
+    procedure DstListChange(Sender: TObject);
+    procedure btnRemoveAllSignersClick(Sender: TObject);
+    procedure cboSrcListChange(Sender: TObject);
   private
     FSigners: TStringList ;
     FCosigner: int64;
@@ -49,6 +55,7 @@ type
     FToday: string;
     FTabID: integer;
     function CosignerOK: Boolean;
+    
   end;
 
 TSignerList = record
@@ -70,7 +77,7 @@ implementation
 {$R *.DFM}
 
 uses
-  rCore, uCore, rTIU, uConst, rPCE;
+  rCore, uCore, rTIU, uConst, rPCE, fDCSumm;
 
 const
   TX_SIGNER_CAP = 'Error adding signers';
@@ -98,7 +105,7 @@ begin
       FSigAction := SigAction;
       FNoteIEN := NoteIEN;
       FRefDate := ARefDate;
-      FExclusions.Assign(Exclusions);
+      FastAssign(Exclusions, FExclusions);
       FToday := FloatToStr(FMToday);
       if FSigAction = SG_COSIGNER then
         begin
@@ -120,7 +127,10 @@ begin
               cboCosigner.ItemIndex := 0;
             end
           else
+          begin
             DstList.Items.Add(Strings[i]);
+            btnRemoveAllSigners.Enabled := DstList.Items.Count > 0;
+          end;
         end;
 
       if (SigAction = SG_COSIGNER) or (SigAction = SG_BOTH) then
@@ -138,7 +148,7 @@ begin
       with SignerList do
         begin
           Signers := TStringList.Create;
-          Signers.Assign(FSigners);
+          FastAssign(FSigners, Signers);
           Cosigner := FCosigner;
           Changed := FChanged ;
         end ;
@@ -196,10 +206,19 @@ begin
         Exit;
       end;
   DstList.Items.Add(cboSrcList.Items[cboSrcList.Itemindex]) ;
-  cboSrcList.SelectByID(cboSrcList.ItemID);
+  btnRemoveSigners.Enabled := DstList.SelCount > 0;
+  btnRemoveAllSigners.Enabled := DstList.Items.Count > 0;
+   
 end;
 
-procedure TfrmAddlSigners.cmdRemoveClick(Sender: TObject);
+procedure TfrmAddlSigners.btnRemoveAllSignersClick(Sender: TObject);
+begin
+  inherited;
+  DstList.SelectAll;
+  btnRemoveSignersClick(self);
+end;
+
+procedure TfrmAddlSigners.btnRemoveSignersClick(Sender: TObject);
 var
   i,j: integer;
 begin
@@ -217,25 +236,35 @@ begin
     end;
 end;
 
+procedure TfrmAddlSigners.btnAddSignersClick(Sender: TObject);
+begin
+  inherited;
+  cboSrcListMouseClick(btnAddSigners);
+end;
+
 procedure TfrmAddlSigners.cboCosignerChange(Sender: TObject);
 var
   i: integer;
 begin
-  if UserInactive(cboCosigner.ItemID) then
-       if (InfoBox(fNoteProps.TX_USER_INACTIVE, TC_INACTIVE_USER, MB_OKCANCEL)= IDCANCEL) then exit;
-  if not CosignerOK then Exit;
-  i := DstList.SelectByID(cboCosigner.ItemID);
-  if i > -1 then
+  with cboCosigner do
+  begin
+    if UserInactive(ItemID) then
+      if (InfoBox(fNoteProps.TX_USER_INACTIVE, TC_INACTIVE_USER, MB_OKCANCEL)= IDCANCEL) then exit;
+    if not CosignerOK then Exit;
+    i := DstList.SelectByID(ItemID);
+    if i > -1 then
     begin
       DstList.Items.Delete(i);
-      FSigners.Add(ORFn.Pieces(cboCosigner.Items[cboCosigner.ItemIndex], U, 1, 2) + '^REMOVE');
+      FSigners.Add(ORFn.Pieces(Items[ItemIndex], U, 1, 2) + '^REMOVE');
     end;
+    for i := 0 to FExclusions.Count - 1 do
+      if (Piece(FExclusions.Strings[i],U,3) = 'Expected Cosigner') then
+        FExclusions.Strings[i] := ORFn.Pieces(Items[ItemIndex], U, 1, 2) + '^Expected Cosigner';
+  end;
 end;
 
 procedure TfrmAddlSigners.FormCreate(Sender: TObject);
 begin
-  cboCosigner.Color := ReadOnlyColor;
-  txtAuthor.Color := ReadOnlyColor;
   FSigners := TStringList.Create;
   FExclusions := TStringList.Create;
 end;
@@ -246,9 +275,18 @@ begin
   FExclusions.Free;
 end;
 
-procedure TfrmAddlSigners.DstListClick(Sender: TObject);
+procedure TfrmAddlSigners.DstListChange(Sender: TObject);
 begin
-  if DstList.ItemIndex > -1 then cmdRemoveClick(Self);
+  inherited;
+if DstList.SelCount = 1 then
+    if Piece(DstList.Items[0], '^', 1) = '' then
+    begin
+      btnRemoveSigners.Enabled := false;
+      btnRemoveAllSigners.Enabled := false;
+      exit;
+    end;
+  btnRemoveSigners.Enabled := DstList.SelCount > 0;
+  btnRemoveAllSigners.Enabled := DstList.Items.Count > 0;
 end;
 
 procedure TfrmAddlSigners.cboSrcListKeyDown(Sender: TObject; var Key: Word;
@@ -293,7 +331,11 @@ begin
   case FTabID of
     CT_NOTES:     TORComboBox(Sender).ForDataUse(SubSetOfUsersWithClass(StartFrom, Direction, FToday));
     CT_CONSULTS:  TORComboBox(Sender).ForDataUse(SubSetOfUsersWithClass(StartFrom, Direction, FToday));
-    CT_DCSUMM:    TORComboBox(Sender).ForDataUse(SubSetOfProviders(StartFrom, Direction));
+    //CQ #17218 - Updated to properly filter co-signers - JCS
+    //CT_DCSUMM:    TORComboBox(Sender).ForDataUse(SubSetOfProviders(StartFrom, Direction));
+    CT_DCSUMM: (Sender as TORComboBox).ForDataUse(SubSetOfCosigners(StartFrom, Direction,
+        FMToday, 0, frmDCSumm.lstSumms.ItemIEN));
+
   end;
 end;
 
@@ -302,12 +344,16 @@ begin
   with cboCosigner do if Text = '' then ItemIndex := -1;
 end;
 
-procedure TfrmAddlSigners.cboSrcListClick(Sender: TObject);
-var UserEIN:string;
+procedure TfrmAddlSigners.cboSrcListChange(Sender: TObject);
 begin
-      UserEIN := Piece(cboSrcList.Items[cboSrcList.Itemindex],U,1);
-      if UserInactive(UserEIN) then
-        if (InfoBox(fNoteProps.TX_USER_INACTIVE, TC_INACTIVE_USER, MB_OKCANCEL)= IDCANCEL) then exit;
+  inherited;
+btnAddSigners.Enabled := CboSrcList.ItemIndex > -1;
+end;
+
+procedure TfrmAddlSigners.cboSrcListClick(Sender: TObject);
+begin
+  if UserInactive(cboSrcList.ItemID) then
+    if (InfoBox(fNoteProps.TX_USER_INACTIVE, TC_INACTIVE_USER, MB_OKCANCEL)= IDCANCEL) then exit;
 
 end;
 

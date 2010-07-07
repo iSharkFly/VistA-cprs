@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ORCtrls, StdCtrls, ExtCtrls, ORNet;
+  ORCtrls, StdCtrls, ExtCtrls, ORNet, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmLabTest = class(TForm)
+  TfrmLabTest = class(TfrmBase508Form)
     pnlLabTest: TORAutoPanel;
     cmdOK: TButton;
     cmdCancel: TButton;
@@ -34,7 +34,7 @@ procedure SelectTest(FontSize: Integer);
 
 implementation
 
-uses fLabs, ORFn, rLabs;
+uses fLabs, ORFn, rLabs, VAUtils;
 
 {$R *.DFM}
 
@@ -98,7 +98,7 @@ end;
 procedure TfrmLabTest.cmdOKClick(Sender: TObject);
 begin
   if cboList.ItemIndex = -1 then
-    ShowMessage('No test was selected.')
+    ShowMsg('No test was selected.')
   else
   begin
     frmLabs.lblSingleTest.Caption := cboList.Items[cboList.ItemIndex];

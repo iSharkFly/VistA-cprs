@@ -1,4 +1,4 @@
-object frmVisit: TfrmVisit
+inherited frmVisit: TfrmVisit
   Left = 426
   Top = 332
   BorderIcons = []
@@ -6,18 +6,12 @@ object frmVisit: TfrmVisit
   Caption = 'Visit Selection'
   ClientHeight = 273
   ClientWidth = 438
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 438
@@ -96,6 +90,7 @@ object frmVisit: TfrmVisit
         SynonymChars = '<>'
         TabOrder = 0
         OnNeedData = cboLocationNeedData
+        CharsNeedMatch = 1
       end
       object grpCategory: TGroupBox
         Left = 248
@@ -181,5 +176,50 @@ object frmVisit: TfrmVisit
       TabOrder = 6
       OnClick = cmdCancelClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = lblInstruct'
+        'Status = stsDefault')
+      (
+        'Component = pnlVisit'
+        'Status = stsDefault')
+      (
+        'Component = timVisitDate'
+        'Status = stsDefault')
+      (
+        'Component = cboLocation'
+        'Status = stsDefault')
+      (
+        'Component = grpCategory'
+        'Status = stsDefault')
+      (
+        'Component = ckbHistorical'
+        'Status = stsDefault')
+      (
+        'Component = lstVisit'
+        'Status = stsDefault')
+      (
+        'Component = radAppt'
+        'Status = stsDefault')
+      (
+        'Component = radAdmit'
+        'Status = stsDefault')
+      (
+        'Component = radNewVisit'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmVisit'
+        'Status = stsDefault'))
   end
 end

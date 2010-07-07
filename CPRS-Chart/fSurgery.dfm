@@ -1,28 +1,38 @@
 inherited frmSurgery: TfrmSurgery
-  Left = 521
-  Top = 221
-  Width = 720
-  Height = 409
+  Left = 468
+  Top = 224
   Align = alClient
   Caption = 'Surgery Page'
+  ClientHeight = 363
+  ClientWidth = 712
   HelpFile = 'overvw'
   Menu = mnuNotes
   OnDestroy = FormDestroy
+  ExplicitLeft = 468
+  ExplicitTop = 224
+  ExplicitWidth = 720
+  ExplicitHeight = 417
   PixelsPerInch = 96
   TextHeight = 13
   inherited shpPageBottom: TShape
     Top = 358
     Width = 712
+    ExplicitTop = 358
+    ExplicitWidth = 712
   end
   inherited sptHorz: TSplitter
     Left = 64
     Height = 358
     AutoSnap = False
     OnCanResize = sptHorzCanResize
+    ExplicitLeft = 64
+    ExplicitHeight = 358
   end
   inherited pnlLeft: TPanel
     Width = 64
     Height = 358
+    ExplicitWidth = 64
+    ExplicitHeight = 358
     object lblCases: TOROffsetLabel
       Left = 0
       Top = 0
@@ -51,22 +61,22 @@ inherited frmSurgery: TfrmSurgery
       Top = 316
       Width = 64
       Height = 21
+      Align = alBottom
       Caption = 'New Report'
       TabOrder = 0
       Visible = False
       OnClick = cmdNewNoteClick
-      Align = alBottom
     end
     object cmdPCE: TORAlignButton
       Left = 0
       Top = 337
       Width = 64
       Height = 21
+      Align = alBottom
       Caption = 'Encounter'
       TabOrder = 1
       Visible = False
       OnClick = cmdPCEClick
-      Align = alBottom
     end
     object pnlDrawers: TPanel
       Left = 0
@@ -107,14 +117,14 @@ inherited frmSurgery: TfrmSurgery
         Constraints.MinWidth = 30
         DragMode = dmAutomatic
         HideSelection = False
+        Images = dmodShared.imgSurgery
         Indent = 19
         PopupMenu = popNoteList
         ReadOnly = True
+        StateImages = dmodShared.imgImages
         TabOrder = 0
-        OnAddition = tvSurgeryAddition
         OnChange = tvSurgeryChange
         OnCollapsed = tvSurgeryCollapsed
-        OnDeletion = tvSurgeryDeletion
         OnExpanded = tvSurgeryExpanded
         Caption = 'Last 100 Surgery Cases'
         NodePiece = 0
@@ -126,6 +136,9 @@ inherited frmSurgery: TfrmSurgery
     Left = 68
     Width = 644
     Height = 358
+    ExplicitLeft = 68
+    ExplicitWidth = 644
+    ExplicitHeight = 358
     object sptVert: TSplitter
       Left = 0
       Top = 309
@@ -352,6 +365,57 @@ inherited frmSurgery: TfrmSurgery
         end
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cmdNewNote'
+        'Status = stsDefault')
+      (
+        'Component = cmdPCE'
+        'Status = stsDefault')
+      (
+        'Component = pnlDrawers'
+        'Status = stsDefault')
+      (
+        'Component = lstNotes'
+        'Status = stsDefault')
+      (
+        'Component = tvSurgery'
+        'Status = stsDefault')
+      (
+        'Component = pnlRead'
+        'Status = stsDefault')
+      (
+        'Component = memSurgery'
+        'Status = stsDefault')
+      (
+        'Component = memPCEShow'
+        'Status = stsDefault')
+      (
+        'Component = pnlWrite'
+        'Status = stsDefault')
+      (
+        'Component = memNewNote'
+        'Status = stsDefault')
+      (
+        'Component = pnlFields'
+        'Status = stsDefault')
+      (
+        'Component = cmdChange'
+        'Status = stsDefault')
+      (
+        'Component = txtSubject'
+        'Status = stsDefault')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = pnlRight'
+        'Status = stsDefault')
+      (
+        'Component = frmSurgery'
+        'Status = stsDefault'))
   end
   object mnuNotes: TMainMenu
     Left = 600
@@ -864,5 +928,25 @@ inherited frmSurgery: TfrmSurgery
     OnReplace = dlgReplaceTextReplace
     Left = 413
     Top = 312
+  end
+  object imgLblImages: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvSurgery
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblImages
+    Left = 16
+    Top = 139
+  end
+  object imgLblSurgery: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = tvSurgery
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblSurgery
+    Left = 24
+    Top = 203
   end
 end

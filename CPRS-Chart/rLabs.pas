@@ -4,6 +4,14 @@ interface
 
 uses SysUtils, Classes, ORNet, ORFn;
 
+type
+
+  TLabPatchInstalled = record
+    PatchInstalled: boolean;
+    PatchChecked: boolean;
+  end;
+
+
 function AtomicTests(const StartFrom: string; Direction: Integer): TStrings;
 function Specimens(const StartFrom: string; Direction: Integer): TStrings;
 function AllTests(const StartFrom: string; Direction: Integer): TStrings;
@@ -42,16 +50,23 @@ procedure RemoteLab(Dest: TStrings; const PatientDFN: string; reportid, hstype,
 procedure GetNewestOldest(const PatientDFN: string; var newest, oldest: string);  //*DFN*
 function GetChart(const PatientDFN: string; ADate1, ADate2: TFMDateTime;
   spec, test: string): TStrings;  //*DFN*
-procedure PrintLabsToDevice(AReport, ADaysBack: Integer;
+procedure PrintLabsToDevice(AReport: string; ADaysBack: Integer;
   const PatientDFN, ADevice: string; ATests: TStrings;
   var ErrMsg: string; ADate1, ADate2: TFMDateTime; ARemoteSiteID, ARemoteQuery: string);
-function GetFormattedLabReport(AReport, ADaysBack: Integer; const PatientDFN: string;
+function GetFormattedLabReport(AReport: string; ADaysBack: Integer; const PatientDFN: string;
   ATests: TStrings; ADate1, ADate2: TFMDateTime; ARemoteSiteID, ARemoteQuery: string): TStrings;
 function TestInfo(Test: String): TStrings;
+function LabPatchInstalled: boolean;
+
 
 implementation
 
-uses rCore, uCore, graphics;
+uses rCore, uCore, graphics, rMisc;
+
+const
+  PSI_05_118 = 'LR*5.2*364';
+var
+  uLabPatchInstalled: TLabPatchInstalled;
 
 function AtomicTests(const StartFrom: string; Direction: Integer): TStrings;
 begin
@@ -257,7 +272,7 @@ begin
   Result := RPCBrokerV.Results;
 end;
 
-procedure PrintLabsToDevice(AReport, ADaysBack: Integer;
+procedure PrintLabsToDevice(AReport: string; ADaysBack: Integer;
  const PatientDFN, ADevice: string; ATests: TStrings; var ErrMsg: string;
  ADate1, ADate2: TFMDateTime; ARemoteSiteID, ARemoteQuery: string);
 { prints a report on the selected device }
@@ -299,7 +314,7 @@ begin
   aHandles.Free;
 end;
 
-function GetFormattedLabReport(AReport, ADaysBack: Integer;
+function GetFormattedLabReport(AReport: String; ADaysBack: Integer;
   const PatientDFN: string; ATests: TStrings; ADate1, ADate2: TFMDateTime;
   ARemoteSiteID, ARemoteQuery: string): TStrings;
 { prints a report on the selected Windows device }
@@ -345,6 +360,17 @@ function TestInfo(Test: String): TStrings;
 begin
   CallV('ORWLRR INFO',[Test]);
   Result := RPCBrokerV.Results;
+end;
+
+function LabPatchInstalled: boolean;
+begin
+  with uLabPatchInstalled do
+    if not PatchChecked then
+      begin
+        PatchInstalled := ServerHasPatch(PSI_05_118);
+        PatchChecked := True;
+      end;
+  Result := uLabPatchInstalled.PatchInstalled;
 end;
 
 end.

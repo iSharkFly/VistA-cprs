@@ -1,21 +1,23 @@
 inherited frmLkUpLocation: TfrmLkUpLocation
   Left = 377
   Top = 314
-  Width = 364
-  Height = 239
   Caption = 'Select Location'
+  ClientHeight = 212
+  ClientWidth = 356
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 364
+  ExplicitHeight = 239
   PixelsPerInch = 96
   TextHeight = 13
-  object lblLocation: TLabel
+  object lblLocation: TLabel [0]
     Left = 8
     Top = 8
     Width = 41
     Height = 13
     Caption = 'Location'
   end
-  object lblInfo: TLabel
+  object lblInfo: TLabel [1]
     Left = 8
     Top = 176
     Width = 341
@@ -23,7 +25,7 @@ inherited frmLkUpLocation: TfrmLkUpLocation
     AutoSize = False
     WordWrap = True
   end
-  object cboLocation: TORComboBox
+  object cboLocation: TORComboBox [2]
     Left = 8
     Top = 22
     Width = 193
@@ -38,14 +40,16 @@ inherited frmLkUpLocation: TfrmLkUpLocation
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = True
+    LookupPiece = 0
     MaxLength = 0
     Pieces = '2'
     Sorted = False
     SynonymChars = '<>'
     TabOrder = 0
     OnNeedData = cboLocationNeedData
+    CharsNeedMatch = 1
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [3]
     Left = 276
     Top = 22
     Width = 72
@@ -55,7 +59,7 @@ inherited frmLkUpLocation: TfrmLkUpLocation
     TabOrder = 1
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [4]
     Left = 276
     Top = 51
     Width = 72
@@ -64,5 +68,20 @@ inherited frmLkUpLocation: TfrmLkUpLocation
     Caption = 'Cancel'
     TabOrder = 2
     OnClick = cmdCancelClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cboLocation'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmLkUpLocation'
+        'Status = stsDefault'))
   end
 end

@@ -1,24 +1,29 @@
-object frmPostings: TfrmPostings
+inherited frmPostings: TfrmPostings
   Left = 610
   Top = 242
-  Width = 435
-  Height = 300
   Caption = 'Postings'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 273
+  ClientWidth = 427
   OldCreateOrder = True
+  ExplicitWidth = 435
+  ExplicitHeight = 300
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 80
     Top = 56
     Width = 185
     Height = 165
     BevelOuter = bvNone
     TabOrder = 0
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = frmPostings'
+        'Status = stsDefault'))
   end
 end

@@ -138,6 +138,7 @@ end;
 function UserFontSize: integer;
 begin
   Result := StrToIntDef(sCallV('ORWCH LDFONT', [nil]),8);
+  If Result = 24 then Result := 18; // CQ #12322 removed 24 pt font
 end;
 
 procedure LoadSizes;
@@ -353,8 +354,12 @@ procedure TSizeHolder.AddSizesToStrList(theList: TStringList);
 var
   i: integer;
 begin
-  for i := 0 to FNameList.Count-1 do
-    theList.Add('B' + U + FNameList[i] + U + FSizeList[i]);
+  for i := 0 to FNameList.Count-1 do begin
+    if Piece(FNameList[i],U,1) = 'C' then
+      theList.Add(FNameList[i] + U + FSizeList[i])
+    else
+      theList.Add('B' + U + FNameList[i] + U + FSizeList[i]);
+  end;
 end;
 
 constructor TSizeHolder.Create;
@@ -393,6 +398,10 @@ begin
   end
   else //Currently is in the NameList
     rSizeVal := FSizeList[nameIndex];
+  if (rSizeVal = '') and (Piece(AName,U,1) = 'C') then begin
+    if not Assigned(uColumns) then LoadSizes;
+    rSizeVal := uColumns.Values[Piece(AName,U,2)];
+  end;
   result := rSizeVal;
 end;
 

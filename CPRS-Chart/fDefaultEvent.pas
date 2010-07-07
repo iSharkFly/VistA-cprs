@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, ExtCtrls, rOrders, ORFn, uCore;
+  StdCtrls, ORCtrls, ExtCtrls, rOrders, ORFn, uCore, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmDefaultEvent = class(TForm)
+  TfrmDefaultEvent = class(TfrmBase508Form)
     pnlTop: TPanel;
     lblCaption: TLabel;
     cboEvents: TORComboBox;
@@ -32,6 +33,8 @@ var
   frmDefaultEvent: TfrmDefaultEvent;
 
 implementation
+
+uses VAUtils;
 
 {$R *.DFM}
 
@@ -90,7 +93,7 @@ var
 begin
   if cboEvents.ItemIndex < 0 then
   begin
-    ShowMessage('You have to select an event first!');
+    ShowMsg('You have to select an event first!');
     Exit;
   end;
   if (Piece(cboEvents.Items[cboEvents.ItemIndex],'^',1) <> FPreDefaultEvtID) and ( Length(FPreDefaultEvtID)>0 )then
@@ -100,9 +103,9 @@ begin
       errMsg := '';
       SetDefaultEvent(errMsg, Piece(cboEvents.Items[cboEvents.ItemIndex],'^',1));
       if length(errMsg)>0 then
-        ShowMessage(errMsg)
+        ShowMsg(errMsg)
       else
-        ShowMessage('The default release event "' + cboEvents.Text + '" has been set successfully!');
+        ShowMsg('The default release event "' + cboEvents.Text + '" has been set successfully!');
       FDefaultEvtName := cboEvents.Text;
       OKPressed := True;
       Close;
@@ -115,9 +118,9 @@ begin
       errMsg := '';
       SetDefaultEvent(errMsg, Piece(cboEvents.Items[cboEvents.ItemIndex],'^',1));
       if length(errMsg)>0 then
-        ShowMessage(errMsg)
+        ShowMsg(errMsg)
       else
-        ShowMessage('The default release event "' + cboEvents.Text + '" has been set successfully!');
+        ShowMsg('The default release event "' + cboEvents.Text + '" has been set successfully!');
      FDefaultEvtName := cboEvents.Text;
      OKPressed := True;
      Close;

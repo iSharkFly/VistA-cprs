@@ -20,6 +20,10 @@ procedure FormMonitorBringToFrontEvent(Form: TForm; AEvent: TNotifyEvent; Second
 
 implementation
 
+const
+  TIMER_INTERVAL = 8;
+  TIMER_CHECKS_BEFORE_TIMEOUT = 1000 div TIMER_INTERVAL;
+
 type
   TFormMonitor = class
   private
@@ -367,7 +371,7 @@ begin
   FTimer := TTimer.Create(Application);
   fTimer.Enabled := FALSE;
   FTimer.OnTimer := Timer;
-  FTimer.Interval := 10;
+  FTimer.Interval := TIMER_INTERVAL;
   FMenuPending := FALSE;
   FLastActiveFormHandle := 0;
 
@@ -572,7 +576,7 @@ var
   NoMenu: boolean;
 begin
   inc(FTimerCount);
-  if(FTimerCount > 20) then
+  if(FTimerCount > TIMER_CHECKS_BEFORE_TIMEOUT) then
   begin
     FTimer.Enabled := FALSE;
     FMenuPending := FALSE;

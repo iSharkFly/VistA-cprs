@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, StdCtrls, ExtCtrls, CheckLst, ORCtrls, ORFn, uGraphs, uCore;
+  ComCtrls, StdCtrls, ExtCtrls, CheckLst, ORCtrls, ORFn, uGraphs, rCore, uCore,
+  fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmGraphProfiles = class(TForm)
+  TfrmGraphProfiles = class(TfrmBase508Form)
     btnAdd: TButton;
     btnAddAll: TButton;
     btnClear: TButton;
@@ -27,13 +28,11 @@ type
     lblSelectandDefine: TLabel;
     lblSelection: TLabel;
     lblSelectionInfo: TLabel;
-    lblSource: TLabel;
     lstActualItems: TORListBox;
     lstDrugClass: TListBox;
     lstItemsDisplayed: TORListBox;
-    lstItemsTopSelection: TORListBox;
+    lstItemsSelection: TORListBox;
     lstScratch: TListBox;
-    lstSource: TORListBox;
     lstTests: TListBox;
     pnlApply: TPanel;
     pnlSource: TPanel;
@@ -46,56 +45,84 @@ type
     radNeither: TRadioButton;
     lblSave: TLabel;
     lblClose: TLabel;
+    lblUser: TLabel;
+    pnlAllSources: TPanel;
+    pnlSources: TPanel;
+    lblSource: TLabel;
+    lstSources: TORListBox;
+    pnlOtherSources: TPanel;
+    pnlOtherSourcesUser: TPanel;
+    lblOtherPersons: TLabel;
+    cboUser: TORComboBox;
+    pnlOtherSourcesBottom: TPanel;
+    lstOtherSources: TORListBox;
+    btnViews: TButton;
+    btnDefinitions: TButton;
+    pnlOtherViews: TPanel;
+    lblOtherViews: TLabel;
+    lblSelectOthers: TLabel;
+    splViews: TSplitter;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
 
     procedure btnClearClick(Sender: TObject);
-    procedure btnDeleteClick(Sender: TObject);
     procedure btnCloseClick(Sender: TObject);
-    procedure btnRemoveClick(Sender: TObject);
+    procedure btnDefinitionsClick(Sender: TObject);
     procedure btnRemoveAllClick(Sender: TObject);
     procedure btnRemoveOneClick(Sender: TObject);
-    procedure btnRenameClick(Sender: TObject);
-    procedure btnSaveClick(Sender: TObject);
-
-    procedure radSourceAllClick(Sender: TObject);
-
+    procedure btnViewsClick(Sender: TObject);
     procedure cboAllItemsClick(Sender: TObject);
     procedure cboAllItemsChange(Sender: TObject);
     procedure cboAllItemsNeedData(Sender: TObject; const StartFrom: String;
       Direction, InsertAt: Integer);
+    procedure cboUserClick(Sender: TObject);
+    procedure cboUserNeedData(Sender: TObject; const StartFrom: string;
+      Direction, InsertAt: Integer);
     procedure lstItemsDisplayedChange(Sender: TObject);
     procedure lstItemsDisplayedDblClick(Sender: TObject);
-    procedure lstSourceChange(Sender: TObject);
-    procedure lstSourceDblClick(Sender: TObject);
+    procedure lstSourcesChange(Sender: TObject);
+    procedure lstSourcesDblClick(Sender: TObject);
+    procedure lstSourcesEnter(Sender: TObject);
+    procedure lstSourcesExit(Sender: TObject);
+    procedure radSourceAllClick(Sender: TObject);
+
+    procedure btnDeleteClick(Sender: TObject);
+    procedure btnRenameClick(Sender: TObject);
+    procedure btnSaveClick(Sender: TObject);
 
     procedure AddToList(aItem: string; aListBox: TORListBox);
     procedure ArrangeList(aCheckFile, aCheckItem, aItem: string;
       aListBox: TORListBox; var addtolist: boolean);
     procedure AssignHints;
-    procedure AssignProfile(aList: TStrings; aProfile: string);
+    procedure AssignProfile(aList: TStrings; aProfile: string; UserNum: integer; allitems: boolean);
+    procedure AssignProfilePre(aList: TStrings; var aProfile: string; UserNum: integer);
+    procedure AssignProfilePost(aList: TStrings; var aProfile, typedata: string);
     procedure CheckPublic;
-    procedure FillSource;
-
-    function ProfileExists(aName: string; aType: integer): boolean;
+    procedure FillSource(aList: TORListBox);
+    function ProfileExists(aName, aType: string): boolean;
+    procedure btnAddAllClick(Sender: TObject);
   private
-    { Private declarations }
     FHintPauseTime: integer;
     FPublicEditor: boolean;
     procedure CheckToClear;
     procedure QualifierDelete(line: string);
     procedure wmNCLButtonDown(var Msg: TWMNCLButtonDown); message WM_NCLBUTTONDOWN;
   public
-    { Public declarations }
+    procedure AllItemsAfter(var filetype, typedata: string);
+    procedure AllItemsBefore(var typedata: string);
+    procedure IDProfile(var profilename, proftype: string);
+    procedure ListBoxSetup(Sender: TObject);
+    procedure ComboBoxSetup(Sender: TObject);
+    procedure Report(aListBox: TORListBox);
+    function GetProfileName(infotitle, info: string; var newprofilename: string): boolean;
   end;
 
 var
   frmGraphProfiles: TfrmGraphProfiles;
 
-procedure DialogOptionsGraphProfiles(topvalue, leftvalue, fontsize: integer;
-  var actiontype: boolean);
-procedure DialogGraphProfiles(fontsize: integer;  var actionOK: boolean;
+procedure DialogOptionsGraphProfiles(var actiontype: boolean);
+procedure DialogGraphProfiles(var actionOK: boolean;
   var checkaction: boolean; aGraphSetting: TGraphSetting;
   var aProfname, aProfilestring, aSection: string;
   const PatientDFN: string; var aCounter: integer;
@@ -106,61 +133,42 @@ implementation
 {$R *.DFM}
 
 uses
-  rGraphs;
+  rGraphs, fGraphData, fGraphOthers, fRptBox, VAUtils;
 
-procedure DialogOptionsGraphProfiles(topvalue, leftvalue, fontsize: integer;
-  var actiontype: boolean);
+procedure DialogOptionsGraphProfiles(var actiontype: boolean);
 // create the form and make it modal, return an action
 var
   FGraphSetting: TGraphSetting;
-  aList, AllTypes: TStrings;
-  dfntype, listline, settings, settings1, t1, t2: string;
+  settings: string;
   actionOK, checkaction: boolean;
-  counter, i: integer;
+  counter: integer;
   aSelections, profile, profilestring, section: string;
 begin
-  aList := TStringList.Create;
-  FastAssign(rpcGetGraphSettings, aList);
-  if aList.Count < 1 then
+  if (GtslData = nil) then
   begin
-    showmessage('CPRS is not configured for graphing.');
-    aList.Free;
+    ShowMsg(TXT_NOGRAPHING);
     exit;
   end;
-  t1 := aList[0]; t2 := aList[1];   // t1 are personal, t2 public settings
-  if length(t1) > 0 then settings := t1
-  else settings := t2;
-  SetPiece(settings, '|', 8, Piece(t2, '|', 8));
-  settings1 := Piece(settings, '|', 1);
-  Alltypes := TStringList.Create;
-  FastAssign(rpcGetTypes('0', true), AllTypes);
-  for i := 0 to AllTypes.Count - 1 do
-  begin
-    listline := AllTypes[i];
-    dfntype := UpperCase(Piece(listline, '^', 1));
-    SetPiece(listline, '^', 1, dfntype);
-    AllTypes[i] := listline;
-  end;
+  settings := GetCurrentSetting;
   FGraphSetting := GraphSettingsInit(settings);
   checkaction := false;
   actionOK := false;
   profile := '*';
   counter := BIG_NUMBER;
   aSelections :='';
-  DialogGraphProfiles(fontsize, actionOK, checkaction, FGraphSetting,
+  DialogGraphProfiles(actionOK, checkaction, FGraphSetting,
     profile, profilestring, section, Patient.DFN, counter, aSelections);
   FGraphSetting.Free;
-  aList.Free;
 end;
 
-procedure DialogGraphProfiles(fontsize: integer;  var actionOK: boolean;
+procedure DialogGraphProfiles(var actionOK: boolean;
   var checkaction: boolean; aGraphSetting: TGraphSetting;
   var aProfname, aProfilestring, aSection: string;
   const PatientDFN: string; var aCounter: integer;
   aSelections: string);
 var
   i: integer;
-  counter, profile, profileitem, profiletype: string;
+  astring, counter, profile, profileitem, profiletype, profiletext: string;
   frmGraphProfiles: TfrmGraphProfiles;
 begin
   frmGraphProfiles := TfrmGraphProfiles.Create(Application);
@@ -180,10 +188,18 @@ begin
         frmGraphProfiles.Caption := 'Select Items and Define Views';
       end;
       if length(aSelections) > 0 then
-        lstSource.Items.Insert(0, '-3^<current selections>^' + aSelections);
+      begin
+        if GtslViews.Count = 0 then
+          GtslViews.Insert(0, VIEW_CURRENT + '^<current selections>^' + aSelections)
+        else if Piece(GtslViews[0], '^', 1) <> VIEW_CURRENT then
+          GtslViews.Insert(0, VIEW_CURRENT + '^<current selections>^' + aSelections)
+        else if GtslViews.Count > 0 then
+          GtslViews[0] := VIEW_CURRENT + '^<current selections>^' + aSelections;
+      end;
       ResizeAnchoredFormToFont(frmGraphProfiles);
       ShowModal;
       actionOK := (btnClose.Tag = 1);
+      profiletext := '';
       aProfname := '';
       if actionOK then
       begin
@@ -196,13 +212,22 @@ begin
         with lstItemsDisplayed do
         for i := 0 to Items.Count - 1 do
         begin
-          profiletype := Piece(Items[i], '^', 1);
-          profileitem := Piece(Items[i], '^', 2);
+          astring := Items[i];
+          profiletext := profiletext + Piece(astring, '^', 3) + '^';
+          profiletype := Piece(astring, '^', 1);
+          if profiletype = '8925' then
+            profileitem := UpperCase(Piece(astring, '^', 3))
+          else
+            profileitem := Piece(astring, '^', 2);
           profile := profile + profiletype + '~' + profileitem + '~|';
         end;
-        aCounter := aCounter + 1;
-        counter := inttostr(aCounter);
-        aProfileString := '^<view' + counter + '>^' + profile;
+        if (GtslViews.Count > 0) and (Piece(GtslViews[0], '^', 1) = VIEW_CURRENT) then
+          counter := inttostr(GtslViews.Count)
+        else
+          counter := inttostr(GtslViews.Count + 1);
+        aProfileString := '<view' + counter + '>^' + profile + '^' + profiletext;
+        GtslViews.Add(aProfileString);
+        aCounter := strtointdef(counter, BIG_NUMBER);
         with aGraphSetting do
         begin
           lstActualItems.Items.Clear;
@@ -213,7 +238,7 @@ begin
           end;
           ItemsForDisplay := lstActualItems.Items;
         end;
-     end;
+      end;
     end;
   finally
     frmGraphProfiles.Release;
@@ -222,26 +247,425 @@ end;
 
 procedure TfrmGraphProfiles.FormCreate(Sender: TObject);
 begin
-  FillSource;
-  FPublicEditor := rpcPublicEdit;
+  FPublicEditor := GraphPublicEditor;
 end;
 
 procedure TfrmGraphProfiles.FormShow(Sender: TObject);
 begin
+  if GtslData = nil then
+  begin
+    radSourceAll.Checked := true;
+    //radSourcePat.Enabled := false;
+  end
+  else if GtslData.Count < 1 then
+  begin
+    radSourceAll.Checked := true;
+    //radSourcePat.Enabled := false;
+  end;
   cboAllItems.Visible := radSourceAll.Checked;
+  FillSource(lstSources);
+  cboUser.InitLongList('');
   FHintPauseTime := Application.HintHidePause;
   Application.HintHidePause := 9000; // uses a longer hint pause time
+end;
+
+procedure TfrmGraphProfiles.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  Application.HintHidePause := FHintPauseTime;
+end;
+
+procedure TfrmGraphProfiles.radSourceAllClick(Sender: TObject);
+var
+  dfn: string;
+begin
+  if Sender = radSourceAll then
+  begin
+    lstItemsSelection.Visible := false;
+    cboAllItems.Visible := true;
+  end
+  else
+  begin
+    if radSourcePat.Tag = 0 then
+    begin
+      dfn := lblClose.Hint;
+      FastAssign(rpcGetAllItems(dfn), lstTests.Items);  // items for patient
+      FastAssign(rpcGetItems('50.605', dfn), lstDrugClass.Items);
+      radSourcePat.Tag := 1;
+    end;
+    cboAllItems.Visible := false;
+    lstItemsSelection.Visible := true;
+  end;
+  if lstSources.ItemIndex > 0 then
+  begin
+    lstSources.Tag := BIG_NUMBER;
+    lstSourcesChange(lstSources);
+  end
+  else if lstSources.ItemIndex > 0 then
+  begin
+    lstOtherSources.Tag := BIG_NUMBER;
+    lstSourcesChange(lstOtherSources);
+  end;
+end;
+
+procedure TfrmGraphProfiles.lstSourcesChange(Sender: TObject);
+var
+  UserNum: int64;
+  filetype, typedata: string;
+  aListBox, oppositeListBox: TORListBox;
+  viewselected: boolean;
+begin
+  CheckPublic;
+  aListBox := (Sender as TORListBox);
+  if aListBox = lstSources then
+  begin
+    oppositeListBox := lstOtherSources;
+    UserNum := User.DUZ;
+  end
+  else
+  begin
+    oppositeListBox := lstSources;
+    UserNum := cboUser.ItemID;
+  end;
+  if aListBox.Tag <> BIG_NUMBER then
+    exit;
+  oppositeListBox.ItemIndex := -1;
+  cboAllItems.Items.Clear;
+  cboAllItems.Text := '';
+  if aListBox.ItemIndex = -1 then exit;
+  typedata :=  aListBox.Items[aListBox.ItemIndex];
+  if pos(LLS_FRONT, typedata) > 0 then  // <clear all selections>
+  begin
+    lstItemsSelection.Clear;
+    cboAllItems.Items.Clear;
+    cboAllItems.Text := '';
+    exit;
+  end;
+  filetype := Piece(typedata, '^', 1);
+  if (filetype = VIEW_PERSONAL)
+  or (filetype = VIEW_PUBLIC)
+  or (filetype = VIEW_LABS)
+  or (filetype = VIEW_TEMPORARY)
+  or (filetype = VIEW_CURRENT) then
+  begin
+    RadSourceAll.Checked := true;
+    RadSourcePat.Enabled := false;
+    AssignProfile(cboAllItems.Items, typedata, UserNum, false);
+    FastAssign(cboAllItems.Items, lstItemsSelection.Items);
+    viewselected := true;
+  end
+  else
+  begin
+    RadSourcePat.Enabled := true;
+    AllItemsBefore(typedata);
+    AllItemsAfter(filetype, typedata);
+    viewselected := false;
+  end;
+  lstItemsSelection.Visible := viewselected or radSourcePat.Checked;
+  cboAllItems.Visible := not lstItemsSelection.Visible;
+  cboAllItemsChange(cboAllItems);
+end;
+
+procedure TfrmGraphProfiles.lstSourcesEnter(Sender: TObject);
+begin
+  (Sender as TORListBox).Tag := BIG_NUMBER;
+end;
+
+procedure TfrmGraphProfiles.lstSourcesExit(Sender: TObject);
+begin
+  (Sender as TORListBox).Tag := 0;
+end;
+
+procedure TfrmGraphProfiles.lstSourcesDblClick(Sender: TObject);
+begin
+  if cboAllItems.Visible then
+  begin
+    if cboAllItems.Items.Count < 1 then exit;
+    cboAllItems.ItemIndex := 0;
+    cboAllItemsClick(cboAllItems);
+  end
+  else
+  begin
+    if lstItemsSelection.Items.Count < 1 then exit;
+    //lstItemsSelection.Selected[0] := true;
+    cboAllItemsClick(lstItemsSelection);
+    btnAddAllClick(self);
+  end;
+end;
+
+procedure TfrmGraphProfiles.cboUserClick(Sender: TObject);
+begin
+  FillSource(lstOtherSources);
+  if cboUser.ItemIndex <> -1 then
+    lblOtherViews.Caption := cboUser.DisplayText[cboUser.ItemIndex] + ' Views:'
+  else
+    lblOtherViews.Caption := 'Other Views:'
+end;
+
+procedure TfrmGraphProfiles.cboUserNeedData(Sender: TObject;
+  const StartFrom: string; Direction, InsertAt: Integer);
+begin
+  cboUser.ForDataUse(SubSetOfPersons(StartFrom, Direction));
+end;
+
+procedure TfrmGraphProfiles.cboAllItemsChange(Sender: TObject);
+//var
+ //astring: string;
+begin
+ if (Sender is TORListBox) then
+   btnClear.Enabled := btnSave.Enabled or ((Sender as TORListBox).Items.Count > 0)
+ else if (Sender is TORComboBox) then
+   btnClear.Enabled := btnSave.Enabled or ((Sender as TORComboBox).Items.Count > 0);
+ if lstItemsSelection.Visible then
+ begin
+   btnAddAll.Enabled := lstItemsSelection.Items.Count > 0;
+   btnAdd.Enabled := lstItemsSelection.ItemIndex > -1;
+   //if btnAdd.Enabled then
+     //astring := lstItemsSelection.Items[lstItemsSelection.ItemIndex];
+ end
+ else
+ begin
+   btnAddAll.Enabled := cboAllItems.Items.Count > 0;
+   btnAdd.Enabled := cboAllItems.ItemIndex > -1;
+ end;
+end;
+
+procedure TfrmGraphProfiles.cboAllItemsClick(Sender: TObject);
+var
+  i: integer;
+begin
+  if Sender is TButton then
+  begin
+    if lstItemsSelection.Visible then
+    begin
+      if Sender = btnAddAll then
+      begin
+        for i := 0 to lstItemsSelection.Items.Count - 1 do
+        begin
+          lstItemsSelection.Selected[i] := true;
+          lstItemsSelection.ItemIndex := i;
+          ListBoxSetup(lstItemsSelection);
+        end;
+        lstItemsSelection.Clear;
+      end
+      else
+      begin
+        lstItemsDisplayed.ItemIndex := 0;
+        ListBoxSetup(lstItemsSelection);
+      end;
+      lstItemsDisplayedChange(self);
+      CheckToClear;
+      exit;
+    end
+    else
+    begin
+      if Sender = btnAdd then
+      begin
+        ComboBoxSetup(cboAllItems);
+        lstItemsDisplayedChange(self);
+        CheckToClear;
+        exit;
+      end;
+    end;
+  end;
+  if (Sender is TORComboBox) then
+    ComboBoxSetup(Sender)
+  else if (Sender is TORListBox) then
+    ListBoxSetup(Sender)
+  else exit;
+  lstItemsDisplayedChange(self);
+  CheckToClear;
+end;
+
+procedure TfrmGraphProfiles.cboAllItemsNeedData(Sender: TObject;
+  const StartFrom: String; Direction, InsertAt: Integer);
+var
+  filetype: string;
+begin
+  if lstSources.ItemIndex = -1 then exit;
+  filetype := Piece(lstSources.Items[lstSources.ItemIndex], '^', 1);
+  cboAllItems.ForDataUse(rpcLookupItems(filetype, StartFrom, Direction));
+end;
+
+procedure TfrmGraphProfiles.lstItemsDisplayedChange(Sender: TObject);
+begin
+ btnSave.Enabled := lstItemsDisplayed.Items.Count > 0;
+ btnSavePublic.Enabled := btnSave.Enabled and FPublicEditor;
+ btnRemoveAll.Enabled := btnSave.Enabled;
+ btnAdd.Enabled := (cboAllItems.Visible and (cboAllItems.ItemIndex > -1))
+   or (lstItemsSelection.Visible and (lstItemsSelection.ItemIndex > -1));
+ btnRemoveOne.Enabled :=  btnSave.Enabled and (lstItemsDisplayed.ItemIndex > -1);
+ btnClear.Enabled := btnSave.Enabled or (lstItemsSelection.Items.Count > 0);
+ if btnSave.Enabled and pnlApply.Visible then btnClose.Caption := 'Close and Display'
+ else btnClose.Caption := 'Close';
+end;
+
+procedure TfrmGraphProfiles.lstItemsDisplayedDblClick(Sender: TObject);
+var
+  line: string;
+begin
+  if lstItemsDisplayed.ItemIndex < 0 then exit;
+  line := lstItemsDisplayed.Items[lstItemsDisplayed.ItemIndex];
+  lstItemsDisplayed.Items.Delete(lstItemsDisplayed.ItemIndex);
+  QualifierDelete(line);
+  lstItemsDisplayedChange(self);
+end;
+
+procedure TfrmGraphProfiles.btnAddAllClick(Sender: TObject);
+begin
+  if cboAllItems.Visible then
+  begin
+    if cboAllItems.Items.Count < 1 then exit;
+    cboAllItems.ItemIndex := 0;
+    cboAllItemsClick(cboAllItems);
+  end
+  else
+  begin
+    if lstItemsSelection.Items.Count < 1 then exit;
+    cboAllItemsClick(btnAddAll);
+  end;
+end;
+
+procedure TfrmGraphProfiles.btnRemoveOneClick(Sender: TObject);
+begin
+  lstItemsDisplayedDblClick(self);
+  CheckToClear;
+end;
+
+procedure TfrmGraphProfiles.btnRemoveAllClick(Sender: TObject);
+begin
+  lstItemsDisplayed.Clear;
+  lstItemsDisplayedChange(self);
+  CheckToClear;
+end;
+
+procedure TfrmGraphProfiles.btnDefinitionsClick(Sender: TObject);
+var
+  firstpublic, firstpersonal, firstlabs: boolean;
+  i, j: integer;
+  aLine, aProfile, filetype, aString, front, back, piece2: string;
+  aList, templist: TStringList;
+begin
+  front := Piece(LLS_FRONT, '^', 2);
+  back := Piece(LLS_BACK, '^', 1);
+  templist := TStringList.Create;
+  aList := TStringList.Create;
+  lstScratch.Clear;
+  lstScratch.Sorted := false;
+  firstpublic := true;
+  firstpersonal := true;
+  firstlabs := true;
+  for i := 0 to lstSources.Items.Count - 1 do
+  begin
+    aLine :=  lstSources.Items[i];
+    filetype := Piece(aLine, '^', 1);
+    aProfile := Piece(aLine, '^', 2);
+    if (filetype = VIEW_PERSONAL)
+    or (filetype = VIEW_PUBLIC)
+    or (filetype = VIEW_LABS) then
+    begin
+      if (filetype = VIEW_PUBLIC) and firstpublic then
+      begin
+        templist.Add(' ');
+        templist.Add(front + copy('Public Views' + back, 0, 60));
+        firstpublic := false;
+      end
+      else
+      if (filetype = VIEW_PERSONAL) and firstpersonal then
+      begin
+        templist.Add(' ');
+        templist.Add(front + copy('Personal Views' + back, 0, 60));
+        firstpersonal := false;
+      end
+      else
+      if (filetype = VIEW_LABS) and firstlabs then
+      begin
+        templist.Add(' ');
+        templist.Add(front + copy('Lab Groups' + back, 0, 60));
+        firstlabs := false;
+      end;
+      AssignProfile(aList, aLine, User.DUZ, true);
+      templist.Add(aProfile);
+      for j := 0 to aList.Count - 1 do
+      begin
+        aLine := aList[j];
+        piece2 := Piece(aLine, '^', 2);
+        if strtointdef(copy(piece2, 0, 1), -1) > 0 then
+        begin
+          aString := Piece(aLine, '^', 3);
+          if copy(aString, 0, 1) = '_' then
+            aString := copy(aString, 2, length(aString));
+          templist.Add('   ' + aString);
+        end
+        else
+        begin
+
+        end;
+      end;
+    end;
+  end;
+  if cboUser.ItemIndex > -1 then
+  begin
+    firstpersonal := true;
+    firstlabs := true;
+    templist.Add('');
+    templist.Add('');
+    templist.Add('Views and Lab Groups for ' + cboUser.Text);
+    for i := 0 to lstOtherSources.Items.Count - 1 do
+    begin
+      aLine :=  lstOtherSources.Items[i];
+      filetype := Piece(aLine, '^', 1);
+      aProfile := Piece(aLine, '^', 2);
+      if (filetype = VIEW_PERSONAL)
+      or (filetype = VIEW_LABS) then
+      begin
+        if (filetype = VIEW_PERSONAL) and firstpersonal then
+        begin
+          templist.Add(' ');
+          templist.Add(front + copy('Views' + back, 0, 60));
+          firstpersonal := false;
+        end
+        else
+        if (filetype = VIEW_LABS) and firstlabs then
+        begin
+          templist.Add(' ');
+          templist.Add(front + copy('Lab Groups' + back, 0, 60));
+          firstlabs := false;
+        end;
+        AssignProfile(aList, aLine, cboUser.ItemID, true);
+        templist.Add(aProfile);
+        for j := 0 to aList.Count - 1 do
+        begin
+          aLine := aList[j];
+          piece2 := Piece(aLine, '^', 2);
+          if strtointdef(copy(piece2, 0, 1), -1) > 0 then
+          begin
+            aString := Piece(aLine, '^', 3);
+            if copy(aString, 0, 1) = '_' then
+              aString := copy(aString, 2, length(aString));
+            templist.Add('   ' + aString);
+          end;
+        end;
+      end;
+    end;
+  end;
+  templist.Insert(0, 'Definitions of Views and Lab Groups');
+  templist.Insert(1, '');
+  templist.Insert(2,'Your Personal Views, Public Views, and Lab Groups');
+  ReportBox(templist, 'Views and Lab Groups', true);
+  templist.Free;
+  aList.Free;
 end;
 
 procedure TfrmGraphProfiles.btnClearClick(Sender: TObject);
 begin
   lstItemsDisplayed.Items.Clear;
-  lstItemsTopSelection.Items.Clear;
+  lstItemsSelection.Items.Clear;
   cboAllItems.Items.Clear;
   cboAllItems.Text :='';
   lstItemsDisplayedChange(self);
   cboAllItemsChange(self);
-  lstSource.ItemIndex := -1; 
+  lstSources.ItemIndex := -1;
+  lstOtherSources.ItemIndex := -1;
 end;
 
 procedure TfrmGraphProfiles.btnDeleteClick(Sender: TObject);
@@ -249,26 +673,26 @@ var
   publicview: boolean;
   info, profilename, profname, proftype: string;
 begin
-  if lstSource.ItemIndex < 0 then
+  if lstSources.ItemIndex < 0 then
   begin
-    showmessage('You must select a valid View for deletion.');
+    ShowMsg('You must select a valid View for deletion.');
     exit;
   end;
   publicview := false;
   profilename := '';
-  info := lstSource.Items[lstSource.ItemIndex];
+  info := lstSources.Items[lstSources.ItemIndex];
   proftype := Piece(info, '^', 1);
   profname := Piece(info, '^', 2);
-  if proftype = '-1' then
+  if proftype = VIEW_PERSONAL then
     profilename := profname
-  else if (proftype = '-2') and FPublicEditor then
+  else if (proftype = VIEW_PUBLIC) and FPublicEditor then
   begin
     profilename := profname;
     publicview := true;
   end
   else
   begin
-    showmessage('You must select a valid View for deletion.');
+    ShowMsg('You must select a valid View for deletion.');
     exit;
   end;
   if publicview then
@@ -298,45 +722,48 @@ begin
   end;
   btnClearClick(self);
   lstItemsDisplayed.Items.Clear;
-  lstItemsTopSelection.Items.Clear;
+  lstItemsSelection.Items.Clear;
   cboAllItems.Items.Clear;
   cboAllItems.Text :='';
-  FormCreate(self);
+  GraphDataOnUser;
+  FormShow(self);
   lstItemsDisplayedChange(self);
   btnDelete.Enabled := false;
   btnRename.Enabled := false;
+  if lstSources.Count > 0 then
+    lstSources.ItemIndex := 0;
 end;
 
 procedure TfrmGraphProfiles.btnRenameClick(Sender: TObject);
 var
   profentered, publicview: boolean;
-  i, match: integer;
-  aName, aType, info, infotitle: string;
-  newprofilename, profilename, profname, proftype: string;
+  i, j: integer;
+  astring, info, infotitle, newprofilename, profile, profileitem, profilename, profiletype, profname, proftype: string;
+  aList: TStrings;
 begin
-  if lstSource.ItemIndex < 0 then
+  if lstSources.ItemIndex < 0 then
   begin
-    showmessage('You must select a valid View to rename.');
+    ShowMsg('You must select a valid View to rename.');
     exit;
   end;
   publicview := false;
   profilename := '';
-  info := lstSource.Items[lstSource.ItemIndex];
+  info := lstSources.Items[lstSources.ItemIndex];
   proftype := Piece(info, '^', 1);
   profname := Piece(info, '^', 2);
-  if proftype = '-1' then
+  if proftype = VIEW_PERSONAL then
     profilename := profname
-  else if (proftype = '-2') and FPublicEditor then
+  else if (proftype = VIEW_PUBLIC) and FPublicEditor then
   begin
     profilename := profname;
     publicview := true;
   end
   else
   begin
-    showmessage('You must select a valid View to rename.');
+    ShowMsg('You must select a valid View to rename.');
   end;
   btnRemoveAllClick(self);
-  lstSourceDblClick(self);
+  lstSourcesDblClick(self);
   if publicview then
   begin
     infotitle := 'Rename this Public View';
@@ -348,116 +775,81 @@ begin
     infotitle := 'Rename your Personal View';
     info := 'Enter a new name for ' + profilename + '.'
   end;
-  profentered := InputQuery(infotitle, info, newprofilename);
+  profentered := GetProfileName(infotitle, info, newprofilename);
   if not profentered then exit;
-  if newprofilename = '' then exit;
   info := '';
-  if not ProfileExists(newprofilename, -2) and publicview then
+  if not ProfileExists(newprofilename, VIEW_PUBLIC) and publicview then
     info := 'The Public View, ' + profilename + ', will be changed to '
       + newprofilename + #13 + 'Is this OK?'
-  else if not ProfileExists(newprofilename, -1) then
+  else if not ProfileExists(newprofilename, VIEW_PERSONAL) then
     info := 'Your Personal View, ' + profilename + ', will be changed to '
       + newprofilename + #13 + 'Is this OK?';
   if length(info) > 0 then
-  begin
     if MessageDlg(info, mtConfirmation, [mbYes, mbNo], 0) <> mrYes then exit;
-    if publicview then
-    begin
-      FastAssign(rpcGetGraphProfiles(UpperCase(profilename), '1', 1), lstScratch.Items);
-      rpcDeleteGraphProfile(UpperCase(profilename), '1');
-      rpcSetGraphProfile(newprofilename, '1', lstScratch.Items);
-      btnClose.Tag := 1;
-      proftype := '-2';
-    end
+  aList := TStringList.Create;
+  profile := '';
+  aList.Clear;
+  j := 1;
+  with lstItemsDisplayed do
+  for i := 0 to Items.Count - 1 do
+  begin
+    astring := Items[i];
+    profiletype := Piece(astring, '^', 1);
+    if profiletype = '8925' then
+      profileitem := UpperCase(Piece(astring, '^', 3))
     else
-    begin
-      FastAssign(rpcGetGraphProfiles(UpperCase(profilename), '0', 1), lstScratch.Items);
-      rpcDeleteGraphProfile(UpperCase(profilename), '0');
-      rpcSetGraphProfile(newprofilename, '0', lstScratch.Items);
-      btnClose.Tag := 1;
-      proftype := '-1';
-    end;
+      profileitem := Piece(astring, '^', 2);
+    profile := profile + profiletype + '~' + profileitem + '~|';
+    j := j + 1;
+    if (j mod 10) = 0 then
+      if length(profile) > 0 then
+      begin
+        aList.Add(UpperCase(profile));
+        profile := '';
+      end;
   end;
-  if length(newprofilename) > 0 then
-    lblSave.Hint := newprofilename;
-  btnClearClick(self);
-  lstScratch.Items.Clear;
-  lstSource.Items.Clear;
-  FormCreate(btnSave);
-  match := -1;
-  profilename := UpperCase(newprofilename);
-  for i := lstSource.Items.Count - 1 downto 0 do
+  if length(profile) > 0 then
   begin
-    info := lstSource.Items[i];
-    aType := Piece(info, '^', 1);
-    aName := Piece(info, '^', 2);
-    if (UpperCase(aName) = newprofilename) and (aType = proftype) then
-    begin
-      match := i;
-      break;
-    end;
+    aList.Add(UpperCase(profile));
+    profile := '';
   end;
-  if match = -1 then exit;
-  lstSource.ItemIndex := match;
-  lstSourceChange(self);
-end;
-
-procedure TfrmGraphProfiles.btnCloseClick(Sender: TObject);
-begin
-  if lstItemsDisplayed.Items.Count > 0 then
+  if publicview then
+  begin
+    proftype := VIEW_PUBLIC;
+    rpcDeleteGraphProfile(UpperCase(profilename), '1');
+    rpcSetGraphProfile(newprofilename, '1', aList);
     btnClose.Tag := 1;
-  Close;
-end;
-
-procedure TfrmGraphProfiles.btnRemoveClick(Sender: TObject);
-begin
-  if lstItemsDisplayed.ItemIndex < 0 then exit;
-  lstItemsDisplayed.Items.Delete(lstItemsDisplayed.ItemIndex);
-  CheckToClear;
-end;
-
-procedure TfrmGraphProfiles.btnRemoveAllClick(Sender: TObject);
-begin
-  lstItemsDisplayed.Clear;
-  lstItemsDisplayedChange(self);
-  CheckToClear;
-end;
-
-procedure TfrmGraphProfiles.btnRemoveOneClick(Sender: TObject);
-begin
-  lstItemsDisplayedDblClick(self);
-  CheckToClear;
-end;
-
-procedure TfrmGraphProfiles.CheckToClear;
-begin
-  if cboAllItems.Visible and (cboAllItems.Items.Count = 0) then
-   lstSource.ItemIndex := -1
-  else if lstItemsTopSelection.Visible and (lstItemsTopSelection.Items.Count = 0) then
-   lstSource.ItemIndex := -1;
-  if lstSource.ItemIndex = -1 then
+  end
+  else
   begin
-    btnAdd.Enabled := false;
-    btnAddAll.Enabled := false;
+    proftype := VIEW_PERSONAL;
+    rpcDeleteGraphProfile(UpperCase(profilename), '0');
+    rpcSetGraphProfile(newprofilename, '0', aList);
+    btnClose.Tag := 1;
   end;
+  aList.Free;
+  IDProfile(newprofilename, proftype);
 end;
 
 procedure TfrmGraphProfiles.btnSaveClick(Sender: TObject);
 var
   profentered, puplicedit: boolean;
-  i, j, match: integer;
-  aName, aType, info, infotitle, profile, profileitem, profilename, profiletype, profname, proftype: string;
+  i, j: integer;
+  astring, info, infotitle, profile, profileitem, profilename, profiletype, profname, proftype: string;
   aList: TStrings;
 begin
   puplicedit := Sender = btnSavePublic;
   if lstItemsDisplayed.Items.Count < 1 then exit;
   profilename := '';
-  if lstSource.ItemIndex > -1 then
+  if lstSources.ItemIndex > -1 then
   begin
-    info := lstSource.Items[lstSource.ItemIndex];
-    proftype := Piece(info, '^', 1);
-    profname := Piece(info, '^', 2);
-    profilename := profname;
+    info := lstSources.Items[lstSources.ItemIndex];
+    if pos(LLS_FRONT, info) < 1 then
+    begin
+      proftype := Piece(info, '^', 1);
+      profname := Piece(info, '^', 2);
+      profilename := profname;
+    end;
   end;
   if puplicedit then
   begin
@@ -471,19 +863,13 @@ begin
     info := 'Save your Personal View by entering a name for it.'
       + #13 + 'If you are editing a View, enter the View''s name to overwrite it.';
   end;
-  profentered := InputQuery(infotitle, info, profilename);
+  profentered := GetProfileName(infotitle, info, profilename);
   if not profentered then exit;
-  if profilename = '' then exit;
-  if (length(profilename) < 3) or (length(profilename) > 30) then
-  begin
-    showmessage('Not accepted - names of views must be 3-30 characters.');
-    exit;
-  end;
   info := '';
-  if ProfileExists(profilename, -2) and FPublicEditor and puplicedit then
+  if ProfileExists(profilename, VIEW_PUBLIC) and FPublicEditor and puplicedit then
     info := 'The Public View, ' + profilename + ', will be overwritten.'
       + #13 + 'Is this OK?'
-  else if ProfileExists(profilename, -1) and (not puplicedit) then
+  else if ProfileExists(profilename, VIEW_PERSONAL) and (not puplicedit) then
     info := 'Your Personal View, ' + profilename + ', will be overwritten.'
       + #13 + 'Is this OK?';
   if length(info) > 0 then
@@ -495,10 +881,14 @@ begin
   with lstItemsDisplayed do
   for i := 0 to Items.Count - 1 do
   begin
-    profiletype := Piece(Items[i], '^', 1);
-    profileitem := Piece(Items[i], '^', 2);
+    astring := Items[i];
+    profiletype := Piece(astring, '^', 1);
+    if profiletype = '8925' then
+      profileitem := UpperCase(Piece(astring, '^', 3))
+    else
+      profileitem := Piece(astring, '^', 2);
     profile := profile + profiletype + '~' + profileitem + '~|';
-    j := j +1;
+    j := j + 1;
     if (j mod 10) = 0 then
       if length(profile) > 0 then
       begin
@@ -513,103 +903,59 @@ begin
   end;
   if puplicedit then
   begin
-    proftype := '-2';
+    proftype := VIEW_PUBLIC;
     rpcSetGraphProfile(profilename, '1', aList);
     btnClose.Tag := 1;
   end
   else
   begin
-    proftype := '-1';
+    proftype := VIEW_PERSONAL;
     rpcSetGraphProfile(profilename, '0', aList);
     btnClose.Tag := 1;
   end;
-  if length(profilename) > 0 then
-    lblSave.Hint := profilename;
-  btnClearClick(self);
-  lstScratch.Items.Clear;
-  lstSource.Items.Clear;
-  FormCreate(btnSave);
-  match := -1;
-  profilename := UpperCase(profilename);
-  for i := lstSource.Items.Count - 1 downto 0 do
-  begin
-    info := lstSource.Items[i];
-    aType := Piece(info, '^', 1);
-    aName := Piece(info, '^', 2);
-    if (UpperCase(aName) = profilename) and (aType = proftype) then
-    begin
-      match := i;
-      break;
-    end;
-  end;
   aList.Free;
-  if match = -1 then exit;
-  lstSource.ItemIndex := match;
-  lstSourceChange(self);
+  IDProfile(profilename, proftype);
+end;
+
+procedure TfrmGraphProfiles.btnCloseClick(Sender: TObject);
+begin
+  if lstItemsDisplayed.Items.Count > 0 then
+    btnClose.Tag := 1;
+  Close;
+end;
+
+procedure TfrmGraphProfiles.btnViewsClick(Sender: TObject);
+begin             // not used
+  pnlOtherSources.Visible := not pnlOtherSources.Visible;
+  if pnlOtherSources.Visible then
+    btnViews.Caption := 'Hide other views'
+  else
+    btnViews.Caption := 'Show other views';
+  DialogGraphOthers(1);
 end;
 
 procedure TfrmGraphProfiles.CheckPublic;
 var
   typedata: string;
 begin
-  if lstSource.ItemIndex = -1 then
+  if lstSources.ItemIndex = -1 then
   begin
     btnDelete.Enabled := false;
     btnRename.Enabled := false;
     exit;
   end;
-  typedata :=  lstSource.Items[lstSource.ItemIndex];
-  btnDelete.Enabled := (Piece(typedata, '^', 1) = '-1')
-                    or ((Piece(typedata, '^', 1) = '-2') and FPublicEditor);
+  typedata :=  lstSources.Items[lstSources.ItemIndex];
+  btnDelete.Enabled := (Piece(typedata, '^', 1) = VIEW_PERSONAL)
+                    or ((Piece(typedata, '^', 1) = VIEW_PUBLIC) and FPublicEditor);
   btnRename.Enabled := btnDelete.Enabled;
 end;
 
-procedure TfrmGraphProfiles.radSourceAllClick(Sender: TObject);
-var
-  dfn: string;
-begin
-  if Sender = radSourceAll then
-  begin
-    lstItemsTopSelection.Visible := false;
-    cboAllItems.Visible := true;
-  end
-  else
-  begin
-    if radSourcePat.Tag = 0 then
-    begin
-      dfn := lblClose.Hint;
-      FastAssign(rpcGetAllItems(dfn), lstTests.Items);  //*** using a DFN, get all items
-      FastAssign(rpcGetItems('50.605', dfn), lstDrugClass.Items);
-      radSourcePat.Tag := 1;
-    end;
-    cboAllItems.Visible := false;
-    lstItemsTopSelection.Visible := true;
-  end;
-  lstSourceChange(self);
-end;
-
-procedure TfrmGraphProfiles.cboAllItemsClick(Sender: TObject);
+procedure TfrmGraphProfiles.ListBoxSetup(Sender: TObject);
 var
   profileselected: boolean;
   i: integer;
-  first, profileitem, selection, subtype: string;
+  selection, first, profileitem: string;
 begin
-  if Sender is TButton then
-  begin
-    if lstItemsTopSelection.Visible then
-    begin
-      if Sender = btnAddAll then
-        lstItemsTopSelection.ItemIndex := 0;
-      Sender := lstItemsTopSelection;
-    end
-    else
-    begin
-      if Sender = btnAddAll then
-        cboAllItems.ItemIndex := 0;
-      Sender := cboAllItems;
-    end;
-  end;
-  if Sender is TORListBox then
   with (Sender as TORListBox) do
   begin
     if ItemIndex < 0 then exit;
@@ -631,10 +977,17 @@ begin
     end
     else
       AddToList(selection, lstItemsDisplayed);
-    if ItemIndex = 0 then Clear;        //profile or type <any>
+    //if ItemIndex = 0 then Clear;        //profile or type <any>
     ItemIndex := -1;
-  end
-  else if Sender is TORComboBox then
+  end;
+end;
+
+procedure TfrmGraphProfiles.ComboBoxSetup(Sender: TObject);
+var
+  profileselected: boolean;
+  i: integer;
+  selection, first, profileitem, subtype: string;
+begin
   with (Sender as TORComboBox) do
   begin
     if ItemIndex < 0 then exit;
@@ -668,62 +1021,61 @@ begin
       AddToList(selection, lstItemsDisplayed);
     if ItemIndex = 0 then Clear;        //profile or type <any>
     ItemIndex := -1;
-  end
-  else exit;
-  lstItemsDisplayedChange(self);
-  CheckToClear;
+  end;
 end;
 
-procedure TfrmGraphProfiles.cboAllItemsChange(Sender: TObject);
-begin
- if (Sender is TORListBox) then
-   btnClear.Enabled := btnSave.Enabled or ((Sender as TORListBox).Items.Count > 0)
- else if (Sender is TORComboBox) then
-   btnClear.Enabled := btnSave.Enabled or ((Sender as TORComboBox).Items.Count > 0);
- if lstItemsTopSelection.Visible then
- begin
-   btnAddAll.Enabled := lstItemsTopSelection.Items.Count > 0;
-   btnAdd.Enabled := lstItemsTopSelection.ItemIndex > -1;
- end
- else
- begin
-   btnAddAll.Enabled := cboAllItems.Items.Count > 0;
-   btnAdd.Enabled := cboAllItems.ItemIndex > -1;
- end;
-end;
-
-procedure TfrmGraphProfiles.cboAllItemsNeedData(Sender: TObject;
-  const StartFrom: String; Direction, InsertAt: Integer);
+procedure TfrmGraphProfiles.Report(aListBox: TORListBox);
 var
-  filetype: string;
+  profileselected: boolean;
+  i: integer;
+  selection, first, profileitem, subtype: string;
 begin
-  if lstSource.ItemIndex = -1 then exit;
-  filetype := Piece(lstSource.Items[lstSource.ItemIndex], '^', 1);
-  cboAllItems.ForDataUse(rpcLookupItems(filetype, StartFrom, Direction));
+  with aListBox do
+  begin
+    if ItemIndex < 0 then exit;
+    selection := Items[ItemIndex];
+    subtype := Piece(Items[0], '^', 3);
+    subtype := Piece(subtype, ':', 2);
+    subtype := copy(subtype, 2, length(subtype));
+    subtype := Piece(subtype, ' ', 1);
+    if UpperCase(copy(selection, 1, 5)) = '63AP;' then
+        selection := copy(selection, 1, 4) + '^A;' + copy(selection, 6, 1) + ';'
+        + Piece(selection, '^', 2) + '^' + subtype + ': ' + Piece(selection, '^', 3)
+    else if UpperCase(copy(selection, 1, 5)) = '63MI;' then
+        selection := copy(selection, 1, 4) + '^M;' + copy(selection, 6, 1) + ';'
+        + Piece(selection, '^', 2) + '^' + subtype + ': ' + Piece(selection, '^', 3);
+    if length(Piece(selection, '_', 2)) > 0 then
+      selection := Piece(selection, '_', 1) + ' ' + Piece(selection, '_', 2);
+    first := Piece(selection, '^', 1);
+    if first = '' then exit;     // line
+    profileselected := strtointdef(Piece(selection, '^', 2), 0) < 0;
+    if profileselected then
+    begin
+      for i := 2 to Items.Count - 1 do
+      begin
+        profileitem := Items[i];
+        if length(Piece(profileitem, '_', 2)) > 0 then
+          profileitem := Piece(profileitem, '_', 1) + ' ' + Piece(profileitem, '_', 2);   //*****???? ^
+        AddToList(profileitem, lstItemsDisplayed);
+      end;
+    end
+    else
+      AddToList(selection, lstItemsDisplayed);
+    if ItemIndex = 0 then Clear;        //profile or type <any>
+    ItemIndex := -1;
+  end;
 end;
 
-procedure TfrmGraphProfiles.lstItemsDisplayedChange(Sender: TObject);
+procedure TfrmGraphProfiles.CheckToClear;
 begin
- btnSave.Enabled := lstItemsDisplayed.Items.Count > 0;
- btnSavePublic.Enabled := btnSave.Enabled and FPublicEditor;
- btnRemoveAll.Enabled := btnSave.Enabled;
- btnAdd.Enabled := (cboAllItems.Visible and (cboAllItems.ItemIndex > -1))
-   or (lstItemsTopSelection.Visible and (lstItemsTopSelection.ItemIndex > -1));
- btnRemoveOne.Enabled :=  btnSave.Enabled and (lstItemsDisplayed.ItemIndex > -1);
- btnClear.Enabled := btnSave.Enabled or (lstItemsTopSelection.Items.Count > 0);
- if btnSave.Enabled and pnlApply.Visible then btnClose.Caption := 'Close and Display'
- else btnClose.Caption := 'Close';
-end;
-
-procedure TfrmGraphProfiles.lstItemsDisplayedDblClick(Sender: TObject);
-var
-  line: string;
-begin
-  if lstItemsDisplayed.ItemIndex < 0 then exit;
-  line := lstItemsDisplayed.Items[lstItemsDisplayed.ItemIndex];
-  lstItemsDisplayed.Items.Delete(lstItemsDisplayed.ItemIndex);
-  QualifierDelete(line);
-  lstItemsDisplayedChange(self);
+  if (cboAllItems.Visible and (cboAllItems.Items.Count = 0))
+  or (lstItemsSelection.Visible and (lstItemsSelection.Items.Count = 0)) then
+  begin
+    lstSources.ItemIndex := -1;
+    lstOtherSources.ItemIndex := -1;
+    btnAdd.Enabled := false;
+    btnAddAll.Enabled := false;
+  end;
 end;
 
 procedure TfrmGraphProfiles.QualifierDelete(line: string);
@@ -745,34 +1097,10 @@ begin
   end;
 end;
 
-procedure TfrmGraphProfiles.lstSourceChange(Sender: TObject);
+procedure TfrmGraphProfiles.AllItemsBefore(var typedata: string);
 var
   i: integer;
-  filetype, itemdata, typedata: string;
 begin
-  cboAllItems.Items.Clear;
-  cboAllItems.Text := '';
-  CheckPublic;
-  if lstSource.ItemIndex = -1 then exit;
-  typedata :=  lstSource.Items[lstSource.ItemIndex];
-  if typedata = LLS_LINE then
-  begin
-    cboAllItems.Items.Clear;
-    cboAllItems.Text := '';
-    exit;
-  end;
-  filetype := Piece(typedata, '^', 1);
-  if filetype = '-1' then
-    AssignProfile(cboAllItems.Items, typedata)
-  else
-  if filetype = '-2' then
-    AssignProfile(cboAllItems.Items, typedata)
-  else
-  if filetype = '-3' then   // current selections
-  begin
-    AssignProfile(cboAllItems.Items, typedata);
-  end
-  else
   with cboAllItems.Items do
   begin
     Clear;
@@ -782,71 +1110,64 @@ begin
     Insert(1, '^' + LLS_LINE);
     if Piece(typedata, '^', 2) = '63AP' then
     begin
-      for i := 0 to lstSource.Items.Count - 1 do
-      if copy(lstSource.Items[i], 1, 5) = '63AP;' then
+      for i := 0 to lstSources.Items.Count - 1 do
+      if copy(lstSources.Items[i], 1, 5) = '63AP;' then
       begin
-        typedata := lstSource.Items[i];
+        typedata := lstSources.Items[i];
         typedata := '0^' + Piece(typedata, '^', 1) + '^ ' + Piece(typedata, '^', 2) + ' <any>';
         Add(typedata);
       end;
     end
     else if Piece(typedata, '^', 2) ='63MI' then
     begin
-      for i := 0 to lstSource.Items.Count - 1 do
-      if copy(lstSource.Items[i], 1, 5) = '63MI;' then
+      for i := 0 to lstSources.Items.Count - 1 do
+      if copy(lstSources.Items[i], 1, 5) = '63MI;' then
       begin
-        typedata := lstSource.Items[i];
+        typedata := lstSources.Items[i];
         typedata := '0^' + Piece(typedata, '^', 1) + '^ ' + Piece(typedata, '^', 2) + ' <any>';
         Add(typedata);
       end;
     end;
   end;
-  cboAllItemsChange(cboAllItems);
-  CheckPublic;
-  if lstSource.ItemIndex = -1 then exit;
-  typedata :=  lstSource.Items[lstSource.ItemIndex];
-  if typedata = LLS_LINE then
-  begin
-    lstItemsTopSelection.Clear;
-    exit;
-  end;
-  filetype := Piece(typedata, '^', 1);
-  if filetype = '-1' then
-    AssignProfile(lstItemsTopSelection.Items, typedata)
-  else
-  if filetype = '-2' then
-    AssignProfile(lstItemsTopSelection.Items, typedata)
-  else
-  if filetype = '-3' then
-  begin
-    AssignProfile(lstItemsTopSelection.Items, typedata);
-  end
-  else
-  with lstItemsTopSelection.Items do
+end;
+
+procedure TfrmGraphProfiles.AllItemsAfter(var filetype, typedata: string);
+var
+  i: integer;
+  itemdata, itemname: string;
+begin
+  with lstItemsSelection.Items do
   begin
     Clear;
-    lstItemsTopSelection.Sorted := true;
-    typedata := '0^' + Piece(typedata, '^', 1) + '^ ' + Piece(typedata, '^', 2) + ' <any>';
+    lstItemsSelection.Sorted := true;
+    itemname := Piece(typedata, '^', 3);
+    if copy(itemname, 1, 1) = ' ' then
+    begin
+      itemname := copy(itemname, 2, length(itemname));   // strip preceding space
+      typedata := '0^' + Piece(typedata, '^', 2) + '^ ' + itemname;
+    end
+    else
+      typedata := '0^' + Piece(typedata, '^', 1) + '^ ' + itemname;
     Insert(0, typedata);
     Insert(1, '^' + LLS_LINE);
-    if filetype = '63AP' then
+    if filetype = '63AP' then                         // finish subitems ***********
     begin
-      lstItemsTopSelection.Sorted := false;
-      for i := 0 to lstSource.Items.Count - 1 do
-      if copy(lstSource.Items[i], 1, 5) = '63AP;' then
+      lstItemsSelection.Sorted := false;
+      for i := 0 to lstSources.Items.Count - 1 do
+      if copy(lstSources.Items[i], 1, 5) = '63AP;' then
       begin
-        typedata := lstSource.Items[i];
+        typedata := lstSources.Items[i];
         typedata := '0^' + Piece(typedata, '^', 1) + '^ ' + Piece(typedata, '^', 2) + ' <any>';
         Add(typedata);
       end;
     end
     else if filetype ='63MI' then
     begin
-      lstItemsTopSelection.Sorted := false;
-      for i := 0 to lstSource.Items.Count - 1 do
-      if copy(lstSource.Items[i], 1, 5) = '63MI;' then
+      lstItemsSelection.Sorted := false;
+      for i := 0 to lstSources.Items.Count - 1 do
+      if copy(lstSources.Items[i], 1, 5) = '63MI;' then
       begin
-        typedata := lstSource.Items[i];
+        typedata := lstSources.Items[i];
         typedata := '0^' + Piece(typedata, '^', 1) + '^ ' + Piece(typedata, '^', 2) + ' <any>';
         Add(typedata);
       end;
@@ -885,23 +1206,7 @@ begin
       if filetype = UpperCase(Piece(itemdata, '^', 1)) then
         Add(itemdata);
     end;
-    cboAllItemsChange(lstItemsTopSelection);
-  end;
-end;
-
-procedure TfrmGraphProfiles.lstSourceDblClick(Sender: TObject);
-begin
-  if cboAllItems.Visible then
-  begin
-    if cboAllItems.Items.Count < 1 then exit;
-    cboAllItems.ItemIndex := 0;
-    cboAllItemsClick(cboAllItems);
-  end
-  else
-  begin
-    if lstItemsTopSelection.Items.Count < 1 then exit;
-    lstItemsTopSelection.Selected[0] := true;
-    cboAllItemsClick(lstItemsTopSelection);
+    cboAllItemsChange(lstItemsSelection);
   end;
 end;
 
@@ -989,89 +1294,128 @@ begin
   end;
 end;
 
-procedure TfrmGraphProfiles.AssignProfile(aList: TStrings; aProfile: string);
+procedure TfrmGraphProfiles.AssignProfile(aList: TStrings; aProfile: string; UserNum: integer; allitems: boolean);
 var
-  ext, stop: boolean;
-  i, j, k: integer;
-  dfn, itemname, itemnums, itempart, itempart1, itempart2, itemtest, typedata, teststring: string;
+  i, k: integer;
+  preprofile, typedata, typepart, typeone, typetwo, testname, teststring: string;
+  itempart, itempart1, itempart2, itemnums, itemname, itemtest: string;
 begin
-  ext := radSourceAll.Checked;
-  if ext then
+  preprofile := aProfile;
+  aList.Clear;
+  if Piece(aProfile, '^', 1) = VIEW_TEMPORARY then
   begin
-    if Piece(aProfile, '^', 1) = '-2' then
-      FastAssign(rpcGetGraphProfiles(UpperCase(Piece(aProfile, '^', 2)), '1', 1), aList)
-    else
-
-    if Piece(aProfile, '^', 1) = '-3' then   // current selection on list
+    typedata := Piece(aProfile, '^', 3);
+    for i := 1 to BIG_NUMBER do
     begin
-      if radSourcePat.Tag = 0 then
-      begin
-        dfn := lblClose.Hint;
-        FastAssign(rpcGetAllItems(dfn), lstTests.Items);  //*** using a DFN, get all items
-        FastAssign(rpcGetItems('50.605', dfn), lstDrugClass.Items);
-        radSourcePat.Tag := 1;
-      end;
-      typedata := '0^-1^ ' + Piece(aProfile, '^', 2);
-      aProfile := Piece(aProfile, '^', 3);
-      aList.Clear;
-      aList.Add(typedata);
-      aList.Add('^' + LLS_LINE);
-      for i := 1 to BIG_NUMBER do
-      begin
-        itempart := Piece(aProfile, '|', i);
-        if itempart = '' then exit;
-        itempart1 := Piece(itempart, '~', 1);
-        itempart2 := Piece(itempart, '~', 2);
-        itemnums := itempart1 + '^' + itempart2;
-        itemname := '';
-        for k := 0 to lstTests.Items.Count - 1 do
-        begin
-          itemtest := UpperCase(Pieces(lstTests.Items[k], '^', 1, 2));
-          if itemtest = itemnums then
-          begin
-            itemname := Piece(lstTests.Items[k], '^', 3);
-            itemnums := itemnums + '^' + itemname;
-            aList.Add(itemnums);
-            break;
-          end;
-        end;
-      end;
-    end
-
-    else
-      FastAssign(rpcGetGraphProfiles(UpperCase(Piece(aProfile, '^', 2)), '0', 1), aList);
-    for i := 0 to aList.Count -1 do
-    begin
-      teststring := aList[i];
-      if Piece(teststring, '^', 1) = '0' then
-        aList[i] := '0^' + Piece(teststring, '^', 2) + '^_' + Piece(teststring, '^', 3);
+      typepart := Piece(typedata, '|', i);
+      if typepart = '' then
+        break;
+      testname := Piece(aProfile, '^', i + 3);
+      typeone := Piece(typepart, '~', 1);
+      typetwo := Piece(typepart, '~', 2);
+      aList.Add(typeone + '^' + typetwo + '^' + testname);
     end;
     typedata := '0^' + Piece(aProfile, '^', 1) + '^ ' + Piece(aProfile, '^', 2);
     aList.Insert(0, typedata);
     aList.Insert(1, '^' + LLS_LINE);
     exit;
   end;
-  if Piece(aProfile, '^', 1) = '-2' then
+  if Piece(aProfile, '^', 1) = VIEW_CURRENT then   // current selection on list
   begin
-    FastAssign(rpcGetGraphProfiles(UpperCase(Piece(aProfile, '^', 2)), '1', 0), lstScratch.Items);
     typedata := '0^-1^ ' + Piece(aProfile, '^', 2);
-  end
-  else
-  if Piece(aProfile, '^', 1) = '-3' then   // current selection on list
+    aProfile := Piece(aProfile, '^', 3);
+    aList.Add(typedata);
+    aList.Add('^' + LLS_LINE);
+    for i := 1 to BIG_NUMBER do
+    begin
+      itempart := Piece(aProfile, '|', i);
+      if itempart = '' then exit;
+      itempart1 := Piece(itempart, '~', 1);
+      itempart2 := Piece(itempart, '~', 2);
+      itemnums := itempart1 + '^' + itempart2;
+      itemname := '';
+      for k := 0 to GtslItems.Count - 1 do
+      begin
+        itemtest := UpperCase(Pieces(GtslItems[k], '^', 1, 2));
+        if Piece(itemtest, '^', 1) = '63' then
+          itemtest := Piece(itemtest, '.', 1);   // works ok but could also remove spec parens on name
+        if itemtest = itemnums then
+        begin
+          itemname := Piece(GtslItems[k], '^', 4);
+          itemnums := itemnums + '^' + itemname;
+          aList.Add(itemnums);
+          break;
+        end;
+      end;
+    end;
+    typedata := '0^' + Piece(aProfile, '^', 1) + '^ ' + Piece(aProfile, '^', 2);
+    aList.Insert(0, typedata);
+    aList.Insert(1, '^' + LLS_LINE);
+    exit;
+  end;
+  if radSourceAll.Checked or allitems then
+  begin
+    AssignProfilePre(aList, aProfile, UserNum);
+    for i := 0 to aList.Count - 1 do
+    begin
+      teststring := aList[i];
+      if Piece(teststring, '^', 1) = '0' then
+        aList[i] := '0^' + Piece(teststring, '^', 2) + '^_' + Piece(teststring, '^', 3);
+    end;
+    exit;
+  end;
+  if Piece(aProfile, '^', 1) = VIEW_LABS then
   begin
     lstScratch.Items.Clear;
-    lstScratch.Items.Add(Piece(aProfile, '^', 3));
+    FastAssign(GetATestGroup(strtointdef(Piece(Piece(aProfile, '^', 2), ')', 1), -1), UserNum), aList);
+    for i  := 0 to aList.Count - 1 do
+      aList[i] := '63^' + aList[i];
+  end
+  else
+  if Piece(aProfile, '^', 1) = VIEW_PUBLIC then
+  begin
+    FastAssign(GetGraphProfiles(UpperCase(Piece(aProfile, '^', 2)), '1', 0, 0), lstScratch.Items);
     typedata := '0^-1^ ' + Piece(aProfile, '^', 2);
-    aProfile := '-1^' + Piece(aProfile, '^', 2) + '^';
   end
   else
   begin
-    FastAssign(rpcGetGraphProfiles(UpperCase(Piece(aProfile, '^', 2)), '0', 0), lstScratch.Items);
+    FastAssign(GetGraphProfiles(UpperCase(Piece(aProfile, '^', 2)), '0', 0, UserNum), lstScratch.Items);
     typedata := '0^' + Piece(aProfile, '^', 1) + '^ ' + Piece(aProfile, '^', 2);
   end;
+  if Piece(aProfile, '^', 1) = VIEW_LABS then
+    exit;
   for i := 0 to lstScratch.Items.Count - 1 do
     aProfile := aProfile + lstScratch.Items[i];
   aProfile := Piece(aProfile, '^', 3);
+  AssignProfilePost(aList, aProfile, typedata);
+end;
+
+procedure TfrmGraphProfiles.AssignProfilePre(aList: TStrings; var aProfile: string; UserNum: integer);
+var
+  i: integer;
+begin
+  if Piece(aProfile, '^', 1) = VIEW_LABS then
+  begin
+    FastAssign(GetATestGroup(strtointdef(Piece(Piece(aProfile, '^', 2), ')', 1), -1), UserNum), aList);
+    for i  := 0 to aList.Count - 1 do
+      aList[i] := '63^' + aList[i];
+  end
+  else
+  if Piece(aProfile, '^', 1) = VIEW_PUBLIC then
+    FastAssign(GetGraphProfiles(UpperCase(Piece(aProfile, '^', 2)), '1', 1, 0), aList)
+  else
+  if Piece(aProfile, '^', 1) = VIEW_PERSONAL then
+    FastAssign(GetGraphProfiles(UpperCase(Piece(aProfile, '^', 2)), '0', 1, UserNum), aList)
+  else
+    FastAssign(GetGraphProfiles(UpperCase(Piece(aProfile, '^', 2)), '0', 1, UserNum), aList);
+end;
+
+procedure TfrmGraphProfiles.AssignProfilePost(aList: TStrings; var aProfile, typedata: string);
+var
+  stop: boolean;
+  i, j, k: integer;
+  itempart, itempart1, itempart2, itemnums, itemname, itemtest: string;
+begin
   aList.Clear;
   aList.Add(typedata);
   aList.Add('^' + LLS_LINE);
@@ -1085,10 +1429,10 @@ begin
     itemname := '';
     if itempart1 = '0' then
     begin
-      for j := 0 to lstSource.Items.Count - 1 do
-        if itempart2 = Piece(lstSource.Items[j], '^', 1) then
+      for j := 0 to lstSources.Items.Count - 1 do
+        if itempart2 = Piece(lstSources.Items[j], '^', 1) then
         begin
-          itemname := Piece(lstSource.Items[j], '^', 2);
+          itemname := Piece(lstSources.Items[j], '^', 2);
           break;
         end;
       typedata := '0^' + itempart2 + '^_' + itemname + ' <any>';
@@ -1126,57 +1470,90 @@ begin
   end;
 end;
 
-procedure TfrmGraphProfiles.FillSource;
+procedure TfrmGraphProfiles.FillSource(aList: TORListBox);
 var
-  i: integer;
-  dfntype, listline: string;
+  i, UserNum: integer;
+  dfntype, firstline, listline: string;
 begin
-  with lstSource do
+  with aList do
   begin
+    Clear;
+    firstline := '';
     Sorted := true;
     OnClick := OnChange;     // turn off onchange event when loading
     OnChange := nil;
-    FastAssign(rpcGetTypes('0', true), Items);
-    for i := 0 to Items.Count - 1 do
+    if aList = lstSources then                  // user
     begin
-      listline := Items[i];
-      dfntype := UpperCase(Piece(listline, '^', 1));
-      SetPiece(listline, '^', 1, dfntype);
-      Items[i] := listline;
+      FastAssign(rpcGetTypes('0', true), Items);   //*** use GtslAllTypes ???
+      for i := 0 to Items.Count - 1 do
+      begin
+        listline := Items[i];
+        dfntype := UpperCase(Piece(listline, '^', 1));
+        SetPiece(listline, '^', 1, dfntype);
+        Items[i] := listline;
+      end;
+      Sorted := false;
+      Items.Insert(0, LLS_FRONT + copy('Types' + LLS_BACK, 0, 30) + '^0');
+      UserNum := User.DUZ;
+      if GtslViews.Count > 0 then
+      begin
+        Items.Add(LLS_FRONT + copy('Temporary Views' + LLS_BACK, 0, 30) + '^0');
+        for i := 0 to GtslViews.Count - 1 do
+        begin
+          listline := GtslViews[i];
+          if Piece(listline, '^', 1) = VIEW_CURRENT then
+            Items.Add(listline)
+          else
+            Items.Add(VIEW_TEMPORARY + '^' + listline + '^');
+        end;
+      end;
+    end
+    else                                         // other user
+    begin
+      UserNum := cboUser.ItemIEN;
+      Sorted := false;
     end;
-    //Items.Add('50.605^Drug Class');
+    FastAssign(GetGraphProfiles('1', '0', 0, UserNum), lstScratch.Items);
+    lstScratch.Sorted := true;
+    if lstScratch.Items.Count > 0 then
+    begin
+      Items.Add(LLS_FRONT + copy('Personal Views' + LLS_BACK, 0, 30) + '^0');
+      for i := 0 to lstScratch.Items.Count - 1 do
+        Items.Add(VIEW_PERSONAL + '^' + lstScratch.Items[i] + '^');
+    end;
+    FastAssign(GetGraphProfiles('1', '1', 0, 0), lstScratch.Items);
+    lstScratch.Sorted := true;
+    if (lstScratch.Items.Count > 0) and (aList = lstSources) then
+    begin
+      Items.Add(LLS_FRONT + copy('Public Views' + LLS_BACK, 0, 30) + '^0');
+      for i := 0 to lstScratch.Items.Count - 1 do
+        Items.Add(VIEW_PUBLIC + '^' + lstScratch.Items[i] + '^');
+    end;
+    FastAssign(rpcTestGroups(UserNum), lstScratch.Items);
+    lstScratch.Sorted := true;
+    if lstScratch.Items.Count > 0 then
+    begin
+      Items.Add(LLS_FRONT + copy('Lab Groups' + LLS_BACK, 0, 30) + '^0');
+      for i := 0 to lstScratch.Items.Count - 1 do
+        Items.Add(VIEW_LABS + '^' + Piece(lstScratch.Items[i], '^', 2) + '^' + Piece(lstScratch.Items[i], '^', 1));
+    end;
     OnChange := OnClick;
     OnClick := nil;
-    Sorted := false;
-    FastAssign(rpcGetGraphProfiles('1', '0', 0), lstScratch.Items);
-    if lstScratch.Items.Count > 0 then
-    begin
-      Items.Add(LLS_LINE);
-      for i := 0 to lstScratch.Items.Count - 1 do
-        Items.Add('-1^' + lstScratch.Items[i] + '^');
-    end;
-    FastAssign(rpcGetGraphProfiles('1', '1', 0), lstScratch.Items);
-    if lstScratch.Items.Count > 0 then
-    begin
-      Items.Add(LLS_LINE);
-      for i := 0 to lstScratch.Items.Count - 1 do
-        Items.Add('-2^' + lstScratch.Items[i] + '^');
-    end;
   end;
 end;
 
-function TfrmGraphProfiles.ProfileExists(aName: string; aType: integer): boolean;
+function TfrmGraphProfiles.ProfileExists(aName, aType: string): boolean;
 var
-  i, sourcetype: integer;
-  info, profilename: string;
+  i: integer;
+  info, sourcetype, profilename: string;
 begin
   Result := false;
   aName := UpperCase(aName);
-  for i := lstSource.Items.Count - 1 downto 0 do
+  for i := lstSources.Items.Count - 1 downto 0 do
   begin
-    info := lstSource.Items[i];
+    info := lstSources.Items[i];
     profilename := Piece(info, '^', 2);
-    sourcetype := strtointdef(Piece(info, '^', 1), 0);
+    sourcetype := Piece(info, '^', 1);
     if (UpperCase(profilename) = aName) and (aType = sourcetype) then
     begin
       Result := true;
@@ -1195,9 +1572,24 @@ begin                       // text defined in uGraphs
   RadSourceAll.Hint := HINT_ALL_SOURCE;
   lblSelectionInfo.Hint := HINT_SELECTION_INFO;
   lblSource.Hint := HINT_SOURCE;
-  lstSource.Hint := HINT_SOURCE;
+  lstSources.Hint := HINT_SOURCE;
+  pnlSources.Hint := HINT_SOURCE;
+  pnlAllSources.Hint := HINT_SOURCE;
+  splViews.Hint := HINT_SOURCE;
+  lblSelectOthers.Hint := HINT_OTHER_SOURCE;
+  lblOtherViews.Hint := HINT_OTHER_SOURCE;
+  lstOtherSources.Hint := HINT_OTHER_SOURCE;
+  pnlOtherSources.Hint := HINT_OTHER_SOURCE;
+  pnlOtherSourcesBottom.Hint := HINT_OTHER_SOURCE;
+  pnlOtherViews.Hint := HINT_OTHER_SOURCE;
+  lblOtherViews.Hint := HINT_OTHER_SOURCE;
+  lblSelectOthers.Hint := HINT_OTHER_SOURCE;
+  lblOtherPersons.Hint := HINT_OTHERS;
+  cboUser.Hint := HINT_OTHERS;
+  pnlOtherSourcesUser.Hint := HINT_OTHERS;
+  btnDefinitions.Hint := HINT_BTN_DEFINITION;
   lblSelection.Hint := HINT_SELECTION;
-  lstItemsTopSelection.Hint := HINT_SELECTION;
+  lstItemsSelection.Hint := HINT_SELECTION;
   cboAllItems.Hint := HINT_SELECTION;
   lblDisplay.Hint := HINT_DISPLAY;
   lstItemsDisplayed.Hint := HINT_DISPLAY;
@@ -1220,17 +1612,63 @@ begin            // clicking the ? button will have controls show hints
   begin
     Msg.Result := 0; // ignore biHelp border icon
     AssignHints;
-    ShowMessage('Help is now available.' + #13 +
+    ShowMsg('Help is now available.' + #13 +
                 'By pausing over a list or control, hints will appear.');
   end
   else
     inherited;
 end;
 
-procedure TfrmGraphProfiles.FormClose(Sender: TObject;
-  var Action: TCloseAction);
+function TfrmGraphProfiles.GetProfileName(infotitle, info: string; var newprofilename: string): boolean;
 begin
-  Application.HintHidePause := FHintPauseTime;
+  Result := InputQuery(infotitle, info, newprofilename);
+  if not Result then exit;
+  if newprofilename = '' then
+  begin
+    Result := false;
+    exit;
+  end;
+  if (length(newprofilename) < 3)
+  or (length(newprofilename) > 30)
+  or (Pos('^', newprofilename) > 0)
+  or (Pos('|', newprofilename) > 0)
+  or (Pos('~', newprofilename) > 0) then
+  begin
+    ShowMsg('Not accepted - names of views must be 3-30 characters.');
+    Result := false;
+    exit;
+  end;
+end;
+
+procedure TfrmGraphProfiles.IDProfile(var profilename, proftype: string);
+var
+  i, match: integer;
+  info, aName, aType: string;
+begin
+  if length(profilename) > 0 then
+    lblSave.Hint := profilename;
+  //btnClearClick(self);
+  lstScratch.Items.Clear;
+  lstSources.Items.Clear;
+  GraphDataOnUser;
+  FormShow(btnSave);
+  match := -1;
+  profilename := UpperCase(profilename);
+  for i := lstSources.Items.Count - 1 downto 0 do
+  begin
+    info := lstSources.Items[i];
+    aType := Piece(info, '^', 1);
+    aName := Piece(info, '^', 2);
+    if (UpperCase(aName) = profilename) and (aType = proftype) then
+    begin
+      match := i;
+      break;
+    end;
+  end;
+  if match = -1 then exit;
+  lstSources.ItemIndex := match;
+  lstSources.Tag := BIG_NUMBER;
+  lstSourcesChange(lstSources);
 end;
 
 end.

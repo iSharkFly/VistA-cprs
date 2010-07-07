@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, fAutoSz, StdCtrls, ComCtrls, ORFn, ExtCtrls, ORCtrls;
+  Dialogs, fAutoSz, StdCtrls, ComCtrls, ORFn, ExtCtrls, ORCtrls,
+  VA508AccessibilityManager;
 
 type
   TfrmARTFreeTextMsg = class(TfrmAutoSz)
@@ -55,7 +56,7 @@ begin
       ActiveControl := memFreeText;
       frmARTFreeTextMsg.ShowModal;
       OKtoContinue := FContinue;
-      AFreeTextComment.Assign(tmpList);
+      FastAssign(tmpList, AFreeTextComment);
     end;
   finally
     tmpList.Free;

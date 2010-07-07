@@ -3,10 +3,11 @@ unit fProbflt;
 interface
 
 uses WinTypes, WinProcs, Classes, Graphics, Forms, Controls, Buttons,
-  StdCtrls, SysUtils, ORCtrls, ExtCtrls, uProbs, uConst, Dialogs;
+  StdCtrls, SysUtils, ORCtrls, ExtCtrls, uProbs, uConst, Dialogs, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmPlVuFilt = class(TForm)
+  TfrmPlVuFilt = class(TfrmBase508Form)
     pnlBase: TORAutoPanel;
     SrcLabel: TLabel;
     DstLabel: TLabel;
@@ -96,11 +97,8 @@ end;
 
 procedure TfrmPlVuFilt.FormCreate(Sender: TObject);
 begin
-  with cboStatus do
-    begin
-      Items.Assign(frmProblems.lstView.Items);
-      SelectByID(PLUser.usViewAct);
-    end;
+  FastAssign(frmProblems.lstView.Items, cboStatus.Items);
+  cboStatus.SelectByID(PLUser.usViewAct);
 end;
 
 procedure TfrmPlVuFilt.FormShow(Sender: TObject);
@@ -188,7 +186,7 @@ begin
     0:  {out patient view} begin
                              GetClinicList;
                              GetListForOP(Alist, frmProblems.wgProbData);
-                             cboSource.Items.Assign(ClinicFilterList(Alist));
+                             FastAssign(ClinicFilterList(Alist), cboSource.Items);
                              cboSource.InsertSeparator;
                              cboSource.InitLongList('') ;
                              for i := 0 to PLFilters.ClinicList.Count - 1 do
@@ -200,7 +198,7 @@ begin
     1:  {in-patient View}  begin
                              GetServiceList;
                              GetListForIP(Alist, frmProblems.wgProbData);
-                             cboSource.Items.Assign(ServiceFilterList(Alist));
+                             FastAssign(ServiceFilterList(Alist), cboSource.Items);
                              cboSource.InsertSeparator;
                              cboSource.InitLongList('') ;
                              for i := 0 to PLFilters.ServiceList.Count - 1 do
@@ -260,7 +258,7 @@ var
           AList.Add('0');
         end
       else
-        alist.assign(lstDest.Items); {conserve only selected items}
+        FastAssign(lstDest.Items, alist); {conserve only selected items}
       LoadFilterList(Alist,VuList);
       PLUser.usCurrentView:=vu;
     finally
@@ -326,8 +324,8 @@ begin
     chkComments.Checked := (Piece(PLUser.usDefaultContext, ';', 4) = '1');
     PLFilters.ProviderList.Clear;
     PLFilters.ProviderList.Add(Piece(PLUser.usViewProv, U, 1));
-    PLFilters.ClinicList.Assign(plUser.usClinList);
-    PlFilters.ServiceList.Assign(plUser.usServList);
+    FastAssign(plUser.usClinList, PLFilters.ClinicList);
+    FastAssign(plUser.usServList, PlFilters.ServiceList);
     cboProvider.InitLongList(Piece(PLUser.usViewProv, U, 2));
     cboProvider.SelectByID(Piece(PLUser.usViewProv, U, 1));
     //InitViewFilters(Alist);

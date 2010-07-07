@@ -1,28 +1,21 @@
-object frmReportPrt: TfrmReportPrt
+inherited frmReportPrt: TfrmReportPrt
   Left = 507
   Top = 114
-  Width = 434
-  Height = 343
   Caption = 'Report Print Device Selection'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = True
+  ClientHeight = 314
+  ClientWidth = 424
   Position = poScreenCenter
-  OnCreate = FormCreate
-  OnDestroy = FormDestroy
+  ExplicitWidth = 432
+  ExplicitHeight = 348
   PixelsPerInch = 96
   TextHeight = 13
-  object lblPrintTo: TLabel
+  object lblPrintTo: TLabel [0]
     Left = 8
     Top = 271
     Width = 3
     Height = 13
   end
-  object lblReportsTitle: TMemo
+  object lblReportsTitle: TMemo [1]
     Left = 8
     Top = 8
     Width = 301
@@ -35,7 +28,7 @@ object frmReportPrt: TfrmReportPrt
     ReadOnly = True
     TabOrder = 4
   end
-  object grpDevice: TGroupBox
+  object grpDevice: TGroupBox [2]
     Left = 8
     Top = 69
     Width = 411
@@ -103,9 +96,10 @@ object frmReportPrt: TfrmReportPrt
       TabOrder = 0
       OnChange = cboDeviceChange
       OnNeedData = cboDeviceNeedData
+      CharsNeedMatch = 1
     end
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [3]
     Left = 267
     Top = 272
     Width = 72
@@ -115,7 +109,7 @@ object frmReportPrt: TfrmReportPrt
     TabOrder = 2
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [4]
     Left = 347
     Top = 272
     Width = 72
@@ -125,13 +119,43 @@ object frmReportPrt: TfrmReportPrt
     TabOrder = 3
     OnClick = cmdCancelClick
   end
-  object chkDefault: TCheckBox
+  object chkDefault: TCheckBox [5]
     Left = 8
     Top = 294
     Width = 171
     Height = 17
     Caption = 'Save as user'#39's default printer'
     TabOrder = 1
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblReportsTitle'
+        'Status = stsDefault')
+      (
+        'Component = grpDevice'
+        'Status = stsDefault')
+      (
+        'Component = txtRightMargin'
+        'Status = stsDefault')
+      (
+        'Component = txtPageLength'
+        'Status = stsDefault')
+      (
+        'Component = cboDevice'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = chkDefault'
+        'Status = stsDefault')
+      (
+        'Component = frmReportPrt'
+        'Status = stsDefault'))
   end
   object dlgWinPrinter: TPrintDialog
     Left = 334

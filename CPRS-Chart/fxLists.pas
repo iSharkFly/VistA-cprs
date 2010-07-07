@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls;
+  StdCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmDbgList = class(TForm)
+  TfrmDbgList = class(TfrmBase508Form)
     memData: TMemo;
     procedure FormKeyUp(Sender: TObject; var Key: Word;
       Shift: TShiftState);
@@ -36,7 +36,7 @@ begin
     with frmDbgList do
     begin
       if AListBox is TORListBox then
-        memData.Lines.Assign(TORListBox(AListBox).Items)
+        FastAssign(TORListBox(AListBox).Items, memData.Lines)
       else
         memData.Lines.Assign(AListBox.Items);
       ShowModal;

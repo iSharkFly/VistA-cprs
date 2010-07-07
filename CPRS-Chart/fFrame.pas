@@ -13,10 +13,13 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, Tabs, ComCtrls,
   ExtCtrls, Menus, StdCtrls, Buttons, ORFn, fPage, uConst, ORCtrls, Trpcb,
-  OleCtrls, VERGENCECONTEXTORLib_TLB, ComObj, AppEvnts;
+  OleCtrls, VERGENCECONTEXTORLib_TLB, ComObj, AppEvnts, fBase508Form,
+  VA508AccessibilityManager
+{ TODO -oRV -cWVEHR Long Age : Changed to use long age }
+  , rWVEHR;
 
 type
-  TfrmFrame = class(TForm)
+  TfrmFrame = class(TfrmBase508Form)
     pnlToolbar: TPanel;
     stsArea: TStatusBar;
     tabPage: TTabControl;
@@ -46,7 +49,6 @@ type
     Z4: TMenuItem;
     mnuEditPref: TMenuItem;
     Prefs1: TMenuItem;
-    mnu24pt1: TMenuItem;
     mnu18pt1: TMenuItem;
     mnu14pt1: TMenuItem;
     mnu12pt1: TMenuItem;
@@ -82,9 +84,6 @@ type
     pnlPrimaryCare: TKeyClickPanel;
     lblPtCare: TStaticText;
     lblPtAttending: TStaticText;
-    pnlCIRN: TKeyClickPanel;
-    lblCIRN: TLabel;
-    lblCIRNData: TLabel;
     pnlReminders: TKeyClickPanel;
     imgReminder: TImage;
     mnuViewReminders: TMenuItem;
@@ -124,7 +123,6 @@ type
     mnuToolsGraphing: TMenuItem;
     laVAA2: TButton;
     laMHV: TButton;
-    lblCIRNAvail: TLabel;
     mnuViewInformation: TMenuItem;
     mnuViewVisits: TMenuItem;
     mnuViewPrimaryCare: TMenuItem;
@@ -132,16 +130,18 @@ type
     mnuInsurance: TMenuItem;
     mnuViewFlags: TMenuItem;
     mnuViewRemoteData: TMenuItem;
+    compAccessTabPage: TVA508ComponentAccessibility;
+    pnlRemoteData: TKeyClickPanel;
+    pnlVistaWeb: TKeyClickPanel;
+    lblVistaWeb: TLabel;
+    pnlCIRN: TKeyClickPanel;
+    lblCIRN: TLabel;
     procedure tabPageChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure pnlPatientMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure pnlPatientMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure pnlVisitMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure pnlVisitMouseUp(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
     procedure mnuFileExitClick(Sender: TObject);
     procedure pnlPostingsMouseDown(Sender: TObject; Button: TMouseButton;
@@ -170,12 +170,6 @@ type
     procedure mnuFilePrintClick(Sender: TObject);
     procedure mnuGECStatusClick(Sender: TObject);
     procedure mnuFileNextClick(Sender: TObject);
-    procedure stsAreaMouseDown(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure stsAreaMouseUp(Sender: TObject; Button: TMouseButton;
-      Shift: TShiftState; X, Y: Integer);
-    procedure stsAreaDrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel;
-      const Rect: TRect);
     procedure pnlPrimaryCareMouseDown(Sender: TObject;
       Button: TMouseButton; Shift: TShiftState; X, Y: Integer);
     procedure pnlPrimaryCareMouseUp(Sender: TObject; Button: TMouseButton;
@@ -240,7 +234,15 @@ type
     procedure laVAA2Click(Sender: TObject);
     procedure ViewInfo(Sender: TObject);
     procedure mnuViewInformationClick(Sender: TObject);
+    procedure compAccessTabPageCaptionQuery(Sender: TObject;
+      var Text: string);
+    procedure pnlVistaWebClick(Sender: TObject);
+    procedure pnlVistaWebMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+    procedure pnlVistaWebMouseUp(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   private
+    FProccessingNextClick : boolean;
     FJustEnteredApp : boolean;
     FCCOWInstalled: boolean;
     FCCOWContextChanging: boolean;
@@ -260,6 +262,7 @@ type
     FNextButtonR: Integer;
     FNextButtonActive: Boolean;
     FNextButtonBitmap: TBitmap;
+    FNextButton: TBitBtn;
     FTerminate: Boolean;
     FTabChanged: TNotifyEvent;
     FOldActivate: TNotifyEvent;
@@ -270,9 +273,12 @@ type
     FFirstLoad:    Boolean;
     FFlagList: TStringList;
     FPrevPtID: string;
-    FVitalsDLLActive: boolean;
     FGraphFloatActive: boolean;
     FGraphContext: string;
+    FDoNotChangeEncWindow: boolean;
+    FOrderPrintForm: boolean;
+    FReviewclick: boolean;
+    FCtrlTabUsed: boolean;
     procedure RefreshFixedStatusWidth;
     procedure FocusApplicationTopForm;
     procedure AppActivated(Sender: TObject);
@@ -317,20 +323,26 @@ type
 {$IFDEF CCOWBROKER}
     procedure CheckForDifferentUser(aContextItemCollection: IDispatch; var UserChanged: boolean);
 {$ENDIF}
-    procedure HideEverything;
+    procedure HideEverything(AMessage: string = 'No patient is currently selected.');
     procedure ShowEverything;
     //function FindBestCCOWDFN(var APatientName: string): string;
     function FindBestCCOWDFN: string;
     procedure HandleCCOWError(AMessage: string);
+    procedure SetUpNextButton;
+    procedure NextButtonClick(Sender: TObject);
+    procedure NextButtonMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
   public
-   EnduringPtSelSplitterPos: integer;
+   EnduringPtSelSplitterPos, frmFrameHeight, pnlPatientSelectedHeight: integer;
     procedure SetBADxList;
+    procedure SetActiveTab(PageID: Integer);
 
     function PageIDToTab(PageID: Integer): Integer;
     procedure ShowHideChartTabMenus(AMenuItem: TMenuItem);
     procedure UpdatePtInfoOnRefresh;
     function  TabExists(ATabID: integer): boolean;
     procedure DisplayEncounterText;
+    function DLLActive: boolean;
     property ChangeSource:    Integer read FChangeSource;
     property CCOWContextChanging: Boolean read FCCOWContextChanging;
     property CCOWDrivedChange: Boolean  read FCCOWDrivedChange;
@@ -339,11 +351,12 @@ type
     property TimedOut:        Boolean read GetTimedOut;
     property Closing:         Boolean read FClosing;
     property OnTabChanged:    TNotifyEvent read FTabChanged write FTabChanged;
-    property VitalsDLLActive: boolean read FVitalsDLLActive write FVitalsDLLActive;
     property GraphFloatActive: boolean read FGraphFloatActive write FGraphFloatActive;
     property GraphContext: string read FGraphContext write FGraphContext;
     procedure ToggleMenuItemChecked(Sender: TObject);
     procedure SetUpCIRN;
+    property DoNotChangeEncWindow: boolean read FDoNotChangeEncWindow write FDoNotChangeEncWindow;
+    property OrderPrintForm: boolean read FOrderPrintForm write FOrderPrintForm;
   end;
 
 var
@@ -353,7 +366,7 @@ var
   FlaggedPTList: TStringList;
   ctxContextor : TContextorControl;
   NextTab, LastTab: Integer;
-  uToolsMaxed, uToolsWarned: boolean;
+  uToolsMaxed, uToolsWarned, uUseVistaWeb: boolean;
 
 const
   PASSCODE = '_gghwn7pghCrOJvOV61PtPvgdeEU2u5cRsGvpkVDjKT_H7SdKE_hqFYWsUIVT1H7JwT6Yz8oCtd2u2PALqWxibNXx3Yo8GPcTYsNaxW' + 'ZFo8OgT11D5TIvpu3cDQuZd3Yh_nV9jhkvb0ZBGdO9n-uNXPPEK7xfYWCI2Wp3Dsu9YDSd_EM34nvrgy64cqu9_jFJKJnGiXY96Lf1ecLiv4LT9qtmJ-BawYt7O9JZGAswi344BmmCbNxfgvgf0gfGZea';
@@ -369,13 +382,14 @@ uses
   rMisc, Clipbrd, fLabs, fReports, rReports, fPtDemo, fEncnt, fPtCWAD, uCore, fAbout, fReview, fxBroker,
   fxLists, fxServer, ORSystem, fRptBox, fSplash, rODAllergy, uInit, fLabTests, fLabInfo,
   uReminders, fReminderTree, ORClasses, fDeviceSelect, fDrawers, fReminderDialog, ShellAPI, rVitals,
-  fOptions, fGraphs, rTemplates, fSurgery, rSurgery, uEventHooks, uSignItems, fDefaultEvent,rECS,
-  fIconLegend, uOrders, fPtSelOptns, DateUtils, uSpell, uOrPtf, fPatientFlagMulti,
-  fAlertForward, UBAGlobals, fBAOptionsDiagnoses, UBACore, fOrdersSign, uVitals, fOrdersRenew, uFormMonitor
+  fOptions, fGraphs, fGraphData, rTemplates, fSurgery, rSurgery, uEventHooks, uSignItems,
+  fDefaultEvent, rECS, fIconLegend, uOrders, fPtSelOptns, DateUtils, uSpell, uOrPtf, fPatientFlagMulti,
+  fAlertForward, UBAGlobals, fBAOptionsDiagnoses, UBACore, fOrdersSign, uVitals, fOrdersRenew, fMHTest, uFormMonitor
   {$IFDEF CCOWBROKER}
   , CCOW_const
   {$ENDIF}
-  ;
+  , VA508AccessibilityRouter, fOtherSchedule, VAUtils, uVA508CPRSCompatibility, fIVRoutes,
+  fPrintLocation, fTemplateEditor;
 
 var                                 //  RV 05/11/04
   IsRunExecuted: Boolean = FALSE;           //  RV 05/11/04
@@ -452,11 +466,35 @@ begin
 end;
 
 procedure TfrmFrame.TimeOutAction;
+var
+  ClosingCPRS: boolean;
+
+  procedure CloseCPRS;
+  begin
+    if ClosingCPRS then
+      halt;
+    try
+      ClosingCPRS := TRUE; 
+      Close;
+    except
+      halt;
+    end;
+  end;
+
 begin
-  if frmFrame.VitalsDLLActive then
-    CloseVitalsDLL()
-  else
-    Close;
+  ClosingCPRS := FALSE;
+  try
+    if assigned(frmOtherSchedule) then frmOtherSchedule.Close;
+    if assigned (frmIVRoutes) then frmIVRoutes.Close;
+    if frmFrame.DLLActive then
+    begin
+       CloseVitalsDLL();
+       CloseMHDLL();
+    end;
+    CloseCPRS;
+  except
+    CloseCPRS;
+  end;
 end;
 
 { General Functions and Procedures }
@@ -477,7 +515,7 @@ begin
       AnAddr := EExternal(E).ExceptionRecord^.ExceptionAddress;
       ErrMsg := ErrMsg + CRLF + 'Address was ' + IntToStr(Integer(AnAddr));
     end;
-    ShowMessage(ErrMsg);
+    ShowMsg(ErrMsg);
   end
   else if (E is EBrokerError) then
   begin
@@ -506,7 +544,7 @@ begin
   end;
   FContextChanging := True;
   Result := True;
-  if COMObjectActive or SpellCheckInProgress or VitalsDLLActive then
+  if COMObjectActive or SpellCheckInProgress or DLLActive then
     begin
       Reason := 'COM_OBJECT_ACTIVE';
       Result:= False;
@@ -522,6 +560,7 @@ begin
     if Assigned(frmSurgery) then Result := frmSurgery.AllowContextChange(Reason);;
   if Result then Result := frmLabs.AllowContextChange(Reason);;
   if Result then Result := frmReports.AllowContextChange(Reason);
+  if Result then Result := frmGraphData.AllowContextChange(Reason);
   if (not User.IsReportsOnly) then
     if Result and Changes.RequireReview then //Result := ReviewChanges(TimedOut);
       case BOOLCHAR[FCCOWContextChanging] of
@@ -545,15 +584,18 @@ end;
 procedure TfrmFrame.ClearPatient;
 { call all pages to make sure patient related information is cleared (when switching patients) }
 begin
-  if frmFrame.Timedout then Exit; // added to correct Access Violation when "Refresh Patient Information" selected
+  //if frmFrame.Timedout then Exit; // added to correct Access Violation when "Refresh Patient Information" selected
   lblPtName.Caption     := '';
   lblPtSSN.Caption      := '';
   lblPtAge.Caption      := '';
   pnlPatient.Caption    := '';
   lblPtCWAD.Caption     := '';
-  lblPtLocation.Caption := 'Visit Not Selected';
-  lblPtProvider.Caption := 'Current Provider Not Selected';
-  pnlVisit.Caption      := lblPtLocation.Caption + CRLF + lblPtProvider.Caption;
+  if DoNotChangeEncWindow = false then
+     begin
+      lblPtLocation.Caption := 'Visit Not Selected';
+      lblPtProvider.Caption := 'Current Provider Not Selected';
+      pnlVisit.Caption      := lblPtLocation.Caption + CRLF + lblPtProvider.Caption;
+     end;
   lblPtCare.Caption     := 'Primary Care Team Unassigned';
   lblPtAttending.Caption := '';
   pnlPrimaryCare.Caption := lblPtCare.Caption + ' ' + lblPtAttending.Caption;
@@ -566,11 +608,13 @@ begin
   frmDCSumm.ClearPtData;
   if Assigned(frmSurgery) then frmSurgery.ClearPtData;
   frmLabs.ClearPtData;
+  frmGraphData.ClearPtData;
   frmReports.ClearPtData;
   tabPage.TabIndex := PageIDToTab(CT_NOPAGE);       // to make sure DisplayPage gets called
   tabPageChange(tabPage);
   ClearReminderData;
   SigItems.Clear;
+  Changes.Clear;
   lstCIRNLocations.Clear;
   uRemoteType := '';
   ClearFlag;
@@ -583,14 +627,22 @@ begin
     Initialize;
     DisplayData('top');
     DisplayData('bottom');
-    lstCheck.Items.Clear;
+    GtslCheck.Clear;
     Caption := 'CPRS Graphing - Patient: ' + MixedCase(Patient.Name);
+  end;
+  if frmFrame.TimedOut then
+  begin
+    infoBox('CPRS has encountered a serious problem and is unable to display the selected patient''s data. This is a known issue documented in PSPO 1089.'
+            + 'To prevent patient safety issues, CPRS is shutting down. Shutting down and then restarting CPRS will correct the problem, and you may continue working in CPRS.'
+             + CRLF + CRLF + 'Please report all occurrences of this problem by contacting your CPRS Help Desk.', 'CPRS Error', MB_OK);
+    frmFrame.Close;
   end;
 end;
 
 procedure TfrmFrame.DisplayEncounterText;
 { updates the display in the header bar of encounter related information (location & provider) }
 begin
+  if DoNotChangeEncWindow = true then exit;
   with Encounter do
   begin
     if Length(LocationText) > 0
@@ -602,6 +654,11 @@ begin
   end;
   pnlVisit.Caption := lblPtLocation.Caption + CRLF + lblPtProvider.Caption;
   FitToolBar;
+end;
+
+function TfrmFrame.DLLActive: boolean;
+begin
+  Result := (VitalsDLLHandle <> 0) or (MHDLLHandle <> 0);
 end;
 
 { Form Events (Create, Destroy) ----------------------------------------------------------- }
@@ -617,6 +674,7 @@ procedure TfrmFrame.FormCreate(Sender: TObject);
 var
   ClientVer, ServerVer, ServerReq: string;
 begin
+  FProccessingNextClick := false;
   FJustEnteredApp := false;
   SizeHolder := TSizeHolder.Create;
   FOldActiveFormChange := Screen.OnActiveFormChange;
@@ -800,6 +858,8 @@ begin
   pnlReminders.Visible := InteractiveRemindersActive;
   GraphFloatActive := false;
   GraphContext := '';
+  frmGraphData := TfrmGraphData.Create(self);        // form is only visible for testing
+  GraphDataOnUser;
   uRemoteType := '';
   FPrevPtID := '';
   SetUserTools;
@@ -893,6 +953,7 @@ begin
   Application.OnActivate := FOldActivate;
   Screen.OnActiveFormChange := FOldActiveFormChange;
   FNextButtonBitmap.Free;
+  if FNextButton <> nil then FNextButton.Free;
   uTabList.Free;
   FlaggedPTList.Free;
   RemoteSites.Free;
@@ -1015,6 +1076,12 @@ begin
 
 end;
 
+procedure TfrmFrame.compAccessTabPageCaptionQuery(Sender: TObject;
+  var Text: string);
+begin
+  Text := GetTabText;
+end;
+
 function TfrmFrame.ValidECSUser: boolean;   //ECS
 var
   isTrue: boolean;
@@ -1040,9 +1107,6 @@ begin
 end;
 
 procedure TfrmFrame.FormClose(Sender: TObject; var Action: TCloseAction);
-//var
-//  i: Integer;
-//  UserTool: TMenuItem;
 begin
   FClosing := TRUE;
   SetFormMonitoring(false);
@@ -1081,6 +1145,8 @@ begin
     if Assigned(frmSurgery) then frmSurgery.Close;    //frmSurgery.Release;
     frmLabs.Close;       //frmLabs.Release;
     frmReports.Close;    //frmReports.Release;
+    frmGraphData.Close;  //frmGraphData.Release;
+  
   end;
 //  with mnuTools do for i := Count - 1 downto 0 do
 //  begin
@@ -1201,13 +1267,15 @@ begin
       else frmNotes.Align := alNone;
     if NewForm.Name = frmConsults.Name then frmConsults.Align := alClient
       else frmConsults.Align := alNone;
+    if NewForm.Name = frmReports.Name then frmReports.Align := alClient
+      else frmReports.Align := alNone;
     if NewForm.Name = frmDCSumm.Name then frmDCSumm.Align := alClient
       else frmDCSumm.Align := alNone;
     if Assigned(frmSurgery) then
       if NewForm.Name = frmSurgery.Name then frmSurgery.Align := alclient
         else frmSurgery.Align := alNone;
     NewForm.BringToFront;                    // to cause tab switch to happen immediately
-    NewForm.FocusFirstControl;
+//CQ12232 NewForm.FocusFirstControl;
     Application.ProcessMessages;
     PostMessage(Handle, UM_SHOWPAGE, 0, 0);  // this calls DisplayPage for the form
   end;
@@ -1223,11 +1291,16 @@ end;
 
 procedure TfrmFrame.tabPageChange(Sender: TObject);
 { switches to form linked to NewTab }
+var
+  PageID : integer;
 begin
-
+  PageID := TabToPageID((sender as TTabControl).TabIndex);
+  if (PageID <> CT_NOPAGE) and (TabPage.CanFocus) and Assigned(FLastPage) and
+     (not TabPage.Focused) then
+    TabPage.SetFocus;  //CQ: 14854
   if (not User.IsReportsOnly) then
   begin
-    case TabToPageID((sender as TTabControl).TabIndex) of
+    case PageID of
       CT_NOPAGE:   SwitchToPage(nil);
       CT_COVER:    SwitchToPage(frmCover);
       CT_PROBLEMS: SwitchToPage(frmProblems);
@@ -1243,7 +1316,8 @@ begin
   end
   else // Reports Only tab.
     SwitchToPage(frmReports);
-
+  if ScreenReaderSystemActive and FCtrlTabUsed then
+    SpeakPatient;
 end;
 
 function TfrmFrame.PageIDToTab(PageID: Integer): Integer;
@@ -1306,7 +1380,11 @@ begin
     Application.ProcessMessages;
     lblPtName.Caption := Name;
     lblPtSSN.Caption := SSN;
-    lblPtAge.Caption := FormatFMDateTime('mmm dd,yyyy', DOB) + ' (' + IntToStr(Age) + ')';
+//
+    { TODO -oRV -cWVEHR Long Age : Change for long patient age. }
+    lblPtAge.Caption := FormatFMDateTime('mmm dd,yyyy', DOB) + '   (' + GetPatientBriefAge(Patient.DFN) + ')';
+    //lblPtAge.Caption := FormatFMDateTime('mmm dd,yyyy', DOB) + ' (' + IntToStr(Age) + ')';
+//
     pnlPatient.Caption := lblPtName.Caption + ' ' + lblPtSSN.Caption + ' ' + lblPtAge.Caption;
     if Length(CWAD) > 0
       then lblPtPostings.Caption := 'Postings'
@@ -1330,7 +1408,7 @@ begin
     if HasFlag then
     begin
       pnlFlag.Enabled := True;
-      lblFlag.Font.Color := clMaroon;
+      lblFlag.Font.Color := Get508CompliantColor(clMaroon);
       lblFlag.Enabled := True;
       if (not FReFreshing) and (TriggerPRFPopUp(Patient.DFN)) then
         ShowFlags;
@@ -1353,6 +1431,7 @@ var
   NextIndex: Integer;
   Reason: string;
   CCOWResponse: UserResponse;
+  AccessStatus: integer;
 
     procedure UpdatePatientInfoForAlert;
     begin
@@ -1370,6 +1449,8 @@ var
     end;
 
 begin
+  DoNotChangeEncWindow := False;
+  mnuFile.Tag := 0;
   SaveDFN := Patient.DFN;
   Notifications.Next;
   if Notifications.Active then
@@ -1380,7 +1461,8 @@ begin
     if SaveDFN <> NewDFN then
     begin
       // newdfn does not have new patient.co information for CCOW call
-      if (AllowContextChangeAll(Reason)) then
+      if ((Sender = mnuFileOpen) or (AllowContextChangeAll(Reason)))
+          and AllowAccessToSensitivePatient(NewDFN, AccessStatus) then
       begin
         RemindersStarted := FALSE;
         Patient.DFN := NewDFN;
@@ -1420,9 +1502,39 @@ begin
           UpdatePatientInfoForAlert
       end else
       begin
-        Patient.DFN := SaveDFN;
-        Notifications.Prior;
-        Exit;
+        if AccessStatus in [DGSR_ASK, DGSR_DENY] then
+        begin
+          Notifications.Clear;
+          // hide the 'next notification' button
+          FNextButtonActive := False;
+          FNextButton.Free;
+          FNextButton := nil;
+          mnuFileNext.Enabled := False;
+          mnuFileNotifRemove.Enabled := False;
+          Patient.DFN := '';
+          mnuFileOpenClick(mnuFileNext);
+          exit;
+        end
+        else
+        if SaveDFN <> '' then
+        begin
+          Patient.DFN := SaveDFN;
+          Notifications.Prior;
+          Exit;
+        end
+        else
+        begin
+          Notifications.Clear;
+(*          // hide the 'next notification' button
+          FNextButtonActive := False;
+          FNextButton.Free;
+          FNextButton := nil;
+          mnuFileNext.Enabled := False;
+          mnuFileNotifRemove.Enabled := False;*)
+          Patient.DFN := '';
+          mnuFileOpenClick(mnuFileNext);
+          exit;
+        end;
       end;
     end;
     stsArea.Panels.Items[1].Text := Notifications.Text;
@@ -1484,6 +1596,9 @@ begin
            Notifications.Delete;
         end;
     NF_LAB_THRESHOLD_EXCEEDED        : NextIndex := PageIDToTab(CT_LABS);
+    NF_MAMMOGRAM_RESULTS             : NextIndex := PageIDToTab(CT_REPORTS);
+    NF_PAP_SMEAR_RESULTS             : NextIndex := PageIDToTab(CT_REPORTS);
+    NF_ANATOMIC_PATHOLOGY_RESULTS    : NextIndex := PageIDToTab(CT_REPORTS);
     NF_SURGERY_UNSIGNED_NOTE         : if TabExists(CT_SURGERY) then
                                          NextIndex := PageIDToTab(CT_SURGERY)
                                        else
@@ -1496,7 +1611,6 @@ begin
   end
   else mnuFileOpenClick(mnuFileNext);
 end;
-
 
 procedure TfrmFrame.SetBADxList;
 var
@@ -1537,6 +1651,8 @@ var
   CCOWResponse: UserResponse;
 begin
   PtSelCancelled := FALSE;
+  if not FRefreshing then mnuFile.Tag := 0
+  else mnuFile.Tag := 1;
   DetermineNextTab;
 (*  if (FRefreshing or User.UseLastTab) and (not FFirstLoad) then
     NextTab := TabToPageID(tabPage.TabIndex)
@@ -1553,7 +1669,8 @@ begin
       if (lstSheets.ItemIndex > -1 ) and (TheCurrentView <> nil) and (theCurrentView.EventDelay.PtEventIFN>0) then
         PtEvtCompleted(TheCurrentView.EventDelay.PtEventIFN, TheCurrentView.EventDelay.EventName);
     end;*)
-  if not AllowContextChangeAll(Reason) then Exit;
+  //if Sender <> mnuFileNext then     //CQ 16273 & 16419 - Missing Review/Sign changes dialog when clicking 'Next' button
+    if not AllowContextChangeAll(Reason) then Exit;
      
   // update status text here
   stsArea.Panels.Items[1].Text := '';
@@ -1612,29 +1729,23 @@ begin
           SelectPatient(SHOW_NOTIFICATIONS, Font.Size, PtSelCancelled);
         if PtSelCancelled then exit;
         ShowEverything;
+        //HideEverything('Retrieving information - please wait....');  //v27 (pending) RV
         DisplayEncounterText;
         FPrevInPatient := Patient.Inpatient;
         if Notifications.Active then
         begin
           // display 'next notification' button
+          SetUpNextButton;
           FNextButtonActive := True;
-          with stsArea.Panels[2] do
-          begin
-            //Text := 'Next ->';
-            Bevel := pbRaised;
-          end;
           mnuFileNext.Enabled := True;
-          mnuFileNextClick(Self);
+          mnuFileNextClick(mnuFileOpen);
         end
         else
         begin
           // hide the 'next notification' button
           FNextButtonActive := False;
-          with stsArea.Panels[2] do
-          begin
-            //Text := '';
-            Bevel := pbLowered;
-          end;
+          FNextButton.Free;
+          FNextButton := nil;
           mnuFileNext.Enabled := False;
           mnuFileNotifRemove.Enabled := False;
           if Patient.DFN <> SaveDFN then
@@ -1698,6 +1809,8 @@ begin
  {Begin BillingAware}
   if  BILLING_AWARE then frmFrame.SetBADxList; //end IsBillingAware
  {End BillingAware}
+ //ShowEverything;  //v27 (pending) RV
+ if not FRefreshing then DoNotChangeEncWindow := false;
  //frmCover.UpdateVAAButton; //VAA CQ7525   CQ#7933 - moved to SetupPatient, before event hook execution (RV)
 end;
 
@@ -1714,7 +1827,7 @@ begin
     NextTab := User.InitialTab;
   if NextTab = CT_NOPAGE then NextTab := User.InitialTab;
   if User.IsReportsOnly then // Reports Only tab.
-    NextTab := 0; // Only one tab should exist by this point in "REPORTS ONLY" mode.
+    NextTab := CT_REPORTS; // Only one tab should exist by this point in "REPORTS ONLY" mode.
   if not TabExists(NextTab) then NextTab := CT_COVER;
   if NextTab = CT_NOPAGE then NextTab := User.InitialTab;
   if NextTab = CT_ORDERS then
@@ -1738,6 +1851,8 @@ var
   EventChanges: boolean;
   NameNeedLook: string;
 begin
+  FReviewClick := True;
+  mnuFile.Tag := 1;
   EventChanges := False;
   NameNeedLook := '';
   UpdatePtInfoOnRefresh;
@@ -1756,6 +1871,8 @@ begin
    end;
   end
   else InfoBox('No new changes to review/sign.', 'Review Changes', MB_OK);
+  FOrderPrintForm := false;
+  FReviewClick := false;
 end;
 
 procedure TfrmFrame.mnuFileExitClick(Sender: TObject);
@@ -1776,12 +1893,12 @@ begin
   except
      on EAccessViolation do
         begin
-        {$ifdef debug}ShowMessage('Access Violation in procedure TfrmFrame.mnuFileExitClick()');{$endif}
+        {$ifdef debug}Show508Message('Access Violation in procedure TfrmFrame.mnuFileExitClick()');{$endif}
         raise;
         end;
      on E: Exception do
         begin
-        {$ifdef debug}ShowMessage('Unhandled exception in procedure TfrmFrame.mnuFileExitClick()');{$endif}
+        {$ifdef debug}Show508Message('Unhandled exception in procedure TfrmFrame.mnuFileExitClick()');{$endif}
         raise;
         end;
   end;
@@ -1855,7 +1972,7 @@ var
            AFile := OROpenDlg.FileName;
            if Pos('ecs gui.exe',lowerCase(AFile))<1 then
            begin
-             ShowMessage('This is not a valid ECS application.');
+             ShowMsg('This is not a valid ECS application.');
              Result := True;
            end else
            begin
@@ -1895,7 +2012,7 @@ var
            AFile := OROpenDlg.FileName;
            if Pos('ecs gui.exe',lowerCase(AFile))<1 then
            begin
-             ShowMessage('This is not a valid ECS application.');
+             ShowMsg('This is not a valid ECS application.');
              Result := True;
            end else
            begin
@@ -1932,7 +2049,7 @@ begin
     IsECSInterface := True;
     if FECSAuthUser then UpdateECSParameter(ECSAppend)
     else begin
-      ShowMessage('You don''t have permission to use ECS.');
+      ShowMsg('You don''t have permission to use ECS.');
       exit;
     end;
   end;
@@ -2002,38 +2119,6 @@ begin
   stsArea.Refresh;
 end;
 
-procedure TfrmFrame.stsAreaMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
-  if (FNextButtonActive) and (X > FNextButtonL) and (X < FNextButtonR) then
-  begin
-    stsArea.Panels[2].Bevel := pbLowered;
-    popAlerts.AutoPopup := TRUE;
-  end;
-end;
-
-procedure TfrmFrame.stsAreaMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-begin
-  if FNextButtonActive then
-  begin
-    stsArea.Panels[2].Bevel := pbRaised;
-    popAlerts.AutoPopup := FALSE;
-    if (X > FNextButtonL) and (X < FNextButtonR) then
-      if Button = mbLeft then mnuFileNextClick(Self);
-  end;
-end;
-
-procedure TfrmFrame.stsAreaDrawPanel(StatusBar: TStatusBar; Panel: TStatusPanel;
-  const Rect: TRect);
-begin
-  if FNextButtonActive then with StatusBar.Canvas do
-  begin
-    Draw(Rect.Left + 2, Rect.Top, FNextButtonBitmap);	{ draw bitmap }
-    TextOut(Rect.Left + 20, Rect.Top + 2, 'Next');	  { draw text to the right of the bitmap }
-  end;
-end;
-
 { Toolbar Methods (make panels act like buttons) ------------------------------------------- }
 
 procedure TfrmFrame.pnlPatientMouseDown(Sender: TObject; Button: TMouseButton;
@@ -2056,30 +2141,6 @@ begin
   with lblPtName do SetBounds(Left-2, Top-2, Width, Height);
   with lblPtSSN  do SetBounds(Left-2, Top-2, Width, Height);
   with lblPtAge  do SetBounds(Left-2, Top-2, Width, Height);
-end;
-
-procedure TfrmFrame.pnlVisitMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-{ emulate a button press in the encounter panel }
-begin
-  if User.IsReportsOnly then
-    exit;
-  pnlVisit.BevelOuter := bvLowered;
-  //with lblStLocation do SetBounds(Left+2, Top+2, Width, Height);
-  with lblPtLocation do SetBounds(Left+2, Top+2, Width, Height);
-  with lblPtProvider do SetBounds(Left+2, Top+2, Width, Height);
-end;
-
-procedure TfrmFrame.pnlVisitMouseUp(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
-{ emulate a button raising in the encounter panel and call Update Provider/Location }
-begin
-  if User.IsReportsOnly then
-    exit;
-  pnlVisit.BevelOuter := bvRaised;
-  //with lblStLocation do SetBounds(Left-2, Top-2, Width, Height);
-  with lblPtLocation do SetBounds(Left-2, Top-2, Width, Height);
-  with lblPtProvider do SetBounds(Left-2, Top-2, Width, Height);
 end;
 
 procedure TfrmFrame.pnlPrimaryCareMouseDown(Sender: TObject;
@@ -2121,7 +2182,6 @@ end;
 procedure TfrmFrame.LoadSizesForUser;
 var
   s1, s2, s3, s4, Dummy: integer;
-
   panelBottom, panelMedIn : integer;
 
 begin
@@ -2139,6 +2199,9 @@ begin
   SetUserColumns(TControl(frmOrders.hdrOrders));
   SetUserColumns(TControl(frmMeds.hdrMedsIn));  // still need conversion
   SetUserColumns(TControl(frmMeds.hdrMedsOut));
+  SetUserBounds2(TemplateEditorSplitters, tmplEditorSplitterMiddle,
+                 tmplEditorSplitterProperties, tmplEditorSplitterMain, tmplEditorSplitterBoil);
+  SetUserBounds2(TemplateEditorSplitters2, tmplEditorSplitterNotes, Dummy, Dummy, Dummy);
   SetUserBounds2(ReminderTreeName, RemTreeDlgLeft, RemTreeDlgTop, RemTreeDlgWidth, RemTreeDlgHeight);
   SetUserBounds2(RemDlgName, RemDlgLeft, RemDlgTop, RemDlgWidth, RemDlgHeight);
   SetUserBounds2(RemDlgSplitters, RemDlgSpltr1, RemDlgSpltr2, Dummy ,Dummy);
@@ -2208,6 +2271,9 @@ begin
       Add(StrUserColumns(frmOrders.hdrOrders));
       Add(StrUserColumns(frmMeds.hdrMedsIn));
       Add(StrUserColumns(frmMeds.hdrMedsOut));
+      Add(StrUserBounds2(TemplateEditorSplitters, tmplEditorSplitterMiddle,
+              tmplEditorSplitterProperties, tmplEditorSplitterMain, tmplEditorSplitterBoil));
+      Add(StrUserBounds2(TemplateEditorSplitters2, tmplEditorSplitterNotes, 0, 0, 0));
       Add(StrUserBounds2(ReminderTreeName, RemTreeDlgLeft, RemTreeDlgTop, RemTreeDlgWidth, RemTreeDlgHeight));
       Add(StrUserBounds2(RemDlgName, RemDlgLeft, RemDlgTop, RemDlgWidth, RemDlgHeight));
       Add(StrUserBounds2(RemDlgSplitters, RemDlgSpltr1, RemDlgSpltr2, 0 ,0));
@@ -2273,8 +2339,15 @@ begin
     FNextButtonL := Panels[0].Width + Panels[1].Width;
     FNextButtonR := FNextButtonL + Panels[2].Width;
   end;
+  if Notifications.Active then SetUpNextButton;
   lstCIRNLocations.Left  := FNextButtonL - ScrollBarWidth - 100;
   lstCIRNLocations.Width := ClientWidth - lstCIRNLocations.Left;
+  //cq: 15641
+  if frmFrame.FNextButtonActive then // keeps button alligned if cancel is pressed
+  begin
+    FNextButton.Left := FNextButtonL;
+    FNextButton.Top := stsArea.Top;
+  end;
   Self.Repaint;
 end;
 
@@ -2306,12 +2379,14 @@ begin
       with lblFlag       do Font.Size := NewFontSize;
       with lblPtCWAD     do Font.Size := NewFontSize;
       with lblCIRN       do Font.Size := NewFontSize;
-      with lblCIRNData   do Font.Size := NewFontSize;
+      with lblVistaWeb   do Font.Size := NewFontSize;
       with lstCIRNLocations do Font.Size := NewFontSize;
       with tabPage       do Font.Size := NewFontSize;
       with laMHV         do Font.Size := NewFontSize; //VAA
       with laVAA2        do Font.Size := NewFontSize; //VAA
 
+      frmFrameHeight := frmFrame.Height;
+      pnlPatientSelectedHeight := pnlPatientSelected.Height;
       tabPage.Height := MainFontHeight + TAB_VOFFSET;   // resize tab selector
       FitToolbar;                                       // resize toolbar
       stsArea.Font.Size := NewFontSize;
@@ -2340,20 +2415,12 @@ begin
     OldFont.Free;
   end;
 
-  //remove CWAD color if using high-contrast colors
-  if ColorToRGB(clWindowText) <> ColorToRGB(clBlack) then
-  begin
-    lblPtCWAD.Font.Color := clWindowText;
-    lblFlag.Font.Color   := clWindowText;
-  end;
-
   case (NewFontSize) of
    8: mnu8pt.Checked := true;
   10: mnu10pt1.Checked := true;
   12: mnu12pt1.Checked := true;
   14: mnu14pt1.Checked := true;
   18: mnu18pt1.Checked := true;
-  24: mnu24pt1.Checked := true;
   end;
 
   //Now that the form elements are resized, the pages will know what size to take.
@@ -2377,13 +2444,19 @@ end;
 procedure TfrmFrame.FitToolBar;
 { resizes and repositions the panels & labels used in the toolbar }
 const
-  PATIENT_WIDTH = 29;
+{ TODO -oRV -cWVEHR Long Age : Change to 40, to fit long age }
+  //PATIENT_WIDTH = 29;
+  PATIENT_WIDTH = 40;
+{}
   VISIT_WIDTH   = 36;
   POSTING_WIDTH = 11.5;
   FLAG_WIDTH    = 5;
-  CIRN_WIDTH    = 7;
+  CIRN_WIDTH    = 11;
   MHV_WIDTH     = 6;
-  LINES_HIGH    = 2;
+{ TODO -oRV -cWVEHR Long Age : Change to 3 lines high, to fit long age }
+  //LINES_HIGH    = 2;
+  LINES_HIGH    = 3;
+{}
   M_HORIZ       = 4;
   M_MIDDLE      = 2;
   M_NVERT       = 4;
@@ -2392,23 +2465,32 @@ const
 //var
   //WidthNeeded: integer;
 begin
-  pnlToolbar.Height  := (LINES_HIGH * lblPtName.Height) + M_HORIZ + M_MIDDLE + M_HORIZ;
+//
+  { TODO -oRV -cWVEHR Long Age : Changed to fit long age }
+  pnlToolbar.Height  := (LINES_HIGH * lblPtName.Height) + M_HORIZ + M_MIDDLE + M_HORIZ + M_HORIZ;
+  //pnlToolbar.Height  := (LINES_HIGH * lblPtName.Height) + M_HORIZ + M_MIDDLE + M_HORIZ;
+//
   pnlPatient.Width   := HigherOf(PATIENT_WIDTH * MainFontWidth, lblPtName.Width + (M_WVERT * 2));
   lblPtSSN.Top       := M_HORIZ + lblPtName.Height + M_MIDDLE;
-  lblPtAge.Top       := lblPtSSN.Top;
-  lblPtAge.Left      := pnlPatient.Width - lblPtAge.Width - M_WVERT;
+//
+  { TODO -oRV -cWVEHR Long Age : Changed to fit long age }
+  lblPtAge.Top       := lblPtSSN.Top + lblPtSSN.Height + M_MIDDLE;
+  lblPtAge.Left      := lblPtSSN.Left;
+  //lblPtAge.Top       := lblPtSSN.Top;
+  //lblPtAge.Left      := pnlPatient.Width - lblPtAge.Width - M_WVERT;
+//
   pnlVisit.Width     := HigherOf(LowerOf(VISIT_WIDTH * MainFontWidth,
                                          HigherOf(lblPtProvider.Width + (M_WVERT * 2),
                                                   lblPtLocation.Width + (M_WVERT * 2))),
                                  PATIENT_WIDTH * MainFontWidth);
   lblPtProvider.Top  := lblPtSSN.Top;
   lblPtAttending.Top := lblPtSSN.Top;
-  lblCIRNData.Top    := lblPtSSN.Top;
   pnlPostings.Width  := Round(POSTING_WIDTH * MainFontWidth);
   pnlFlag.Width      := Round(FLAG_WIDTH * MainFontWidth);
   pnlFlag.Width      := Round(FLAG_WIDTH * MainFontWidth);
-  pnlCIRN.Width      := Round(CIRN_WIDTH * MainFontWidth) + M_WVERT;
-  paVAA.Width        := Round(MHV_WIDTH * MainFontWidth) + M_WVERT;
+  pnlRemoteData.Width := Round(CIRN_WIDTH * MainFontWidth) + M_WVERT;
+  pnlVistaWeb.Height := pnlRemoteData.Height div 2;
+  paVAA.Width        := Round(MHV_WIDTH * MainFontWidth) + M_WVERT + 2;
   with lblPtPostings do
     SetBounds(M_WVERT, M_HORIZ, pnlPostings.Width-M_WVERT-M_WVERT, lblPtName.Height);
   with lblPtCWAD     do
@@ -2451,10 +2533,10 @@ end;
 procedure TfrmFrame.mnuFontSizeClick(Sender: TObject);
 begin
   if (frmRemDlg <> nil) then
-    ShowMessage('Please close the reminder dialog before changing font sizes.')
+    ShowMsg('Please close the reminder dialog before changing font sizes.')
   else
      if (dlgProbs <> nil) then
-    ShowMessage('Font size cannot be changed while adding or editing a problem.')
+    ShowMsg('Font size cannot be changed while adding or editing a problem.')
   else
      begin
      with (Sender as TMenuItem) do
@@ -2690,117 +2772,36 @@ var
   aAutoQuery: string;
   ASite: TRemoteSite;
 begin
+  uUseVistaWeb := false;
   with RemoteSites do
-  if UseVistaWeb then
-    begin
-      ChangePatient(Patient.DFN);
-      lblCIRN.Caption := 'Remote';      //VistaWeb On
-      lblCIRNData.Caption := 'Data*';
-      pnlCIRN.Caption := 'Remote Data';
-      lblCIRN.Width := 43;
-      lblCIRNData.Width := 43;
-      lblCIRNData.Alignment := taCenter;
-      lblCIRN.Alignment := taCenter;
-      lblCIRN.Enabled     := True;
-      lblCIRNData.Enabled := True;
-      lblCIRNAvail.Enabled := True;
-      pnlCIRN.TabStop     := True;
-      if RemoteDataExists and (RemoteSites.Count > 0) then
-        begin
-          lblCIRN.Enabled     := True;
-          lblCIRNData.Enabled := True;
-          lblCIRNAvail.Enabled := True;
-          pnlCIRN.TabStop     := True;
-          if ColorToRGB(clWindowText) = ColorToRGB(clBlack) then
-            begin
-              lblCIRN.Font.Color  := clBlue;
-              lblCIRNData.Font.Color  := clBlue;
-              lblCIRNAvail.Font.Color := clBlue;
-              lstCIRNLocations.Font.Color  := clBlue;
-              lblCIRN.Caption := 'Remote';
-              lblCIRNData.Caption := 'Data*';
-              lblCIRNAvail.Caption := 'Available';
-              pnlCIRN.Caption := 'Remote Data Available';
-            end
-          else
-            begin
-              lblCIRN.Font.Color  := clWindowText;
-              lblCIRNData.Font.Color  := clWindowText;
-              lblCIRNAvail.Font.Color := clWindowText;
-              lstCIRNLocations.Font.Color  := clWindowText;
-            end;
-        end
-      else
-        begin
-          lblCIRN.Font.Color  := clWindowText;
-          lblCIRNData.Font.Color  := clWindowText;
-          lblCIRNAvail.Font.Color := clWindowText;
-          lblCIRN.Enabled     := False;
-          lblCIRNData.Enabled := False;
-          lblCIRNAvail.Enabled := False;
-          pnlCIRN.TabStop     := False;
-          pnlCIRN.Hint := NoDataReason;
-        end;
-      pnlCIRN.Hint := 'Click to open VistaWeb';
-    end
-  else
-    begin
-      ChangePatient(Patient.DFN);
-      lblCIRN.Caption := ' Remote';
-      lblCIRNData.Caption := 'Data';
-      pnlCIRN.Caption := 'Remote Data';
-      lblCIRNAvail.Caption := '';
-      lblCIRN.Width := 43;
-      lblCIRNData.Width := 43;
-      lblCIRNData.Alignment := taCenter;
-      lblCIRN.Alignment := taCenter;
-      if RemoteDataExists and (RemoteSites.Count > 0) then
-        begin
-          lblCIRN.Enabled     := True;
-          lblCIRNData.Enabled := True;
-          lblCIRNAvail.Enabled := True;
-          pnlCIRN.TabStop     := True;
-          if ColorToRGB(clWindowText) = ColorToRGB(clBlack) then
-            begin
-              lblCIRN.Font.Color  := clBlue;
-              lblCIRNData.Font.Color  := clBlue;
-              lblCIRNAvail.Font.Color := clBlue;
-              lstCIRNLocations.Font.Color  := clBlue;
-              lblCIRN.Caption := 'Remote';
-              lblCIRNData.Caption := 'Data';
-              lblCIRNAvail.Caption := 'Available';
-              pnlCIRN.Caption := 'Remote Data Available';
-            end
-          else
-            begin
-              lblCIRN.Font.Color  := clWindowText;
-              lblCIRNData.Font.Color  := clWindowText;
-              lblCIRNAvail.Font.Color := clWindowText;
-              lstCIRNLocations.Font.Color  := clWindowText;
-              lblCIRNAvail.Color := clWindowText;
-            end;
-          pnlCIRN.Hint := 'Click to display other facilities having data for this patient.';
-          lstCIRNLocations.Items.Add('-1' + U + 'Use VistaWeb from now on');
-          if RemoteSites.Count > 0 then
-            lstCIRNLocations.Items.Add('0' + U + 'All Available Sites');
-          for i := 0 to RemoteSites.Count - 1 do
-            begin
-              ASite := TRemoteSite(SiteList[i]);
-              lstCIRNLocations.Items.Add(ASite.SiteID + U + ASite.SiteName + U +
-                FormatFMDateTime('mmm dd yyyy hh:nn', ASite.LastDate));
-            end;
-        end
-      else
-        begin
-          lblCIRN.Font.Color  := clWindowText;
-          lblCIRNData.Font.Color  := clWindowText;
-          lblCIRNAvail.Font.Color := clWindowText;
-          lblCIRN.Enabled     := False;
-          lblCIRNData.Enabled := False;
-          lblCIRNAvail.Enabled := False;
-          pnlCIRN.TabStop     := False;
-          pnlCIRN.Hint := NoDataReason;
-        end;
+  begin
+    ChangePatient(Patient.DFN);
+    lblCIRN.Caption := ' Remote Data';
+    lblCIRN.Alignment := taCenter;
+    if RemoteDataExists and (RemoteSites.Count > 0) then
+      begin
+        lblCIRN.Enabled     := True;
+        pnlCIRN.TabStop     := True;
+        lblCIRN.Font.Color  := Get508CompliantColor(clBlue);
+        lstCIRNLocations.Font.Color  := Get508CompliantColor(clBlue);
+        lblCIRN.Caption := 'Remote Data';
+        pnlCIRN.Hint := 'Click to display other facilities having data for this patient.';
+        if RemoteSites.Count > 0 then
+          lstCIRNLocations.Items.Add('0' + U + 'All Available Sites');
+        for i := 0 to RemoteSites.Count - 1 do
+          begin
+            ASite := TRemoteSite(SiteList[i]);
+            lstCIRNLocations.Items.Add(ASite.SiteID + U + ASite.SiteName + U +
+              FormatFMDateTime('mmm dd yyyy hh:nn', ASite.LastDate));
+          end;
+      end
+    else
+      begin
+        lblCIRN.Font.Color  := clWindowText;
+        lblCIRN.Enabled     := False;
+        pnlCIRN.TabStop     := False;
+        pnlCIRN.Hint := NoDataReason;
+      end;
     aAutoQuery := AutoRDV;        //Check to see if Remote Queries should be used for all available sites
     if (aAutoQuery = '1') and (lstCIRNLocations.Count > 0) then
       begin
@@ -2812,49 +2813,11 @@ begin
 end;
 
 procedure TfrmFrame.pnlCIRNClick(Sender: TObject);
-//var
-//  aAddress: string;
 begin
-  {if UseVistaWeb then
-    begin
-      pnlCIRN.BevelOuter := bvRaised;
-      pnlCIRN.Hint := 'Click to open VistaWeb';
-      lblCIRN.Width := 43;
-      lblCIRNData.Width := 43;
-      lblCIRNData.Alignment := taCenter;
-      lblCIRN.Alignment := taCenter;
-      lstCIRNLocations.Visible := false;
-      lstCIRNLocations.SendToBack;
-      aAddress := GetVistaWebAddress(Patient.DFN);
-      ShellExecute(Handle, 'open', PChar(aAddress), PChar(''), '', SW_NORMAL);
-      Exit;
-    end;
-  if not RemoteSites.RemoteDataExists then Exit;
-  if (not lstCIRNLocations.Visible) then
-    begin
-      pnlCIRN.BevelOuter := bvLowered;
-      lstCIRNLocations.Visible := True;
-      lstCIRNLocations.BringToFront;
-      lstCIRNLocations.SetFocus;
-      pnlCIRN.Hint := 'Click to close list.';
-    end
-  else
-    begin
-      pnlCIRN.BevelOuter := bvRaised;
-      lstCIRNLocations.Visible := False;
-      lstCIRNLocations.SendToBack;
-      pnlCIRN.Hint := 'Click to display other facilities having data for this patient.';
-    end }
   ViewInfo(mnuViewRemoteData);
 end;
 
 procedure TfrmFrame.lstCIRNLocationsClick(Sender: TObject);
-const
-  DGSR_FAIL = -1;
-  DGSR_NONE =  0;
-  DGSR_SHOW =  1;
-  DGSR_ASK  =  2;
-  DGSR_DENY =  3;
 var
   iIndex,j,iAll,iCur: integer;
   aMsg,s: string;
@@ -2863,63 +2826,6 @@ begin
   iAll := 1;
   AccessStatus := 0;
   iIndex := lstCIRNLocations.ItemIndex;
-  if iIndex = 0 then
-    if (piece(lstCIRNLocations.Items[0],'^',1) = '-1') and (lstCIRNLocations.Checked[iIndex] = true) then
-      begin
-        if MessageDlg('Are you sure you want to make VistaWeb your default for viewing Remote Data?',
-          mtConfirmation, [mbYes, mbNo], 0) = mrYes then
-          begin
-            ChangeVistaWebParam('1');
-            lblCIRN.Caption := 'Remote';          //VistaWeb On
-            lblCIRNData.Caption := 'Data*';
-            pnlCIRN.Caption := 'Remote Data';
-            lblCIRNAvail.Caption := '';
-            lblCIRN.Width := 43;
-            lblCIRNData.Width := 43;
-            lblCIRNData.Alignment := taCenter;
-            lblCIRN.Alignment := taCenter;
-            with RemoteSites do if RemoteDataExists and (RemoteSites.Count > 0) then
-              begin
-                lblCIRN.Enabled     := True;
-                lblCIRNData.Enabled := True;
-                pnlCIRN.TabStop     := True;
-                if ColorToRGB(clWindowText) = ColorToRGB(clBlack) then
-                  begin
-                    lblCIRN.Font.Color  := clBlue;
-                    lblCIRNData.Font.Color  := clBlue;
-                    lstCIRNLocations.Font.Color  := clBlue;
-                    lblCIRN.Caption := 'Remote';
-                    lblCIRNData.Caption := 'Data*';
-                    lblCIRNAvail.Caption := 'Available';
-                    pnlCIRN.Caption := 'Remote Data Available';
-                  end
-                else
-                  begin
-                    lblCIRN.Font.Color  := clWindowText;
-                    lblCIRNData.Font.Color  := clWindowText;
-                    lstCIRNLocations.Font.Color  := clWindowText;
-                    lblCIRNAvail.Font.Color := clWindowText;
-                  end;
-              end;
-            pnlCIRNClick(self);
-            Exit;
-          end
-        else
-          lstCIRNLocations.Checked[iIndex] := false;
-      end
-    else
-      begin
-        ChangeVistaWebParam('0');
-        lblCIRN.Caption := 'Remote';
-        lblCIRNData.Caption := 'Data';
-        pnlCIRN.Caption := 'Remote Data';
-        lblCIRN.Width := 43;
-        lblCIRNData.Width := 43;
-        lblCIRNData.Alignment := taCenter;
-        lblCIRN.Alignment := taCenter;
-        pnlCIRNClick(self);
-        Exit;
-      end;
   if not CheckHL7TCPLink then
     begin
       InfoBox('Local HL7 TCP Link is down.' + CRLF + 'Unable to retrieve remote data.', TC_DGSR_ERR, MB_OK);
@@ -2948,9 +2854,9 @@ begin
       begin
         with RemoteSites.SiteList do
         for j := 0 to Count - 1 do
-          if lstCIRNLocations.Checked[j+2] = true then
+          if lstCIRNLocations.Checked[j+1] = true then
             begin
-              lstCIRNLocations.Checked[j+2] := false;
+              lstCIRNLocations.Checked[j+1] := false;
               TRemoteSite(RemoteSites.SiteList[j]).Selected := false;
               TRemoteSite(RemoteSites.SiteList[j]).ReportClear;
               TRemoteSite(RemoteSites.SiteList[j]).LabClear;
@@ -2966,13 +2872,13 @@ begin
                 AccessStatus);}
               Screen.Cursor := crDefault;
               aMsg := aMsg + ' at site: ' + TRemoteSite(Items[j]).SiteName;
-              s := lstCIRNLocations.Items[j+2];
-              lstCIRNLocations.Items[j+2] := pieces(s, '^', 1, 3);
+              s := lstCIRNLocations.Items[j+1];
+              lstCIRNLocations.Items[j+1] := pieces(s, '^', 1, 3);
               case AccessStatus of
               DGSR_FAIL: begin
                            if piece(aMsg,':',1) = 'RPC name not found at site' then //Allow for backward compatibility
                              begin
-                               lstCIRNLocations.Checked[j+2] := true;
+                               lstCIRNLocations.Checked[j+1] := true;
                                TRemoteSite(RemoteSites.SiteList[j]).ReportClear;
                                TRemoteSite(RemoteSites.SiteList[j]).LabClear;
                                TRemoteSite(Items[j]).Selected := true;
@@ -2980,21 +2886,21 @@ begin
                            else
                              begin
                                InfoBox(aMsg, TC_DGSR_ERR, MB_OK);
-                               lstCIRNLocations.Checked[j+2] := false;
-                               lstCIRNLocations.Items[j+2] := pieces(s, '^', 1, 3) + '^' + TC_DGSR_ERR;
+                               lstCIRNLocations.Checked[j+1] := false;
+                               lstCIRNLocations.Items[j+1] := pieces(s, '^', 1, 3) + '^' + TC_DGSR_ERR;
                                TRemoteSite(Items[j]).Selected := false;
                                Continue;
                              end;
                          end;
               DGSR_NONE: begin
-                           lstCIRNLocations.Checked[j+2] := true;
+                           lstCIRNLocations.Checked[j+1] := true;
                            TRemoteSite(RemoteSites.SiteList[j]).ReportClear;
                            TRemoteSite(RemoteSites.SiteList[j]).LabClear;
                            TRemoteSite(Items[j]).Selected := true;
                          end;
               DGSR_SHOW: begin
                            InfoBox(AMsg, TC_DGSR_SHOW, MB_OK);
-                           lstCIRNLocations.Checked[j+2] := true;
+                           lstCIRNLocations.Checked[j+1] := true;
                            TRemoteSite(RemoteSites.SiteList[j]).ReportClear;
                            TRemoteSite(RemoteSites.SiteList[j]).LabClear;
                            TRemoteSite(Items[j]).Selected := true;
@@ -3002,22 +2908,22 @@ begin
               DGSR_ASK:  if InfoBox(AMsg + TX_DGSR_YESNO, TC_DGSR_SHOW, MB_YESNO or MB_ICONWARNING or
                            MB_DEFBUTTON2) = IDYES then
                            begin
-                             lstCIRNLocations.Checked[j+2] := true;
+                             lstCIRNLocations.Checked[j+1] := true;
                              TRemoteSite(RemoteSites.SiteList[j]).ReportClear;
                              TRemoteSite(RemoteSites.SiteList[j]).LabClear;
                              TRemoteSite(Items[j]).Selected := true;
                            end
                            else
                              begin
-                               lstCIRNLocations.Checked[j+2] := false;
-                               lstCIRNLocations.Items[j+2] := pieces(s, '^', 1, 3) + '^' + TC_DGSR_SHOW;
+                               lstCIRNLocations.Checked[j+1] := false;
+                               lstCIRNLocations.Items[j+1] := pieces(s, '^', 1, 3) + '^' + TC_DGSR_SHOW;
                                TRemoteSite(Items[j]).Selected := false;
                                Continue;
                              end;
               else       begin
                            InfoBox(AMsg, TC_DGSR_DENY, MB_OK);
-                           lstCIRNLocations.Checked[j+2] := false;
-                           lstCIRNLocations.Items[j+2] := pieces(s, '^', 1, 3) + '^' + TC_DGSR_DENY;
+                           lstCIRNLocations.Checked[j+1] := false;
+                           lstCIRNLocations.Items[j+1] := pieces(s, '^', 1, 3) + '^' + TC_DGSR_DENY;
                            TRemoteSite(Items[j]).Selected := false;
                            Continue;
                          end;
@@ -3099,10 +3005,16 @@ begin
                       pnlRightTop.Height := lblTitle.Height + TabControl1.Height;
                     end;
               with frmLabs do
-                if lstReports.ItemIndex > -1 then
+                if piece(uRemoteType,'^',1) = '1' then
+                  if not(piece(uRemoteType,'^',2) = 'V') then
+                    begin
+                      TabControl1.Visible := true;
+                      pnlRightTop.Height := lblTitle.Height + TabControl1.Height;
+                    end;
+                {if lstReports.ItemIndex > -1 then
                   if piece(lstReports.Items[lstReports.ItemIndex],'^',3) = '1' then
                     if not(piece(lstReports.Items[lstReports.ItemIndex],'^',5) = 'V') then
-                      TabControl1.Visible := true;
+                      TabControl1.Visible := true;}
             end;
         end;
     end;
@@ -3115,10 +3027,10 @@ begin
           frmLabs.TabControl1.Tabs.AddObject(TRemoteSite(Items[j]).SiteName,
             TRemoteSite(Items[j]));
         end;
-  //frmLabs.TabControl1.OnChange(nil);
-  //frmReports.TabControl1.OnChange(nil);
+
   if frmReports.tvReports.SelectionCount > 0 then frmReports.tvReportsClick(self);
-  if frmLabs.lstReports.ItemIndex > -1 then frmLabs.ExtlstReportsClick(self, true);
+  if frmLabs.tvReports.SelectionCount > 0 then frmLabs.tvReportsClick(self);
+  //if frmLabs.lstReports.ItemIndex > -1 then frmLabs.ExtlstReportsClick(self, true);
   StatusText('');
 end;
 
@@ -3233,20 +3145,19 @@ end;
 procedure TfrmFrame.LoadUserPreferences;
 begin
   LoadSizesForUser;
-//  LoadUserVitalPreferences;
   GetUserTemplateDefaults(TRUE);
 end;
 
 procedure TfrmFrame.SaveUserPreferences;
 begin
   SaveSizesForUser;         // position & size settings
-//  SaveUserVitalPreferences; // save Vitals metric setting
   SaveUserTemplateDefaults;
 end;
 
 procedure TfrmFrame.mnuFileRefreshClick(Sender: TObject);
 begin
   FRefreshing := TRUE;
+
   try
     mnuFileOpenClick(Self);
   finally
@@ -3259,6 +3170,8 @@ begin
   if assigned(FOldActivate) then
     FOldActivate(Sender);
   SetActiveWindow(Application.Handle);
+  if ScreenReaderSystemActive and assigned(Patient) and (Patient.Name <> '') then
+      SpeakTabAndPatient;
 end;
 
 // close Treatment Factor hint window if alt-tab pressed.
@@ -3282,14 +3195,6 @@ begin
   end;
 end;
 
-(*procedure TfrmFrame.CreateTab(var AnInstance: TObject; AClass: TClass; ATabID: integer; ALabel: string);
-begin
-  AnInstance := TPage.Create(Self);
-  TPage(AnInstance).Parent := pnlPage;
-  TPage(AnInstance).Show;
-  uTabList.Add(IntToStr(ATabID));
-  tabPage.Tabs.Add(ALabel);
-end;*)
 
 procedure TfrmFrame.CreateTab(ATabID: integer; ALabel: string);
 begin
@@ -3387,16 +3292,9 @@ mnuHelpLists.visible := false;
 mnuHelpSymbols.visible := false;
 
 // Top panel components:
-//pnlVisit.visible := false;
 pnlVisit.hint := 'Provider/Location';
 pnlVisit.onMouseDown := nil;
 pnlVisit.onMouseUp := nil;
-//pnlPrimaryCare.visible := false;
-//pnlPostings.visible := false;
-//lblPtCWAD.visible := false;
-//lblPtPostings.visible := false;
-//pnlReminders.visible := false;
-//anmtRemSearch.visible := false;
 
 // Forms for other tabs:
 frmCover.visible := false;
@@ -3425,9 +3323,41 @@ begin
   Patient.DFN := tmpDFN;
   uCore.TempEncounterLoc := 0;  //hds7591  Clinic/Ward movement.
   uCore.TempEncounterLocName := ''; //hds7591  Clinic/Ward movement.
-
+  uCore.TempEncounterText := '';
+  uCore.TempEncounterDateTime := 0;
+  uCore.TempEncounterVistCat := #0;
+  //ucore.TempOutEncounterLoc := 0;
+  //uCore.TempOutEncounterLocName := '';
+  if (not FRefreshing) and (FReviewClick = false) then DoNotChangeEncWindow := false;
   if (FPrevInPatient and Patient.Inpatient) then                //transfering inside hospital
-    Encounter.Location := Patient.Location
+    begin
+     // if DoNotChangeEncWindow = false then
+     //   begin
+          if FReviewClick = True then
+            begin
+              ucore.TempEncounterLoc := Encounter.Location;
+              uCore.TempEncounterLocName := Encounter.LocationName;
+              uCore.TempEncounterText := Encounter.LocationText;
+              uCore.TempEncounterDateTime := Encounter.DateTime;
+              uCore.TempEncounterVistCat := Encounter.VisitCategory;
+            end
+          else if (patient.Location <> encounter.Location) and (OrderPrintForm = false) then
+                begin
+                  frmPrintLocation.SwitchEncounterLoction(Encounter.Location, Encounter.locationName, Encounter.LocationText,
+                                                          Encounter.DateTime, Encounter.VisitCategory);
+                  DisplayEncounterText;
+                  exit;
+                end
+          else if (patient.Location <> encounter.Location) and (OrderPrintForm = True) then
+            begin
+              OrderPrintForm := false;
+              Exit;
+            end;
+               
+            //end;
+          Encounter.Location := Patient.Location;
+       // end;
+    end
   else if (FPrevInPatient and (not Patient.Inpatient)) then     //patient was discharged
   begin
     Encounter.Inpatient := False;
@@ -3439,9 +3369,19 @@ begin
     Encounter.Inpatient := True;
     uCore.TempEncounterLoc := Encounter.Location;  //hds7591  Clinic/Ward movement.
     uCore.TempEncounterLocName := Encounter.LocationName; //hds7591  Clinic/Ward movement.
-    Encounter.Location := Patient.Location;
-    Encounter.DateTime := Patient.AdmitTime;
-    Encounter.VisitCategory := 'H';
+    uCore.TempEncounterText := Encounter.LocationText;
+    uCore.TempEncounterDateTime := Encounter.DateTime;
+    uCore.TempEncounterVistCat := Encounter.VisitCategory;
+    if (FReviewClick = False) and (encounter.Location <> patient.Location) then
+        frmPrintLocation.SwitchEncounterLoction(Encounter.Location, Encounter.locationName, Encounter.LocationText,
+                                                Encounter.DateTime, Encounter.VisitCategory)
+    else
+    //if DoNotChangeEncWindow = false then
+      begin
+        Encounter.Location := Patient.Location;
+        Encounter.DateTime := Patient.AdmitTime;
+        Encounter.VisitCategory := 'H';
+      end;
     FPrevInPatient := True;
   end;
   //if User.IsProvider then Encounter.Provider := ;
@@ -3452,14 +3392,19 @@ procedure TfrmFrame.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftSta
 var
   NewTabIndex: integer;
 begin
+  inherited;
+  FCtrlTabUsed := FALSE;
   //CQ2844: Toggle Remote Data button using Alt+R
    case Key of
      82,114:  if (ssAlt in Shift) then
                  frmFrame.pnlCIRNClick(Sender);
      end;
 
-  if (Key = VK_TAB) then begin
-    if (ssCtrl in Shift) then begin
+  if (Key = VK_TAB) then
+  begin
+    if (ssCtrl in Shift) then
+    begin
+      FCtrlTabUsed := TRUE;
       if not (ActiveControl is TCustomMemo) or not TMemo(ActiveControl).WantTabs then begin
         NewTabIndex := tabPage.TabIndex;
         if ssShift in Shift then
@@ -3517,14 +3462,46 @@ end;
 
 procedure TfrmFrame.pnlPatientClick(Sender: TObject);
 begin
+  pnlPatient.Enabled := false;
   ViewInfo(mnuViewDemo);
+  pnlPatient.Enabled := true;
 end;
 
 procedure TfrmFrame.pnlVisitClick(Sender: TObject);
 begin
- //if (not User.IsReportsOnly) then // Reports Only tab.
- //  mnuFileEncounterClick(Self);
+  pnlVisit.Enabled := false;
+  pnlVisit.BevelOuter := bvLowered;
+  with lblPtLocation do SetBounds(Left+2, Top+2, Width, Height);
+  with lblPtProvider do SetBounds(Left+2, Top+2, Width, Height);
+
   ViewInfo(mnuViewVisits);
+
+  pnlVisit.BevelOuter := bvRaised;
+  with lblPtLocation do SetBounds(Left-2, Top-2, Width, Height);
+  with lblPtProvider do SetBounds(Left-2, Top-2, Width, Height);
+  pnlVisit.Enabled := true;
+end;
+
+procedure TfrmFrame.pnlVistaWebClick(Sender: TObject);
+begin
+  inherited;
+  uUseVistaWeb := true;
+  pnlCIRNClick(self);
+  uUseVistaWeb := false;
+end;
+
+procedure TfrmFrame.pnlVistaWebMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  inherited;
+  pnlVistaWeb.BevelOuter := bvLowered;
+end;
+
+procedure TfrmFrame.pnlVistaWebMouseUp(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  inherited;
+  pnlVistaWeb.BevelOuter := bvRaised;
 end;
 
 procedure TfrmFrame.pnlPrimaryCareClick(Sender: TObject);
@@ -3550,7 +3527,7 @@ end;
 procedure TfrmFrame.HandleCCOWError(AMessage: string);
 begin
   {$ifdef DEBUG}
-    ShowMessage(AMessage);
+    Show508Message(AMessage);
   {$endif}
   InfoBox(TX_CCOW_ERROR, TC_CCOW_ERROR, MB_ICONERROR or MB_OK);
   FCCOWInstalled := False;
@@ -3648,7 +3625,7 @@ begin
     if (response = UrCommit) then
     begin
       // New context is committed.
-      //ShowMessage('Response was Commit');
+      //Show508Message('Response was Commit');
       mnuFileResumeContext.Enabled := False;
       mnuFileBreakContext.Enabled := True;
       FCCOWIconName := 'BMP_CCOW_LINKED';
@@ -3691,8 +3668,8 @@ begin
     end;
   except
     on exc : EOleException do
-      //ShowMessage('EOleException: ' + exc.Message + ' - ' + string(exc.ErrorCode) );
-      ShowMessage('EOleException: ' + exc.Message);
+      //Show508Message('EOleException: ' + exc.Message + ' - ' + string(exc.ErrorCode) );
+      ShowMsg('EOleException: ' + exc.Message);
   end;
 end;
 
@@ -3753,7 +3730,12 @@ begin
   if Pos('COM_OBJECT_ACTIVE', Reason) > 0 then
     Sleep(12000)
   else if Length(Reason) > 0 then
-    ctxContextor.SetSurveyResponse(Reason);
+    ctxContextor.SetSurveyResponse(Reason)
+  else
+    begin
+      imgCCOW.Picture.BitMap.LoadFromResourceName(hInstance, 'BMP_CCOW_LINKED');
+      pnlCCOW.Hint := TX_CCOW_LINKED;
+    end;
   FCCOWContextChanging := False;
 end;
 
@@ -3787,6 +3769,7 @@ begin
     Exit;
   end;
   if not PtChanged then exit;
+  // HideEverything('Retrieving information - please wait....'); // v27 (pending) RV
   FCCOWDrivedChange := True;
   i := 0;
   while Length(Screen.Forms[i].Name) > 0 do
@@ -3803,6 +3786,7 @@ begin
   FCCOWIconName := 'BMP_CCOW_LINKED';
   pnlCCOW.Hint := TX_CCOW_LINKED;
   imgCCOW.Picture.BitMap.LoadFromResourceName(hInstance, FCCOWIconName);
+  // ShowEverything;    // v27 (pending) RV
 end;
 
 //function TfrmFrame.FindBestCCOWDFN(var APatientName: string): string;
@@ -3869,6 +3853,7 @@ var
   PtDFN(*, PtName*): string;
 begin
   if not FCCOWInstalled then exit;
+  DoNotChangeEncWindow := false;
   //PtDFN := FindBestCCOWDFN(PtName);
   PtDFN := FindBestCCOWDFN;
   if StrToInt64Def(PtDFN, 0) > 0 then
@@ -3939,12 +3924,15 @@ begin
   end;
   if FCCOWError then exit;
   UpdateCCOWContext;
-  FCCOWIconName := 'BMP_CCOW_LINKED';
-  pnlCCOW.Hint := TX_CCOW_LINKED;
-  imgCCOW.Picture.BitMap.LoadFromResourceName(hInstance, FCCOWIconName);
-  mnuFileResumeContext.Enabled := False;
-  mnuFileBreakContext.Visible := True;
-  mnuFileBreakContext.Enabled := True;
+  if not FNoPatientSelected then
+  begin
+    FCCOWIconName := 'BMP_CCOW_LINKED';
+    pnlCCOW.Hint := TX_CCOW_LINKED;
+    imgCCOW.Picture.BitMap.LoadFromResourceName(hInstance, FCCOWIconName);
+    mnuFileResumeContext.Enabled := False;
+    mnuFileBreakContext.Visible := True;
+    mnuFileBreakContext.Enabled := True;
+  end;
 end;
 
 procedure TfrmFrame.mnuFileResumeContextSetClick(Sender: TObject);
@@ -4051,9 +4039,10 @@ begin
     end;
 end;
 
-procedure TfrmFrame.HideEverything;
+procedure TfrmFrame.HideEverything(AMessage: string = 'No patient is currently selected.');
 begin
   FNoPatientSelected := TRUE;
+  pnlNoPatientSelected.Caption := AMessage;
   pnlNoPatientSelected.Visible := True;
   pnlNoPatientSelected.BringToFront;
   mnuFileReview.Enabled := False;
@@ -4070,11 +4059,13 @@ begin
   mnuEdit.Enabled := False;
   mnuView.Enabled := False;
   mnuTools.Enabled := False;
+  if FNextButtonActive then FNextButton.Visible := False;
 end;
 
 procedure TfrmFrame.ShowEverything;
 begin
   FNoPatientSelected := FALSE;
+  pnlNoPatientSelected.Caption := '';
   pnlNoPatientSelected.Visible := False;
   pnlNoPatientSelected.SendToBack;
   mnuFileReview.Enabled := True;
@@ -4100,6 +4091,7 @@ begin
   mnuEdit.Enabled := True;
   mnuView.Enabled := True;
   mnuTools.Enabled := True;
+  if FNextButtonActive then FNextButton.Visible := True;
 end;
 
 
@@ -4260,7 +4252,10 @@ begin
       with GraphFloat do
       begin
         if btnClose.Tag = 1 then
-          Exit;
+        begin
+          Screen.Cursor := crDefault;
+          exit;
+        end;
         Initialize;
         Caption := 'CPRS Graphing - Patient: ' + MixedCase(Patient.Name);
         BorderIcons := [biSystemMenu, biMaximize, biMinimize];
@@ -4281,33 +4276,40 @@ begin
         GraphFloatActive := true;
     end;
   end
-  else if GraphFloat.btnClose.Tag = 1 then
-    Exit
-  else if GraphFloatActive and (GraphFloat.lstTypes.Hint = Patient.DFN) then
-    GraphFloat.BringToFront             // graph is active, same patient
-  else if GraphFloat.lstTypes.Hint = Patient.DFN then
-  begin                                 // graph is not active, same patient
-    // context sensitive
-    GraphFloat.Show;
-    GraphFloatActive := true;
-  end
   else
-  //with GraphFloat do                    // new patient
   begin
-    GraphFloat.InitialRetain;
-    GraphFloatActive := false;
-    GraphFloat.Free;
-    GraphFloat := nil;
-    mnuToolsGraphingClick(self);          // delete and recurse
-    {//FormCreate(self);   //****************
-    Initialize;
-    DisplayData('top');
-    DisplayData('bottom');
-    lstCheck.Items.Clear;
-    Caption := 'CPRS Graphing - Patient: ' + MixedCase(Patient.Name);
-    // context sensitive
-    Show;
-    GraphFloatActive := true;}
+    GraphFloat.Caption := 'CPRS Graphing - Patient: ' + MixedCase(Patient.Name);
+    if GraphFloat.btnClose.Tag = 1 then
+    begin
+      Screen.Cursor := crDefault;
+      exit;
+    end
+    else if GraphFloatActive and (frmGraphData.pnlData.Hint = Patient.DFN) then
+      GraphFloat.BringToFront             // graph is active, same patient
+    else if frmGraphData.pnlData.Hint = Patient.DFN then
+    begin                                 // graph is not active, same patient
+      // context sensitive
+      GraphFloat.Show;
+      GraphFloatActive := true;
+    end
+    else
+    //with GraphFloat do                    // new patient
+    begin
+      GraphFloat.InitialRetain;
+      GraphFloatActive := false;
+      GraphFloat.Free;
+      GraphFloat := nil;
+      mnuToolsGraphingClick(self);          // delete and recurse
+      {//FormCreate(self);   //****************
+      Initialize;
+      DisplayData('top');
+      DisplayData('bottom');
+      GtslCheck.Clear;
+      Caption := 'CPRS Graphing - Patient: ' + MixedCase(Patient.Name);
+      // context sensitive
+      Show;
+      GraphFloatActive := true;}
+    end;
   end;
   Screen.Cursor := crDefault;
 end;
@@ -4353,6 +4355,7 @@ var
   InsuranceSubscriberName: string;
   ReportString: TStringList;
   aAddress: string;
+
 begin
   case (Sender as TMenuItem).Tag of
     1:begin { displays patient inquiry report (which optionally allows new patient to be selected) }
@@ -4377,7 +4380,9 @@ begin
     5:begin
         if fCover.VAAFlag[0] <> '0' then //'0' means subscriber not found
         begin
-          InsuranceSubscriberName := fCover.VAAFlag[12];
+         //  CQ:15534-GE  Remove leading spaces from Patient Name
+          InsuranceSubscriberName := ( (Piece(fCover.VAAFlag[12],':',1)) + ':  ' +
+                                     (TRIM(Piece(fCover.VAAFlag[12],':',2)) ));//fCover.VAAFlag[12];
           ReportString := VAAFlag;
           ReportString[0] := '';
           ReportBox(ReportString, InsuranceSubscriberName, True);
@@ -4387,13 +4392,9 @@ begin
         ShowFlags;
       end;
     7:begin
-        if UseVistaWeb then
+        if uUseVistaWeb = true then
           begin
             pnlCIRN.BevelOuter := bvRaised;
-            pnlCIRN.Hint := 'Click to open VistaWeb';
-            lblCIRN.Width := 43;
-            lblCIRNData.Width := 43;
-            lblCIRNData.Alignment := taCenter;
             lblCIRN.Alignment := taCenter;
             lstCIRNLocations.Visible := false;
             lstCIRNLocations.SendToBack;
@@ -4440,7 +4441,53 @@ begin
   mnuViewPostings.Enabled := frmFrame.pnlPostings.Enabled;
 end;
 
+procedure TfrmFrame.SetActiveTab(PageID: Integer);
+begin
+  tabPage.TabIndex := frmFrame.PageIDToTab(PageID);
+  tabPageChange(tabPage);
+end;
+
+procedure TfrmFrame.NextButtonClick(Sender: TObject);
+begin
+  if FProccessingNextClick then Exit;
+  FProccessingNextClick := true;
+  popAlerts.AutoPopup := TRUE;
+  mnuFileNext.Enabled := True;
+  mnuFileNextClick(Self);
+  FProccessingNextClick := false;
+end;
+
+procedure TfrmFrame.NextButtonMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Integer);
+begin
+   popAlerts.AutoPopup := TRUE;
+end;
+
+procedure TfrmFrame.SetUpNextButton;
+ begin
+   if FNextButton <> nil then
+   begin
+      FNextButton.free;
+      FNextButton := nil;
+   end;
+   FNextButton := TBitBtn.Create(self);
+   FNextButton.Parent:= frmFrame;
+   FNextButton.Glyph := FNextButtonBitmap;
+   FNextButton.OnMouseDown := NextButtonMouseDown;
+   FNextButton.OnClick := NextButtonClick;
+   FNextButton.Caption := '&Next';
+   FNextButton.PopupMenu := popAlerts;
+   FNextButton.Top := stsArea.Top;
+   FNextButton.Left := FNextButtonL;
+   FNextButton.Height := stsArea.Height;
+   FNextButton.Width := stsArea.Panels[2].Width;
+   FNextButton.TabStop := True;
+   FNextButton.TabOrder := 1;
+   FNextButton.show;
+end;
+
 initialization
+  SpecifyFormIsNotADialog(TfrmFrame);
 
 finalization
 

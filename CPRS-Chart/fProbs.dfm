@@ -1,36 +1,47 @@
 inherited frmProblems: TfrmProblems
   Left = 627
   Top = 64
-  Width = 639
-  Height = 409
   HelpContext = 2000
   Caption = 'Problems List Page'
+  ClientHeight = 355
+  ClientWidth = 631
   HelpFile = 'overvw'
   Menu = mnuProbs
   OnDestroy = FormDestroy
   OnHide = FormHide
   OnMouseMove = FormMouseMove
   OnShow = FormShow
+  ExplicitLeft = 627
+  ExplicitTop = 64
+  ExplicitWidth = 639
+  ExplicitHeight = 409
   PixelsPerInch = 96
   TextHeight = 13
   inherited shpPageBottom: TShape
-    Top = 358
+    Top = 350
     Width = 631
     Constraints.MinHeight = 5
+    ExplicitTop = 358
+    ExplicitWidth = 631
   end
   inherited sptHorz: TSplitter
     Left = 159
     Width = 2
-    Height = 358
+    Height = 350
     OnMoved = sptHorzMoved
+    ExplicitLeft = 159
+    ExplicitWidth = 2
+    ExplicitHeight = 358
   end
   inherited pnlLeft: TPanel
     Width = 159
-    Height = 358
+    Height = 350
     TabStop = True
+    ExplicitWidth = 159
+    ExplicitHeight = 358
     object pnlButtons: TPanel
       Left = 0
-      Top = 312
+      Top = 304
       Width = 159
       Height = 46
       Align = alBottom
@@ -42,34 +53,35 @@ inherited frmProblems: TfrmProblems
         Top = 2
         Width = 159
         Height = 22
+        Align = alBottom
         Caption = 'Other Problem'
         TabOrder = 0
         OnClick = bbOtherProbClick
         OnExit = bbNewProbExit
         OnMouseMove = FormMouseMove
-        Align = alBottom
       end
       object bbCancel: TORAlignButton
         Left = 0
         Top = 24
         Width = 159
         Height = 22
+        Align = alBottom
         Caption = 'Cancel'
         TabOrder = 1
         OnClick = bbCancelClick
         OnExit = bbNewProbExit
         OnMouseMove = FormMouseMove
-        Align = alBottom
       end
     end
     object pnlView: TPanel
       Left = 0
       Top = 0
       Width = 159
-      Height = 312
+      Height = 304
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitHeight = 312
       object lblView: TOROffsetLabel
         Left = 0
         Top = 0
@@ -112,19 +124,19 @@ inherited frmProblems: TfrmProblems
         Top = 116
         Width = 159
         Height = 24
+        Align = alTop
         Caption = 'New problem'
         TabOrder = 1
         OnClick = lstProbActsClick
         OnExit = bbNewProbExit
         OnMouseMove = FormMouseMove
-        Align = alTop
       end
     end
     object pnlProbEnt: TPanel
       Left = 0
       Top = 0
       Width = 159
-      Height = 312
+      Height = 304
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 2
@@ -132,22 +144,23 @@ inherited frmProblems: TfrmProblems
       OnResize = pnlProbEntResize
       object lblProbEnt: TLabel
         Left = 0
-        Top = 278
+        Top = 270
         Width = 159
         Height = 13
         Align = alBottom
         AutoSize = False
         Caption = 'Enter new problem:'
+        ExplicitTop = 278
       end
       object edProbEnt: TCaptionEdit
         Left = 0
-        Top = 291
+        Top = 283
         Width = 159
         Height = 21
+        Align = alBottom
         TabOrder = 0
         OnExit = lstViewExit
         OnKeyPress = edProbEntKeyPress
-        Align = alBottom
         Caption = 'Enter new problem'
       end
     end
@@ -155,11 +168,12 @@ inherited frmProblems: TfrmProblems
       Left = 0
       Top = 0
       Width = 159
-      Height = 312
+      Height = 304
       Align = alClient
       BevelOuter = bvNone
       Constraints.MinHeight = 90
       TabOrder = 0
+      ExplicitHeight = 312
       object sptProbPanel: TSplitter
         Left = 0
         Top = 157
@@ -210,10 +224,11 @@ inherited frmProblems: TfrmProblems
         Left = 0
         Top = 160
         Width = 159
-        Height = 152
+        Height = 144
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
+        ExplicitHeight = 152
         object lblProblems: TLabel
           Left = 0
           Top = 0
@@ -229,7 +244,7 @@ inherited frmProblems: TfrmProblems
           Left = 0
           Top = 13
           Width = 159
-          Height = 139
+          Height = 131
           Hint = 'Select problem to add'
           Align = alClient
           Ctl3D = False
@@ -245,6 +260,7 @@ inherited frmProblems: TfrmProblems
           ItemTipColor = clWindow
           LongList = False
           Pieces = '2,3'
+          ExplicitHeight = 139
         end
       end
     end
@@ -252,9 +268,12 @@ inherited frmProblems: TfrmProblems
   inherited pnlRight: TPanel
     Left = 161
     Width = 470
-    Height = 358
+    Height = 350
     OnExit = pnlRightExit
     OnResize = pnlRightResize
+    ExplicitLeft = 161
+    ExplicitWidth = 470
+    ExplicitHeight = 350
     object lblProbList: TOROffsetLabel
       Left = 0
       Top = 0
@@ -271,17 +290,18 @@ inherited frmProblems: TfrmProblems
       Left = 0
       Top = 36
       Width = 470
-      Height = 322
+      Height = 314
       Align = alClient
       TabOrder = 0
       Visible = False
       OnMouseMove = FormMouseMove
+      ExplicitHeight = 322
     end
     object wgProbData: TCaptionListBox
       Left = 0
       Top = 36
       Width = 470
-      Height = 322
+      Height = 314
       Style = lbOwnerDrawVariable
       Align = alClient
       Color = clCream
@@ -303,7 +323,6 @@ inherited frmProblems: TfrmProblems
       Top = 19
       Width = 470
       Height = 17
-      DragReorder = False
       Sections = <
         item
           ImageIndex = -1
@@ -393,6 +412,66 @@ inherited frmProblems: TfrmProblems
       OnMouseDown = HeaderControlMouseDown
       OnMouseUp = HeaderControlMouseUp
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlButtons'
+        'Status = stsDefault')
+      (
+        'Component = bbOtherProb'
+        'Status = stsDefault')
+      (
+        'Component = bbCancel'
+        'Status = stsDefault')
+      (
+        'Component = pnlView'
+        'Status = stsDefault')
+      (
+        'Component = lstView'
+        'Status = stsDefault')
+      (
+        'Component = bbNewProb'
+        'Status = stsDefault')
+      (
+        'Component = pnlProbEnt'
+        'Status = stsDefault')
+      (
+        'Component = edProbEnt'
+        'Status = stsDefault')
+      (
+        'Component = pnlProbList'
+        'Status = stsDefault')
+      (
+        'Component = pnlProbCats'
+        'Status = stsDefault')
+      (
+        'Component = lstCatPick'
+        'Status = stsDefault')
+      (
+        'Component = pnlProbs'
+        'Status = stsDefault')
+      (
+        'Component = lstProbPick'
+        'Status = stsDefault')
+      (
+        'Component = pnlProbDlg'
+        'Status = stsDefault')
+      (
+        'Component = wgProbData'
+        'Status = stsDefault')
+      (
+        'Component = HeaderControl'
+        'Status = stsDefault')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = pnlRight'
+        'Status = stsDefault')
+      (
+        'Component = frmProblems'
+        'Status = stsDefault'))
   end
   object popProb: TPopupMenu
     Left = 282

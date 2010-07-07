@@ -1,4 +1,4 @@
-object frmPtSens: TfrmPtSens
+inherited frmPtSens: TfrmPtSens
   Left = 216
   Top = 373
   BorderIcons = []
@@ -6,24 +6,18 @@ object frmPtSens: TfrmPtSens
   Caption = 'Restricted Patient Record'
   ClientHeight = 181
   ClientWidth = 596
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object imgWarning: TImage
+  object imgWarning: TImage [0]
     Left = 16
     Top = 16
     Width = 32
     Height = 32
   end
-  object lblContinue: TStaticText
+  object lblContinue: TStaticText [1]
     Left = 64
     Top = 150
     Width = 267
@@ -31,7 +25,7 @@ object frmPtSens: TfrmPtSens
     Caption = 'Do you want to continue processing this patient record?'
     TabOrder = 3
   end
-  object memWarning: TMemo
+  object memWarning: TMemo [2]
     Left = 64
     Top = 16
     Width = 517
@@ -69,7 +63,7 @@ object frmPtSens: TfrmPtSens
     ReadOnly = True
     TabOrder = 0
   end
-  object cmdYes: TButton
+  object cmdYes: TButton [3]
     Left = 408
     Top = 144
     Width = 75
@@ -78,7 +72,7 @@ object frmPtSens: TfrmPtSens
     TabOrder = 1
     OnClick = cmdYesClick
   end
-  object cmdNo: TButton
+  object cmdNo: TButton [4]
     Left = 500
     Top = 144
     Width = 75
@@ -87,5 +81,23 @@ object frmPtSens: TfrmPtSens
     Default = True
     TabOrder = 2
     OnClick = cmdNoClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblContinue'
+        'Status = stsDefault')
+      (
+        'Component = memWarning'
+        'Status = stsDefault')
+      (
+        'Component = cmdYes'
+        'Status = stsDefault')
+      (
+        'Component = cmdNo'
+        'Status = stsDefault')
+      (
+        'Component = frmPtSens'
+        'Status = stsDefault'))
   end
 end

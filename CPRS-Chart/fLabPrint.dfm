@@ -1,27 +1,21 @@
-object frmLabPrint: TfrmLabPrint
+inherited frmLabPrint: TfrmLabPrint
   Left = 294
   Top = 216
-  Width = 445
-  Height = 336
   Caption = 'Lab Print Device Selection'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 307
+  ClientWidth = 435
   OldCreateOrder = True
-  OnCreate = FormCreate
-  OnDestroy = FormDestroy
+  ExplicitWidth = 443
+  ExplicitHeight = 341
   PixelsPerInch = 96
   TextHeight = 13
-  object lblPrintTo: TLabel
+  object lblPrintTo: TLabel [0]
     Left = 7
     Top = 270
     Width = 3
     Height = 13
   end
-  object lblLabTitle: TMemo
+  object lblLabTitle: TMemo [1]
     Left = 8
     Top = 8
     Width = 301
@@ -34,7 +28,7 @@ object frmLabPrint: TfrmLabPrint
     ReadOnly = True
     TabOrder = 4
   end
-  object grpDevice: TGroupBox
+  object grpDevice: TGroupBox [2]
     Left = 8
     Top = 69
     Width = 411
@@ -92,6 +86,7 @@ object frmLabPrint: TfrmLabPrint
       ItemTipEnable = True
       ListItemsOnly = False
       LongList = True
+      LookupPiece = 0
       MaxLength = 0
       ParentShowHint = False
       Pieces = '2,4'
@@ -102,9 +97,10 @@ object frmLabPrint: TfrmLabPrint
       TabOrder = 0
       OnChange = cboDeviceChange
       OnNeedData = cboDeviceNeedData
+      CharsNeedMatch = 1
     end
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [3]
     Left = 267
     Top = 272
     Width = 72
@@ -114,7 +110,7 @@ object frmLabPrint: TfrmLabPrint
     TabOrder = 1
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [4]
     Left = 347
     Top = 272
     Width = 72
@@ -124,13 +120,43 @@ object frmLabPrint: TfrmLabPrint
     TabOrder = 2
     OnClick = cmdCancelClick
   end
-  object chkDefault: TCheckBox
+  object chkDefault: TCheckBox [5]
     Left = 7
     Top = 288
     Width = 173
     Height = 17
     Caption = 'Save as user'#39's default printer'
     TabOrder = 3
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = lblLabTitle'
+        'Status = stsDefault')
+      (
+        'Component = grpDevice'
+        'Status = stsDefault')
+      (
+        'Component = txtRightMargin'
+        'Status = stsDefault')
+      (
+        'Component = txtPageLength'
+        'Status = stsDefault')
+      (
+        'Component = cboDevice'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = chkDefault'
+        'Status = stsDefault')
+      (
+        'Component = frmLabPrint'
+        'Status = stsDefault'))
   end
   object dlgWinPrinter: TPrintDialog
     Left = 352

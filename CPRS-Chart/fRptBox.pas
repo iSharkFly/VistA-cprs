@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORFn, ComCtrls, ExtCtrls, fFrame;
+  StdCtrls, ORFn, ComCtrls, ExtCtrls, fFrame, fBase508Form,
+  VA508AccessibilityManager, uReports;
 
 type
-  TfrmReportBox = class(TForm)
+  TfrmReportBox = class(TfrmBase508Form)
     lblFontTest: TLabel;
     memReport: TRichEdit;
     pnlButton: TPanel;
@@ -18,7 +19,6 @@ type
     procedure cmdPrintClick(Sender: TObject);
     procedure cmdCloseClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
-    procedure FormCreate(Sender: TObject);
   end;
 
 procedure ReportBox(ReportText: TStrings; ReportTitle: string; AllowPrint: boolean);
@@ -93,7 +93,7 @@ begin
       end;
       //cmdClose.Left := pnlButton.Width - cmdClose.Width - cmdCloseRightMargin;
       //cmdPrint.Left := pnlButton.Width - cmdPrint.Width - cmdPrintRightMargin;
-      memReport.Lines.Assign(ReportText);
+      QuickCopy(ReportText, memReport);
       for i := 1 to Length(ReportTitle) do if ReportTitle[i] = #9 then ReportTitle[i] := ' ';
       Caption := ReportTitle;
       memReport.SelStart := 0;
@@ -147,19 +147,13 @@ begin
     begin
       AHeader := TStringList.Create;
       CreatePatientHeader(AHeader, Title);
-      memPrintReport := TRichEdit.Create(Form);
+      memPrintReport := CreateReportTextComponent(Form);
       try
         MaxLines := 60 - AHeader.Count;
         LastLine := 0;
         ThisPage := 0;
         with memPrintReport do
           begin
-            Visible := False;
-            Parent := Form;
-            Font.Name := 'Courier New';
-            Font.Size := MainFontSize;
-            Width := Printer.Canvas.TextWidth(StringOfChar('-', 74));
-            //Width := 600;
             repeat
               with Lines do
                 begin
@@ -216,11 +210,6 @@ procedure TfrmReportBox.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if(not (fsModal in FormState)) then
     Action := caFree;
-end;
-
-procedure TfrmReportBox.FormCreate(Sender: TObject);
-begin
-  memReport.Color := ReadOnlyColor;
 end;
 
 end.

@@ -1,17 +1,10 @@
-object frmFrame: TfrmFrame
-  Left = 380
-  Top = 292
-  Width = 684
-  Height = 487
+inherited frmFrame: TfrmFrame
+  Left = 196
+  Top = 119
   Caption = 'p'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 574
+  ClientWidth = 687
   FormStyle = fsMDIForm
-  KeyPreview = True
   Menu = mnuFrame
   OldCreateOrder = True
   Visible = True
@@ -21,15 +14,18 @@ object frmFrame: TfrmFrame
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnHelp = FormHelp
-  OnKeyDown = FormKeyDown
   OnResize = FormResize
+  ExplicitLeft = 196
+  ExplicitTop = 119
+  ExplicitWidth = 695
+  ExplicitHeight = 620
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlNoPatientSelected: TPanel
+  object pnlNoPatientSelected: TPanel [0]
     Left = 0
     Top = 0
-    Width = 676
-    Height = 433
+    Width = 687
+    Height = 574
     Align = alClient
     Caption = 'No patient is currently selected'
     Font.Charset = DEFAULT_CHARSET
@@ -41,35 +37,38 @@ object frmFrame: TfrmFrame
     TabOrder = 1
     Visible = False
   end
-  object pnlPatientSelected: TPanel
+  object pnlPatientSelected: TPanel [1]
     Left = 0
     Top = 0
-    Width = 676
-    Height = 433
+    Width = 687
+    Height = 574
     Align = alClient
     TabOrder = 0
     object bvlPageTop: TBevel
       Left = 1
       Top = 41
-      Width = 674
+      Width = 685
       Height = 1
       Align = alTop
+      ExplicitWidth = 674
     end
     object pnlToolbar: TPanel
       Left = 1
       Top = 1
-      Width = 674
+      Width = 685
       Height = 40
       Align = alTop
       BevelOuter = bvNone
+      Caption = 'object pnlRemoteData: TKeyClickPanel'
       TabOrder = 0
       object bvlToolTop: TBevel
         Left = 0
         Top = 0
-        Width = 674
+        Width = 685
         Height = 1
         Align = alTop
         Style = bsRaised
+        ExplicitWidth = 674
       end
       object pnlCCOW: TPanel
         Left = 0
@@ -129,7 +128,7 @@ object frmFrame: TfrmFrame
         Color = clInfoBk
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clInfoBk
-        Font.Height = -8
+        Font.Height = -11
         Font.Name = 'MS Sans Serif'
         Font.Style = []
         ParentFont = False
@@ -164,8 +163,8 @@ object frmFrame: TfrmFrame
         object lblPtSSN: TStaticText
           Left = 6
           Top = 19
-          Width = 64
-          Height = 17
+          Width = 4
+          Height = 4
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clInfoText
           Font.Height = -11
@@ -180,10 +179,10 @@ object frmFrame: TfrmFrame
           OnMouseUp = pnlPatientMouseUp
         end
         object lblPtAge: TStaticText
-          Left = 176
+          Left = 175
           Top = 19
-          Width = 3
-          Height = 6
+          Width = 4
+          Height = 4
           Alignment = taRightJustify
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clInfoText
@@ -202,7 +201,7 @@ object frmFrame: TfrmFrame
       object pnlVisit: TKeyClickPanel
         Left = 226
         Top = 1
-        Width = 168
+        Width = 119
         Height = 39
         Hint = 'Click to change provider/location.'
         Align = alLeft
@@ -220,8 +219,6 @@ object frmFrame: TfrmFrame
         OnClick = pnlVisitClick
         OnEnter = pnlPrimaryCareEnter
         OnExit = pnlPrimaryCareExit
-        OnMouseDown = pnlVisitMouseDown
-        OnMouseUp = pnlVisitMouseUp
         object lblPtLocation: TStaticText
           Left = 6
           Top = 4
@@ -238,8 +235,6 @@ object frmFrame: TfrmFrame
           ShowHint = False
           TabOrder = 0
           OnClick = pnlVisitClick
-          OnMouseDown = pnlVisitMouseDown
-          OnMouseUp = pnlVisitMouseUp
         end
         object lblPtProvider: TStaticText
           Left = 6
@@ -256,14 +251,12 @@ object frmFrame: TfrmFrame
           ShowHint = False
           TabOrder = 1
           OnClick = pnlVisitClick
-          OnMouseDown = pnlVisitMouseDown
-          OnMouseUp = pnlVisitMouseUp
         end
       end
       object pnlPrimaryCare: TKeyClickPanel
-        Left = 394
+        Left = 345
         Top = 1
-        Width = 31
+        Width = 67
         Height = 39
         Hint = 'Primary Care Team / Primary Care Provider'
         Align = alClient
@@ -320,80 +313,8 @@ object frmFrame: TfrmFrame
           OnMouseUp = pnlPrimaryCareMouseUp
         end
       end
-      object pnlCIRN: TKeyClickPanel
-        Left = 520
-        Top = 1
-        Width = 49
-        Height = 39
-        Align = alRight
-        BevelWidth = 2
-        Caption = 'Remote Data'
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clBtnFace
-        Font.Height = -11
-        Font.Name = 'MS Sans Serif'
-        Font.Style = []
-        ParentFont = False
-        ParentShowHint = False
-        ShowHint = True
-        TabOrder = 5
-        OnClick = pnlCIRNClick
-        OnEnter = pnlPrimaryCareEnter
-        OnExit = pnlPrimaryCareExit
-        OnMouseDown = pnlCIRNMouseDown
-        OnMouseUp = pnlCIRNMouseUp
-        object lblCIRN: TLabel
-          Left = 2
-          Top = 2
-          Width = 45
-          Height = 13
-          Align = alTop
-          Alignment = taCenter
-          Caption = 'Remote'
-          Enabled = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBtnFace
-          Font.Height = -8
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnClick = pnlCIRNClick
-        end
-        object lblCIRNData: TLabel
-          Left = 2
-          Top = 15
-          Width = 45
-          Height = 13
-          Align = alTop
-          Alignment = taCenter
-          Caption = 'Data'
-          Enabled = False
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBtnFace
-          Font.Height = -8
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnClick = pnlCIRNClick
-        end
-        object lblCIRNAvail: TLabel
-          Left = 2
-          Top = 28
-          Width = 45
-          Height = 9
-          Align = alClient
-          Alignment = taCenter
-          Font.Charset = DEFAULT_CHARSET
-          Font.Color = clBtnFace
-          Font.Height = -8
-          Font.Name = 'MS Sans Serif'
-          Font.Style = []
-          ParentFont = False
-          OnClick = pnlCIRNClick
-        end
-      end
       object pnlReminders: TKeyClickPanel
-        Left = 569
+        Left = 580
         Top = 1
         Width = 35
         Height = 39
@@ -435,7 +356,7 @@ object frmFrame: TfrmFrame
         end
       end
       object pnlFlag: TKeyClickPanel
-        Left = 485
+        Left = 472
         Top = 1
         Width = 35
         Height = 39
@@ -472,10 +393,12 @@ object frmFrame: TfrmFrame
           OnClick = pnlFlagClick
           OnMouseDown = pnlFlagMouseDown
           OnMouseUp = pnlFlagMouseUp
+          ExplicitWidth = 25
+          ExplicitHeight = 13
         end
       end
       object pnlPostings: TKeyClickPanel
-        Left = 604
+        Left = 615
         Top = 1
         Width = 70
         Height = 39
@@ -540,7 +463,7 @@ object frmFrame: TfrmFrame
         end
       end
       object paVAA: TKeyClickPanel
-        Left = 425
+        Left = 412
         Top = 1
         Width = 60
         Height = 39
@@ -574,7 +497,7 @@ object frmFrame: TfrmFrame
         end
         object laMHV: TButton
           Left = 0
-          Top = 1
+          Top = 0
           Width = 59
           Height = 18
           Hint = 'Click to display MHV data'
@@ -586,11 +509,122 @@ object frmFrame: TfrmFrame
           OnClick = laMHVClick
         end
       end
+      object pnlRemoteData: TKeyClickPanel
+        Left = 507
+        Top = 1
+        Width = 73
+        Height = 39
+        Align = alRight
+        BevelWidth = 2
+        Caption = 'Remote Data'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clBtnFace
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
+        TabOrder = 5
+        TabStop = True
+        OnClick = pnlCIRNClick
+        OnEnter = pnlPrimaryCareEnter
+        OnExit = pnlPrimaryCareExit
+        OnMouseDown = pnlCIRNMouseDown
+        OnMouseUp = pnlCIRNMouseUp
+        object pnlVistaWeb: TKeyClickPanel
+          Left = 2
+          Top = 2
+          Width = 69
+          Height = 18
+          Hint = 'Click to open VistaWeb'
+          Align = alTop
+          BevelWidth = 2
+          Caption = 'VistaWeb'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBtnFace
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 0
+          TabStop = True
+          OnClick = pnlVistaWebClick
+          OnEnter = pnlPrimaryCareEnter
+          OnExit = pnlPrimaryCareExit
+          OnMouseDown = pnlVistaWebMouseDown
+          OnMouseUp = pnlVistaWebMouseUp
+          object lblVistaWeb: TLabel
+            Left = 2
+            Top = 2
+            Width = 65
+            Height = 14
+            Align = alClient
+            Alignment = taCenter
+            Caption = 'VistaWeb'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clInfoText
+            Font.Height = -8
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            Layout = tlCenter
+            OnClick = pnlVistaWebClick
+            ExplicitWidth = 46
+            ExplicitHeight = 13
+          end
+        end
+        object pnlCIRN: TKeyClickPanel
+          Left = 2
+          Top = 20
+          Width = 69
+          Height = 17
+          Align = alClient
+          BevelWidth = 2
+          Caption = 'Remote Data'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clBtnFace
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
+          ParentFont = False
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 1
+          TabStop = True
+          OnClick = pnlCIRNClick
+          OnEnter = pnlPrimaryCareEnter
+          OnExit = pnlPrimaryCareExit
+          OnMouseDown = pnlCIRNMouseDown
+          OnMouseUp = pnlCIRNMouseUp
+          object lblCIRN: TLabel
+            Left = 2
+            Top = 2
+            Width = 65
+            Height = 13
+            Align = alClient
+            Alignment = taCenter
+            Caption = 'Remote Data'
+            Enabled = False
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clBtnFace
+            Font.Height = -8
+            Font.Name = 'MS Sans Serif'
+            Font.Style = []
+            ParentFont = False
+            Layout = tlCenter
+            OnClick = pnlCIRNClick
+            ExplicitWidth = 63
+          end
+        end
+      end
     end
     object stsArea: TStatusBar
       Left = 1
-      Top = 411
-      Width = 674
+      Top = 552
+      Width = 685
       Height = 21
       Panels = <
         item
@@ -614,14 +648,11 @@ object frmFrame: TfrmFrame
         end>
       PopupMenu = popAlerts
       SizeGrip = False
-      OnMouseDown = stsAreaMouseDown
-      OnMouseUp = stsAreaMouseUp
-      OnDrawPanel = stsAreaDrawPanel
     end
     object tabPage: TTabControl
       Left = 1
-      Top = 389
-      Width = 674
+      Top = 530
+      Width = 685
       Height = 22
       Align = alBottom
       Font.Charset = DEFAULT_CHARSET
@@ -638,8 +669,8 @@ object frmFrame: TfrmFrame
     object pnlPage: TPanel
       Left = 1
       Top = 42
-      Width = 674
-      Height = 347
+      Width = 685
+      Height = 488
       Align = alClient
       BevelOuter = bvNone
       Font.Charset = DEFAULT_CHARSET
@@ -681,6 +712,106 @@ object frmFrame: TfrmFrame
         CheckEntireLine = True
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Left = 8
+    Top = 48
+    Data = (
+      (
+        'Component = pnlNoPatientSelected'
+        'Status = stsDefault')
+      (
+        'Component = pnlPatientSelected'
+        'Status = stsDefault')
+      (
+        'Component = pnlToolbar'
+        'Status = stsDefault')
+      (
+        'Component = pnlCCOW'
+        'Status = stsDefault')
+      (
+        'Component = pnlPatient'
+        'Status = stsDefault')
+      (
+        'Component = lblPtName'
+        'Status = stsDefault')
+      (
+        'Component = lblPtSSN'
+        'Status = stsDefault')
+      (
+        'Component = lblPtAge'
+        'Status = stsDefault')
+      (
+        'Component = pnlVisit'
+        'Status = stsDefault')
+      (
+        'Component = lblPtLocation'
+        'Status = stsDefault')
+      (
+        'Component = lblPtProvider'
+        'Status = stsDefault')
+      (
+        'Component = pnlPrimaryCare'
+        'Status = stsDefault')
+      (
+        'Component = lblPtCare'
+        'Status = stsDefault')
+      (
+        'Component = lblPtAttending'
+        'Status = stsDefault')
+      (
+        'Component = pnlReminders'
+        'Status = stsDefault')
+      (
+        'Component = anmtRemSearch'
+        'Status = stsDefault')
+      (
+        'Component = pnlFlag'
+        'Status = stsDefault')
+      (
+        'Component = pnlPostings'
+        'Status = stsDefault')
+      (
+        'Component = lblPtPostings'
+        'Status = stsDefault')
+      (
+        'Component = lblPtCWAD'
+        'Status = stsDefault')
+      (
+        'Component = paVAA'
+        'Status = stsDefault')
+      (
+        'Component = laVAA2'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = laMHV'
+        'Property = Hint'
+        'Status = stsOK')
+      (
+        'Component = stsArea'
+        'Status = stsDefault')
+      (
+        'Component = tabPage'
+        'Status = stsDefault')
+      (
+        'Component = pnlPage'
+        'Status = stsDefault')
+      (
+        'Component = lstCIRNLocations'
+        'Status = stsDefault')
+      (
+        'Component = frmFrame'
+        'Status = stsDefault')
+      (
+        'Component = pnlRemoteData'
+        'Status = stsDefault')
+      (
+        'Component = pnlVistaWeb'
+        'Status = stsDefault')
+      (
+        'Component = pnlCIRN'
+        'Status = stsDefault'))
   end
   object mnuFrame: TMainMenu
     Left = 180
@@ -815,12 +946,6 @@ object frmFrame: TfrmFrame
           object mnu18pt1: TMenuItem
             Tag = 18
             Caption = '18 pt'
-            RadioItem = True
-            OnClick = mnuFontSizeClick
-          end
-          object mnu24pt1: TMenuItem
-            Tag = 24
-            Caption = '24 pt'
             RadioItem = True
             OnClick = mnuFontSizeClick
           end
@@ -1028,14 +1153,17 @@ object frmFrame: TfrmFrame
     Top = 200
     object mnuAlertContinue: TMenuItem
       Caption = 'Continue'
+      ShortCut = 16451
       OnClick = mnuFileNextClick
     end
     object mnuAlertForward: TMenuItem
       Caption = 'Forward'
+      ShortCut = 16454
       OnClick = mnuAlertForwardClick
     end
     object mnuAlertRenew: TMenuItem
       Caption = 'Renew'
+      ShortCut = 16466
       OnClick = mnuAlertRenewClick
     end
   end
@@ -1044,5 +1172,11 @@ object frmFrame: TfrmFrame
     OnShortCut = AppEventsShortCut
     Left = 336
     Top = 256
+  end
+  object compAccessTabPage: TVA508ComponentAccessibility
+    Component = tabPage
+    OnCaptionQuery = compAccessTabPageCaptionQuery
+    Left = 56
+    Top = 48
   end
 end

@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ComCtrls, ORNet;
+  StdCtrls, ComCtrls, ORNet, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmDbgServer = class(TForm)
+  TfrmDbgServer = class(TfrmBase508Form)
     memSymbols: TRichEdit;
     RadioButton1: TRadioButton;
     RadioButton2: TRadioButton;

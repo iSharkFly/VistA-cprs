@@ -1,21 +1,17 @@
-object frmLabTestGroups: TfrmLabTestGroups
+inherited frmLabTestGroups: TfrmLabTestGroups
   Left = 337
   Top = 202
-  Width = 465
-  Height = 461
   Caption = 'Select Lab Tests'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 434
+  ClientWidth = 457
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 465
+  ExplicitHeight = 461
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlLabTestGroups: TORAutoPanel
+  object pnlLabTestGroups: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 457
@@ -73,13 +69,6 @@ object frmLabTestGroups: TfrmLabTestGroups
       Caption = 'Arrange order of tests for display.'
       WordWrap = True
     end
-    object lblDefine: TLabel
-      Left = 356
-      Top = 4
-      Width = 92
-      Height = 13
-      Caption = 'Define Test Groups'
-    end
     object lblTestGroup: TLabel
       Left = 181
       Top = 198
@@ -88,15 +77,25 @@ object frmLabTestGroups: TfrmLabTestGroups
       Caption = 'To create a New Test Group, limit selection to 7 tests.'
       WordWrap = True
     end
+    object lblDefine: TVA508StaticText
+      Name = 'lblDefine'
+      Left = 352
+      Top = 8
+      Width = 94
+      Height = 15
+      AutoSize = True
+      Caption = 'Define Test Groups'
+      TabOrder = 10
+      ShowAccelChar = True
+    end
     object pnlUpButton: TKeyClickPanel
       Left = 235
       Top = 299
-      Width = 27
-      Height = 27
+      Width = 29
+      Height = 29
       BevelOuter = bvNone
-      Caption = 'Display selected test earlier'
-      Constraints.MaxHeight = 27
-      Constraints.MaxWidth = 27
+      Constraints.MaxHeight = 29
+      Constraints.MaxWidth = 29
       TabOrder = 5
       TabStop = True
       OnClick = cmdUpClick
@@ -104,9 +103,9 @@ object frmLabTestGroups: TfrmLabTestGroups
       OnExit = pnlUpButtonExit
       OnResize = pnlUpButtonResize
       object cmdUp: TSpeedButton
-        Left = 0
-        Top = 1
-        Width = 27
+        Left = 2
+        Top = 2
+        Width = 25
         Height = 25
         Caption = '^'
         Enabled = False
@@ -116,12 +115,11 @@ object frmLabTestGroups: TfrmLabTestGroups
     object pnlDownButton: TKeyClickPanel
       Left = 235
       Top = 331
-      Width = 27
-      Height = 27
+      Width = 29
+      Height = 29
       BevelOuter = bvNone
-      Caption = 'Display selected test later'
-      Constraints.MaxHeight = 27
-      Constraints.MaxWidth = 27
+      Constraints.MaxHeight = 29
+      Constraints.MaxWidth = 29
       TabOrder = 6
       TabStop = True
       OnClick = cmdDownClick
@@ -129,9 +127,9 @@ object frmLabTestGroups: TfrmLabTestGroups
       OnExit = pnlDownButtonExit
       OnResize = pnlDownButtonResize
       object cmdDown: TSpeedButton
-        Left = 0
-        Top = 1
-        Width = 27
+        Left = 2
+        Top = 2
+        Width = 25
         Height = 25
         Caption = 'v'
         Enabled = False
@@ -178,8 +176,8 @@ object frmLabTestGroups: TfrmLabTestGroups
       OnClick = cmdRemoveClick
     end
     object lstList: TORListBox
-      Left = 280
-      Top = 166
+      Left = 278
+      Top = 163
       Width = 160
       Height = 211
       ItemHeight = 13
@@ -191,6 +189,7 @@ object frmLabTestGroups: TfrmLabTestGroups
       ItemTipColor = clWindow
       LongList = False
       Pieces = '2'
+      OnChange = lstListClick
     end
     object cboTests: TORComboBox
       Left = 10
@@ -207,6 +206,7 @@ object frmLabTestGroups: TfrmLabTestGroups
       ItemTipEnable = True
       ListItemsOnly = False
       LongList = True
+      LookupPiece = 0
       MaxLength = 0
       ParentShowHint = False
       Pieces = '2'
@@ -220,11 +220,12 @@ object frmLabTestGroups: TfrmLabTestGroups
       OnEnter = cboTestsEnter
       OnExit = cboTestsExit
       OnNeedData = cboTestsNeedData
+      CharsNeedMatch = 1
     end
     object cboUsers: TORComboBox
       Left = 164
-      Top = 26
-      Width = 160
+      Top = 23
+      Width = 165
       Height = 21
       Style = orcsDropDown
       AutoSelect = True
@@ -236,13 +237,15 @@ object frmLabTestGroups: TfrmLabTestGroups
       ItemTipEnable = True
       ListItemsOnly = False
       LongList = True
+      LookupPiece = 0
       MaxLength = 0
       Pieces = '2'
       Sorted = False
       SynonymChars = '<>'
-      TabOrder = 10
+      TabOrder = 11
       OnClick = cboUsersClick
       OnNeedData = cboUsersNeedData
+      CharsNeedMatch = 1
     end
     object lstTestGroups: TORListBox
       Left = 10
@@ -252,12 +255,12 @@ object frmLabTestGroups: TfrmLabTestGroups
       ItemHeight = 13
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 11
-      OnClick = lstTestGroupsClick
+      TabOrder = 12
       Caption = 'Test Groups'
       ItemTipColor = clWindow
       LongList = False
       Pieces = '2'
+      OnChange = lstTestGroupsChange
     end
     object cmdReplace: TButton
       Left = 368
@@ -266,7 +269,7 @@ object frmLabTestGroups: TfrmLabTestGroups
       Height = 21
       Caption = 'Replace'
       Enabled = False
-      TabOrder = 13
+      TabOrder = 14
       OnClick = cmdReplaceClick
     end
     object cboSpecimen: TORComboBox
@@ -284,6 +287,7 @@ object frmLabTestGroups: TfrmLabTestGroups
       ItemTipEnable = True
       ListItemsOnly = False
       LongList = True
+      LookupPiece = 0
       MaxLength = 0
       ParentShowHint = False
       Pieces = '2'
@@ -292,6 +296,7 @@ object frmLabTestGroups: TfrmLabTestGroups
       SynonymChars = '<>'
       TabOrder = 1
       OnNeedData = cboSpecimenNeedData
+      CharsNeedMatch = 1
     end
     object cmdDelete: TButton
       Left = 368
@@ -300,7 +305,7 @@ object frmLabTestGroups: TfrmLabTestGroups
       Height = 21
       Caption = 'Delete'
       Enabled = False
-      TabOrder = 14
+      TabOrder = 15
       OnClick = cmdDeleteClick
     end
     object cmdAdd: TButton
@@ -312,7 +317,7 @@ object frmLabTestGroups: TfrmLabTestGroups
       Enabled = False
       ParentShowHint = False
       ShowHint = False
-      TabOrder = 12
+      TabOrder = 13
       OnClick = cmdAddClick
     end
     object cmdAddTest: TButton
@@ -325,5 +330,69 @@ object frmLabTestGroups: TfrmLabTestGroups
       TabOrder = 2
       OnClick = cmdAddTestClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlLabTestGroups'
+        'Status = stsDefault')
+      (
+        'Component = pnlUpButton'
+        'Text = Display selected test earlier'
+        'Status = stsOK')
+      (
+        'Component = pnlDownButton'
+        'Text = Display selected test later'
+        'Status = stsOK')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = cmdClear'
+        'Status = stsDefault')
+      (
+        'Component = cmdRemove'
+        'Status = stsDefault')
+      (
+        'Component = lstList'
+        'Status = stsDefault')
+      (
+        'Component = cboTests'
+        'Status = stsDefault')
+      (
+        'Component = cboUsers'
+        'Label = lblUsers'
+        'Status = stsOK')
+      (
+        'Component = lstTestGroups'
+        'Label = lblTestGroups'
+        'Status = stsOK')
+      (
+        'Component = cmdReplace'
+        'Text = Replace Test Group'
+        'Status = stsOK')
+      (
+        'Component = cboSpecimen'
+        'Status = stsDefault')
+      (
+        'Component = cmdDelete'
+        'Text = Delete Test Group'
+        'Status = stsOK')
+      (
+        'Component = cmdAdd'
+        'Text = New Test Group'
+        'Status = stsOK')
+      (
+        'Component = cmdAddTest'
+        'Status = stsDefault')
+      (
+        'Component = frmLabTestGroups'
+        'Status = stsDefault')
+      (
+        'Component = lblDefine'
+        'Status = stsDefault'))
   end
 end

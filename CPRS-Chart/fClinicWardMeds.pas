@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, fAutoSz, StdCtrls, ExtCtrls, ORCtrls,ORFn, rCore, uCore, oRNet, Math;
+  Dialogs, fAutoSz, StdCtrls, ExtCtrls, ORCtrls,ORFn, rCore, uCore, oRNet, Math,
+  VA508AccessibilityManager;
 
 type
   TfrmClinicWardMeds = class(TfrmAutoSz)
@@ -176,9 +177,10 @@ end;
 
 procedure TfrmClinicWardMeds.rpcChangeOrderLocation(pOrderList:TStringList);
 begin
-// OrderIEN^Location  -- used to alter location if ward is selected.
+// OrderIEN^Location^1  -- used to alter location if ward is selected RPC expected third value to determine if
+//order is an IMO order. If it is being called from here assumed IMO order.
 
-   CallV('ORWDX CHANGE',[pOrderList, Patient.DFN]);
+   CallV('ORWDX CHANGE',[pOrderList, Patient.DFN, '1']);
 end;
 
 function TfrmClinicWardMeds.rpcIsPatientOnWard(Patient: string): boolean;

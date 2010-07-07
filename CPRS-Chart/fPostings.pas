@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, ORCtrls;
+  ExtCtrls, ORCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmPostings = class(TForm)
+  TfrmPostings = class(TfrmBase508Form)
     pnlBase: TORAutoPanel;
   private
     { Private declarations }

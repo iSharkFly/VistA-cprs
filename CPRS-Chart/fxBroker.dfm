@@ -1,26 +1,21 @@
-object frmBroker: TfrmBroker
+inherited frmBroker: TfrmBroker
   Left = 338
   Top = 235
-  Width = 435
-  Height = 300
   BorderIcons = [biSystemMenu]
   Caption = 'Broker Calls'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
+  ClientHeight = 273
+  ClientWidth = 427
   OldCreateOrder = True
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnKeyUp = FormKeyUp
   OnResize = FormResize
+  ExplicitWidth = 435
+  ExplicitHeight = 300
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlTop: TORAutoPanel
+  object pnlTop: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 427
@@ -110,7 +105,6 @@ object frmBroker: TfrmBroker
       Min = 1
       Position = 10
       TabOrder = 3
-      Wrap = False
     end
     object btnRLT: TButton
       Left = 257
@@ -122,16 +116,46 @@ object frmBroker: TfrmBroker
       OnClick = btnRLTClick
     end
   end
-  object memData: TRichEdit
+  object memData: TRichEdit [1]
     Left = 0
     Top = 53
     Width = 427
-    Height = 217
+    Height = 220
     Align = alClient
     HideScrollBars = False
     ReadOnly = True
     ScrollBars = ssBoth
     TabOrder = 1
     WantReturns = False
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = lblCallID'
+        'Status = stsDefault')
+      (
+        'Component = txtMaxCalls'
+        'Status = stsDefault')
+      (
+        'Component = cmdPrev'
+        'Status = stsDefault')
+      (
+        'Component = cmdNext'
+        'Status = stsDefault')
+      (
+        'Component = udMax'
+        'Status = stsDefault')
+      (
+        'Component = btnRLT'
+        'Status = stsDefault')
+      (
+        'Component = memData'
+        'Status = stsDefault')
+      (
+        'Component = frmBroker'
+        'Status = stsDefault'))
   end
 end

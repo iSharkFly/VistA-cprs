@@ -1,11 +1,11 @@
 inherited frmMeds: TfrmMeds
-  Left = 93
-  Top = 250
-  Width = 709
-  Height = 686
+  Left = 333
+  Top = 55
   HelpContext = 3000
   VertScrollBar.Visible = False
   Caption = 'Medications Page'
+  ClientHeight = 651
+  ClientWidth = 701
   HelpFile = 'qnoback'
   Menu = mnuMeds
   Visible = True
@@ -13,6 +13,8 @@ inherited frmMeds: TfrmMeds
   OnMouseUp = FormMouseUp
   OnResize = FormResize
   OnShow = FormShow
+  ExplicitWidth = 709
+  ExplicitHeight = 697
   PixelsPerInch = 96
   TextHeight = 13
   inherited shpPageBottom: TShape
@@ -20,10 +22,13 @@ inherited frmMeds: TfrmMeds
     Width = 1028
     Height = -4
     Align = alCustom
+    ExplicitTop = 524
+    ExplicitWidth = 1028
+    ExplicitHeight = -4
   end
-  object splitTop: TSplitter
+  object splitTop: TSplitter [1]
     Left = 0
-    Top = 421
+    Top = 440
     Width = 701
     Height = 4
     Cursor = crVSplit
@@ -35,17 +40,18 @@ inherited frmMeds: TfrmMeds
     MinSize = 100
     ParentColor = False
     OnMoved = splitTopMoved
+    ExplicitTop = 429
   end
-  object pnlBottom: TORAutoPanel
+  object pnlBottom: TORAutoPanel [2]
     Left = 0
-    Top = 425
+    Top = 444
     Width = 701
     Height = 207
     Align = alBottom
     Constraints.MinHeight = 40
     Ctl3D = False
     ParentCtl3D = False
-    TabOrder = 0
+    TabOrder = 2
     object splitBottom: TSplitter
       Left = 1
       Top = 102
@@ -98,7 +104,6 @@ inherited frmMeds: TfrmMeds
         Width = 697
         Height = 16
         BiDiMode = bdLeftToRight
-        DragReorder = False
         Constraints.MinHeight = 16
         Sections = <
           item
@@ -177,7 +182,6 @@ inherited frmMeds: TfrmMeds
         Width = 697
         Height = 16
         BiDiMode = bdLeftToRight
-        DragReorder = False
         Constraints.MinHeight = 16
         Sections = <
           item
@@ -213,11 +217,11 @@ inherited frmMeds: TfrmMeds
       end
     end
   end
-  object pnlTop: TORAutoPanel
+  object pnlTop: TORAutoPanel [3]
     Left = 0
-    Top = 0
+    Top = 22
     Width = 701
-    Height = 421
+    Height = 418
     Align = alClient
     Ctl3D = True
     ParentCtl3D = False
@@ -227,7 +231,7 @@ inherited frmMeds: TfrmMeds
       Left = 1
       Top = 17
       Width = 699
-      Height = 403
+      Height = 400
       Style = lbOwnerDrawVariable
       Align = alClient
       Color = clCream
@@ -251,7 +255,6 @@ inherited frmMeds: TfrmMeds
       Width = 699
       Height = 16
       BiDiMode = bdLeftToRight
-      DragReorder = False
       Constraints.MinHeight = 16
       Sections = <
         item
@@ -297,6 +300,69 @@ inherited frmMeds: TfrmMeds
       OnMouseUp = hdrMedsOutMouseUp
       OnResize = hdrMedsOutResize
     end
+  end
+  object pnlView: TPanel [4]
+    Left = 0
+    Top = 0
+    Width = 701
+    Height = 22
+    Align = alTop
+    TabOrder = 0
+    object txtView: TVA508StaticText
+      Name = 'txtView'
+      Left = 9
+      Top = 3
+      Width = 36
+      Height = 15
+      Alignment = taLeftJustify
+      Caption = 'txtView'
+      TabOrder = 0
+      ShowAccelChar = True
+    end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Left = 16
+    Top = 152
+    Data = (
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = pnlMedIn'
+        'Status = stsDefault')
+      (
+        'Component = lstMedsIn'
+        'Status = stsDefault')
+      (
+        'Component = hdrMedsIn'
+        'Status = stsDefault')
+      (
+        'Component = pnlNonVA'
+        'Status = stsDefault')
+      (
+        'Component = lstMedsNonVA'
+        'Status = stsDefault')
+      (
+        'Component = hdrMedsNonVA'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = lstMedsOut'
+        'Status = stsDefault')
+      (
+        'Component = hdrMedsOut'
+        'Status = stsDefault')
+      (
+        'Component = frmMeds'
+        'Status = stsDefault')
+      (
+        'Component = pnlView'
+        'Status = stsDefault')
+      (
+        'Component = txtView'
+        'Status = stsDefault'))
   end
   object mnuMeds: TMainMenu
     Left = 56
@@ -437,10 +503,6 @@ inherited frmMeds: TfrmMeds
         Caption = 'Sort by &VA Drug Class'
         Visible = False
       end
-      object mnuViewSortName: TMenuItem
-        Caption = 'Sort by Drug &Name'
-        Visible = False
-      end
       object Z4: TMenuItem
         Caption = '-'
         Visible = False
@@ -449,9 +511,30 @@ inherited frmMeds: TfrmMeds
         Caption = '&Details...'
         OnClick = mnuViewDetailClick
       end
+      object mnuViewSortName: TMenuItem
+        Caption = 'Sort by Drug &Name'
+        Visible = False
+      end
       object mnuViewHistory: TMenuItem
         Caption = 'Administration &History...'
         OnClick = mnuViewHistoryClick
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object SortbyStatusthenLocation1: TMenuItem
+        Caption = 'Sort by Status/Exp. Date (IMO first on Inpt)'
+        OnClick = SortbyStatusthenLocation1Click
+      end
+      object SortbyClinicOrderthenStatusthenStopDate1: TMenuItem
+        Caption = 'Sort by Status Group/Status/Location/Drug Name'
+        OnClick = SortbyClinicOrderthenStatusthenStopDate1Click
+      end
+      object SortbyDrugalphabeticallystatusactivestatusrecentexpired1: TMenuItem
+        Caption = 
+          'Sort by Drug (alphabetically), status active, status recent expi' +
+          'red'
+        OnClick = SortbyDrugalphabeticallystatusactivestatusrecentexpired1Click
       end
     end
     object mnuAct: TMenuItem

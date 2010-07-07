@@ -6,10 +6,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, ExtCtrls, uConst,
-  rOrders;
+  rOrders, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmPage = class(TForm)
+  TfrmPage = class(TfrmBase508Form)
     shpPageBottom: TShape;
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -45,7 +45,7 @@ var
 
 implementation
 
-uses ORFn, fFrame, uInit;
+uses ORFn, fFrame, uInit, VA508AccessibilityRouter;
 
 {$R *.DFM}
 
@@ -87,9 +87,9 @@ procedure TfrmPage.DisplayPage;
 begin
   BringToFront;
   if ActiveControl <> nil then
-    FocusControl(ActiveControl)
-  else
-    FocusFirstControl;
+    FocusControl(ActiveControl);
+ //CQ12232 else
+//CQ12232   FocusFirstControl;
   //SetFocus;
   Inc(FDisplayCount);
   Inc(FPatientCount);
@@ -157,5 +157,8 @@ begin
       NextControl.SetFocus;
   end;
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmPage);
 
 end.

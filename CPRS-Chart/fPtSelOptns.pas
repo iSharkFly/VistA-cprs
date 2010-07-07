@@ -4,13 +4,14 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ORDtTmRng, ORCtrls, StdCtrls, ExtCtrls, ORFn;
+  ORDtTmRng, ORCtrls, StdCtrls, ExtCtrls, ORFn, fBase508Form,
+  VA508AccessibilityManager;
 
 type
   TSetCaptionTopProc = procedure of object;
   TSetPtListTopProc = procedure(IEN: Int64) of object;
 
-  TfrmPtSelOptns = class(TForm)
+  TfrmPtSelOptns = class(TfrmBase508Form)
     orapnlMain: TORAutoPanel;
     bvlPtList: TORAutoPanel;
     lblPtList: TLabel;
@@ -54,10 +55,6 @@ type
     procedure cmdSaveListClick(Sender: TObject);
     procedure SetDefaultPtList(Dflt: string);
     procedure UpdateDefault;
-
-
-
-
     property LastTopList: string read FLastTopList write FLastTopList;
     property SrcType: Integer read FSrcType write FSrcType;
     property SetCaptionTopProc: TSetCaptionTopProc read FSetCaptionTop write FSetCaptionTop;
@@ -75,7 +72,7 @@ const
   TAG_SRC_ALL  = 18;                             // all patients
 
 var
-   frmPtSelOptns: TfrmPtSelOptns;
+  frmPtSelOptns: TfrmPtSelOptns;
   //frmPtSelOptns: TfrmPtSelOptns;
   clinDoSave, clinSaveToday: boolean;
   clinDefaults: string;
@@ -85,7 +82,7 @@ implementation
 {$R *.DFM}
 
 uses
-  rCore, fPtSelOptSave,fPtSel;
+  rCore, fPtSelOptSave, fPtSel, VA508AccessibilityRouter;
 
 const
   TX_LS_DFLT = 'This is already saved as your default patient list settings.';
@@ -98,8 +95,6 @@ const
   TX_LS_SAV1 = 'Save ';
   TX_LS_SAV2 = CRLF + 'as your default patient list setting?';
   TC_LS_SAVE = 'Save Patient List Settings';
-
-
 
 function TfrmPtSelOptns.IsLast5(x: string): Boolean;
 { returns true if string matchs patterns: A9999 or 9999 (BS & BS5 xrefs for patient lookup) }
@@ -116,6 +111,7 @@ begin
   for i := 1 to 4 do if not (x[i] in ['0'..'9']) then Exit;
   Result := True;
 end;
+
 function TfrmPtSelOptns.IsPatientName(x: string):Boolean;
  { returns true if string matchs patient name pattern: all alphabetic," ",",","-","." only }
 var
@@ -127,6 +123,7 @@ begin
 
   Result := True;
 end;
+
 function TfrmPtSelOptns.IsEnhanced(x: String) : boolean ;
 var
   i: integer;
@@ -140,6 +137,7 @@ begin
   Result := True;   //False;
   if (frmPtSelOptns.radAll.Checked <> True)and (frmPtSelOptns.radDflt.Checked <> True) then Result := False;
 end;
+
 function TfrmPtSelOptns.IsFullSSN(x: string): boolean;
 var
   i: integer;
@@ -187,6 +185,29 @@ end;
 procedure TfrmPtSelOptns.radShowSrcClick(Sender: TObject);
 { called by radTeams, radSpecialties, radWards - shows items for the list source }
 begin
+  cboList.Pieces := '2';
+  FSrcType := TControl(Sender).Tag;
+  FLastTopList := '';
+  HideDateRange;
+  FSetCaptionTop;
+  with cboList do
+  begin
+    Clear;
+    LongList := False;
+    Sorted := True;
+    case FSrcType of
+    TAG_SRC_TEAM: ListTeamAll(Items);
+    TAG_SRC_SPEC: ListSpecialtyAll(Items);
+    TAG_SRC_WARD: ListWardAll(Items);
+    end;
+    Visible := True;
+  end;
+  cboList.Caption := TRadioButton(Sender).Caption;
+end;
+
+procedure TfrmPtSelOptns.radLongSrcClick(Sender: TObject);
+{ called by radProviders, radClinics - switches to long list & shows items for the list source }
+begin
     //vwpt remove other radio button selections
  if fPtSel.radiogrp1index <> 0 then
  begin
@@ -207,55 +228,6 @@ begin
     TAG_SRC_WARD: begin
                     radWards.Checked := False;
                     radWards.Refresh;
-                    radAll.Checked := True;
-                    radAll.Refresh;
-                  end;
-    end;
-  //frmPtSel.RadioGroup1.SetFocus;
-  //frmPtSel.RadioGroup1.Refresh;
- end
- else
- begin
-  //end vwpt
-  cboList.Pieces := '2';
-  FSrcType := TControl(Sender).Tag;
-  FLastTopList := '';
-  HideDateRange;
-  FSetCaptionTop;
-  with cboList do
-  begin
-    Clear;
-    LongList := False;
-    Sorted := True;
-    case FSrcType of
-    TAG_SRC_TEAM: ListTeamAll(Items);
-    TAG_SRC_SPEC: ListSpecialtyAll(Items);
-    TAG_SRC_WARD: ListWardAll(Items);
-    end;
-    Visible := True;
-  end;
-  cboList.Caption := TRadioButton(Sender).Caption;
- end; //else
-end;
-
-procedure TfrmPtSelOptns.radLongSrcClick(Sender: TObject);
-{ called by radProviders, radClinics - switches to long list & shows items for the list source }
-begin
-  //vwpt remove other radio button selections
- if fPtSel.radiogrp1index <> 0 then
- begin
-      FSrcType := TControl(Sender).Tag;
-      case FSrcType of
-    TAG_SRC_PROV: begin
-                    radProviders.Checked := False;
-                    radProviders.Refresh;
-                    radAll.Checked := True;
-                    radAll.Refresh;
-
-                  end;
-    TAG_SRC_CLIN: begin
-                    radClinics.Checked := False;
-                    radClinics.Refresh;
                     radAll.Checked := True;
                     radAll.Refresh;
                   end;
@@ -323,10 +295,10 @@ resulting in a "B" xref that looks like this:
 ^SC("B","zz bhost/eve/ornelas",2885) = 
 ^SC("B","zz bhost/resident",2710) = 
 ^SC("B","zz bhost/sws",2946) = 
-^SC("B","zz c&P ortho/patel",3292) =
+^SC("B","zz c&P ortho/patel",3292) = 
 ^SC("B","zz mhc md/kelley",320) = 
 ^SC("B","zz/mhc/p",1076) = 
-^SC("B","zzMHC MD/THRASHER",1018) =
+^SC("B","zzMHC MD/THRASHER",1018) = 
 ^SC("B","zztest clinic",3090) = 
 ^SC("B","zzz-hbpc-phone-jung",1830) = 
 ^SC("B","zzz-hbpcphone cocohran",1825) = 
@@ -490,5 +462,8 @@ begin
     fPtSel.FDfltSrc := '';
   SetDefaultPtList(fPtSel.FDfltSrc);
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmPtSelOptns);
 
 end.

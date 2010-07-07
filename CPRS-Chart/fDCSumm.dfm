@@ -1,28 +1,37 @@
 inherited frmDCSumm: TfrmDCSumm
-  Left = 488
-  Top = 83
-  Width = 687
-  Height = 409
+  Left = 1291
+  Top = 197
   HelpContext = 7000
   Caption = 'Discharge Summary Page'
+  ClientHeight = 382
+  ClientWidth = 679
   HelpFile = 'overvw'
   Menu = mnuSumms
   OnDestroy = FormDestroy
+  ExplicitWidth = 687
+  ExplicitHeight = 428
   PixelsPerInch = 96
   TextHeight = 13
   inherited shpPageBottom: TShape
-    Top = 358
+    Top = 377
     Width = 679
+    ExplicitTop = 358
+    ExplicitWidth = 679
   end
   inherited sptHorz: TSplitter
     Left = 64
     Width = 3
-    Height = 358
+    Height = 377
     OnCanResize = sptHorzCanResize
+    ExplicitLeft = 64
+    ExplicitWidth = 3
+    ExplicitHeight = 358
   end
   inherited pnlLeft: TPanel
     Width = 64
-    Height = 358
+    Height = 377
+    ExplicitWidth = 64
+    ExplicitHeight = 377
     object lblSumms: TOROffsetLabel
       Left = 0
       Top = 0
@@ -39,49 +48,51 @@ inherited frmDCSumm: TfrmDCSumm
     end
     object lblSpace1: TLabel
       Left = 0
-      Top = 334
+      Top = 353
       Width = 64
       Height = 3
       Align = alBottom
       AutoSize = False
       Caption = ' '
+      ExplicitTop = 334
     end
     object cmdNewSumm: TORAlignButton
       Left = 0
-      Top = 313
+      Top = 332
       Width = 64
       Height = 21
+      Align = alBottom
       Caption = 'New Summary'
       TabOrder = 1
       OnClick = cmdNewSummClick
-      Align = alBottom
     end
     object cmdPCE: TORAlignButton
       Left = 0
-      Top = 337
+      Top = 356
       Width = 64
       Height = 21
+      Align = alBottom
       Caption = 'Encounter'
       TabOrder = 2
       Visible = False
       OnClick = cmdPCEClick
-      Align = alBottom
     end
     object pnlDrawers: TPanel
       Left = 0
       Top = 19
       Width = 64
-      Height = 294
+      Height = 313
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
       object splDrawers: TSplitter
         Left = 0
-        Top = 291
+        Top = 310
         Width = 64
         Height = 3
         Cursor = crVSplit
         Align = alBottom
+        ExplicitTop = 291
       end
       object lstSumms: TORListBox
         Left = 0
@@ -107,19 +118,19 @@ inherited frmDCSumm: TfrmDCSumm
         Left = 0
         Top = 0
         Width = 64
-        Height = 291
+        Height = 310
         Align = alClient
         Constraints.MinWidth = 30
         HideSelection = False
+        Images = dmodShared.imgNotes
         Indent = 19
         PopupMenu = popSummList
         ReadOnly = True
+        StateImages = dmodShared.imgImages
         TabOrder = 1
-        OnAddition = tvSummsAddition
         OnChange = tvSummsChange
         OnClick = tvSummsClick
         OnCollapsed = tvSummsCollapsed
-        OnDeletion = tvSummsDeletion
         OnDragDrop = tvSummsDragDrop
         OnDragOver = tvSummsDragOver
         OnExpanded = tvSummsExpanded
@@ -133,18 +144,22 @@ inherited frmDCSumm: TfrmDCSumm
   inherited pnlRight: TPanel
     Left = 67
     Width = 612
-    Height = 358
+    Height = 377
+    ExplicitLeft = 67
+    ExplicitWidth = 612
+    ExplicitHeight = 377
     object sptVert: TSplitter
       Left = 0
-      Top = 309
+      Top = 328
       Width = 612
       Height = 4
       Cursor = crVSplit
       Align = alBottom
+      ExplicitTop = 309
     end
     object memPCEShow: TRichEdit
       Left = 0
-      Top = 313
+      Top = 332
       Width = 612
       Height = 45
       Align = alBottom
@@ -162,7 +177,7 @@ inherited frmDCSumm: TfrmDCSumm
       Left = 0
       Top = 0
       Width = 612
-      Height = 309
+      Height = 328
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 1
@@ -172,7 +187,7 @@ inherited frmDCSumm: TfrmDCSumm
         Left = 0
         Top = 52
         Width = 612
-        Height = 257
+        Height = 276
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -301,7 +316,7 @@ inherited frmDCSumm: TfrmDCSumm
       Left = 0
       Top = 0
       Width = 612
-      Height = 309
+      Height = 328
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
@@ -338,7 +353,7 @@ inherited frmDCSumm: TfrmDCSumm
         Left = 0
         Top = 116
         Width = 612
-        Height = 193
+        Height = 212
         Align = alClient
         Color = clCream
         Ctl3D = True
@@ -400,6 +415,8 @@ inherited frmDCSumm: TfrmDCSumm
         HideSelection = False
         ReadOnly = True
         RowSelect = True
+        SmallImages = dmodShared.imgNotes
+        StateImages = dmodShared.imgImages
         TabOrder = 1
         ViewStyle = vsReport
         Visible = False
@@ -410,6 +427,75 @@ inherited frmDCSumm: TfrmDCSumm
         Caption = 'No Discharge Summaries Found'
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cmdNewSumm'
+        'Status = stsDefault')
+      (
+        'Component = cmdPCE'
+        'Status = stsDefault')
+      (
+        'Component = pnlDrawers'
+        'Status = stsDefault')
+      (
+        'Component = lstSumms'
+        'Status = stsDefault')
+      (
+        'Component = tvSumms'
+        'Status = stsDefault')
+      (
+        'Component = memPCEShow'
+        'Status = stsDefault')
+      (
+        'Component = pnlWrite'
+        'Status = stsDefault')
+      (
+        'Component = memNewSumm'
+        'Status = stsDefault')
+      (
+        'Component = pnlFields'
+        'Status = stsDefault')
+      (
+        'Component = lblNewTitle'
+        'Status = stsDefault')
+      (
+        'Component = lblVisit'
+        'Status = stsDefault')
+      (
+        'Component = lblRefDate'
+        'Status = stsDefault')
+      (
+        'Component = lblCosigner'
+        'Status = stsDefault')
+      (
+        'Component = lblDictator'
+        'Status = stsDefault')
+      (
+        'Component = lblDischarge'
+        'Status = stsDefault')
+      (
+        'Component = cmdChange'
+        'Status = stsDefault')
+      (
+        'Component = pnlRead'
+        'Status = stsDefault')
+      (
+        'Component = memSumm'
+        'Status = stsDefault')
+      (
+        'Component = lvSumms'
+        'Status = stsDefault')
+      (
+        'Component = pnlLeft'
+        'Status = stsDefault')
+      (
+        'Component = pnlRight'
+        'Status = stsDefault')
+      (
+        'Component = frmDCSumm'
+        'Status = stsDefault'))
   end
   object mnuSumms: TMainMenu
     Left = 596
@@ -898,5 +984,31 @@ inherited frmDCSumm: TfrmDCSumm
     OnReplace = dlgReplaceTextReplace
     Left = 409
     Top = 313
+  end
+  object imgLblNotes: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = lvSumms
+      end
+      item
+        Component = tvSumms
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblNotes
+    Left = 16
+    Top = 171
+  end
+  object imgLblImages: TVA508ImageListLabeler
+    Components = <
+      item
+        Component = lvSumms
+      end
+      item
+        Component = tvSumms
+      end>
+    Labels = <>
+    RemoteLabeler = dmodShared.imgLblImages
+    Left = 16
+    Top = 203
   end
 end

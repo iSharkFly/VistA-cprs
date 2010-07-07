@@ -1,20 +1,22 @@
-object frmAutoSz: TfrmAutoSz
-  Left = 182
+inherited frmAutoSz: TfrmAutoSz
+  Left = 226
   Top = 373
-  Width = 435
-  Height = 300
   HorzScrollBar.Visible = False
   VertScrollBar.Visible = False
   Caption = 'frmAutoSz'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 273
+  ClientWidth = 427
   OldCreateOrder = True
   OnDestroy = FormDestroy
   OnResize = FormResize
+  ExplicitWidth = 435
+  ExplicitHeight = 300
   PixelsPerInch = 96
   TextHeight = 13
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = frmAutoSz'
+        'Status = stsDefault'))
+  end
 end

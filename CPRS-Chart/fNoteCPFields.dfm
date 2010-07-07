@@ -1,21 +1,16 @@
-object frmNoteCPFields: TfrmNoteCPFields
+inherited frmNoteCPFields: TfrmNoteCPFields
   Left = 508
   Top = 307
-  Width = 257
-  Height = 178
   Caption = 'Enter Required Fields'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = True
+  ClientHeight = 151
+  ClientWidth = 249
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 257
+  ExplicitHeight = 178
   PixelsPerInch = 96
   TextHeight = 13
-  object lblAuthor: TLabel
+  object lblAuthor: TLabel [0]
     Left = 7
     Top = 5
     Width = 94
@@ -23,7 +18,7 @@ object frmNoteCPFields: TfrmNoteCPFields
     AutoSize = False
     Caption = 'Author:'
   end
-  object lblProcSummCode: TOROffsetLabel
+  object lblProcSummCode: TOROffsetLabel [1]
     Left = 4
     Top = 50
     Width = 125
@@ -34,7 +29,7 @@ object frmNoteCPFields: TfrmNoteCPFields
     VertOffset = 2
     WordWrap = False
   end
-  object lblProcDateTime: TOROffsetLabel
+  object lblProcDateTime: TOROffsetLabel [2]
     Left = 4
     Top = 96
     Width = 105
@@ -45,7 +40,7 @@ object frmNoteCPFields: TfrmNoteCPFields
     VertOffset = 2
     WordWrap = False
   end
-  object cboAuthor: TORComboBox
+  object cboAuthor: TORComboBox [3]
     Left = 4
     Top = 17
     Width = 239
@@ -69,8 +64,9 @@ object frmNoteCPFields: TfrmNoteCPFields
     SynonymChars = '<>'
     TabOrder = 0
     OnNeedData = cboAuthorNeedData
+    CharsNeedMatch = 1
   end
-  object cboProcSummCode: TORComboBox
+  object cboProcSummCode: TORComboBox [4]
     Left = 4
     Top = 66
     Width = 142
@@ -96,8 +92,9 @@ object frmNoteCPFields: TfrmNoteCPFields
     Sorted = False
     SynonymChars = '<>'
     TabOrder = 1
+    CharsNeedMatch = 1
   end
-  object calProcDateTime: TORDateBox
+  object calProcDateTime: TORDateBox [5]
     Left = 4
     Top = 112
     Width = 142
@@ -107,7 +104,7 @@ object frmNoteCPFields: TfrmNoteCPFields
     RequireTime = True
     Caption = 'Procedure Date/Time'
   end
-  object cmdOK: TButton
+  object cmdOK: TButton [6]
     Left = 166
     Top = 78
     Width = 72
@@ -122,7 +119,7 @@ object frmNoteCPFields: TfrmNoteCPFields
     TabOrder = 3
     OnClick = cmdOKClick
   end
-  object cmdCancel: TButton
+  object cmdCancel: TButton [7]
     Left = 166
     Top = 105
     Width = 72
@@ -136,5 +133,26 @@ object frmNoteCPFields: TfrmNoteCPFields
     ShowHint = True
     TabOrder = 4
     OnClick = cmdCancelClick
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = cboAuthor'
+        'Status = stsDefault')
+      (
+        'Component = cboProcSummCode'
+        'Status = stsDefault')
+      (
+        'Component = calProcDateTime'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = frmNoteCPFields'
+        'Status = stsDefault'))
   end
 end

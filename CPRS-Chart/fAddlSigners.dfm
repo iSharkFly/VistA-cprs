@@ -1,34 +1,30 @@
-object frmAddlSigners: TfrmAddlSigners
+inherited frmAddlSigners: TfrmAddlSigners
   Left = 275
   Top = 164
   BorderStyle = bsDialog
   Caption = 'Identify Additional Signers'
-  ClientHeight = 362
-  ClientWidth = 403
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 364
+  ClientWidth = 443
   OldCreateOrder = True
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  ExplicitWidth = 449
+  ExplicitHeight = 396
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TPanel
+  object pnlBase: TPanel [0]
     Left = 0
     Top = 0
-    Width = 403
-    Height = 362
+    Width = 443
+    Height = 364
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
     object pnlButtons: TORAutoPanel
       Left = 0
-      Top = 309
-      Width = 403
+      Top = 311
+      Width = 443
       Height = 53
       Align = alBottom
       BevelOuter = bvNone
@@ -38,7 +34,7 @@ object frmAddlSigners: TfrmAddlSigners
         Top = 14
         Width = 75
         Height = 25
-        Caption = 'OK'
+        Caption = '&OK'
         TabOrder = 0
         OnClick = cmdOKClick
       end
@@ -48,7 +44,7 @@ object frmAddlSigners: TfrmAddlSigners
         Width = 75
         Height = 25
         Cancel = True
-        Caption = 'Cancel'
+        Caption = '&Cancel'
         TabOrder = 1
         OnClick = cmdCancelClick
       end
@@ -56,8 +52,8 @@ object frmAddlSigners: TfrmAddlSigners
     object pnlAdditional: TORAutoPanel
       Left = 0
       Top = 70
-      Width = 403
-      Height = 239
+      Width = 443
+      Height = 241
       Align = alClient
       TabOrder = 1
       object SrcLabel: TLabel
@@ -69,8 +65,8 @@ object frmAddlSigners: TfrmAddlSigners
         Caption = 'Select or enter additional signers'
       end
       object DstLabel: TLabel
-        Left = 214
-        Top = 16
+        Left = 266
+        Top = 15
         Width = 145
         Height = 16
         AutoSize = False
@@ -98,6 +94,7 @@ object frmAddlSigners: TfrmAddlSigners
         SynonymChars = '<>'
         TabOrder = 0
         TabStop = True
+        OnChange = cboSrcListChange
         OnClick = cboSrcListClick
         OnKeyDown = cboSrcListKeyDown
         OnMouseClick = cboSrcListMouseClick
@@ -105,36 +102,58 @@ object frmAddlSigners: TfrmAddlSigners
         CharsNeedMatch = 1
       end
       object DstList: TORListBox
-        Left = 213
-        Top = 33
-        Width = 174
+        Left = 266
+        Top = 37
+        Width = 170
         Height = 185
         ItemHeight = 13
         MultiSelect = True
         ParentShowHint = False
         ShowHint = True
-        TabOrder = 1
-        OnClick = DstListClick
+        Sorted = True
+        TabOrder = 2
+        OnClick = DstListChange
         Caption = 'Current additional signers'
         ItemTipColor = clWindow
         LongList = False
         Pieces = '2'
+        OnChange = DstListChange
       end
-      object cmdRemove: TButton
-        Left = 264
-        Top = 221
-        Width = 75
+      object btnRemoveSigners: TButton
+        Left = 189
+        Top = 108
+        Width = 71
         Height = 25
-        Caption = 'Remove'
-        TabOrder = 2
-        Visible = False
-        OnClick = cmdRemoveClick
+        Caption = '&Remove'
+        Enabled = False
+        TabOrder = 3
+        OnClick = btnRemoveSignersClick
+      end
+      object btnAddSigners: TButton
+        Left = 189
+        Top = 77
+        Width = 71
+        Height = 25
+        Caption = '&Add'
+        Enabled = False
+        TabOrder = 1
+        OnClick = btnAddSignersClick
+      end
+      object btnRemoveAllSigners: TButton
+        Left = 189
+        Top = 139
+        Width = 71
+        Height = 25
+        Caption = 'R&emove All'
+        Enabled = False
+        TabOrder = 4
+        OnClick = btnRemoveAllSignersClick
       end
     end
     object pnlTop: TORAutoPanel
       Left = 0
       Top = 0
-      Width = 403
+      Width = 443
       Height = 70
       Align = alTop
       BevelOuter = bvNone
@@ -151,8 +170,8 @@ object frmAddlSigners: TfrmAddlSigners
         WordWrap = False
       end
       object lblCosigner: TOROffsetLabel
-        Left = 213
-        Top = 10
+        Left = 246
+        Top = 6
         Width = 155
         Height = 15
         Caption = 'Expected Cosigner (not editable)'
@@ -162,8 +181,8 @@ object frmAddlSigners: TfrmAddlSigners
         WordWrap = False
       end
       object cboCosigner: TORComboBox
-        Left = 214
-        Top = 26
+        Left = 246
+        Top = 27
         Width = 174
         Height = 21
         Style = orcsDropDown
@@ -202,5 +221,50 @@ object frmAddlSigners: TfrmAddlSigners
         Caption = 'Author (not editable)'
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = pnlButtons'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = pnlAdditional'
+        'Status = stsDefault')
+      (
+        'Component = cboSrcList'
+        'Status = stsDefault')
+      (
+        'Component = DstList'
+        'Status = stsDefault')
+      (
+        'Component = btnRemoveSigners'
+        'Status = stsDefault')
+      (
+        'Component = btnAddSigners'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = cboCosigner'
+        'Status = stsDefault')
+      (
+        'Component = txtAuthor'
+        'Status = stsDefault')
+      (
+        'Component = frmAddlSigners'
+        'Status = stsDefault')
+      (
+        'Component = btnRemoveAllSigners'
+        'Status = stsDefault'))
   end
 end

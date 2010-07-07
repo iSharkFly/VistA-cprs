@@ -1,83 +1,116 @@
-object frmFlags: TfrmFlags
-  Left = 210
-  Top = 169
-  Width = 505
-  Height = 498
+inherited frmFlags: TfrmFlags
+  Left = 380
+  Top = 122
+  Width = 504
+  Height = 532
   VertScrollBar.Range = 116
-  AutoScroll = False
   Caption = 'Patient Record Flags'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
   Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  OnKeyDown = FormKeyDown
   OnShow = FormShow
+  ExplicitWidth = 504
+  ExplicitHeight = 532
   PixelsPerInch = 96
   TextHeight = 13
-  object Splitter1: TSplitter
+  object Splitter1: TSplitter [0]
     Left = 0
     Top = 80
     Width = 497
     Height = 5
-    Cursor = crHSplit
     Align = alNone
   end
-  object Splitter2: TSplitter
+  object Splitter2: TSplitter [1]
     Left = 0
-    Top = 308
-    Width = 497
+    Top = 349
+    Width = 496
     Height = 4
     Cursor = crVSplit
     Align = alBottom
     MinSize = 45
   end
-  object pnlTop: TORAutoPanel
+  object pnlTop: TORAutoPanel [2]
     Left = 0
     Top = 0
-    Width = 497
-    Height = 80
+    Width = 496
+    Height = 113
     Align = alTop
     Constraints.MinHeight = 40
     Constraints.MinWidth = 300
     TabOrder = 0
     object lblFlags: TLabel
       Left = 1
-      Top = 1
-      Width = 495
+      Top = 54
+      Width = 494
       Height = 13
       Align = alTop
-      Caption = 'Active Flag'
+      Caption = 'Category II Flags'
       Layout = tlCenter
+      ExplicitWidth = 79
     end
-    object lstFlags: TORListBox
+    object lblCat1: TLabel
       Left = 1
-      Top = 14
-      Width = 495
-      Height = 65
+      Top = 1
+      Width = 494
+      Height = 13
+      Align = alTop
+      Caption = 'Category I Flags'
+      Color = clBtnFace
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ParentColor = False
+      ParentFont = False
+      Layout = tlCenter
+      ExplicitWidth = 93
+    end
+    object lstFlagsCat2: TORListBox
+      Left = 1
+      Top = 67
+      Width = 494
+      Height = 45
       Align = alClient
       ItemHeight = 13
       ParentShowHint = False
       ShowHint = True
-      TabOrder = 0
-      OnClick = lstFlagsClick
+      TabOrder = 1
+      OnClick = lstFlagsCat2Click
       ItemTipColor = clWindow
       LongList = False
       Pieces = '2'
-      OnChange = lstFlagsClick
+    end
+    object lstFlagsCat1: TORListBox
+      Left = 1
+      Top = 14
+      Width = 494
+      Height = 40
+      Align = alTop
+      BevelKind = bkTile
+      BevelOuter = bvRaised
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'MS Sans Serif'
+      Font.Style = [fsBold]
+      ItemHeight = 13
+      ParentFont = False
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 0
+      OnClick = lstFlagsCat1Click
+      ItemTipColor = clWindow
+      LongList = False
+      Pieces = '2'
     end
   end
-  object memFlags: TRichEdit
+  object memFlags: TRichEdit [3]
     Left = 0
-    Top = 80
-    Width = 497
-    Height = 228
+    Top = 113
+    Width = 496
+    Height = 236
     Align = alClient
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -94,17 +127,17 @@ object frmFlags: TfrmFlags
     WantReturns = False
     WordWrap = False
   end
-  object pnlNotes: TPanel
+  object pnlNotes: TPanel [4]
     Left = 0
-    Top = 312
-    Width = 497
+    Top = 353
+    Width = 496
     Height = 152
     Align = alBottom
     TabOrder = 2
     object lblNoteTitle: TLabel
       Left = 1
       Top = 1
-      Width = 495
+      Width = 53
       Height = 13
       Align = alTop
       Caption = 'lblNoteTitle'
@@ -112,7 +145,7 @@ object frmFlags: TfrmFlags
     object lvPRF: TCaptionListView
       Left = 1
       Top = 14
-      Width = 495
+      Width = 494
       Height = 106
       Align = alClient
       Columns = <
@@ -134,11 +167,6 @@ object frmFlags: TfrmFlags
         end>
       Constraints.MinHeight = 50
       HideSelection = False
-      Items.Data = {
-        6C0000000100000000000000FFFFFFFFFFFFFFFF03000000000000000857414E
-        44455245521C4F63746F6265722032302C20323030334031303A31353A32333A
-        3233115245414C4C59204C4F4E47205354554646115069636B6572696E672C20
-        4D6F726F6E69FFFFFFFFFFFF}
       ReadOnly = True
       RowSelect = True
       TabOrder = 0
@@ -149,15 +177,15 @@ object frmFlags: TfrmFlags
     object pnlBottom: TORAutoPanel
       Left = 1
       Top = 120
-      Width = 495
+      Width = 494
       Height = 31
       Align = alBottom
       TabOrder = 1
       DesignSize = (
-        495
+        494
         31)
       object btnClose: TButton
-        Left = 410
+        Left = 409
         Top = 5
         Width = 77
         Height = 21
@@ -168,5 +196,42 @@ object frmFlags: TfrmFlags
         TabOrder = 0
       end
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = lstFlagsCat2'
+        'Status = stsDefault')
+      (
+        'Component = lstFlagsCat1'
+        'Status = stsDefault')
+      (
+        'Component = memFlags'
+        'Status = stsDefault')
+      (
+        'Component = pnlNotes'
+        'Status = stsDefault')
+      (
+        'Component = lvPRF'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnClose'
+        'Status = stsDefault')
+      (
+        'Component = frmFlags'
+        'Status = stsDefault'))
+  end
+  object TimerTextFlash: TTimer
+    Enabled = False
+    Interval = 750
+    OnTimer = TimerTextFlashTimer
+    Left = 240
+    Top = 24
   end
 end

@@ -2,16 +2,18 @@ inherited frmARTAllergy: TfrmARTAllergy
   Tag = 1105
   Left = 339
   Top = 266
-  Width = 561
-  Height = 465
   Caption = 'Enter Allergy or Adverse Reaction'
+  ClientHeight = 438
+  ClientWidth = 553
   Position = poScreenCenter
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  ExplicitWidth = 561
+  ExplicitHeight = 472
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlBase: TORAutoPanel
+  object pnlBase: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 553
@@ -36,7 +38,7 @@ inherited frmARTAllergy: TfrmARTAllergy
       Top = 403
       Width = 72
       Height = 21
-      Caption = 'OK'
+      Caption = '&OK'
       TabOrder = 1
       OnClick = cmdOKClick
     end
@@ -46,7 +48,7 @@ inherited frmARTAllergy: TfrmARTAllergy
       Width = 72
       Height = 21
       Cancel = True
-      Caption = 'Cancel'
+      Caption = '&Cancel'
       TabOrder = 2
       OnClick = cmdCancelClick
     end
@@ -57,10 +59,9 @@ inherited frmARTAllergy: TfrmARTAllergy
       Height = 371
       ActivePage = tabGeneral
       MultiLine = True
-      TabIndex = 0
       TabOrder = 0
       object tabGeneral: TTabSheet
-        Caption = '&General'
+        Caption = 'General'
         object lblAgent: TOROffsetLabel
           Left = 7
           Top = 44
@@ -185,7 +186,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           Top = 3
           Width = 119
           Height = 17
-          Caption = 'No Known Allergies'
+          Caption = '&No Known Allergies'
           TabOrder = 0
           OnClick = ckNoKnownAllergiesClick
         end
@@ -194,7 +195,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           Top = 24
           Width = 114
           Height = 21
-          Caption = 'Active Allergies'
+          Caption = '&Active Allergies'
           TabOrder = 1
           OnClick = btnCurrentClick
         end
@@ -222,8 +223,14 @@ inherited frmARTAllergy: TfrmARTAllergy
           Height = 21
           Style = orcsDropDown
           AutoSelect = True
-          Color = clWindow
+          Color = clBtnFace
           DropDownCount = 8
+          Enabled = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clInactiveCaption
+          Font.Height = -11
+          Font.Name = 'MS Sans Serif'
+          Font.Style = []
           ItemHeight = 13
           ItemTipColor = clWindow
           ItemTipEnable = True
@@ -231,6 +238,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           LongList = True
           LookupPiece = 2
           MaxLength = 0
+          ParentFont = False
           ParentShowHint = False
           Pieces = '2,3'
           ShowHint = False
@@ -258,7 +266,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           Top = 307
           Width = 113
           Height = 17
-          Caption = 'Marked On Chart'
+          Caption = '&Marked On Chart'
           Checked = True
           State = cbChecked
           TabOrder = 18
@@ -270,7 +278,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           Top = 307
           Width = 97
           Height = 17
-          Caption = 'ID Band Marked'
+          Caption = '&ID Band Marked'
           TabOrder = 17
           OnClick = ControlChange
         end
@@ -319,7 +327,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           Top = 270
           Width = 62
           Height = 21
-          Caption = 'Date/Time'
+          Caption = '&Date/Time'
           TabOrder = 13
           OnClick = btnDateTimeClick
         end
@@ -328,7 +336,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           Top = 270
           Width = 57
           Height = 21
-          Caption = 'Remove'
+          Caption = '&Remove'
           TabOrder = 14
           OnClick = btnRemoveClick
         end
@@ -340,8 +348,8 @@ inherited frmARTAllergy: TfrmARTAllergy
           Columns = 2
           Ctl3D = True
           Items.Strings = (
-            'Observed'
-            'Historical')
+            'O&bserved'
+            '&Historical')
           ParentCtl3D = False
           ParentShowHint = False
           ShowHint = True
@@ -387,7 +395,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           Top = 96
           Width = 140
           Height = 21
-          Caption = 'View Previous Observations'
+          Caption = 'View &Previous Observations'
           TabOrder = 6
           OnClick = cmdPrevObsClick
         end
@@ -411,7 +419,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           Top = 270
           Width = 157
           Height = 21
-          Caption = 'View Previous Comments'
+          Caption = '&View Previous Comments'
           TabOrder = 16
           OnClick = cmdPrevCmtsClick
         end
@@ -443,7 +451,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           Top = 96
           Width = 21
           Height = 21
-          Caption = '?'
+          Caption = '&?'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
           Font.Height = -11
@@ -455,7 +463,7 @@ inherited frmARTAllergy: TfrmARTAllergy
         end
       end
       object tabVerify: TTabSheet
-        Caption = '&Verify'
+        Caption = 'Verify'
         ImageIndex = 3
         object lblVerifier: TOROffsetLabel
           Left = 99
@@ -484,7 +492,7 @@ inherited frmARTAllergy: TfrmARTAllergy
           Top = 18
           Width = 69
           Height = 17
-          Caption = 'Verified'
+          Caption = '&Verified'
           TabOrder = 0
           OnClick = ControlChange
         end
@@ -547,13 +555,14 @@ inherited frmARTAllergy: TfrmARTAllergy
           Font.Name = 'MS Sans Serif'
           Font.Style = [fsBold]
           ParentFont = False
+          ExplicitWidth = 83
         end
         object ckEnteredInError: TCheckBox
           Left = 286
           Top = 5
           Width = 203
           Height = 17
-          Caption = 'Mark this allergy as "Entered In Error"'
+          Caption = '&Mark this allergy as "Entered In Error"'
           TabOrder = 0
           Visible = False
           OnClick = ControlChange
@@ -601,8 +610,110 @@ inherited frmARTAllergy: TfrmARTAllergy
       CharsNeedMatch = 1
     end
   end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlBase'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = pgAllergy'
+        'Status = stsDefault')
+      (
+        'Component = tabGeneral'
+        'Status = stsDefault')
+      (
+        'Component = ckNoKnownAllergies'
+        'Status = stsDefault')
+      (
+        'Component = btnCurrent'
+        'Status = stsDefault')
+      (
+        'Component = lstAllergy'
+        'Status = stsDefault')
+      (
+        'Component = cboOriginator'
+        'Status = stsDefault')
+      (
+        'Component = calOriginated'
+        'Status = stsDefault')
+      (
+        'Component = ckChartMarked'
+        'Status = stsDefault')
+      (
+        'Component = ckIDBand'
+        'Status = stsDefault')
+      (
+        'Component = cboSymptoms'
+        'Status = stsDefault')
+      (
+        'Component = lstSelectedSymptoms'
+        'Status = stsDefault')
+      (
+        'Component = btnDateTime'
+        'Status = stsDefault')
+      (
+        'Component = btnRemove'
+        'Status = stsDefault')
+      (
+        'Component = grpObsHist'
+        'Status = stsDefault')
+      (
+        'Component = cboSeverity'
+        'Status = stsDefault')
+      (
+        'Component = calObservedDate'
+        'Status = stsDefault')
+      (
+        'Component = cmdPrevObs'
+        'Status = stsDefault')
+      (
+        'Component = memComments'
+        'Status = stsDefault')
+      (
+        'Component = cmdPrevCmts'
+        'Status = stsDefault')
+      (
+        'Component = cboNatureOfReaction'
+        'Status = stsDefault')
+      (
+        'Component = btnSevHelp'
+        'Status = stsDefault')
+      (
+        'Component = tabVerify'
+        'Status = stsDefault')
+      (
+        'Component = ckVerified'
+        'Status = stsDefault')
+      (
+        'Component = cboVerifier'
+        'Status = stsDefault')
+      (
+        'Component = calVerifyDate'
+        'Status = stsDefault')
+      (
+        'Component = tabEnteredInError'
+        'Status = stsDefault')
+      (
+        'Component = ckEnteredInError'
+        'Status = stsDefault')
+      (
+        'Component = memErrCmts'
+        'Status = stsDefault')
+      (
+        'Component = cboAllergyType'
+        'Status = stsDefault')
+      (
+        'Component = frmARTAllergy'
+        'Status = stsDefault'))
+  end
   object dlgReactionDateTime: TORDateTimeDlg
-    FMDateTime = 2981202
+    FMDateTime = 2981202.000000000000000000
     DateOnly = False
     RequireTime = False
     Left = 5

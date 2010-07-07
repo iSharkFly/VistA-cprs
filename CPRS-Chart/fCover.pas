@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fPage, StdCtrls, ORCtrls, ExtCtrls, rOrders, ORClasses, Menus, rCover, fAllgyBox; {REV}
+  fPage, StdCtrls, ORCtrls, ExtCtrls, rOrders, ORClasses, Menus, rCover, fAllgyBox,
+  VA508AccessibilityManager, fBase508Form; {REV}
 
 type
   TfrmCover = class(TfrmPage)
@@ -120,7 +121,8 @@ implementation
 {$R *.DFM}
 
 uses ORNet, ORFn, fRptBox, fVitals, fvit, fFrame, uCore, TRPCB, uConst, uInit,
-  uReminders, rReminders, fARTAllgy, uOrPtf, fPatientFlagMulti, rODAllergy, rMisc;
+  uReminders, rReminders, fARTAllgy, uOrPtf, fPatientFlagMulti, rODAllergy, rMisc,
+  VA508AccessibilityRouter;
 
 const
   TAG_PROB = 10;
@@ -279,7 +281,8 @@ begin
           FCoverList.CVlbl(i).Caption := aName;
           FCoverList.CVlst(i).Caption := aName;
           if Length(aTabPos) > 0 then FCoverList.CVlst(i).TabPositions := aTabPos;
-          if Length(aTextColor) > 0 then FCoverList.CVlst(i).Font.Color := StringToColor(aTextColor);
+          if Length(aTextColor) > 0 then FCoverList.CVlst(i).Font.Color :=
+                                            Get508CompliantColor(StringToColor(aTextColor));
           if Length(aPiece) > 0 then FCoverList.CVlst(i).Pieces := aPiece;
           FCoverList.CVlst(i).Tag := StrToInt(aID);
           if(aID <> RemID) then
@@ -441,9 +444,9 @@ begin
      TAG_VITL:
              if ItemID <> '' then
                begin
-                 frmFrame.VitalsDLLActive := True;
+//                 frmFrame.DLLActive := True;
                  SelectVitals(Piece(DisplayText[ItemIndex],Char(9),1)); //Char(9) = Tab Character
-                 frmFrame.VitalsDLLActive := False;
+//                 frmFrame.DLLActive := False;
                  ClearPtData;
                  DisplayPage;
                end;
@@ -516,12 +519,12 @@ begin
     try
       ReminderSL.Add(RemUnchanged);
       ListAllBackGround(Done, ProbSL, PostSL, MedsSL, ReminderSL, LabsSL, VitSL, VisitSL, uIPAddress, frmFrame.Handle);
-      if (iProb > -1) and (ProbSL.Count > 0) then (Components[iProb] as TORListBox).Items.Assign(ProbSL);
-      if (iPost > -1) and (PostSL.Count > 0) then (Components[iPost] as TORListBox).Items.Assign(PostSL);
-      if (iMeds > -1) and (MedsSL.Count > 0) then (Components[iMeds] as TORListBox).Items.Assign(MedsSL);
-      if (iLabs > -1) and (LabsSL.Count > 0) then (Components[iLabs] as TORListBox).Items.Assign(LabsSL);
-      if (iVit > -1) and (VitSL.Count > 0) then (Components[iVit] as TORListBox).Items.Assign(VitSL);
-      if (iVisit > -1) and (VisitSL.Count > 0) then (Components[iVisit] as TORListBox).Items.Assign(VisitSL);
+      if (iProb > -1) and (ProbSL.Count > 0) then FastAssign(ProbSL, (Components[iProb] as TORListBox).Items);
+      if (iPost > -1) and (PostSL.Count > 0) then FastAssign(PostSL, (Components[iPost] as TORListBox).Items);
+      if (iMeds > -1) and (MedsSL.Count > 0) then FastAssign(MedsSL, (Components[iMeds] as TORListBox).Items);
+      if (iLabs > -1) and (LabsSL.Count > 0) then FastAssign(LabsSL, (Components[iLabs] as TORListBox).Items);
+      if (iVit > -1) and (VitSL.Count > 0) then FastAssign(VitSL, (Components[iVit] as TORListBox).Items);
+      if (iVisit > -1) and (VisitSL.Count > 0) then FastAssign(VisitSL, (Components[iVisit] as TORListBox).Items);
       // since this RPC is connected to a timer, clear the results each time to make sure that
       // the results aren't passed to another RPC in the case that there is an error
       RPCBrokerV.ClearResults := True;
@@ -545,13 +548,13 @@ begin
   else
   begin
     ListAllBackGround(Done, ProbSL, PostSL, MedsSL, RemSL, LabsSL, VitSL, VisitSL, uIPAddress, frmFrame.Handle);
-    if (iProb > -1) and (ProbSL.Count > 0) then (Components[iProb] as TORListBox).Items.Assign(ProbSL);
-    if (iPost > -1) and (PostSL.Count > 0) then (Components[iPost] as TORListBox).Items.Assign(PostSL);
-    if (iMeds > -1) and (MedsSL.Count > 0) then (Components[iMeds] as TORListBox).Items.Assign(MedsSL);
-    if (iRem > -1) and (RemSL.Count > 0) then (Components[iRem] as TORListBox).Items.Assign(RemSL);
-    if (iLabs > -1) and (LabsSL.Count > 0) then (Components[iLabs] as TORListBox).Items.Assign(LabsSL);
-    if (iVit > -1) and (VitSL.Count > 0) then (Components[iVit] as TORListBox).Items.Assign(VitSL);
-    if (iVisit > -1) and (VisitSL.Count > 0) then (Components[iVisit] as TORListBox).Items.Assign(VisitSL);
+    if (iProb > -1) and (ProbSL.Count > 0) then FastAssign(ProbSL, (Components[iProb] as TORListBox).Items);
+    if (iPost > -1) and (PostSL.Count > 0) then FastAssign(PostSL, (Components[iPost] as TORListBox).Items);
+    if (iMeds > -1) and (MedsSL.Count > 0) then FastAssign(MedsSL, (Components[iMeds] as TORListBox).Items);
+    if (iRem > -1) and (RemSL.Count > 0) then FastAssign(RemSL, (Components[iRem] as TORListBox).Items);
+    if (iLabs > -1) and (LabsSL.Count > 0) then FastAssign(LabsSL, (Components[iLabs] as TORListBox).Items);
+    if (iVit > -1) and (VitSL.Count > 0) then FastAssign(VitSL, (Components[iVit] as TORListBox).Items);
+    if (iVisit > -1) and (VisitSL.Count > 0) then FastAssign(VisitSL, (Components[iVisit] as TORListBox).Items);
     // since this RPC is connected to a timer, clear the results each time to make sure that
     // the results aren't passed to another RPC in the case that there is an error
     RPCBrokerV.ClearResults := True;
@@ -689,8 +692,6 @@ begin
   FCoverList.Add(pnl_6, lbl_6, lst_6);
   FCoverList.Add(pnl_7, lbl_7, lst_7);
   FCoverList.Add(pnl_8, lbl_8, lst_8);
-  if ColorToRGB(clWindowText) <> ColorToRGB(clBlack) then
-    lst_3.Font.Color := clWindowText;
 end;
 
 procedure TfrmCover.FormDestroy(Sender: TObject);
@@ -843,7 +844,8 @@ begin
   if Length(aTextColor) > 0 then aTextColor := 'cl' + aTextColor;
   // Assign properties to components
   if Length(aTabPos) > 0 then (popMenuAllergies.PopupComponent as TORListBox).TabPositions := aTabPos;
-  if Length(aTextColor) > 0 then (popMenuAllergies.PopupComponent as TORListBox).Font.Color := StringToColor(aTextColor);
+  if Length(aTextColor) > 0 then (popMenuAllergies.PopupComponent as TORListBox).Font.Color :=
+                                                      Get508CompliantColor(StringToColor(aTextColor));
   if Length(aPiece) > 0 then (popMenuAllergies.PopupComponent as TORListBox).Pieces := aPiece;
   (popMenuAllergies.PopupComponent as TORListBox).Tag := StrToInt(aID);
   LoadList(aStatus, (popMenuAllergies.PopupComponent as TORListBox), aRpc, bCase, bInvert, iDatePiece, aDateFormat, aParam1, aID, aDetail);
@@ -868,13 +870,14 @@ procedure TfrmCover.GetPatientFlag;
 begin
   pnlFlag.Visible := HasFlag;
   sptFlag.Visible := HasFlag;
-  lstFlag.Items.Assign(FlagList);
+  FastAssign(FlagList, lstFlag.Items);
 end;
 
 procedure TfrmCover.lstFlagClick(Sender: TObject);
 begin
   if lstFlag.ItemIndex >= 0 then
     ShowFlags(lstFlag.ItemID);
+  lstFlag.ItemIndex := -1;
 end;
 
 procedure TfrmCover.lstFlagKeyDown(Sender: TObject; var Key: Word;
@@ -892,7 +895,6 @@ const
 //var
 //  PtIsVAA: boolean;
 //  PtIsMHV: boolean;
-
 begin
 //VAA & MHV
   PtIsVAA := false;
@@ -903,14 +905,13 @@ begin
   VAA_DFN := Patient.DFN;
   tCallV(VAAFlag, 'ORVAA VAA', [VAA_DFN]);
   tCallV(MHVFlag, 'ORWMHV MHV', [VAA_DFN]);
-
   if VAAFlag[0] <> '0' then
      begin
      PtIsVAA := true;
 
      with frmFrame do
         begin
-        laVAA2.Caption := Piece(VAAFlag[0], '^', 0);
+        laVAA2.Caption := Piece(VAAFlag[0], '^', 1);
         laVAA2.Hint := Piece(VAAFlag[0], '^', 2); //CQ7626 was piece '6'
         end;
      end
@@ -982,6 +983,7 @@ begin
            laVAA2.Top := paVAA.Top;
            paVAA.Height := pnlPrimaryCare.Height-2;
            laVAA2.Height := paVAA.ClientHeight - 1;
+           laVAA2.Width := paVAA.Width - 1;
            laVAA2.Visible := true;
            laMHV.Visible := false;
 
@@ -992,6 +994,7 @@ begin
 end;
 
 initialization
+  SpecifyFormIsNotADialog(TfrmCover);
 
 finalization
   if Assigned(fCover.VAAFlag) then fCover.VAAFlag.Free; //VAA

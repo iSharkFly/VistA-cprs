@@ -6,19 +6,20 @@ unit fAutoSz;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, StdCtrls;
+  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, StdCtrls, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmAutoSz = class(TForm)
+  TfrmAutoSz = class(TfrmBase508Form)
     procedure FormResize(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
     FSizes: TList;
     FAutoSizeDisabled: Boolean;
   protected
+    procedure Loaded; override;
     property AutoSizeDisabled: Boolean read FAutoSizeDisabled write FAutoSizeDisabled;
   public
-    procedure Loaded; override;
   end;
 
 var
@@ -29,7 +30,7 @@ implementation
 {$R *.DFM}
 
 uses
-  ORfn;
+  ORfn, VA508AccessibilityRouter;
 type
   TSizeRatio = class         // records relative sizes and positions for resizing logic
     FControl: TControl;
@@ -120,5 +121,9 @@ begin
   end;
   FSizes.Free;
 end;
+
+initialization
+  SpecifyFormIsNotADialog(TfrmAutoSz);
+
 
 end.

@@ -1,24 +1,18 @@
-object frmdlgProb: TfrmdlgProb
-  Left = 570
-  Top = 307
-  Width = 504
-  Height = 385
+inherited frmdlgProb: TfrmdlgProb
+  Left = 148
+  Top = 108
   HelpContext = 2000
   BorderIcons = []
   Caption = 'frmdlgProb'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 358
+  ClientWidth = 496
   OldCreateOrder = True
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object Label1: TLabel
+  object Label1: TLabel [0]
     Left = 6
     Top = 357
     Width = 47
@@ -26,7 +20,7 @@ object frmdlgProb: TfrmdlgProb
     Caption = 'Recorded'
     Visible = False
   end
-  object Label5: TLabel
+  object Label5: TLabel [1]
     Left = 4
     Top = 368
     Width = 45
@@ -34,7 +28,7 @@ object frmdlgProb: TfrmdlgProb
     Caption = 'Resolved'
     Visible = False
   end
-  object Label7: TLabel
+  object Label7: TLabel [2]
     Left = 8
     Top = 382
     Width = 41
@@ -42,7 +36,7 @@ object frmdlgProb: TfrmdlgProb
     Caption = 'Updated'
     Visible = False
   end
-  object pnlComments: TPanel
+  object pnlComments: TPanel [3]
     Left = 0
     Top = 200
     Width = 496
@@ -160,7 +154,7 @@ object frmdlgProb: TfrmdlgProb
       NumGlyphs = 2
     end
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [4]
     Left = 0
     Top = 331
     Width = 496
@@ -192,6 +186,7 @@ object frmdlgProb: TfrmdlgProb
       Height = 21
       Anchors = [akTop, akRight]
       Caption = 'OK'
+      Default = True
       ModalResult = 1
       TabOrder = 1
       OnClick = bbFileClick
@@ -223,7 +218,7 @@ object frmdlgProb: TfrmdlgProb
       Caption = 'Rec Date'
     end
   end
-  object edResDate: TCaptionEdit
+  object edResDate: TCaptionEdit [5]
     Left = 66
     Top = 365
     Width = 94
@@ -237,7 +232,7 @@ object frmdlgProb: TfrmdlgProb
     OnChange = ControlChange
     Caption = 'Res Date'
   end
-  object edUpdate: TCaptionEdit
+  object edUpdate: TCaptionEdit [6]
     Left = 67
     Top = 376
     Width = 94
@@ -251,7 +246,7 @@ object frmdlgProb: TfrmdlgProb
     OnChange = ControlChange
     Caption = 'Update'
   end
-  object pnlTop: TPanel
+  object pnlTop: TPanel [7]
     Left = 0
     Top = 0
     Width = 496
@@ -365,15 +360,15 @@ object frmdlgProb: TfrmdlgProb
     end
     object gbTreatment: TGroupBox
       Left = 310
-      Top = 62
+      Top = 58
       Width = 181
-      Height = 126
+      Height = 142
       Anchors = [akTop, akRight]
       Caption = 'Treatment Factors'
       TabOrder = 5
       DesignSize = (
         181
-        126)
+        142)
       object ckSC: TCheckBox
         Left = 7
         Top = 15
@@ -387,7 +382,7 @@ object frmdlgProb: TfrmdlgProb
       end
       object ckRad: TCheckBox
         Left = 7
-        Top = 33
+        Top = 50
         Width = 154
         Height = 17
         Anchors = [akTop, akRight]
@@ -398,7 +393,7 @@ object frmdlgProb: TfrmdlgProb
       end
       object ckAO: TCheckBox
         Left = 7
-        Top = 51
+        Top = 32
         Width = 154
         Height = 17
         Anchors = [akTop, akRight]
@@ -409,18 +404,18 @@ object frmdlgProb: TfrmdlgProb
       end
       object ckENV: TCheckBox
         Left = 7
-        Top = 69
+        Top = 68
         Width = 149
         Height = 17
         Anchors = [akTop, akRight]
-        Caption = 'Env. Contaminants '
+        Caption = 'Southwest &Asia Conditions'
         Enabled = False
         TabOrder = 3
         OnClick = ControlChange
       end
       object ckHNC: TCheckBox
         Left = 7
-        Top = 87
+        Top = 119
         Width = 149
         Height = 17
         Anchors = [akTop, akRight]
@@ -431,7 +426,7 @@ object frmdlgProb: TfrmdlgProb
       end
       object ckMST: TCheckBox
         Left = 7
-        Top = 105
+        Top = 102
         Width = 149
         Height = 17
         Anchors = [akTop, akRight]
@@ -439,6 +434,14 @@ object frmdlgProb: TfrmdlgProb
         Enabled = False
         TabOrder = 5
         OnClick = ControlChange
+      end
+      object ckSHAD: TCheckBox
+        Left = 7
+        Top = 85
+        Width = 170
+        Height = 17
+        Caption = 'Shipboard Hazard and Defense'
+        TabOrder = 6
       end
     end
     object cbServ: TORComboBox
@@ -552,5 +555,101 @@ object frmdlgProb: TfrmdlgProb
       OnChange = ControlChange
       Caption = 'Date of Onset'
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlComments'
+        'Status = stsDefault')
+      (
+        'Component = lblCom'
+        'Status = stsDefault')
+      (
+        'Component = bbAdd'
+        'Status = stsDefault')
+      (
+        'Component = bbRemove'
+        'Status = stsDefault')
+      (
+        'Component = lstComments'
+        'Status = stsDefault')
+      (
+        'Component = bbEdit'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = bbQuit'
+        'Status = stsDefault')
+      (
+        'Component = bbFile'
+        'Status = stsDefault')
+      (
+        'Component = ckVerify'
+        'Status = stsDefault')
+      (
+        'Component = edRecDate'
+        'Status = stsDefault')
+      (
+        'Component = edResDate'
+        'Status = stsDefault')
+      (
+        'Component = edUpdate'
+        'Status = stsDefault')
+      (
+        'Component = pnlTop'
+        'Status = stsDefault')
+      (
+        'Component = rgStatus'
+        'Status = stsDefault')
+      (
+        'Component = rgStage'
+        'Status = stsDefault')
+      (
+        'Component = bbChangeProb'
+        'Status = stsDefault')
+      (
+        'Component = edProb'
+        'Status = stsDefault')
+      (
+        'Component = gbTreatment'
+        'Status = stsDefault')
+      (
+        'Component = ckSC'
+        'Status = stsDefault')
+      (
+        'Component = ckRad'
+        'Status = stsDefault')
+      (
+        'Component = ckAO'
+        'Status = stsDefault')
+      (
+        'Component = ckENV'
+        'Status = stsDefault')
+      (
+        'Component = ckHNC'
+        'Status = stsDefault')
+      (
+        'Component = ckMST'
+        'Status = stsDefault')
+      (
+        'Component = ckSHAD'
+        'Status = stsDefault')
+      (
+        'Component = cbServ'
+        'Status = stsDefault')
+      (
+        'Component = cbLoc'
+        'Status = stsDefault')
+      (
+        'Component = cbProv'
+        'Status = stsDefault')
+      (
+        'Component = edOnsetdate'
+        'Status = stsDefault')
+      (
+        'Component = frmdlgProb'
+        'Status = stsDefault'))
   end
 end

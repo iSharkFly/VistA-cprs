@@ -4,10 +4,10 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ORCtrls, StdCtrls, ExtCtrls;
+  ORCtrls, StdCtrls, ExtCtrls, fBase508Form, VA508AccessibilityManager;
 
 type
-  TfrmLabTests = class(TForm)
+  TfrmLabTests = class(TfrmBase508Form)
     pnlLabTests: TORAutoPanel;
     cmdOK: TButton;
     cmdCancel: TButton;
@@ -29,7 +29,6 @@ type
     procedure cboTestsEnter(Sender: TObject);
     procedure cboTestsExit(Sender: TObject);
     procedure cmdAddClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
@@ -41,7 +40,7 @@ procedure SelectTests(FontSize: Integer);
 
 implementation
 
-uses fLabs, ORFn, rLabs, rMisc;
+uses fLabs, ORFn, rLabs, rMisc, VAUtils;
 
 {$R *.DFM}
 
@@ -60,7 +59,8 @@ begin
       ResizeToFont(FontSize, W, H);
       ClientWidth := W; pnlLabTests.Width := W;
       ClientHeight := H; pnlLabTests.Height := H;
-      lstList.Items.Assign(frmLabs.lstTests.Items);
+      SetFormPosition(frmLabTests);
+      FastAssign(frmLabs.lstTests.Items, lstList.Items);
       if lstList.Items.Count > 0 then lstList.ItemIndex := 0;
       lstListClick(frmLabTests);
       ShowModal;
@@ -86,10 +86,10 @@ end;
 procedure TfrmLabTests.cmdOKClick(Sender: TObject);
 begin
   if lstList.Items.Count = 0 then
-    ShowMessage('No tests were selected.')
+    ShowMsg('No tests were selected.')
   else
   begin
-    frmLabs.lstTests.Items.Assign(lstList.Items);
+    FastAssign(lstList.Items, frmLabs.lstTests.Items);
     Close;
   end;
 end;
@@ -155,11 +155,6 @@ begin
   if textindex = lstList.Items.Count then lstList.Items.Add(cboTests.Items[cboTests.ItemIndex]);
   lstList.ItemIndex := textindex;
   lstListClick(self);
-end;
-
-procedure TfrmLabTests.FormShow(Sender: TObject);
-begin
-  SetFormPosition(Self);
 end;
 
 procedure TfrmLabTests.FormClose(Sender: TObject;

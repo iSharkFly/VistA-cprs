@@ -35,14 +35,12 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, ORCtrls, TeEngine, Series, TeeProcs, Chart, ExtCtrls, Grids,
-  Buttons, ORNet, ORFn, uConst, Menus, ORDtTmRng
-  , ComCtrls
-  , uVitals
-  ;  {*KCM*}
+  StdCtrls, ORCtrls, TeEngine, Series, TeeProcs, Chart, ExtCtrls, Grids,Buttons,
+  ORNet, ORFn, uConst, Menus, ORDtTmRng, fBase508Form, ComCtrls, uVitals, VAUtils,
+  VA508AccessibilityManager;
 
 type
-  TfrmVitals = class(TForm)
+  TfrmVitals = class(TfrmBase508Form)
     pnlTop: TPanel;
     chtChart: TChart;
     serTest: TLineSeries;
@@ -129,8 +127,7 @@ function VitalsMemo(const patient: string; date1, date2: TFMDateTime; tests: TSt
 
 implementation
 
-uses fCover, uCore, rCore, fVit, fFrame, fEncnt, fVisit, fRptBox, rReports,
-  uAccessibleStringGrid, uInit;
+uses fCover, uCore, rCore, fVit, fFrame, fEncnt, fVisit, fRptBox, rReports, uInit;
 
 const
   ZOOM_PERCENT = 99;        // padding for inflating margins
@@ -184,7 +181,8 @@ begin
   GMV_FName :='GMV_VitalsViewDLG';
   GMV_LibName :='GMV_VitalsViewEnter.dll';
   GMV_LibName := GetProgramFilesPath + SHARE_DIR + GMV_LibName;
-  VitalsDLLHandle := LoadLibrary(PChar(GMV_LibName));
+  if VitalsDLLHandle = 0 then
+    VitalsDLLHandle := LoadLibrary(PChar(GMV_LibName));
  // UpdateTimeOutInterval(5000);
   if VitalsDLLHandle <> 0 then
     begin
@@ -203,9 +201,13 @@ begin
   else
     MessageDLG('Can''t find library "'+GMV_LibName+'".',mtError,[mbok],0);
   @VLPtVitals := nil;
-  FreeLibrary(VitalsDLLHandle);
-  if DLLForceClose then
-    frmFrame.Close; // Fix for CQ: 7535
+  if VitalsDLLHandle <> 0 then
+  begin
+    FreeLibrary(VitalsDLLHandle);
+    VitalsDLLHandle := 0;
+  end;
+//  if DLLForceClose then                  // jm - removed as part of timeout fix
+//    frmFrame.Close; // Fix for CQ: 7535  // jm - removed as part of timeout fix
 end;
 
 (*
@@ -342,7 +344,7 @@ begin
   else
     BeginEndDates(date1,date2,daysback);
   //date1 := date1 + 0.2359;
-  tmpGrid.Assign(VitalsGrid(Patient.DFN, date1, date2, 0, lstVitals.Items));
+  FastAssign(VitalsGrid(Patient.DFN, date1, date2, 0, lstVitals.Items), tmpGrid);
   vindex := lstVitals.ItemIndex;
   VGrid(tmpGrid);
   lstVitals.ItemIndex := vindex;
@@ -363,18 +365,15 @@ end;
 
 procedure TfrmVitals.FormCreate(Sender: TObject);
 begin
-  grdVitals.Color := ReadOnlyColor;
   tmpGrid := TStringList.Create;
   if Patient.Inpatient then lstDates.ItemIndex := 1 else lstDates.ItemIndex := 4;
   SerTest.GetHorizAxis.ExactDateTime := true;
   SerTest.GetHorizAxis.Increment := DateTimeStep[dtOneMinute];
-  TAccessibleStringGrid.WrapControl(grdVitals);
 end;
 
 procedure TfrmVitals.FormDestroy(Sender: TObject);
 begin
   tmpGrid.free;
-  TAccessibleStringGrid.UnwrapControl(grdVitals);
 end;
 
 function TfrmVitals.FMToDateTime(FMDateTime: string): TDateTime;

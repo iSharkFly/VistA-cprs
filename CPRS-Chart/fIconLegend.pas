@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs, dShared,
-  ComCtrls, StdCtrls, ExtCtrls, ImgList, mImgText, Menus, FAutoSz;
+  ComCtrls, StdCtrls, ExtCtrls, ImgList, mImgText, Menus, FAutoSz,
+  VA508AccessibilityManager;
 
 type
   TIconLegendType = (ilLast, ilNotes, ilTemplates, ilReminders, ilConsults, ilSurgery);

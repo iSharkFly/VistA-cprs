@@ -22,6 +22,7 @@ type
     SrvSeq:    Integer;
     LastFill:  TFMDateTime;
     Location:   String;
+    Drug:      String;
     //Action:    Integer;
   end;
 
@@ -29,7 +30,7 @@ procedure ClearMedList(AList: TList);
 function DetailMedLM(ID: string): TStrings;
 function MedAdminHistory(OrderID: string): TStrings;
 function MedStatusGroup(const s: string): Integer;
-procedure LoadActiveMedLists(InPtMeds, OutPtMeds, NonVAMeds: TList);
+procedure LoadActiveMedLists(InPtMeds, OutPtMeds, NonVAMeds: TList; var view: integer);
 function GetNewDialog: string;
 function PickUpDefault: string;
 procedure Refill(AnOrderID, PickUpAt: string);
@@ -128,11 +129,37 @@ begin
   else Result := 0;
 end;
 
-procedure LoadActiveMedLists(InPtMeds, OutPtMeds, NonVAMeds: TList);
+function ByStatusThenLocation(Item1, Item2: Pointer): Integer;
+{ < 0 if Item1 is less and Item2, 0 if they are equal and > 0 if Item1 is greater than Item2 }
+var
+  //Status1, Status2: Integer;
+  loc1, loc2: string;
+  Med1, Med2: TMedListRec;
+begin
+  Med1 := TMedListRec(Item1);
+  Med2 := TMedListRec(Item2);
+  loc1 := Med1.Location;
+  loc2 := Med2.Location;
+  //Status1 := MedStatusGroup(Med1.Status);
+  //Status2 := MedStatusGroup(Med2.Status);
+  if (compareText(Med1.Status,Med2.Status) >0) then Result := 1
+  else if (compareText(Med1.Status,Med2.Status) <0) then Result := -1
+  else if ( compareText(loc1,loc2)>0 ) then Result := -1
+  else if ( compareText(loc1,loc2)<0 ) then Result := 1
+  else if (compareText(Med1.Drug,Med2.Drug) >0) then Result := 1
+  else if (compareText(Med1.Drug,Med2.Drug) <0) then Result := -1
+  //else if Med1.StopDate > Med2.StopDate then Result := -1
+  //else if Med1.StopDate < Med2.StopDate then Result := 1
+  //else if Med1.SrvSeq < Med2.SrvSeq then Result := -1
+  //else if Med1.SrvSeq > Med2.SrvSeq then Result := 1
+  else Result := 0;
+end;
+
+procedure LoadActiveMedLists(InPtMeds, OutPtMeds, NonVAMeds: TList; var view: integer);
 var
   idx, ASeq: Integer;
   x, y: string;
-  ClinMeds,tmpInPtMeds: TList;
+  ClinMeds, tmpInPtMeds: TList;
   AMed: TMedListRec;
 begin
   //Check for CQ 9814 this should prevent an M error is DFn is not defined.
@@ -143,8 +170,10 @@ begin
   ClearMedList(InPtMeds);
   ClearMedList(OutPtMeds);
   ClearMedList(NonVAMeds);
-  CallV('ORWPS ACTIVE', [Patient.DFN]);
+  CallV('ORWPS ACTIVE', [Patient.DFN, User.DUZ, view, True]);
   ASeq := 0;
+  if (view = 0) and (RPCBrokerV.Results.Count > 0) then
+    view := StrToIntDef(RPCBrokerV.Results.Strings[0],0);
   with RPCBrokerV do while Results.Count > 0 do
   begin
     x := Results[0];
@@ -161,10 +190,12 @@ begin
     SetMedFields(AMed, x, y);
     Inc(ASeq);
     AMed.SrvSeq := ASeq;
-    if AMed.Inpatient then
+    if (AMed.Inpatient) then
     begin
-      if Copy(x,2,2)='CP' then ClinMeds.Add(AMed)
-      else tmpInPtMeds.Add(AMed);
+      tmpInPtMeds.Add(AMed);
+      //if (Copy(x,2,2)='CP') then tmpInPtMeds.Add(AMed);
+     // if (Copy(x,2,2)='CP') and ((view = 2) or (view = 0)) then ClinMeds.Add(AMed)
+     // else tmpInPtMeds.Add(AMed);
     end
     else
     if  AMed.NonVAMed then
@@ -172,13 +203,17 @@ begin
     else
        OutPtMeds.Add(AMed);
   end;
-  ClinMeds.Sort(ByStatusThenStop);
-  tmpInPtMeds.Sort(ByStatusThenStop);                           //IMO
-  InPtMeds.Assign(ClinMeds);
+ // 12-4 if view <> 1 then ClinMeds.Sort(ByStatusThenStop);
+ // 12-4 if view = 1 then tmpInPtMeds.Sort(ByStatusThenLocation)
+ // 12-4 else tmpInPtMeds.Sort(ByStatusThenStop);
+  //tmpInPtMeds.Sort(ByStatusThenStop);                           //IMO
+ //12-4 if view <> 1 then InPtMeds.Assign(ClinMeds);
   for idx := 0 to tmpInPtMeds.Count - 1 do
     InPtMeds.Add(TMedListRec(tmpInPtMeds.Items[idx]));
-  OutPtMeds.Sort(ByStatusThenStop);
-  NonVAMeds.Sort(ByStatusThenStop);
+  //if view <> 1 then OutPtMeds.Sort(ByStatusThenStop)
+  //else OutPtMeds.Sort(ByStatusThenLocation);
+ //12-4 if view <> 1 then NonVAMeds.Sort(ByStatusThenStop)
+ //12-4 else NonVAMeds.Sort(ByStatusThenLocation);
   if Assigned(ClinMeds) then FreeAndNil(ClinMeds);
   if Assigned(tmpInPtMeds) then FreeAndNil(tmpInPtMeds);
 end;

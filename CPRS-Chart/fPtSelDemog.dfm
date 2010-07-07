@@ -1,34 +1,33 @@
-object frmPtSelDemog: TfrmPtSelDemog
-  Left = 862
-  Top = 298
+inherited frmPtSelDemog: TfrmPtSelDemog
+  Left = 550
+  Top = 250
   BorderStyle = bsNone
   Caption = 'frmPtSelDemog'
-  ClientHeight = 151
-  ClientWidth = 190
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  OldCreateOrder = False
+  ClientHeight = 193
+  ClientWidth = 169
+  DefaultMonitor = dmDesktop
+  Position = poDesigned
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  ExplicitLeft = 550
+  ExplicitTop = 250
+  ExplicitWidth = 177
+  ExplicitHeight = 227
   PixelsPerInch = 96
   TextHeight = 13
-  object orapnlMain: TORAutoPanel
+  object orapnlMain: TORAutoPanel [0]
     Left = 0
     Top = 0
-    Width = 190
-    Height = 151
+    Width = 169
+    Height = 193
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 0
     object Memo: TCaptionMemo
       Left = 0
       Top = 0
-      Width = 190
-      Height = 151
+      Width = 169
+      Height = 193
       Align = alClient
       HideSelection = False
       Lines.Strings = (
@@ -41,7 +40,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblPtName: TStaticText
       Tag = 2
       Left = 1
-      Top = 2
+      Top = 3
       Width = 166
       Height = 17
       Caption = 'Winchester,Charles Emerson'
@@ -56,7 +55,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblSSN: TStaticText
       Tag = 1
       Left = 1
-      Top = 21
+      Top = 17
       Width = 29
       Height = 17
       Caption = 'SSN:'
@@ -65,7 +64,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblPtSSN: TStaticText
       Tag = 2
       Left = 31
-      Top = 21
+      Top = 17
       Width = 64
       Height = 17
       Caption = '123-45-1234'
@@ -74,7 +73,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblDOB: TStaticText
       Tag = 1
       Left = 1
-      Top = 39
+      Top = 33
       Width = 30
       Height = 17
       Caption = 'DOB:'
@@ -83,7 +82,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblPtDOB: TStaticText
       Tag = 2
       Left = 31
-      Top = 39
+      Top = 32
       Width = 63
       Height = 17
       Caption = 'Jun 26,1957'
@@ -92,7 +91,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblPtSex: TStaticText
       Tag = 2
       Left = 1
-      Top = 57
+      Top = 47
       Width = 66
       Height = 17
       Caption = 'Male, age 39'
@@ -101,7 +100,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblPtVet: TStaticText
       Tag = 2
       Left = 1
-      Top = 75
+      Top = 62
       Width = 41
       Height = 17
       Caption = 'Veteran'
@@ -110,7 +109,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblPtSC: TStaticText
       Tag = 2
       Left = 1
-      Top = 93
+      Top = 75
       Width = 118
       Height = 17
       Caption = 'Service Connected 50%'
@@ -119,7 +118,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblLocation: TStaticText
       Tag = 1
       Left = 1
-      Top = 111
+      Top = 90
       Width = 48
       Height = 17
       Caption = 'Location:'
@@ -127,8 +126,8 @@ object frmPtSelDemog: TfrmPtSelDemog
     end
     object lblPtRoomBed: TStaticText
       Tag = 2
-      Left = 61
-      Top = 131
+      Left = 64
+      Top = 107
       Width = 32
       Height = 17
       Caption = '257-B'
@@ -138,7 +137,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblPtLocation: TStaticText
       Tag = 2
       Left = 61
-      Top = 111
+      Top = 90
       Width = 41
       Height = 17
       Caption = '2 EAST'
@@ -148,7 +147,7 @@ object frmPtSelDemog: TfrmPtSelDemog
     object lblRoomBed: TStaticText
       Tag = 1
       Left = 1
-      Top = 131
+      Top = 104
       Width = 57
       Height = 17
       Caption = 'Room-Bed:'
@@ -158,9 +157,60 @@ object frmPtSelDemog: TfrmPtSelDemog
       Tag = 2
       Left = 104
       Top = 21
-      Width = 7
-      Height = 17
+      Width = 4
+      Height = 4
       TabOrder = 13
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = orapnlMain'
+        'Status = stsDefault')
+      (
+        'Component = Memo'
+        'Status = stsDefault')
+      (
+        'Component = lblPtName'
+        'Status = stsDefault')
+      (
+        'Component = lblSSN'
+        'Status = stsDefault')
+      (
+        'Component = lblPtSSN'
+        'Status = stsDefault')
+      (
+        'Component = lblDOB'
+        'Status = stsDefault')
+      (
+        'Component = lblPtDOB'
+        'Status = stsDefault')
+      (
+        'Component = lblPtSex'
+        'Status = stsDefault')
+      (
+        'Component = lblPtVet'
+        'Status = stsDefault')
+      (
+        'Component = lblPtSC'
+        'Status = stsDefault')
+      (
+        'Component = lblLocation'
+        'Status = stsDefault')
+      (
+        'Component = lblPtRoomBed'
+        'Status = stsDefault')
+      (
+        'Component = lblPtLocation'
+        'Status = stsDefault')
+      (
+        'Component = lblRoomBed'
+        'Status = stsDefault')
+      (
+        'Component = lblPtHRN'
+        'Status = stsDefault')
+      (
+        'Component = frmPtSelDemog'
+        'Status = stsDefault'))
   end
 end

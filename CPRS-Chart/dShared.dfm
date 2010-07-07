@@ -2,10 +2,10 @@ object dmodShared: TdmodShared
   OldCreateOrder = False
   OnCreate = dmodSharedCreate
   OnDestroy = dmodSharedDestroy
-  Left = 285
-  Top = 161
+  Left = 50
+  Top = 159
   Height = 479
-  Width = 741
+  Width = 439
   object imgTemplates: TImageList
     BkColor = clWhite
     AllocBy = 6
@@ -1211,8 +1211,8 @@ object dmodShared: TdmodShared
     BkColor = clWhite
     AllocBy = 6
     Width = 20
-    Left = 100
-    Top = 16
+    Left = 28
+    Top = 80
     Bitmap = {
       494C010108000900040014001000FFFFFF00FF10FFFFFFFFFFFFFFFF424D3600
       000000000000360000002800000050000000300000000100200000000000003C
@@ -1720,8 +1720,8 @@ object dmodShared: TdmodShared
       000000000000}
   end
   object imgNotes: TImageList
-    Left = 174
-    Top = 16
+    Left = 22
+    Top = 144
     Bitmap = {
       494C01010F001300040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000005000000001002000000000000050
@@ -2391,8 +2391,8 @@ object dmodShared: TdmodShared
       000000000000}
   end
   object imgImages: TImageList
-    Left = 240
-    Top = 18
+    Left = 24
+    Top = 202
     Bitmap = {
       494C010106000900040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000003000000001002000000000000030
@@ -2799,8 +2799,8 @@ object dmodShared: TdmodShared
   end
   object imgReminders2: TImageList
     Width = 32
-    Left = 104
-    Top = 72
+    Left = 200
+    Top = 80
     Bitmap = {
       494C01010A000E00040020001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000800000004000000001002000000000000080
@@ -3866,8 +3866,8 @@ object dmodShared: TdmodShared
       000000000000}
   end
   object imgConsults: TImageList
-    Left = 320
-    Top = 18
+    Left = 24
+    Top = 266
     Bitmap = {
       494C010109000E00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
@@ -4405,8 +4405,8 @@ object dmodShared: TdmodShared
       000000000000}
   end
   object imgSurgery: TImageList
-    Left = 389
-    Top = 17
+    Left = 29
+    Top = 329
     Bitmap = {
       494C01010D000E00040010001000FFFFFFFFFF10FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000004000000001002000000000000040
@@ -4942,5 +4942,544 @@ object dmodShared: TdmodShared
       FFFFB9FFE007E007FFFFBFFFC007C007FFFF048FC007C007FFFF07FFE007E007
       FFFF07FFF803F803FFFF9FFFFC03FC0300000000000000000000000000000000
       000000000000}
+  end
+  object imgLblReminders: TVA508ImageListLabeler
+    Components = <>
+    ImageList = imgReminders
+    Labels = <
+      item
+        Caption = 'Reminder Category'
+        ImageIndex = 0
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Reminder Category'
+        ImageIndex = 1
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Due Reminder'
+        ImageIndex = 2
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Applicable Reminder'
+        ImageIndex = 3
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Not Applicable Reminder'
+        ImageIndex = 4
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Unevaluated Reminder'
+        ImageIndex = 5
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'With Dialog'
+        ImageIndex = 6
+        OverlayIndex = 0
+      end
+      item
+        Caption = 'With Processed Dialog'
+        ImageIndex = 7
+        OverlayIndex = 1
+      end>
+    Left = 112
+    Top = 80
+  end
+  object imgLblHealthFactorLabels: TVA508ImageListLabeler
+    Components = <>
+    ImageList = imgTemplates
+    Labels = <
+      item
+        Caption = 'Template Root'
+        ImageIndex = 0
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Root'
+        ImageIndex = 1
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Category'
+        ImageIndex = 2
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Category'
+        ImageIndex = 3
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Personal Template'
+        ImageIndex = 4
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Group Template'
+        ImageIndex = 5
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Group Template'
+        ImageIndex = 6
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Personal Template *'
+        ImageIndex = 7
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Group Template *'
+        ImageIndex = 8
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Group Template *'
+        ImageIndex = 9
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Shared Template'
+        ImageIndex = 10
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Group Template'
+        ImageIndex = 11
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Group Template'
+        ImageIndex = 12
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Shared Template *'
+        ImageIndex = 13
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Group Template *'
+        ImageIndex = 14
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Group Template *'
+        ImageIndex = 15
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Folder'
+        ImageIndex = 16
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Folder'
+        ImageIndex = 17
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Dialog'
+        ImageIndex = 18
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Dialog'
+        ImageIndex = 19
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Dialog *'
+        ImageIndex = 20
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Dialog *'
+        ImageIndex = 21
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Dialog'
+        ImageIndex = 22
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Dialog'
+        ImageIndex = 23
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Dialog *'
+        ImageIndex = 24
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Template Dialog *'
+        ImageIndex = 25
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Reminder Dialog'
+        ImageIndex = 26
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Reminder Dialog'
+        ImageIndex = 27
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'COM Object Template'
+        ImageIndex = 28
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'COM Object Template not installed'
+        ImageIndex = 29
+        OverlayIndex = -1
+      end>
+    Left = 136
+    Top = 16
+  end
+  object imgLblNotes: TVA508ImageListLabeler
+    Components = <>
+    ImageList = imgNotes
+    Labels = <
+      item
+        Caption = 'Top Grouping'
+        ImageIndex = 0
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Subgrouping'
+        ImageIndex = 1
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Subgrouping'
+        ImageIndex = 2
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Note'
+        ImageIndex = 3
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Note with Addenda'
+        ImageIndex = 4
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Interdisciplanary Note'
+        ImageIndex = 5
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Interdisciplanary Note'
+        ImageIndex = 6
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Interdisciplanary Note with Addenda'
+        ImageIndex = 7
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Interdisciplanary Note with Addenda'
+        ImageIndex = 8
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Interdisciplanary entry'
+        ImageIndex = 9
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Interdisciplanary entry with addenda'
+        ImageIndex = 10
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Addendum'
+        ImageIndex = 11
+        OverlayIndex = -1
+      end
+      item
+        ImageIndex = 12
+        OverlayIndex = -1
+      end
+      item
+        ImageIndex = 13
+        OverlayIndex = -1
+      end
+      item
+        ImageIndex = 14
+        OverlayIndex = -1
+      end>
+    Left = 120
+    Top = 144
+  end
+  object imgLblImages: TVA508ImageListLabeler
+    Components = <>
+    ImageList = imgNotes
+    Labels = <
+      item
+        Caption = 'Top Grouping'
+        ImageIndex = 0
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Subgrouping'
+        ImageIndex = 1
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Subgrouping'
+        ImageIndex = 2
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Document'
+        ImageIndex = 3
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Document with Addenda'
+        ImageIndex = 4
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Folder'
+        ImageIndex = 5
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Folder'
+        ImageIndex = 6
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Folder Plus'
+        ImageIndex = 7
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Folder Plus'
+        ImageIndex = 8
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Entry'
+        ImageIndex = 9
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Entry with Addenda'
+        ImageIndex = 10
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Addendum'
+        ImageIndex = 11
+        OverlayIndex = -1
+      end
+      item
+        ImageIndex = 12
+        OverlayIndex = -1
+      end
+      item
+        ImageIndex = 13
+        OverlayIndex = -1
+      end
+      item
+        ImageIndex = 14
+        OverlayIndex = -1
+      end>
+    Left = 112
+    Top = 208
+  end
+  object imgLblConsults: TVA508ImageListLabeler
+    Components = <>
+    ImageList = imgConsults
+    Labels = <
+      item
+        Caption = 'Top Grouping'
+        ImageIndex = 0
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Subgrouping'
+        ImageIndex = 1
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Subgrouping'
+        ImageIndex = 2
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Consult request'
+        ImageIndex = 3
+        OverlayIndex = -1
+      end
+      item
+        ImageIndex = 4
+        OverlayIndex = -1
+      end
+      item
+        ImageIndex = 5
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Procedure Request'
+        ImageIndex = 6
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Interfacility Consult Request'
+        ImageIndex = 7
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Interfacility Procedure'
+        ImageIndex = 8
+        OverlayIndex = -1
+      end>
+    Left = 128
+    Top = 272
+  end
+  object imgLblSurgery: TVA508ImageListLabeler
+    Components = <>
+    ImageList = imgSurgery
+    Labels = <
+      item
+        ImageIndex = 0
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Top Grouping'
+        ImageIndex = 1
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Subgrouping'
+        ImageIndex = 2
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Subgrouping'
+        ImageIndex = 3
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'OR Case no attached reports'
+        ImageIndex = 4
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'OR case attached reports'
+        ImageIndex = 5
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'OR case attached reports'
+        ImageIndex = 6
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Report'
+        ImageIndex = 7
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Report with Addenda'
+        ImageIndex = 8
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Addendum'
+        ImageIndex = 9
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Non-OR case without attached reports'
+        ImageIndex = 10
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Non-OR case with attached report'
+        ImageIndex = 11
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Non-OR case with attached report'
+        ImageIndex = 12
+        OverlayIndex = -1
+      end>
+    Left = 120
+    Top = 328
+  end
+  object imgLblReminders2: TVA508ImageListLabeler
+    Components = <>
+    ImageList = imgReminders2
+    Labels = <
+      item
+        Caption = 'Reminder Due'
+        ImageIndex = 0
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Reminder Due Check'
+        ImageIndex = 1
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Reminder Applicable'
+        ImageIndex = 2
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Reminder Applicable Check'
+        ImageIndex = 3
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Reminder Not Applicable'
+        ImageIndex = 4
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Reminder Not Applicable Check'
+        ImageIndex = 5
+        OverlayIndex = -1
+      end
+      item
+        ImageIndex = 6
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Check'
+        ImageIndex = 7
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Reminder Category'
+        ImageIndex = 8
+        OverlayIndex = -1
+      end
+      item
+        Caption = 'Reminder Category Check'
+        ImageIndex = 9
+        OverlayIndex = -1
+      end>
+    Left = 288
+    Top = 80
   end
 end

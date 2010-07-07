@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  fAutoSz, Grids, Calendar, ORDtTmCal, StdCtrls, ORDtTm, ORFn;
+  fAutoSz, Grids, Calendar, ORDtTmCal, StdCtrls, ORDtTm, ORFn,
+  VA508AccessibilityManager;
 
 type
   TfrmEffectDate = class(TfrmAutoSz)

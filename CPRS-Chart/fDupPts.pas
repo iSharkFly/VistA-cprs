@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics,
-  Controls, Forms, Dialogs, StdCtrls, ORCtrls, ExtCtrls, OrFn;
+  Controls, Forms, Dialogs, StdCtrls, ORCtrls, ExtCtrls, OrFn, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmDupPts = class(TForm)
+  TfrmDupPts = class(TfrmBase508Form)
     pnlDupPts: TPanel;
     btnOK: TButton;
     btnCancel: TButton;
@@ -49,8 +50,8 @@ var
 begin
   fPtSel.DupDFN := 'Cancel'; // Pre-set as default.
   theDups := tStringList.create;
-  theDups.assign(fPtSel.PtStrs);
-  lboSelPt.items.assign(theDups);
+  FastAssign(fPtSel.PtStrs, theDups);
+  FastAssign(theDups, lboSelPt.Items);
   ResizeAnchoredFormToFont(self);
 end;
 
@@ -71,11 +72,9 @@ end;
 procedure TfrmDupPts.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-
-// Check for "Esc" keypress:
-if (key = 27) then // ESC key.
-  btnCancel.click;
-
+  inherited;
+  if (key = VK_ESCAPE) then
+    btnCancel.click;
 end;
 
 procedure TfrmDupPts.lboSelPtDblClick(Sender: TObject);

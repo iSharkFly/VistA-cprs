@@ -1,21 +1,17 @@
-object frmLabInfo: TfrmLabInfo
+inherited frmLabInfo: TfrmLabInfo
   Left = 276
   Top = 256
-  Width = 591
-  Height = 304
   Caption = 'Lab Test Description'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 277
+  ClientWidth = 583
   OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
+  ExplicitWidth = 320
+  ExplicitHeight = 240
   PixelsPerInch = 96
   TextHeight = 13
-  object Panel1: TPanel
+  object Panel1: TPanel [0]
     Left = 0
     Top = 244
     Width = 583
@@ -38,7 +34,7 @@ object frmLabInfo: TfrmLabInfo
       OnClick = btnOKClick
     end
   end
-  object memInfo: TCaptionMemo
+  object memInfo: TCaptionMemo [1]
     Left = 160
     Top = 0
     Width = 423
@@ -49,8 +45,9 @@ object frmLabInfo: TfrmLabInfo
     ScrollBars = ssVertical
     TabOrder = 1
     Caption = 'Laboratory Test Descriptions'
+    ExplicitTop = -1
   end
-  object cboTests: TORComboBox
+  object cboTests: TORComboBox [2]
     Left = 0
     Top = 0
     Width = 160
@@ -67,6 +64,7 @@ object frmLabInfo: TfrmLabInfo
     ItemTipEnable = True
     ListItemsOnly = False
     LongList = True
+    LookupPiece = 0
     MaxLength = 0
     ParentShowHint = False
     Pieces = '2'
@@ -76,5 +74,24 @@ object frmLabInfo: TfrmLabInfo
     TabOrder = 0
     OnClick = cboTestsClick
     OnNeedData = cboTestsNeedData
+    CharsNeedMatch = 1
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = Panel1'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = memInfo'
+        'Status = stsDefault')
+      (
+        'Component = cboTests'
+        'Status = stsDefault')
+      (
+        'Component = frmLabInfo'
+        'Status = stsDefault'))
   end
 end

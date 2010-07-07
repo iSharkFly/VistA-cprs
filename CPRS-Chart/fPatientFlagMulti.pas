@@ -4,7 +4,8 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, fAutoSz, ORCtrls, ExtCtrls, ComCtrls, rMisc;
+  Dialogs, StdCtrls, fAutoSz, ORCtrls, ExtCtrls, ComCtrls, rMisc, fBase508Form,
+  VA508AccessibilityManager;
 
 type
   {This object holds a List of Notes Linked to a PRF as Returned VIA the RPCBroker}
@@ -21,11 +22,11 @@ type
     destructor Destroy(); override;
   end;
 
-  TfrmFlags = class(TForm)
+  TfrmFlags = class(TfrmBase508Form)
     Splitter1: TSplitter;
     pnlTop: TORAutoPanel;
     lblFlags: TLabel;
-    lstFlags: TORListBox;
+    lstFlagsCat2: TORListBox;
     memFlags: TRichEdit;
     pnlNotes: TPanel;
     lvPRF: TCaptionListView;
@@ -33,7 +34,10 @@ type
     Splitter2: TSplitter;
     pnlBottom: TORAutoPanel;
     btnClose: TButton;
-    procedure lstFlagsClick(Sender: TObject);
+    lstFlagsCat1: TORListBox;
+    lblCat1: TLabel;
+    TimerTextFlash: TTimer;
+    procedure lstFlagsCat1Click(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
     procedure FormShow(Sender: TObject);
@@ -43,11 +47,18 @@ type
     procedure lvPRFClick(Sender: TObject);
     procedure lvPRFKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure TimerTextFlashTimer(Sender: TObject);
+    procedure lstFlagsCat2Click(Sender: TObject);
   private
     FFlagID: integer;
     FPRFNotes : TPRFNotes;
     FNoteTitle: String;
-    procedure GetNotes();
+    procedure GetNotes(SelectedList : TORListBox);
+    procedure MakeCat1FlagsStandOut;
+    procedure LoadSelectedFlagData(SelectedList : TORListBox);
+    procedure ActivateSpecificFlag;
+    procedure PutFlagsOnLists(flags, Cat1List,  Cat2List: TStrings);
+    function GetListToActivate : TORListBox;
   public
     { Public declarations }
   end;
@@ -79,9 +90,10 @@ begin
     SetFormPosition(frmFlags);
     if HasFlag then
     begin
-      //SetFormPosition(frmFlags);
-      frmFlags.FFlagID := FlagId;
-      frmFlags.lstFlags.Items.Assign(FlagList);
+      with frmFlags do begin
+        FFlagID := FlagId;
+        PutFlagsOnLists(FlagList, lstFlagsCat1.Items, lstFlagsCat2.Items);
+      end;
       frmFlags.memFlags.SelStart := 0;
       ResizeFormToFont(TForm(frmFlags));
       frmFlags.ShowModal;
@@ -91,18 +103,13 @@ begin
   end;
 end;
 
-procedure TfrmFlags.lstFlagsClick(Sender: TObject);
-var
-  FlagArray: TStringList;
+procedure TfrmFlags.lstFlagsCat1Click(Sender: TObject);
 begin
-  if lstFlags.ItemIndex >= 0 then
+  if lstFlagsCat1.ItemIndex >= 0 then
   begin
-    FlagArray := TStringList.Create;
-    GetActiveFlg(FlagArray, Patient.DFN, lstFlags.ItemID);
-    if FlagArray.Count > 0 then
-      memFlags.Lines.Assign(FlagArray);
-    memFlags.SelStart := 0;
-    GetNotes;
+    with lstFlagsCat2 do
+      Selected[ItemIndex] := False;
+    LoadSelectedFlagData(lstFlagsCat1);
   end;
 end;
 
@@ -115,17 +122,13 @@ end;
 
 
 procedure TfrmFlags.FormShow(Sender: TObject);
-var
-  idx: integer;
 begin
   inherited;
   SetFormPosition(Self);
-  idx := 0;
-  if FFlagID > 0 then idx := lstFlags.SelectByIEN(FFlagId);
-  lstFlags.ItemIndex := idx;
-  lstFlagsClick(Self);
-  ActiveControl := memFlags;
-  GetNotes;
+  if lstFlagsCat1.Count > 0 then
+    MakeCat1FlagsStandOut;
+
+  ActivateSpecificFlag;
 end;
 
 procedure TfrmFlags.FormCreate(Sender: TObject);
@@ -140,13 +143,13 @@ begin
   SaveUserBounds(Self);
 end;
 
-procedure TfrmFlags.GetNotes;
+procedure TfrmFlags.GetNotes(SelectedList : TORListBox);
 var
   NoteTitleIEN, FlagID : Int64;
 begin
     if FPRFNotes = nil then
       FPRFNotes := TPRFNotes.Create;
-    FlagID := lstFlags.ItemID;
+    FlagID := SelectedList.ItemID;
     CallV('TIU GET PRF TITLE', [Patient.DFN,FlagID]);
     FNoteTitle := Piece(RPCBrokerV.Results[0],U,NOTE_TITLE);
     lblNoteTitle.Caption := 'Signed, Linked Notes of Title: '+ FNoteTitle;
@@ -184,7 +187,7 @@ const
   REVERSE_CHRONO = 1;
 begin
   CallV('TIU GET LINKED PRF NOTES', [DFN,TitleIEN,REVERSE_CHRONO]);
-  FPRFNoteList.Assign(RPCBrokerV.Results);
+  FastAssign(RPCBrokerV.Results, FPRFNoteList);
 end;
 
 procedure TPRFNotes.ShowActionsOnList(DisplayList: TCaptionListView);
@@ -223,6 +226,98 @@ procedure TfrmFlags.lvPRFKeyDown(Sender: TObject; var Key: Word;
 begin
   if (Key = VK_SPACE) or (Key = VK_RETURN) then
     lvPRFClick(Sender);
+end;
+
+
+procedure TfrmFlags.MakeCat1FlagsStandOut;
+Const
+  FONT_INC = 4;
+  clBrightOrange = TColor($3ABEF3);  //Blue 58 Green 190 Red 243
+begin
+  lblCat1.Font.Size := lblCat1.Font.Size + FONT_INC;
+  lstFlagsCat1.Font.Size := lstFlagsCat1.Font.Size + FONT_INC;
+  lblCat1.Color := Get508CompliantColor(clBrightOrange);
+  lstFlagsCat1.Color := Get508CompliantColor(clBrightOrange);
+  lblCat1.Font.Color := Get508CompliantColor(clWhite);
+  lstFlagsCat1.Font.Color := Get508CompliantColor(clWhite);
+  TimerTextFlash.Enabled := true;
+end;
+
+procedure TfrmFlags.TimerTextFlashTimer(Sender: TObject);
+begin
+  if lblCat1.Font.Color = Get508CompliantColor(clWhite) then
+    lblCat1.Font.Color := Get508CompliantColor(clBlack)
+  else
+    lblCat1.Font.Color := Get508CompliantColor(clWhite);
+end;
+
+procedure TfrmFlags.LoadSelectedFlagData(SelectedList: TORListBox);
+var
+  FlagArray: TStringList;
+begin
+    FlagArray := TStringList.Create;
+    GetActiveFlg(FlagArray, Patient.DFN, SelectedList.ItemID);
+    if FlagArray.Count > 0 then
+      QuickCopy(FlagArray, memFlags);
+    memFlags.SelStart := 0;
+    GetNotes(SelectedList);
+end;
+
+procedure TfrmFlags.lstFlagsCat2Click(Sender: TObject);
+begin
+  if lstFlagsCat2.ItemIndex >= 0 then
+  begin
+    with lstFlagsCat1 do
+      Selected[ItemIndex] := False;
+    LoadSelectedFlagData(lstFlagsCat2);
+  end;
+end;
+
+procedure TfrmFlags.ActivateSpecificFlag;
+var
+  idx: integer;
+  SelectedList : TORListBox;
+begin
+  idx := 0;
+  SelectedList := GetListToActivate;
+  if FFlagID > 0 then
+    idx := SelectedList.SelectByIEN(FFlagId);
+  SelectedList.ItemIndex := idx;
+  SelectedList.OnClick(Self);
+  ActiveControl := memFlags;
+  GetNotes(SelectedList);
+end;
+
+function TfrmFlags.GetListToActivate: TORListBox;
+begin
+  Result := nil;
+  if FFlagID > 0 then begin
+    if lstFlagsCat1.SelectByIEN(FFlagId) > -1 then
+      Result := lstFlagsCat1
+    else if lstFlagsCat2.SelectByIEN(FFlagId) > -1 then
+      Result := lstFlagsCat2
+  end;
+  if Result = nil then
+    if lstFlagsCat1.Items.Count > 0 then
+      Result := lstFlagsCat1
+    else
+      Result := lstFlagsCat2;
+
+end;
+
+procedure TfrmFlags.PutFlagsOnLists(flags, Cat1List, Cat2List: TStrings);
+Const
+  FLAG_TYPE_POS = 3;
+  TRUE_STRING = '1';
+var
+  i : integer;
+begin
+  for i := 0 to flags.Count-1 do begin
+    if Piece(flags[i],U,FLAG_TYPE_POS) = TRUE_STRING then
+      Cat1List.Add(flags[i])
+    else
+      Cat2List.Add(flags[i]);
+  end;
 end;
 
 end.

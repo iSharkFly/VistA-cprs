@@ -4,10 +4,11 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ExtCtrls, ORCtrls, StdCtrls, ORFn, uTIU;
+  ExtCtrls, ORCtrls, StdCtrls, ORFn, uTIU, fBase508Form,
+  VA508AccessibilityManager;
 
 type
-  TfrmNotesByAuthor = class(TForm)
+  TfrmNotesByAuthor = class(TfrmBase508Form)
     pnlBase: TORAutoPanel;
     lblAuthor: TLabel;
     radSort: TRadioGroup;

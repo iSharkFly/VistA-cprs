@@ -69,8 +69,9 @@ begin
   if AppOutOfDate(x) and FileExists(CPRSUpdate) then RunProgram(CPRSUpdate + ' XFER="' + x + '"');
   x := FullToPathPart(Application.ExeName) + WhatsThisHelpFile + '.CNT';
   if AppOutOfDate(x) and FileExists(CPRSUpdate) then RunProgram(CPRSUpdate + ' XFER="' + x + '"');
-  x := FullToPathPart(Application.ExeName) + 'BORLNDMM.DLL';
-  if AppOutOfDate(x) and FileExists(CPRSUpdate) then RunProgram(CPRSUpdate + ' XFER="' + x + '"');
+  // Moved to CPRSUpdate.EXE in early test version of v27.  This code removed for CPRS v27.27.
+  //x := FullToPathPart(Application.ExeName) + 'BORLNDMM.DLL';
+  //if AppOutOfDate(x) and FileExists(CPRSUpdate) then RunProgram(CPRSUpdate + ' XFER="' + x + '"');
 end;
 
 {** Timeout Functions **}
@@ -147,6 +148,7 @@ begin
     timTimeout := nil;
   end;
 end;
+
 
 { TCPRSTimeoutTime }
 

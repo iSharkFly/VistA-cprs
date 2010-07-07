@@ -1,288 +1,360 @@
 object fraCoPayDesc: TfraCoPayDesc
   Left = 0
   Top = 0
-  Width = 598
-  Height = 132
+  Width = 592
+  Height = 157
   Anchors = [akLeft, akTop, akRight]
-  AutoScroll = False
-  AutoSize = True
   ParentShowHint = False
   ShowHint = True
   TabOrder = 0
   object pnlRight: TPanel
-    Left = 388
+    Left = 304
     Top = 0
-    Width = 210
-    Height = 132
+    Width = 288
+    Height = 157
     Align = alRight
+    Alignment = taLeftJustify
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitLeft = 310
     object Spacer2: TLabel
       Left = 0
-      Top = 0
-      Width = 210
+      Top = 16
+      Width = 288
       Height = 3
       Align = alTop
       AutoSize = False
     end
     object lblCaption: TStaticText
       Left = 0
-      Top = 3
-      Width = 210
-      Height = 14
+      Top = 0
+      Width = 288
+      Height = 16
       Align = alTop
+      Alignment = taCenter
       AutoSize = False
       Caption = 'Outpatient Medications Related To:'
       TabOrder = 0
     end
     object pnlMain: TPanel
-      Left = 0
-      Top = 17
-      Width = 210
-      Height = 115
-      Align = alClient
+      Left = 16
+      Top = 15
+      Width = 265
+      Height = 141
       BevelInner = bvRaised
       BevelOuter = bvLowered
       TabOrder = 1
       object spacer1: TLabel
         Left = 2
         Top = 2
-        Width = 206
+        Width = 261
         Height = 3
         Align = alTop
         AutoSize = False
+        ExplicitWidth = 213
       end
-      object Panel7: TPanel
+      object pnlHNC: TPanel
         Left = 2
-        Top = 95
-        Width = 206
+        Top = 112
+        Width = 261
+        Height = 15
+        Align = alTop
+        Alignment = taRightJustify
+        BevelOuter = bvNone
+        TabOrder = 7
+        object lblHNC2: TVA508StaticText
+          Name = 'lblHNC2'
+          Left = 50
+          Top = 0
+          Width = 125
+          Height = 15
+          Caption = 'Head and/or &Neck Cancer'
+          TabOrder = 1
+          TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
+        end
+        object lblHNC: TVA508StaticText
+          Name = 'lblHNC'
+          Left = 12
+          Top = 0
+          Width = 30
+          Height = 15
+          Caption = 'HNC -'
+          TabOrder = 0
+          TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
+        end
+      end
+      object pnlMST: TPanel
+        Left = 2
+        Top = 97
+        Width = 261
         Height = 15
         Align = alTop
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 6
-        object lblHNC2: TORStaticText
+        object lblMST2: TVA508StaticText
+          Name = 'lblMST2'
           Left = 50
           Top = 0
-          Width = 150
+          Width = 22
           Height = 15
-          AutoSize = False
-          Caption = '&Head and/or Neck Cancer'
-          TabOrder = 1
-          TabStop = True
-        end
-        object lblHNC: TORStaticText
-          Left = 0
-          Top = 0
-          Width = 50
-          Height = 15
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = '  HNC -  '
-          TabOrder = 0
-          TabStop = True
-        end
-      end
-      object Panel8: TPanel
-        Left = 2
-        Top = 80
-        Width = 206
-        Height = 15
-        Align = alTop
-        Alignment = taRightJustify
-        BevelOuter = bvNone
-        TabOrder = 5
-        object Label12: TORStaticText
-          Left = 50
-          Top = 0
-          Width = 150
-          Height = 15
-          AutoSize = False
           Caption = '&MST'
           TabOrder = 1
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
-        object Label11: TORStaticText
-          Left = 0
+        object lblMST: TVA508StaticText
+          Name = 'lblMST'
+          Left = 13
           Top = 0
-          Width = 50
+          Width = 29
           Height = 15
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = '  MST -  '
+          Caption = 'MST -'
           TabOrder = 0
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
       end
-      object Panel9: TPanel
+      object pnlSWAC: TPanel
         Left = 2
         Top = 65
-        Width = 206
+        Width = 261
         Height = 15
         Align = alTop
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 4
-        object Label14: TORStaticText
+        object lblSWAC2: TVA508StaticText
+          Name = 'lblSWAC2'
           Left = 50
           Top = 0
-          Width = 150
+          Width = 129
           Height = 15
-          AutoSize = False
-          Caption = '&Environmental Contaminants'
+          Caption = 'Southwest &Asia Conditions'
           TabOrder = 1
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
-        object Label13: TORStaticText
-          Left = 0
+        object lblSWAC: TVA508StaticText
+          Name = 'lblSWAC'
+          Left = 3
           Top = 0
-          Width = 50
+          Width = 39
           Height = 15
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = '    EC -  '
+          Caption = 'SWAC -'
           TabOrder = 0
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
       end
-      object Panel10: TPanel
+      object pnlIR: TPanel
         Left = 2
         Top = 50
-        Width = 206
+        Width = 261
         Height = 15
         Align = alTop
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 3
-        object Label16: TORStaticText
+        object lblIR2: TVA508StaticText
+          Name = 'lblIR2'
           Left = 50
           Top = 0
-          Width = 150
+          Width = 135
           Height = 15
-          AutoSize = False
           Caption = 'Ionizing &Radiation Exposure'
           TabOrder = 1
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
-        object Label15: TORStaticText
-          Left = 0
+        object lblIR: TVA508StaticText
+          Name = 'lblIR'
+          Left = 21
           Top = 0
-          Width = 50
+          Width = 20
           Height = 15
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = '     IR -  '
+          Caption = 'IR -'
           TabOrder = 0
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
       end
-      object Panel11: TPanel
+      object pnlAO: TPanel
         Left = 2
         Top = 35
-        Width = 206
+        Width = 261
         Height = 15
         Align = alTop
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 2
-        object Label18: TORStaticText
+        object lblAO2: TVA508StaticText
+          Name = 'lblAO2'
           Left = 50
           Top = 0
-          Width = 150
+          Width = 118
           Height = 15
-          AutoSize = False
           Caption = 'Agent &Orange Exposure'
           TabOrder = 1
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
-        object Label17: TORStaticText
-          Left = 0
+        object lblAO: TVA508StaticText
+          Name = 'lblAO'
+          Left = 18
           Top = 0
-          Width = 50
+          Width = 24
           Height = 15
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = '    AO -  '
+          Caption = 'AO -'
           TabOrder = 0
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
       end
-      object Panel12: TPanel
+      object pnlSC: TPanel
         Left = 2
         Top = 5
-        Width = 206
+        Width = 261
         Height = 15
         Align = alTop
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 0
-        object Label24: TORStaticText
+        object lblSC2: TVA508StaticText
+          Name = 'lblSC2'
           Left = 50
           Top = 0
-          Width = 150
+          Width = 140
           Height = 15
-          AutoSize = False
           Caption = 'Service &Connected Condition'
           TabOrder = 1
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
-        object Label23: TORStaticText
-          Left = 0
-          Top = 0
-          Width = 50
-          Height = 17
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = '    SC -  '
+        object lblSC: TVA508StaticText
+          Name = 'lblSC'
+          Left = 20
+          Top = 2
+          Width = 22
+          Height = 15
+          Caption = 'SC -'
           TabOrder = 0
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
       end
-      object Panel1: TPanel
+      object pnlCV: TPanel
         Left = 2
         Top = 20
-        Width = 206
+        Width = 261
         Height = 15
         Align = alTop
         Alignment = taRightJustify
         BevelOuter = bvNone
         TabOrder = 1
-        object StaticText4: TORStaticText
+        object lblCV2: TVA508StaticText
+          Name = 'lblCV2'
           Left = 50
           Top = 0
-          Width = 150
+          Width = 146
           Height = 15
-          AutoSize = False
           Caption = 'Combat &Vet (Combat Related)'
           TabOrder = 1
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
-        object StaticText1: TORStaticText
-          Left = 0
+        object lblCV: TVA508StaticText
+          Name = 'lblCV'
+          Left = 20
           Top = 0
-          Width = 50
+          Width = 22
           Height = 15
-          Alignment = taRightJustify
-          AutoSize = False
-          Caption = '    CV -  '
+          Caption = 'CV -'
           TabOrder = 0
           TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
+        end
+      end
+      object pnlSHD: TPanel
+        Left = 2
+        Top = 80
+        Width = 261
+        Height = 17
+        Align = alTop
+        Alignment = taRightJustify
+        BevelOuter = bvNone
+        TabOrder = 5
+        object lblSHAD: TVA508StaticText
+          Name = 'lblSHAD'
+          Left = 13
+          Top = 0
+          Width = 29
+          Height = 15
+          Caption = 'SHD -'
+          TabOrder = 0
+          TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
+        end
+        object lblSHAD2: TVA508StaticText
+          Name = 'lblSHAD2'
+          Left = 51
+          Top = 0
+          Width = 151
+          Height = 15
+          Caption = 'Shipboard &Hazard and Defense'
+          TabOrder = 1
+          TabStop = True
+          OnEnter = lblEnter
+          OnExit = lblExit
+          ShowAccelChar = True
         end
       end
     end
   end
-  object pnlSC: TPanel
+  object pnlSCandRD: TPanel
     Left = 0
     Top = 0
-    Width = 388
-    Height = 132
+    Width = 304
+    Height = 157
     Align = alClient
     BevelOuter = bvNone
     TabOrder = 1
     object lblSCDisplay: TLabel
       Left = 0
       Top = 0
-      Width = 388
+      Width = 304
       Height = 17
       Align = alTop
       AutoSize = False
@@ -292,8 +364,8 @@ object fraCoPayDesc: TfraCoPayDesc
     object memSCDisplay: TCaptionMemo
       Left = 0
       Top = 17
-      Width = 388
-      Height = 115
+      Width = 304
+      Height = 140
       Align = alClient
       Color = clBtnFace
       Lines.Strings = (

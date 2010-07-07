@@ -1,26 +1,17 @@
-object frmMHTest: TfrmMHTest
+inherited frmMHTest: TfrmMHTest
   Left = 217
   Top = 156
-  Width = 508
-  Height = 460
   BorderIcons = [biSystemMenu]
   Caption = 'frmMHTest'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
-  KeyPreview = True
-  OldCreateOrder = False
+  ClientHeight = 433
+  ClientWidth = 500
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  OnKeyDown = FormKeyDown
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object sbMain: TScrollBox
+  object sbMain: TScrollBox [0]
     Left = 0
     Top = 0
     Width = 500
@@ -31,7 +22,7 @@ object frmMHTest: TfrmMHTest
     TabOrder = 0
     OnResize = sbMainResize
   end
-  object pnlBottom: TPanel
+  object pnlBottom: TPanel [1]
     Left = 0
     Top = 408
     Width = 500
@@ -72,5 +63,26 @@ object frmMHTest: TfrmMHTest
       TabOrder = 0
       OnClick = btnClearClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = sbMain'
+        'Status = stsDefault')
+      (
+        'Component = pnlBottom'
+        'Status = stsDefault')
+      (
+        'Component = btnCancel'
+        'Status = stsDefault')
+      (
+        'Component = btnOK'
+        'Status = stsDefault')
+      (
+        'Component = btnClear'
+        'Status = stsDefault')
+      (
+        'Component = frmMHTest'
+        'Status = stsDefault'))
   end
 end

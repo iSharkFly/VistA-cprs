@@ -1,23 +1,16 @@
-object frmLabTests: TfrmLabTests
+inherited frmLabTests: TfrmLabTests
   Left = 288
   Top = 115
-  Width = 460
-  Height = 308
   Caption = 'Select Lab Tests'
-  Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
-  Font.Color = clWindowText
-  Font.Height = -11
-  Font.Name = 'MS Sans Serif'
-  Font.Style = []
+  ClientHeight = 281
+  ClientWidth = 452
   OldCreateOrder = True
   Position = poScreenCenter
   OnClose = FormClose
   OnCreate = FormCreate
-  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
-  object pnlLabTests: TORAutoPanel
+  object pnlLabTests: TORAutoPanel [0]
     Left = 0
     Top = 0
     Width = 452
@@ -132,5 +125,35 @@ object frmLabTests: TfrmLabTests
       TabOrder = 1
       OnClick = cmdAddClick
     end
+  end
+  inherited amgrMain: TVA508AccessibilityManager
+    Data = (
+      (
+        'Component = pnlLabTests'
+        'Status = stsDefault')
+      (
+        'Component = cmdOK'
+        'Status = stsDefault')
+      (
+        'Component = cmdCancel'
+        'Status = stsDefault')
+      (
+        'Component = lstList'
+        'Status = stsDefault')
+      (
+        'Component = cboTests'
+        'Status = stsDefault')
+      (
+        'Component = cmdRemove'
+        'Status = stsDefault')
+      (
+        'Component = cmdClear'
+        'Status = stsDefault')
+      (
+        'Component = cmdAdd'
+        'Status = stsDefault')
+      (
+        'Component = frmLabTests'
+        'Status = stsDefault'))
   end
 end
