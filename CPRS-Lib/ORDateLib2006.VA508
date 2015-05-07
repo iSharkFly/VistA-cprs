@@ -1,0 +1,37 @@
+C:\Vista\cprs\main\CPRS-Lib\ORDtTm.dfm
+5780/925128716
+0
+2
+C:\Vista\cprs\main\CPRS-Lib\ORDtTmRng.dfm
+1172/925128716
+2
+2
+C:\Vista\cprs\main\CPRS-Lib\OR2006Compatibility.dfm
+408/925128716
+4
+2
+E:\Vista_30_28\OR_SRC_CREATION\CPRS-Lib\ORDtTm.dfm
+5780/1014934341
+6
+2
+E:\Vista_30_28\OR_SRC_CREATION\CPRS-Lib\ORDtTmRng.dfm
+1172/1014934341
+8
+2
+E:\Vista_30_28\OR_SRC_CREATION\CPRS-Lib\OR2006Compatibility.dfm
+408/1014934340
+10
+2
+|EOINDEX|
+242
+object ORfrmDtTm: TORfrmDtTm
+60
+object ORfrmDateRange: TORfrmDateRange
+18
+object frm2006Compatibility: Tfrm2006Compatibility
+242
+object ORfrmDtTm: TORfrmDtTm
+60
+object ORfrmDateRange: TORfrmDateRange
+18
+object frm2006Compatibility: Tfrm2006Compatibility
