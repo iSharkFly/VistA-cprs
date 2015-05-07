@@ -1,14 +1,18 @@
 unit fMHTest;
 
+{$DEFINE CCOWBROKER}
+
 interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
   StdCtrls, ExtCtrls, ORCtrls, ORFn, uConst, fBase508Form, uDlgComponents,
-  VA508AccessibilityManager, uCore, orNet, TRPCB, StrUtils, rCore, VAUtils;
+  VA508AccessibilityManager, uCore, orNet, TRPCB, StrUtils, rCore, VAUtils
+  ;
 
 type
-TShowProc = procedure(Broker: TRPCBroker;
+TShowProc = procedure(
+   RPCBrokerV: TRPCBroker;
   InstrumentName,
   PatientDFN,
   OrderedBy,
@@ -20,7 +24,8 @@ TShowProc = procedure(Broker: TRPCBroker;
   Required: boolean;
   var ProgressNote: string); stdcall;
 
-TSaveProc = procedure(Broker: TRPCBroker;
+TSaveProc = procedure(
+   RPCBrokerV: TRPCBroker;
   InstrumentName,
   PatientDFN,
   OrderedByDUZ,
@@ -29,7 +34,8 @@ TSaveProc = procedure(Broker: TRPCBroker;
   LocationIEN: string;
   var Status: string); stdcall;
 
-TRemoveTempFile = procedure(
+TRemoveTempVistaFile = procedure(
+   RPCBrokerV: TRPCBroker;
   InstrumentName,
   PatientDFN: string); stdcall;
 
@@ -84,7 +90,7 @@ procedure CloseMHDLL;
 
 var
   MHDLLHandle: THandle = 0;
-  
+
 implementation
 
 uses fFrame,rReminders, VA508AccessibilityRouter;
@@ -106,15 +112,14 @@ const
 
   ShowProc                    : TShowProc = nil;
   SaveProc                    : TSaveProc = nil;
-  RemoveTempFile              : TRemoveTempFile = nil;
-  CloseProc                  : TCloseProc = nil;
+  RemoveTempVistaFile         : TRemoveTempVistaFile = nil;
+  CloseProc                   : TCloseProc = nil;
   SHARE_DIR = '\VISTA\Common Files\';
 var
   frmMHTest: TfrmMHTest;
   FFirstCtrl: TList;
   FYPos: TList;
   UsedMHDll: TUsedMHDll;
-  //DLLForceClose: boolean = false;
 
 type
   TMHQuestion = class(TObject)
@@ -145,6 +150,30 @@ type
     property ID: integer read FID;
     property Text: string read FText;
   end;
+
+const
+  MHDLLName = 'YS_MHA_A.DLL';
+
+procedure LoadMHDLL;
+var
+  MHPath: string;
+
+begin
+  if MHDLLHandle = 0 then
+  begin
+    MHPath := GetProgramFilesPath + SHARE_DIR + MHDLLName;
+    MHDLLHandle := LoadLibrary(PChar(MHPath));
+  end;
+end;
+
+procedure UnloadMHDLL;
+begin
+  if MHDLLHandle <> 0 then
+  begin
+    FreeLibrary(MHDLLHandle);
+    MHDLLHandle := 0;
+  end;
+end;
 
 procedure ProcessMsg;
 var
@@ -223,16 +252,13 @@ end;
 
 function SaveMHTest(TestName, date, Loc: string): boolean;
 var
-  MHPath, save: string;
-  
+  save: string;
 begin
-  MHPath := GetProgramFilesPath + SHARE_DIR + 'YS_MHA';
-  if MHDLLHandle = 0 then
-    MHDLLHandle := LoadLibrary(PChar(MHPath));
+  LoadMHDLL;
   Result := true;
   if MHDLLHandle = 0 then
     begin
-      InfoBox('YS_MHA.DLL not available', 'Error', MB_OK);
+      InfoBox(MHDLLName + ' not available', 'Error', MB_OK);
       Exit;
     end
   else
@@ -243,13 +269,12 @@ begin
         if @SaveProc = nil then
           begin
           // function not found.. misspelled?
-            infoBox('Save Instrument Function not found within YS_MHA.DLL.', 'Error', MB_OK);
+            infoBox('Save Instrument Function not found within ' + MHDLLName + '.', 'Error', MB_OK);
             Exit;
           end;
 
         if Assigned(SaveProc) then
          begin
-//          fFrame.frmFrame.DLLActive := True;
           try
             SaveProc(RPCBrokerV,
             UpperCase(TestName), //InstrumentName
@@ -257,10 +282,9 @@ begin
             InttoStr(User.duz), //OrderedByDUZ
             InttoStr(User.duz), //AdministeredByDUZ
             date,
-            Loc, //LocationIEN
+            Loc + 'V', //LocationIEN
             save);
           finally
-//            fFrame.frmFrame.DLLActive := false;
             if RPCBrokerV.CurrentContext <> 'OR CPRS GUI CHART' then
                begin
                  if RPCBrokerV.CreateContext('OR CPRS GUI CHART') = false then
@@ -269,47 +293,38 @@ begin
           end;  {inner try..finally}
          end;
       finally
-        if MHDLLHandle <> 0 then
-        begin
-          FreeLibrary(MHDLLHandle);
-          MHDLLHandle := 0;
-        end;
+        UnloadMHDLL;
       end; {try..finally}
   end;
 end;
 
 procedure RemoveMHTest(TestName: string);
-var
-  MHPath: string;
 begin
-  MHPath := GetProgramFilesPath + SHARE_DIR + 'YS_MHA';
-  if MHDLLHandle = 0 then
-    MHDLLHandle := LoadLibrary(PChar(MHPath));
+  LoadMHDLL;
   if MHDLLHandle = 0 then
     begin
-      InfoBox('YS_MHA.DLL not available', 'Error', MB_OK);
+      InfoBox(MHDLLName + ' not available', 'Error', MB_OK);
       Exit;
     end
   else
     begin
       try
-        @RemoveTempFile := GetProcAddress(MHDLLHandle, 'RemoveTempFile');
+        @RemoveTempVistaFile := GetProcAddress(MHDLLHandle, 'RemoveTempVistaFile');
 
-        if @RemoveTempFile = nil then
+        if @RemoveTempVistaFile = nil then
           begin
           // function not found.. misspelled?
-            InfoBox('Remove Temp File function not found within YS_MHA.DLL.', 'Error', MB_OK);
+            InfoBox('Remove Temp File function not found within ' + MHDLLName + '.', 'Error', MB_OK);
             Exit;
           end;
 
-        if Assigned(RemoveTempFile) then
+        if Assigned(RemoveTempVistaFile) then
          begin
-//          fFrame.frmFrame.DLLActive := True;
           try
-            RemoveTempFile(UpperCase(TestName), //InstrumentName
+            RemoveTempVistaFile(RPCBrokerV,
+            UpperCase(TestName), //InstrumentName
             Patient.DFN);
           finally
-//            fFrame.frmFrame.DLLActive := False;
             if RPCBrokerV.CurrentContext <> 'OR CPRS GUI CHART' then
                begin
                  if RPCBrokerV.CreateContext('OR CPRS GUI CHART') = false then
@@ -318,18 +333,12 @@ begin
           end;  {inner try..finally}
          end;
       finally
-        if MHDLLHandle <> 0 then
-        begin
-          FreeLibrary(MHDLLHandle);
-          MHDLLHandle := 0;
-        end;
+        UnloadMHDLL;
       end; {try..finally}
   end;
 end;
 
 function CheckforMHDll: boolean;
-var
-  MHPath: string;
 begin
   Result := True;
     if (UsedMHDll.Checked = True) and (UsedMHDll.Display = False) then Exit
@@ -345,15 +354,11 @@ begin
     end;
   if MHDLLHandle = 0 then // if not 0 the DLL already loaded - result = true
   begin
-    MHPath := GetProgramFilesPath + SHARE_DIR + 'YS_MHA';
-    MHDLLHandle := LoadLibrary(PChar(MHPath));
+    LoadMHDLL;
     if MHDLLHandle = 0 then
       Result := false
     else
-    begin
-      FreeLibrary(MHDLLHandle);
-      MHDLLHandle := 0;
-    end;
+      UnloadMHDLL;
   end;
 end;
 
@@ -367,11 +372,7 @@ begin
       CloseProc;
     end;
   finally
-    if MHDLLHandle <> 0 then
-    begin
-      FreeLibrary(MHDLLHandle);
-      MHDLLHandle := 0;
-    end;
+    UnloadMHDLL;
   end; {try..finally}
 end;
 
@@ -692,8 +693,7 @@ end;
 
 function TfrmMHTest.CallMHDLL(TestName: string; Required: boolean): String;
 var                               
-//  dllHandle                   : THandle;
-  ProgressNote, MHPath                : string;
+  ProgressNote : string;
 begin
   ProgressNote := '';
   if (UsedMHDll.Checked = True) and (UsedMHDll.Display = False) then Exit
@@ -703,14 +703,14 @@ begin
       UsedMHDll.Checked := True;
       if UsedMHDll.Display = false then exit;
     end;
-  MHPath := GetProgramFilesPath + SHARE_DIR + 'YS_MHA';
-  if MHDLLHandle = 0 then
-    MHDLLHandle := LoadLibrary(PChar(MHPath));
+  LoadMHDLL;
   Result := '';
   if MHDLLHandle = 0 then
     begin
-      InfoBox('YS_MHA.dll not available.' + CRLF + 'CPRS will continue processing the MH test using the previous format.' +
-                  CRLF + CRLF + 'Contact IRM to install the YS_MHA.dll file on this machine.', 'Warning', MB_OK);
+      InfoBox(MHDLLName + ' not available.' + CRLF +
+                          'CPRS will continue processing the MH test using the previous format.' +
+                  CRLF + CRLF + 'Contact IRM to install the ' + MHDLLName +
+                                ' file on this machine.', 'Warning', MB_OK);
       Exit;
     end
   else
@@ -721,15 +721,14 @@ begin
         if @ShowProc = nil then
           begin
           // function not found.. misspelled?
-            InfoBox('Function ShowInstrument not found within YS_MHA.DLL not available', 'Error', MB_OK);
+            InfoBox('Function ShowInstrument not found within ' + MHDLLName +
+                    ' not available', 'Error', MB_OK);
             Exit;
           end;
 
         if Assigned(ShowProc) then
            begin
-//             MHDLLHandle := dllHandle;
              Result := '';
-//             fFrame.frmFrame.DLLActive := True;
              try
                ShowProc(RPCBrokerV,
                UpperCase(TestName), //InstrumentName
@@ -739,14 +738,12 @@ begin
                User.Name, //AdministeredByName
                InttoStr(User.duz), //AdministeredByDUZ
                Encounter.LocationName, //Location
-               InttoStr(Encounter.Location), //LocationIEN
+               InttoStr(Encounter.Location) + 'V', //LocationIEN
                Required,
                ProgressNote);
                Result := ProgressNote;
            finally
-//             MHDllHandle := 0;
-//             fFrame.frmFrame.DLLActive := false;
-             if RPCBrokerV.CurrentContext <> 'OR CPRS GUI CHART' then
+//           if RPCBrokerV.CurrentContext <> 'OR CPRS GUI CHART' then
                begin
                  if RPCBrokerV.CreateContext('OR CPRS GUI CHART') = false then
                     infoBox('Error switching broker context','Error', MB_OK);
@@ -754,11 +751,7 @@ begin
                end; {inner try ..finally}
             end;
       finally
-        if MHDLLHandle <> 0 then
-        begin
-          FreeLibrary(MHDLLHandle);
-          MHDllHandle := 0;
-        end;
+        UnloadMHDLL;
       end; {try..finally}
       //Result := ProgressNote;
   end;

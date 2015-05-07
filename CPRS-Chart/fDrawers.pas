@@ -3,7 +3,6 @@ unit fDrawers;
 bugs noticed:
   if delete only note (currently editing) then drawers and encounter button still enabled
 }
-//vw mod for template callup. Checks in test  4/15/07
 interface
 
 uses
@@ -692,11 +691,6 @@ end;
 procedure TfrmDrawers.tvTemplatesGetSelectedIndex(Sender: TObject;
   Node: TTreeNode);
 begin
-//vw mod for template callup. Checks in test
-
-   //Application.MessageBox(PChar('Node='+IntToStr(Node.Index)+' tvtemplates.VertScrollPos='+IntToStr(tvTemplates.VertScrollPos)),PChar(Application.Title),MB_ICONINFORMATION);
-    sbTemplates.Caption := 'Templates '+ 'Node='+IntToStr(Node.Index)+' VertScrollPos='+IntToStr(tvTemplates.VertScrollPos) ;
-//end vw mod
   Node.SelectedIndex := dmodShared.ImgIdx(Node);
 end;
 
@@ -723,11 +717,6 @@ begin
       if(FInternalHiddenExpand) then AllowExpansion := FALSE;
     end;
   end;
-  //vw mod for template callup. Checks in test
-
-   //Application.MessageBox(PChar('Node='+IntToStr(Node.Index)+' tvtemplates.VertScrollPos='+IntToStr(tvTemplates.VertScrollPos)),PChar(Application.Title),MB_ICONINFORMATION);
-    sbTemplates.Caption := 'Templates '+ 'Node='+IntToStr(Node.Index)+' VertScrollPos='+IntToStr(tvTemplates.VertScrollPos) ;
-  //end vw mod
 end;
 
 procedure TfrmDrawers.CheckAsk;
@@ -784,11 +773,6 @@ begin
     if(AllowCollapse) then
       FClickOccurred := FALSE;
   end;
-  //vw mod for template callup. Checks in test
-
-   //Application.MessageBox(PChar('Node='+IntToStr(Node.Index)+' tvtemplates.VertScrollPos='+IntToStr(tvTemplates.VertScrollPos)),PChar(Application.Title),MB_ICONINFORMATION);
-    sbTemplates.Caption := 'Templates '+ 'Node='+IntToStr(Node.Index)+' VertScrollPos='+IntToStr(tvTemplates.VertScrollPos) ;
-  //end vw mod
 end;
 
 procedure TfrmDrawers.tvTemplatesKeyDown(Sender: TObject; var Key: Word;

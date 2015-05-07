@@ -55,9 +55,6 @@ type
     Vet: string;
     Location: string;
     RoomBed: string;
-    //ADD VWPT BELOW FOR HRN
-    HRN : string;
-    AltHRN :string;
   end;
 
   TPtSelect = record                              // record for ORWPT SELECT
@@ -80,9 +77,7 @@ type
     PrimaryTeam: string;
     PrimaryProvider: string;
     Attending: string;
-    //ADD VWPT BELOW FOR HRN AltHRN
-    HRN : string;
-    AltHRN : string;
+    Associate: string;
   end;
 
   TEncounterText = record                         // record for ORWPT ENCTITL
@@ -152,7 +147,7 @@ procedure ListWardAll(Dest: TStrings);
 procedure ListProviderTop(Dest: TStrings);
 function SubSetOfProviders(const StartFrom: string; Direction: Integer): TStrings;
 function SubSetOfCosigners(const StartFrom: string; Direction: Integer; Date: TFMDateTime;
-  ADocType: integer; ATitle: integer): TStrings;
+  ATitle: integer; ADocType: integer): TStrings;
 procedure ListClinicTop(Dest: TStrings);
 function SubSetOfClinics(const StartFrom: string; Direction: Integer): TStrings;
 function GetDfltSort: string;
@@ -173,11 +168,6 @@ function DfltDateRangeClinic: string;
 function MakeRPLPtList(RPLList: string): string;
 function ReadRPLPtList(RPLJobNumber: string; const StartFrom: string; Direction: Integer) : TStrings;
 procedure KillRPLPtList(RPLJobNumber: string);
-
-// VWPT ADDITIONS FOR ENHANCED PATIENT LOOKUP
-procedure ListPtByOther (Dest: Tstrings; const othertext: string ;caption :string);//:string; radbutton:Tobject);
-procedure ListPtByTimson (Dest: Tstrings; const othertext: string);
-//end VWPT
 
 { Patient specific calls }
 
@@ -224,16 +214,7 @@ var
 
 function FormatSSN(const x: string): string;
 { places the dashes in a social security number }
-//vwpt code 4/17/0  see below
-var
-
-  i:Integer;
-//end vwpt
 begin
-//vwpt code to prevent extra dashes 4/17/07
-  Result := x;
-  ///take out for i := 1 to Length(x) do if (x[i] in ['-'..'-']) then Exit;
-  //end vwpt
   if Length(x) > 8
     then Result := Copy(x,1,3) + '-' + Copy(x,4,2) + '-' + Copy(x,6,Length(x))
     else Result := x;
@@ -625,13 +606,13 @@ begin
 end;
 
 function SubSetOfCosigners(const StartFrom: string; Direction: Integer; Date: TFMDateTime;
-  ADocType: integer; ATitle: integer): TStrings;
+  ATitle: integer; ADocType: integer): TStrings;
 { returns a pointer to a list of cosigners (for use in a long list box) -  The return value is
   a pointer to RPCBrokerV.Results, so the data must be used BEFORE the next broker call! }
 begin
   if ATitle > 0 then ADocType := 0;
-  // CQ #17218 - Correcting order of parameters for this call
-  //  CallV('ORWU2 COSIGNER', [StartFrom, Direction, Date, ATitle, ADocType]);
+  // CQ #17218 - Correcting order of parameters for this call - jcs
+  //CallV('ORWU2 COSIGNER', [StartFrom, Direction, Date, ATitle, ADocType]);
   CallV('ORWU2 COSIGNER', [StartFrom, Direction, Date, ADocType, ATitle]);
 
   //  MixedCaseList(RPCBrokerV.Results);
@@ -814,36 +795,6 @@ begin
   MixedCaseList(RPCBrokerV.Results);
   FastAssign(RPCBrokerV.Results, Dest);
 end;
-
-// VWPT ADDITIONS FOR ENHANCED PATIENT LOOKUP
-procedure ListPtByOther (Dest: Tstrings; const othertext: string;caption:string );//:string; radbutton:Tobject);
-var
-  i: Integer;
-  x,Afieldname: string;
-begin
-
-   CallV('ORWPT OTHER-RADIOBUTTONS',[othertext, caption]);
-  //SortByPiece(TStringList(RPCBrokerV.Results), U, 2);
-  MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
-end;
-
-procedure ListPtByTimson (Dest: Tstrings; const othertext: string);//
-
-var
-  i: Integer;
-  x,Afieldname: string;
-begin
-
-  CallV('ORWPT ENHANCED PATLOOKUP',[othertext]);
-  //SortByPiece(TStringList(RPCBrokerV.Results), U, 2);
-  MixedCaseList(RPCBrokerV.Results);
-  Dest.Assign(RPCBrokerV.Results);
-end;
-
-
-
-//END VWPT ADDITIONS
 
 procedure ListPtByLast5(Dest: TStrings; const Last5: string);
 var
@@ -1058,9 +1009,8 @@ begin
 end;
 
 function GetPtIDInfo(const DFN: string): TPtIDInfo;  //*DFN*
-//VWPT ADD HRN   ,ALT HRN (FUTURE)
-//  Pieces: SSN[1]^DOB[2]^SEX[3]^VET[4]^SC%[5]^WARD[6]^RM-BED[7]^NAME[8]^HRN[9]^ALTHRN[10] }
- // Pieces: SSN[1]^DOB[2]^SEX[3]^VET[4]^SC%[5]^WARD[6]^RM-BED[7]^NAME[8] }
+{ returns the identifiers displayed upon patient selection
+  Pieces: SSN[1]^DOB[2]^SEX[3]^VET[4]^SC%[5]^WARD[6]^RM-BED[7]^NAME[8] }
 var
   x: string;
 begin
@@ -1087,9 +1037,6 @@ begin
       else SCSts := '';
     Location := Piece(x, U, 6);                                         // Inpatient Location
     RoomBed  := Piece(x, U, 7);                                         // Inpatient Room-Bed
-    // VWPT ADD HRN
-    HRN :=   Piece(x, U, 9);
-    AltHRN := Piece(x, U, 10);
   end;
 end;
 
@@ -1135,9 +1082,7 @@ end;
 procedure SelectPatient(const DFN: string; var PtSelect: TPtSelect);   //*DFN*
 { selects the patient (updates DISV, calls Pt Select actions) & returns key fields
   Pieces: NAME[1]^SEX[2]^DOB[3]^SSN[4]^LOCIEN[5]^LOCNAME[6]^ROOMBED[7]^CWAD[8]^SENSITIVE[9]^
-  //VWPT add HRN and ALTERNATE HRN used with PID hl7 segments
-  ADMITTIME[10]^CONVERTED[11]^SVCONN[12]^SC%[13]^ICN[14]^Age[15]^TreatSpec[16]^HRN[17]^AltHRN[18] }
- //  BEFORE THIS VWPT WAS         ADMITTIME[10]^CONVERTED[11]^SVCONN[12]^SC%[13]^ICN[14]^Age[15]^TreatSpec[16] }
+          ADMITTIME[10]^CONVERTED[11]^SVCONN[12]^SC%[13]^ICN[14]^Age[15]^TreatSpec[16] }
 var
   x: string;
 begin
@@ -1160,9 +1105,6 @@ begin
     AdmitTime := MakeFMDateTime(Piece(x, U, 10));
     ServiceConnected := Piece(x, U, 12) = '1';
     SCPercent := StrToIntDef(Piece(x, U, 13), 0);
-    //VWPT ADD HRN   AltHRN (future)
-    HRN := Piece(x, U, 17);
-    AltHRN := Piece(x, U, 18);
   end;
   x := sCallV('ORWPT1 PRCARE', [DFN]);
   with PtSelect do
@@ -1172,6 +1114,7 @@ begin
     if Length(Location) > 0 then
       begin
         Attending := Piece(x, U, 3);
+        Associate := Piece(x, U, 4);
         x := sCallV('ORWPT INPLOC', [DFN]);
         WardService := Piece(x, U, 3);
       end;

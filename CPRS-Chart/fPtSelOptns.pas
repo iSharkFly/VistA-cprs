@@ -48,10 +48,6 @@ type
   public
     function IsLast5(x: string): Boolean;
     function IsFullSSN(x: string): Boolean;
-    //vwpt voe
-    function IsEnhanced(x: String) : Boolean ;
-    function IsPatientName(x: String) :Boolean;
-    //end
     procedure cmdSaveListClick(Sender: TObject);
     procedure SetDefaultPtList(Dflt: string);
     procedure UpdateDefault;
@@ -73,7 +69,6 @@ const
 
 var
   frmPtSelOptns: TfrmPtSelOptns;
-  //frmPtSelOptns: TfrmPtSelOptns;
   clinDoSave, clinSaveToday: boolean;
   clinDefaults: string;
 
@@ -110,32 +105,6 @@ begin
   end;
   for i := 1 to 4 do if not (x[i] in ['0'..'9']) then Exit;
   Result := True;
-end;
-
-function TfrmPtSelOptns.IsPatientName(x: string):Boolean;
- { returns true if string matchs patient name pattern: all alphabetic," ",",","-","." only }
-var
-  i: Integer;
-begin
-  Result := False;
-
-   for i := 1 to Length(x) do if not (x[i] in ['A'..'Z', 'a'..'z', ' '..' ', ','..'.']) then Exit;
-
-  Result := True;
-end;
-
-function TfrmPtSelOptns.IsEnhanced(x: String) : boolean ;
-var
-  i: integer;
-begin
-  //Result := True;
-  //for i:= 1 to Length(x) do if (x[i] in ['0'..'9']) then Exit;
-  //for i:= 1 to Length(x) do
-  //begin
-  // if ((x[i] = '(') or (x[i] = ')') or (x[i] = '-') or (x[i] = '/') or (x[i] = ',') or (x[i] = '\')) then Exit;
-  //end;
-  Result := True;   //False;
-  if (frmPtSelOptns.radAll.Checked <> True)and (frmPtSelOptns.radDflt.Checked <> True) then Result := False;
 end;
 
 function TfrmPtSelOptns.IsFullSSN(x: string): boolean;
@@ -208,36 +177,6 @@ end;
 procedure TfrmPtSelOptns.radLongSrcClick(Sender: TObject);
 { called by radProviders, radClinics - switches to long list & shows items for the list source }
 begin
-    //vwpt remove other radio button selections
- if fPtSel.radiogrp1index <> 0 then
- begin
-      FSrcType := TControl(Sender).Tag;
-      case FSrcType of
-    TAG_SRC_TEAM: begin
-                    radTeams.Checked := False;
-                    radTeams.Refresh;
-                    radAll.Checked := True;
-                    radAll.Refresh;
-                  end;
-    TAG_SRC_SPEC: begin
-                    radSpecialties.Checked := False;
-                    radSpecialties.Refresh;
-                    radAll.Checked := True;
-                    radAll.Refresh;
-                  end;
-    TAG_SRC_WARD: begin
-                    radWards.Checked := False;
-                    radWards.Refresh;
-                    radAll.Checked := True;
-                    radAll.Refresh;
-                  end;
-    end;
-  //frmPtSel.RadioGroup1.SetFocus;
-  //frmPtSel.RadioGroup1.Refresh;
- end
- else
- begin
-  //end vwpt
   cboList.Pieces := '2';
   FSrcType := TControl(Sender).Tag;
   FLastTopList := '';
@@ -262,7 +201,6 @@ begin
     Visible := True;
   end;
   cboList.Caption := TRadioButton(Sender).Caption;
- end; //else
 end;
 
 procedure TfrmPtSelOptns.cboListExit(Sender: TObject);
@@ -449,6 +387,9 @@ begin
   begin
     radDflt.Enabled := False;
     radAll.Checked := True;                  // causes radHideSrcClick to be called
+    bvlPtList.TabStop := True;
+    bvlPtList.Hint := 'No default radio button unavailable 1 of 7 to move to the other patient list categories press tab';
+    // fixes CQ #4716: 508 - No Default rad btn on Patient Selection screen doesn't read in JAWS. [CPRS v28.1] (TC).
   end;
 end;
 

@@ -9,10 +9,8 @@ inherited frmDrawers: TfrmDrawers
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
-  ExplicitLeft = 285
-  ExplicitTop = 335
-  ExplicitWidth = 197
-  ExplicitHeight = 399
+  ExplicitWidth = 189
+  ExplicitHeight = 365
   PixelsPerInch = 96
   TextHeight = 13
   object pnlRemindersButton: TKeyClickPanel [0]

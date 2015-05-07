@@ -1,6 +1,5 @@
 inherited frmPtSelDemog: TfrmPtSelDemog
-  Left = 550
-  Top = 250
+  Left = 100
   BorderStyle = bsNone
   Caption = 'frmPtSelDemog'
   ClientHeight = 193
@@ -9,10 +8,9 @@ inherited frmPtSelDemog: TfrmPtSelDemog
   Position = poDesigned
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  ExplicitLeft = 550
-  ExplicitTop = 250
-  ExplicitWidth = 177
-  ExplicitHeight = 227
+  OnShow = FormShow
+  ExplicitWidth = 169
+  ExplicitHeight = 193
   PixelsPerInch = 96
   TextHeight = 13
   object orapnlMain: TORAutoPanel [0]
@@ -153,12 +151,13 @@ inherited frmPtSelDemog: TfrmPtSelDemog
       Caption = 'Room-Bed:'
       TabOrder = 10
     end
-    object lblPtHRN: TStaticText
+    object lblCombatVet: TStaticText
       Tag = 2
-      Left = 104
-      Top = 21
-      Width = 4
-      Height = 4
+      Left = 1
+      Top = 127
+      Width = 66
+      Height = 17
+      Caption = 'lblCombatVet'
       TabOrder = 13
     end
   end
@@ -207,10 +206,10 @@ inherited frmPtSelDemog: TfrmPtSelDemog
         'Component = lblRoomBed'
         'Status = stsDefault')
       (
-        'Component = lblPtHRN'
+        'Component = frmPtSelDemog'
         'Status = stsDefault')
       (
-        'Component = frmPtSelDemog'
+        'Component = lblCombatVet'
         'Status = stsDefault'))
   end
 end

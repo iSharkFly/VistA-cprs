@@ -19,6 +19,7 @@ type
 function ShowMsg(const Msg, Caption: string; Icon: TShow508MessageIcon = smiNone;
                     Buttons: TShow508MessageButton = smbOK): TShow508MessageResult; overload;
 
+function Show508Message(Const Msg: String): TShow508MessageResult;
 function ShowMsg(const Msg: string; Icon: TShow508MessageIcon = smiNone;
                     Buttons: TShow508MessageButton = smbOK): TShow508MessageResult; overload;
 
@@ -280,10 +281,17 @@ begin
     smiWarning:   Caption := ' Warning';
     smiError:     Caption := ' Error';
     smiQuestion:  Caption := ' Inquiry';
+    smiInfo:      Caption := ' Information';
   end;
   Caption := Application.Title + Caption;
   Result := ShowMsg(Msg, Caption, Icon, Buttons);
 end;
+
+function Show508Message(Const Msg: String): TShow508MessageResult;
+begin
+  Result := ShowMsg(msg);
+end;
+
 
 procedure FreeAndNilTStringsAndObjects(var Strings);
 var

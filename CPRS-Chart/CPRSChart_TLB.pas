@@ -11,11 +11,11 @@ unit CPRSChart_TLB;
 // manual modifications will be lost.                                         
 // ************************************************************************ //
 
-// PASTLWTR : 1.2
-// File generated on 6/26/2010 8:43:12 PM from Type Library described below.
+// $Rev: 8291 $
+// File generated on 5/2/2015 5:57:00 PM from Type Library described below.
 
 // ************************************************************************  //
-// Type Lib: P:\vista\CPRS-WV_OFFICIAL_RELEASE-27\WVEHR-v27Delphi2006\CPRS-chart\CPRSChart.tlb (1)
+// Type Lib: E:\Vista_30_28\OR_SRC_CREATION\CPRS-Chart\CPRSChart.tlb (1)
 // LIBID: {0A4A6086-6504-11D5-82DE-00C04F72C274}
 // LCID: 0
 // Helpfile: 

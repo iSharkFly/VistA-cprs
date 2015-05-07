@@ -33,7 +33,7 @@ requires
   vcl,
   tee,
   ORCtrlLib2006,
-  XWB_R10;
+  XWB_R2007;
 
 contains
   ORDtTmCal in 'ORDtTmCal.pas',

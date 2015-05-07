@@ -169,8 +169,8 @@ end;
 procedure SelectVitals(VitalType: String);
 var
   VLPtVitals : TGMV_VitalsViewForm;
-  GMV_FName,
-  GMV_LibName: String;
+  GMV_FName: String;
+  
 begin
  { Availble Forms:
   GMV_FName :='GMV_VitalsEnterDLG';
@@ -179,10 +179,7 @@ begin
   GMV_FName :='GMV_VitalsViewDLG';
   }
   GMV_FName :='GMV_VitalsViewDLG';
-  GMV_LibName :='GMV_VitalsViewEnter.dll';
-  GMV_LibName := GetProgramFilesPath + SHARE_DIR + GMV_LibName;
-  if VitalsDLLHandle = 0 then
-    VitalsDLLHandle := LoadLibrary(PChar(GMV_LibName));
+  LoadVitalsDLL;
  // UpdateTimeOutInterval(5000);
   if VitalsDLLHandle <> 0 then
     begin
@@ -199,15 +196,9 @@ begin
        MessageDLG('Can''t find function "'+GMV_FName+'".',mtError,[mbok],0);
     end
   else
-    MessageDLG('Can''t find library "'+GMV_LibName+'".',mtError,[mbok],0);
+    MessageDLG('Can''t find library '+VitalsDLLName+'.',mtError,[mbok],0);
   @VLPtVitals := nil;
-  if VitalsDLLHandle <> 0 then
-  begin
-    FreeLibrary(VitalsDLLHandle);
-    VitalsDLLHandle := 0;
-  end;
-//  if DLLForceClose then                  // jm - removed as part of timeout fix
-//    frmFrame.Close; // Fix for CQ: 7535  // jm - removed as part of timeout fix
+  UnloadVitalsDLL;
 end;
 
 (*

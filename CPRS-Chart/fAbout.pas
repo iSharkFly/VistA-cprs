@@ -58,8 +58,7 @@ end;
 procedure TfrmAbout.FormCreate(Sender: TObject);
 begin
   inherited;
-  lblCompanyName.Caption        := 'Developed for ' + 'VOE VWPT Patient Enhanced Lookup Version 1.6b';  //vw
-  //lblCompanyName.Caption        := 'Developed by the ' + FileVersionValue(Application.ExeName, FILE_VER_COMPANYNAME);
+  lblCompanyName.Caption        := 'Developed by the ' + FileVersionValue(Application.ExeName, FILE_VER_COMPANYNAME);
   lblFileDescription.Caption    := 'Compiled ' + FileVersionValue(Application.ExeName, FILE_VER_FILEDESCRIPTION);  //date
   lblFileVersion.Caption        := FileVersionValue(Application.ExeName, FILE_VER_FILEVERSION);
   lblInternalName.Caption       := FileVersionValue(Application.ExeName, FILE_VER_INTERNALNAME);

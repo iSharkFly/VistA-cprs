@@ -7,6 +7,7 @@ program CPRSChart;
 uses
   ShareMem,
   Forms,
+  WinHelpViewer,
   ORSystem,
   fPage in 'fPage.pas' {frmPage},
   fHSplit in 'fHSplit.pas' {frmHSplit},
@@ -314,7 +315,12 @@ uses
   fGraphOthers in 'fGraphOthers.pas' {frmGraphOthers},
   VA508AccessibilityRouter in '..\VA\VA508Accessibility\VA508AccessibilityRouter.pas',
   fIVRoutes in 'Orders\fIVRoutes.pas' {frmIVRoutes},
-  fFindingTemplates in 'Templates\fFindingTemplates.pas' {frmFindingTemplates};
+  fFindingTemplates in 'Templates\fFindingTemplates.pas' {frmFindingTemplates},
+  fSpellNotify in 'fSpellNotify.pas' {frmSpellNotify},
+  uCombatVet in 'uCombatVet.pas',
+  fCombatVet in 'fCombatVet.pas' {frmCombatVet},
+  fOCMonograph in 'Orders\fOCMonograph.pas' {frmOCMonograph},
+  fHunSpell in 'fHunSpell.pas' {frmHunSpell};
 
 {$R *.TLB}
 
@@ -326,6 +332,7 @@ begin
     if not BorlandDLLVersionOK then exit;         // Exit immediately if old or missing BORLNDMM.DLL
     RegisterCPRSTypeLibrary;                      // will halt program if /regserver or /unregserver param
     Application.Initialize;
+
     frmSplash := nil;
     if ParamSearch('SPLASH') <> 'OFF' then
     begin

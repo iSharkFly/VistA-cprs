@@ -1,16 +1,18 @@
 inherited frmPtSel: TfrmPtSel
-  Top = 131
-  BorderIcons = []
+  Left = 290
+  Top = 232
+  BorderIcons = [biSystemMenu]
   Caption = 'Patient Selection'
   ClientHeight = 555
   ClientWidth = 785
   OldCreateOrder = True
+  Position = poMainFormCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
   OnShow = FormShow
-  ExplicitTop = 131
+  ExplicitTop = -20
   ExplicitWidth = 793
   ExplicitHeight = 589
   PixelsPerInch = 96
@@ -81,7 +83,7 @@ inherited frmPtSel: TfrmPtSel
       Top = 33
       Width = 272
       Height = 251
-      Hint = 'Enter name,Full SSN ,Last 4 (x1234),'#39'HRN'#39',DOB, or Phone#'
+      Hint = 'Enter name or use "Last 4" (x1234) format'
       Style = orcsSimple
       AutoSelect = True
       Caption = 'Patient'
@@ -99,13 +101,14 @@ inherited frmPtSel: TfrmPtSel
       ShowHint = True
       Sorted = False
       SynonymChars = '<>'
-      TabPositions = '20,25,30,60'
+      TabPositions = '20,25,30'
       TabOrder = 1
       OnChange = cboPatientChange
       OnDblClick = cboPatientDblClick
       OnEnter = cboPatientEnter
       OnExit = cboPatientExit
       OnKeyDown = cboPatientKeyDown
+      OnKeyUp = cboPatientKeyUp
       OnKeyPause = cboPatientKeyPause
       OnMouseClick = cboPatientMouseClick
       OnNeedData = cboPatientNeedData
@@ -113,7 +116,7 @@ inherited frmPtSel: TfrmPtSel
       UniqueAutoComplete = True
     end
     object cmdOK: TButton
-      Left = 698
+      Left = 682
       Top = 3
       Width = 78
       Height = 21
@@ -122,7 +125,7 @@ inherited frmPtSel: TfrmPtSel
       OnClick = cmdOKClick
     end
     object cmdCancel: TButton
-      Left = 698
+      Left = 682
       Top = 24
       Width = 78
       Height = 21
@@ -133,26 +136,12 @@ inherited frmPtSel: TfrmPtSel
     end
     object cmdSaveList: TButton
       Left = 494
-      Top = 265
+      Top = 252
       Width = 175
       Height = 21
       Caption = 'Save Patient List Settings'
       TabOrder = 0
       OnClick = cmdSaveListClick
-    end
-    object RadioGroup1: TRadioGroup
-      Left = 512
-      Top = 192
-      Width = 265
-      Height = 65
-      Caption = 'Specific "In-Depth" Lookup by '
-      ItemIndex = 0
-      Items.Strings = (
-        '&None of the below'
-        '&PHONE NUMBER [RESIDENCE]'
-        '&DATE OF BIRTH')
-      TabOrder = 4
-      OnClick = onclick1
     end
   end
   object pnlNotifications: TORAutoPanel [3]
@@ -164,23 +153,83 @@ inherited frmPtSel: TfrmPtSel
     BevelOuter = bvNone
     TabOrder = 2
     Visible = False
-    object cmdProcessInfo: TButton
-      Left = 11
-      Top = 10
-      Width = 95
-      Height = 21
-      Caption = 'Process Info'
-      TabOrder = 0
-      OnClick = cmdProcessInfoClick
+    object txtCmdComments: TVA508StaticText
+      Name = 'txtCmdComments'
+      Left = 441
+      Top = 0
+      Width = 159
+      Height = 15
+      Alignment = taLeftJustify
+      Caption = 'Show Comments Button Disabled'
+      TabOrder = 7
+      Visible = False
+      ShowAccelChar = True
     end
-    object cmdProcessAll: TButton
-      Left = 120
+    object txtCmdRemove: TVA508StaticText
+      Name = 'txtCmdRemove'
+      Left = 577
+      Top = 0
+      Width = 120
+      Height = 15
+      Alignment = taLeftJustify
+      Caption = 'Remove Button Disabled'
+      TabOrder = 9
+      Visible = False
+      ShowAccelChar = True
+    end
+    object txtCmdForward: TVA508StaticText
+      Name = 'txtCmdForward'
+      Left = 344
+      Top = 0
+      Width = 118
+      Height = 15
+      Alignment = taLeftJustify
+      Caption = 'Forward Button Disabled'
+      TabOrder = 5
+      Visible = False
+      ShowAccelChar = True
+    end
+    object txtCmdProcess: TVA508StaticText
+      Name = 'txtCmdProcess'
+      Left = 232
+      Top = 0
+      Width = 118
+      Height = 15
+      Alignment = taLeftJustify
+      Caption = 'Process Button Disabled'
+      TabOrder = 3
+      Visible = False
+      ShowAccelChar = True
+    end
+    object cmdRemove: TButton
+      Left = 577
       Top = 10
       Width = 95
       Height = 21
-      Caption = 'Process All'
-      TabOrder = 1
-      OnClick = cmdProcessAllClick
+      Caption = 'Remove'
+      Enabled = False
+      TabOrder = 8
+      OnClick = cmdRemoveClick
+    end
+    object cmdComments: TButton
+      Left = 441
+      Top = 10
+      Width = 95
+      Height = 21
+      Caption = 'Show Comments'
+      Enabled = False
+      TabOrder = 6
+      OnClick = cmdCommentsClick
+    end
+    object cmdForward: TButton
+      Left = 335
+      Top = 10
+      Width = 95
+      Height = 21
+      Caption = 'Forward'
+      Enabled = False
+      TabOrder = 4
+      OnClick = cmdForwardClick
     end
     object cmdProcess: TButton
       Left = 229
@@ -192,35 +241,23 @@ inherited frmPtSel: TfrmPtSel
       TabOrder = 2
       OnClick = cmdProcessClick
     end
-    object cmdForward: TButton
-      Left = 335
+    object cmdProcessAll: TButton
+      Left = 120
       Top = 10
       Width = 95
       Height = 21
-      Caption = 'Forward'
-      Enabled = False
-      TabOrder = 3
-      OnClick = cmdForwardClick
+      Caption = 'Process All'
+      TabOrder = 1
+      OnClick = cmdProcessAllClick
     end
-    object cmdRemove: TButton
-      Left = 577
+    object cmdProcessInfo: TButton
+      Left = 11
       Top = 10
       Width = 95
       Height = 21
-      Caption = 'Remove'
-      Enabled = False
-      TabOrder = 5
-      OnClick = cmdRemoveClick
-    end
-    object cmdComments: TButton
-      Left = 441
-      Top = 10
-      Width = 95
-      Height = 21
-      Caption = 'Show Comments'
-      Enabled = False
-      TabOrder = 4
-      OnClick = cmdCommentsClick
+      Caption = 'Process Info'
+      TabOrder = 0
+      OnClick = cmdProcessInfoClick
     end
   end
   object lstvAlerts: TCaptionListView [4]
@@ -281,6 +318,7 @@ inherited frmPtSel: TfrmPtSel
     OnDblClick = lstvAlertsDblClick
     OnInfoTip = lstvAlertsInfoTip
     OnKeyDown = lstvAlertsKeyDown
+    OnMouseUp = lstvAlertsMouseUp
     OnSelectItem = lstvAlertsSelectItem
     Caption = 'Notifications'
   end
@@ -330,6 +368,18 @@ inherited frmPtSel: TfrmPtSel
         'Status = stsDefault')
       (
         'Component = cmdComments'
+        'Status = stsDefault')
+      (
+        'Component = txtCmdComments'
+        'Status = stsDefault')
+      (
+        'Component = txtCmdRemove'
+        'Status = stsDefault')
+      (
+        'Component = txtCmdForward'
+        'Status = stsDefault')
+      (
+        'Component = txtCmdProcess'
         'Status = stsDefault'))
   end
   object popNotifications: TPopupMenu

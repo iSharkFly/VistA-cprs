@@ -72,7 +72,7 @@ var
 implementation
 
 uses fBALocalDiagnoses, fOrdersSign, fReview, rOrders, uCore, rCore, rPCE,uPCE,
-     UBAConst, UBAMessages, USignItems;
+     UBAConst, UBAMessages, USignItems, VAUtils;
 
 
 // -----------------  MAIN CIDC DX HAS BEEN ENTERED LOGIC  ---------------------------
