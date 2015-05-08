@@ -1,4 +1,3 @@
 Notes:
 This version (stored under trunk) is the official WV CPRS version.
-As of 7/4/2008, this is version 1.0.26.76 (according to version
-information in CPRSChart.exe)  //kt
+As of 08 May 2015, this is version 1.0.28.24 
