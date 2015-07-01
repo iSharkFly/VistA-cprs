@@ -8,99 +8,99 @@
   resources were bound to the produced executable.
 */
 
-#define Consts_SDuplicateMenus 65312
-#define Consts_SDockedCtlNeedsName 65313
-#define Consts_SDockTreeRemoveError 65314
-#define Consts_SDockZoneNotFound 65315
-#define Consts_SDockZoneHasNoCtl 65316
-#define Consts_SDockZoneVersionConflict 65317
-#define Consts_SANSIEncoding 65318
-#define Consts_SASCIIEncoding 65319
-#define Consts_SUnicodeEncoding 65320
-#define Consts_SBigEndianEncoding 65321
-#define Consts_SUTF8Encoding 65322
-#define Consts_SUTF7Encoding 65323
+#define Consts_SDockZoneVersionConflict 65312
+#define Consts_SANSIEncoding 65313
+#define Consts_SASCIIEncoding 65314
+#define Consts_SUnicodeEncoding 65315
+#define Consts_SBigEndianEncoding 65316
+#define Consts_SUTF8Encoding 65317
+#define Consts_SUTF7Encoding 65318
+#define ComConst_SOleError 65319
+#define ComConst_SNoMethod 65320
+#define ComConst_SVarNotObject 65321
+#define ComConst_STooManyParams 65322
+#define ComConst_SDCOMNotInstalled 65323
 #define OleConst_sNoRunningObject 65324
-#define Consts_SmkcEnter 65328
-#define Consts_SmkcSpace 65329
-#define Consts_SmkcPgUp 65330
-#define Consts_SmkcPgDn 65331
-#define Consts_SmkcEnd 65332
-#define Consts_SmkcHome 65333
-#define Consts_SmkcLeft 65334
-#define Consts_SmkcUp 65335
-#define Consts_SmkcRight 65336
-#define Consts_SmkcDown 65337
-#define Consts_SmkcIns 65338
-#define Consts_SmkcDel 65339
-#define Consts_SmkcShift 65340
-#define Consts_SmkcCtrl 65341
-#define Consts_SmkcAlt 65342
-#define Consts_SIconToClipboard 65343
-#define Consts_SMsgDlgInformation 65344
-#define Consts_SMsgDlgConfirm 65345
-#define Consts_SMsgDlgYes 65346
-#define Consts_SMsgDlgNo 65347
-#define Consts_SMsgDlgOK 65348
-#define Consts_SMsgDlgCancel 65349
-#define Consts_SMsgDlgHelp 65350
-#define Consts_SMsgDlgAbort 65351
-#define Consts_SMsgDlgRetry 65352
-#define Consts_SMsgDlgIgnore 65353
-#define Consts_SMsgDlgAll 65354
-#define Consts_SMsgDlgNoToAll 65355
-#define Consts_SMsgDlgYesToAll 65356
-#define Consts_SmkcBkSp 65357
-#define Consts_SmkcTab 65358
-#define Consts_SmkcEsc 65359
-#define Consts_SGroupIndexTooLow 65360
-#define Consts_SNoMDIForm 65361
-#define Consts_SControlParentSetToSelf 65362
-#define Consts_SOKButton 65363
-#define Consts_SCancelButton 65364
-#define Consts_SYesButton 65365
-#define Consts_SNoButton 65366
-#define Consts_SHelpButton 65367
-#define Consts_SCloseButton 65368
-#define Consts_SIgnoreButton 65369
-#define Consts_SRetryButton 65370
-#define Consts_SAbortButton 65371
-#define Consts_SAllButton 65372
-#define Consts_SCannotDragForm 65373
-#define Consts_SMsgDlgWarning 65374
-#define Consts_SMsgDlgError 65375
-#define Consts_SInvalidImageSize 65376
-#define Consts_SInvalidImageList 65377
-#define Consts_SImageIndexError 65378
-#define Consts_SImageReadFail 65379
-#define Consts_SImageWriteFail 65380
-#define Consts_SWindowDCError 65381
-#define Consts_SWindowClass 65382
-#define Consts_SCannotFocus 65383
-#define Consts_SParentRequired 65384
-#define Consts_SMDIChildNotVisible 65385
-#define Consts_SVisibleChanged 65386
-#define Consts_SCannotShowModal 65387
-#define Consts_SMenuIndexError 65388
-#define Consts_SMenuReinserted 65389
-#define Consts_SMenuNotFound 65390
-#define Consts_SNoTimers 65391
-#define ComConst_SOleError 65392
-#define ComConst_SNoMethod 65393
-#define ComConst_SVarNotObject 65394
-#define ComConst_STooManyParams 65395
-#define ComConst_SDCOMNotInstalled 65396
-#define HelpIntfs_hNoTableOfContents 65397
-#define HelpIntfs_hNothingFound 65398
-#define HelpIntfs_hNoContext 65399
-#define HelpIntfs_hNoContextFound 65400
-#define HelpIntfs_hNoTopics 65401
-#define Consts_SInvalidBitmap 65402
-#define Consts_SInvalidIcon 65403
-#define Consts_SChangeIconSize 65404
-#define Consts_SUnknownClipboardFormat 65405
-#define Consts_SOutOfResources 65406
-#define Consts_SNoCanvasHandle 65407
+#define Consts_SmkcHome 65328
+#define Consts_SmkcLeft 65329
+#define Consts_SmkcUp 65330
+#define Consts_SmkcRight 65331
+#define Consts_SmkcDown 65332
+#define Consts_SmkcIns 65333
+#define Consts_SmkcDel 65334
+#define Consts_SmkcShift 65335
+#define Consts_SmkcCtrl 65336
+#define Consts_SmkcAlt 65337
+#define Consts_SIconToClipboard 65338
+#define Consts_SDuplicateMenus 65339
+#define Consts_SDockedCtlNeedsName 65340
+#define Consts_SDockTreeRemoveError 65341
+#define Consts_SDockZoneNotFound 65342
+#define Consts_SDockZoneHasNoCtl 65343
+#define Consts_SMsgDlgCancel 65344
+#define Consts_SMsgDlgHelp 65345
+#define Consts_SMsgDlgAbort 65346
+#define Consts_SMsgDlgRetry 65347
+#define Consts_SMsgDlgIgnore 65348
+#define Consts_SMsgDlgAll 65349
+#define Consts_SMsgDlgNoToAll 65350
+#define Consts_SMsgDlgYesToAll 65351
+#define Consts_SmkcBkSp 65352
+#define Consts_SmkcTab 65353
+#define Consts_SmkcEsc 65354
+#define Consts_SmkcEnter 65355
+#define Consts_SmkcSpace 65356
+#define Consts_SmkcPgUp 65357
+#define Consts_SmkcPgDn 65358
+#define Consts_SmkcEnd 65359
+#define Consts_SYesButton 65360
+#define Consts_SNoButton 65361
+#define Consts_SHelpButton 65362
+#define Consts_SCloseButton 65363
+#define Consts_SIgnoreButton 65364
+#define Consts_SRetryButton 65365
+#define Consts_SAbortButton 65366
+#define Consts_SAllButton 65367
+#define Consts_SCannotDragForm 65368
+#define Consts_SMsgDlgWarning 65369
+#define Consts_SMsgDlgError 65370
+#define Consts_SMsgDlgInformation 65371
+#define Consts_SMsgDlgConfirm 65372
+#define Consts_SMsgDlgYes 65373
+#define Consts_SMsgDlgNo 65374
+#define Consts_SMsgDlgOK 65375
+#define Consts_SWindowDCError 65376
+#define Consts_SWindowClass 65377
+#define Consts_SCannotFocus 65378
+#define Consts_SParentRequired 65379
+#define Consts_SMDIChildNotVisible 65380
+#define Consts_SVisibleChanged 65381
+#define Consts_SCannotShowModal 65382
+#define Consts_SMenuIndexError 65383
+#define Consts_SMenuReinserted 65384
+#define Consts_SMenuNotFound 65385
+#define Consts_SNoTimers 65386
+#define Consts_SGroupIndexTooLow 65387
+#define Consts_SNoMDIForm 65388
+#define Consts_SControlParentSetToSelf 65389
+#define Consts_SOKButton 65390
+#define Consts_SCancelButton 65391
+#define HelpIntfs_hNoTableOfContents 65392
+#define HelpIntfs_hNothingFound 65393
+#define HelpIntfs_hNoContext 65394
+#define HelpIntfs_hNoContextFound 65395
+#define HelpIntfs_hNoTopics 65396
+#define Consts_SInvalidBitmap 65397
+#define Consts_SInvalidIcon 65398
+#define Consts_SChangeIconSize 65399
+#define Consts_SUnknownClipboardFormat 65400
+#define Consts_SOutOfResources 65401
+#define Consts_SNoCanvasHandle 65402
+#define Consts_SInvalidImageSize 65403
+#define Consts_SInvalidImageList 65404
+#define Consts_SImageIndexError 65405
+#define Consts_SImageReadFail 65406
+#define Consts_SImageWriteFail 65407
 #define RTLConsts_SInvalidPropertyValue 65408
 #define RTLConsts_SInvalidRegType 65409
 #define RTLConsts_SListCapacityError 65410
@@ -231,11 +231,6 @@
 #define SysConst_SRangeError 65535
 STRINGTABLE
 BEGIN
-	Consts_SDuplicateMenus,	"Menu '%s' is already being used by another form"
-	Consts_SDockedCtlNeedsName,	"Docked control must have a name"
-	Consts_SDockTreeRemoveError,	"Error removing control from dock tree"
-	Consts_SDockZoneNotFound,	" - Dock zone not found"
-	Consts_SDockZoneHasNoCtl,	" - Dock zone has no control"
 	Consts_SDockZoneVersionConflict,	"Error loading dock zone from the stream. Expecting version %d, but found %d."
 	Consts_SANSIEncoding,	"ANSI"
 	Consts_SASCIIEncoding,	"ASCII"
@@ -243,12 +238,12 @@ BEGIN
 	Consts_SBigEndianEncoding,	"Big Endian Unicode"
 	Consts_SUTF8Encoding,	"UTF-8"
 	Consts_SUTF7Encoding,	"UTF-7"
+	ComConst_SOleError,	"OLE error %.8x"
+	ComConst_SNoMethod,	"Method '%s' not supported by automation object"
+	ComConst_SVarNotObject,	"Variant does not reference an automation object"
+	ComConst_STooManyParams,	"Dispatch methods do not support more than 64 parameters"
+	ComConst_SDCOMNotInstalled,	"DCOM not installed"
 	OleConst_sNoRunningObject,	"Unable to retrieve a pointer to a running object registered with OLE for %s/%s"
-	Consts_SmkcEnter,	"Enter"
-	Consts_SmkcSpace,	"Space"
-	Consts_SmkcPgUp,	"PgUp"
-	Consts_SmkcPgDn,	"PgDn"
-	Consts_SmkcEnd,	"End"
 	Consts_SmkcHome,	"Home"
 	Consts_SmkcLeft,	"Left"
 	Consts_SmkcUp,	"Up"
@@ -260,11 +255,11 @@ BEGIN
 	Consts_SmkcCtrl,	"Ctrl+"
 	Consts_SmkcAlt,	"Alt+"
 	Consts_SIconToClipboard,	"Clipboard does not support Icons"
-	Consts_SMsgDlgInformation,	"Information"
-	Consts_SMsgDlgConfirm,	"Confirm"
-	Consts_SMsgDlgYes,	"&Yes"
-	Consts_SMsgDlgNo,	"&No"
-	Consts_SMsgDlgOK,	"OK"
+	Consts_SDuplicateMenus,	"Menu '%s' is already being used by another form"
+	Consts_SDockedCtlNeedsName,	"Docked control must have a name"
+	Consts_SDockTreeRemoveError,	"Error removing control from dock tree"
+	Consts_SDockZoneNotFound,	" - Dock zone not found"
+	Consts_SDockZoneHasNoCtl,	" - Dock zone has no control"
 	Consts_SMsgDlgCancel,	"Cancel"
 	Consts_SMsgDlgHelp,	"&Help"
 	Consts_SMsgDlgAbort,	"&Abort"
@@ -276,11 +271,11 @@ BEGIN
 	Consts_SmkcBkSp,	"BkSp"
 	Consts_SmkcTab,	"Tab"
 	Consts_SmkcEsc,	"Esc"
-	Consts_SGroupIndexTooLow,	"GroupIndex cannot be less than a previous menu item's GroupIndex"
-	Consts_SNoMDIForm,	"Cannot create form. No MDI forms are currently active"
-	Consts_SControlParentSetToSelf,	"A control cannot have itself as its parent"
-	Consts_SOKButton,	"OK"
-	Consts_SCancelButton,	"Cancel"
+	Consts_SmkcEnter,	"Enter"
+	Consts_SmkcSpace,	"Space"
+	Consts_SmkcPgUp,	"PgUp"
+	Consts_SmkcPgDn,	"PgDn"
+	Consts_SmkcEnd,	"End"
 	Consts_SYesButton,	"&Yes"
 	Consts_SNoButton,	"&No"
 	Consts_SHelpButton,	"&Help"
@@ -292,11 +287,11 @@ BEGIN
 	Consts_SCannotDragForm,	"Cannot drag a form"
 	Consts_SMsgDlgWarning,	"Warning"
 	Consts_SMsgDlgError,	"Error"
-	Consts_SInvalidImageSize,	"Invalid image size"
-	Consts_SInvalidImageList,	"Invalid ImageList"
-	Consts_SImageIndexError,	"Invalid ImageList Index"
-	Consts_SImageReadFail,	"Failed to read ImageList data from stream"
-	Consts_SImageWriteFail,	"Failed to write ImageList data to stream"
+	Consts_SMsgDlgInformation,	"Information"
+	Consts_SMsgDlgConfirm,	"Confirm"
+	Consts_SMsgDlgYes,	"&Yes"
+	Consts_SMsgDlgNo,	"&No"
+	Consts_SMsgDlgOK,	"OK"
 	Consts_SWindowDCError,	"Error creating window device context"
 	Consts_SWindowClass,	"Error creating window class"
 	Consts_SCannotFocus,	"Cannot focus a disabled or invisible window"
@@ -308,11 +303,11 @@ BEGIN
 	Consts_SMenuReinserted,	"Menu inserted twice"
 	Consts_SMenuNotFound,	"Sub-menu is not in menu"
 	Consts_SNoTimers,	"Not enough timers available"
-	ComConst_SOleError,	"OLE error %.8x"
-	ComConst_SNoMethod,	"Method '%s' not supported by automation object"
-	ComConst_SVarNotObject,	"Variant does not reference an automation object"
-	ComConst_STooManyParams,	"Dispatch methods do not support more than 64 parameters"
-	ComConst_SDCOMNotInstalled,	"DCOM not installed"
+	Consts_SGroupIndexTooLow,	"GroupIndex cannot be less than a previous menu item's GroupIndex"
+	Consts_SNoMDIForm,	"Cannot create form. No MDI forms are currently active"
+	Consts_SControlParentSetToSelf,	"A control cannot have itself as its parent"
+	Consts_SOKButton,	"OK"
+	Consts_SCancelButton,	"Cancel"
 	HelpIntfs_hNoTableOfContents,	"Unable to find a Table of Contents"
 	HelpIntfs_hNothingFound,	"No help found for %s"
 	HelpIntfs_hNoContext,	"No context-sensitive help installed"
@@ -324,6 +319,11 @@ BEGIN
 	Consts_SUnknownClipboardFormat,	"Unsupported clipboard format"
 	Consts_SOutOfResources,	"Out of system resources"
 	Consts_SNoCanvasHandle,	"Canvas does not allow drawing"
+	Consts_SInvalidImageSize,	"Invalid image size"
+	Consts_SInvalidImageList,	"Invalid ImageList"
+	Consts_SImageIndexError,	"Invalid ImageList Index"
+	Consts_SImageReadFail,	"Failed to read ImageList data from stream"
+	Consts_SImageWriteFail,	"Failed to write ImageList data to stream"
 	RTLConsts_SInvalidPropertyValue,	"Invalid property value"
 	RTLConsts_SInvalidRegType,	"Invalid data type for '%s'"
 	RTLConsts_SListCapacityError,	"List capacity out of bounds (%d)"
@@ -457,7 +457,7 @@ END
 /* c:\program files\codegear\rad studio\5.0\lib\Controls.res */
 /* c:\program files\codegear\rad studio\5.0\lib\Buttons.res */
 /* c:\program files\codegear\rad studio\5.0\lib\ExtDlgs.res */
-/* fVA508HiddenJawsDataWindow.dfm */
-/* fVA508HiddenJawsMainWindow.dfm */
-/* E:\Vista_30_28\OR_SRC_CREATION\VA\VA508Accessibility\JAWS\JAWS.res */
-/* E:\Vista_30_28\OR_SRC_CREATION\VA\VA508Accessibility\JAWS\JAWS.drf */
+/* E:\WVEHR\trunk\VA\VA508Accessibility\JAWS\fVA508HiddenJawsDataWindow.dfm */
+/* E:\WVEHR\trunk\VA\VA508Accessibility\JAWS\fVA508HiddenJawsMainWindow.dfm */
+/* E:\WVEHR\trunk\VA\VA508Accessibility\JAWS\JAWS.res */
+/* E:\WVEHR\trunk\VA\VA508Accessibility\JAWS\JAWS.drf */

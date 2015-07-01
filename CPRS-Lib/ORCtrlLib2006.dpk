@@ -25,17 +25,16 @@ package ORCtrlLib2006;
 {$IMAGEBASE $400000}
 {$DESCRIPTION 'CPRS Custom Controls'}
 {$DESIGNONLY}
-{$IMPLICITBUILD ON}
+{$IMPLICITBUILD OFF}
 
 requires
   vcl,
   vclx,
   designide,
-  VAShared2006,
   rtl;
 
 contains
-  ORCtrls in 'ORCtrls.pas',
-  ORCtrlsDsgn in 'ORCtrlsDsgn.pas';
+  ORCtrlsDsgn in 'ORCtrlsDsgn.pas',
+  ORCtrls in 'ORCtrls.pas';
 
 end.

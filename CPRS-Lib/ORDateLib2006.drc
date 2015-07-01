@@ -13,10 +13,11 @@ BEGIN
 END
 
 /* OR2006Compatibility.dfm */
+/* c:\program files\codegear\rad studio\5.0\lib\TeeResou.res */
 /* ORDtTm.DFM */
 /* ORDtTm.RES */
 /* ORDtTmRng.DFM */
-/* E:\Vista_30_28\OR_SRC_CREATION\CPRS-Lib\ORDateLib2006.res */
-/* E:\Vista_30_28\OR_SRC_CREATION\CPRS-Lib\ORDtTm.dcr */
-/* E:\Vista_30_28\OR_SRC_CREATION\CPRS-Lib\ORDtTmRng.dcr */
-/* E:\Vista_30_28\OR_SRC_CREATION\CPRS-Lib\ORDateLib2006.drf */
+/* E:\WVEHR\trunk\CPRS-Lib\ORDateLib2006.res */
+/* E:\WVEHR\trunk\CPRS-Lib\ORDtTm.dcr */
+/* E:\WVEHR\trunk\CPRS-Lib\ORDtTmRng.dcr */
+/* E:\WVEHR\trunk\CPRS-Lib\ORDateLib2006.drf */

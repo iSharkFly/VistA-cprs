@@ -22,7 +22,25 @@ E:\Vista_30_28\OR_SRC_CREATION\CPRS-Lib\OR2006Compatibility.dfm
 408/1014934340
 10
 2
+E:\WVEHR\trunk\CPRS-Lib\ORDtTm.dfm
+5780/1014976261
+12
+2
+E:\WVEHR\trunk\CPRS-Lib\ORDtTmRng.dfm
+1172/1014976261
+14
+2
+E:\WVEHR\trunk\CPRS-Lib\OR2006Compatibility.dfm
+408/1014976260
+16
+2
 |EOINDEX|
+242
+object ORfrmDtTm: TORfrmDtTm
+60
+object ORfrmDateRange: TORfrmDateRange
+18
+object frm2006Compatibility: Tfrm2006Compatibility
 242
 object ORfrmDtTm: TORfrmDtTm
 60

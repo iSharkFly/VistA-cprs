@@ -35,7 +35,8 @@ requires
   vcldb,
   VclSmp,
   rtl,
-  VAShared2006;
+  VAShared2006,
+  ORCtrlLib2006;
 
 contains
   VA508AccessibilityCompiler in 'VA508AccessibilityCompiler.pas',
